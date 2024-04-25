@@ -1,0 +1,45 @@
+﻿@model webMetics.Models.ExportarParticipantesModel
+
+<h2>Lista de participantes</h2>
+<h4> Grupo: @Model.nombreGrupo</h4>
+<h4> Asesor: @Model.nombreAsesorAsociado</h4>
+
+<table border='1' cellpadding='5' cellspacing='0' style='border: 1px solid #ccc;font-family: Arial; font-size: 10pt;'>
+    <tr>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Identificación</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Nombre completo</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Condición</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Unidad académica</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Correo</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Teléfono</th>
+    </tr>
+
+    @foreach (var participante in Model.listaParticipantes)
+    {
+        <tr>
+            <td style='border: 1px solid #ccc'>
+                @participante.idParticipante
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @participante.nombre @participante.apellido_1 @participante.apellido_2
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @participante.condicion)
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @participante.unidadAcademica
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @participante.correo
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @participante.telefonos
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,35 @@
+﻿@model webMetics.Models.ParticipanteModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Obtener participante";
+
+    int rolCookie = 1; // To do
+}
+
+<!DOCTYPE html>
+<html>
+<body>
+    @if (User.Identity.IsAuthenticated && rolCookie == 1) // To do
+    {
+        using (Html.BeginForm("ObtenerParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <h1 class="mt-5">@ViewBag.Title</h1>
+            <h5>Inserte los siguientes datos:</h5>
+            <hr />
+            <div form-group>
+                <label>Identificación del participante a buscar:</label>
+                <input required class="form-control" type="number" id="participanteABuscar" name="participanteABuscar" placeholder="Identificación" />
+                <small class="form-text text-muted">Ingresar el número de identificación único del participante.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Aceptar</button>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+    </body>
+</html>
+

@@ -1,0 +1,104 @@
+﻿@model webMetics.Models.TemaModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Agregar tema";
+    int rolCookie = 1;// To Do
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+</head>
+<body>
+    @if (User.Identity.IsAuthenticated && rolCookie == 1)// To Do
+    {
+        using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1 class="mt-5">Crear tema</h1>
+                <h5>Inserte los siguientes datos:</h5>
+                <h6 style="color:red"> * Son campos obligatorios</h6>
+                <hr />
+
+                @if (ViewBag.Message != null)
+                {
+                    if (ViewBag.ExitoAlCrear != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                }
+
+                <div class="row">
+                    <div class="col">
+                        <div class="container">
+                            <div class="form-group">
+                                @Html.LabelFor(temaModel => temaModel.categoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownList("categoria", ViewData["Categorias"] as List<SelectListItem>, "---", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(temaModel => temaModel.categoria, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(temaModel => temaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64" })
+                                @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(temaModel => temaModel.tipoActividad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownList("tipoActividad", ViewData["TipoActividad"] as List<SelectListItem>, "---", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(temaModel => temaModel.tipoActividad, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(temaModel => temaModel.asesorPrincipal, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownList("asesorPrincipal", ViewData["Asesores"] as List<SelectListItem>, "---", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(temaModel => temaModel.asesorPrincipal, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(temaModel => temaModel.asesoresApoyo, new { Style = "font-size:22px" })
+                                @Html.DropDownListFor(temaModel => temaModel.asesoresApoyo, new MultiSelectList(ViewBag.Asesores, "Value", "Text"), new { @class = "form-select", id = "multiSelectAsesores", multiple = "multiple" })
+                                @Html.ValidationMessageFor(temaModel => temaModel.asesoresApoyo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center" style="margin-top:20px">
+                            <a class="btn boton-formulario" style="margin-right: 20px; width: 20%; height: 105%; background-color: grey; color: white; text-decoration: none; " onclick="history.go(-1); return false;" href="#">Cancelar</a><br />
+                            <input type="submit" class="btn btn-primary" value="Guardar" style="float: right; margin-right: 20px;width:20%;height:105%" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>
+
+@section scripts{
+
+    <script>
+        $(function () {
+            $('#multiSelectAsesores').chosen({ placeholder_text_multiple: "  ---" });
+            document.getElementById("multiSelectAsesores_chosen").style["width"] = "100%";
+        });
+
+    </script>
+}
+
+
+

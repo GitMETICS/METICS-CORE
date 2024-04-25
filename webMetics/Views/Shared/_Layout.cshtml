@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<!--
+    Aqui se encuentra el Header y Footer del sitio web que se comparte para cada vista del sitio
+//-->
+@using webMetics.Controllers
+@{
+    int rolCookie = 0;
+    string idCookie = "";
+
+    // if (HttpContext.Current.User.Identity.IsAuthenticated)
+    // {
+    //     if (Request.Cookies.Get("rolUsuario") != null)
+    //     {
+    //         rolCookie = Convert.ToInt32(Request.Cookies["rolUsuario"].Value);
+    //     }
+
+    //     if (Request.Cookies.Get("idUsuario") != null)
+    //     {
+    //         idCookie = Convert.ToString(Request.Cookies["idUsuario"].Value);
+    //     }
+    // }
+}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap-chosen.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="logos_wrapper" style="background-color: #44beef ">
+        <a href="https://www.ucr.ac.cr/"> <img src="~/Imagenes/logoUCR.png" style="width: 10%; margin-right: 1%;" alt="Logo Universidad de Costa Rica" /> </a>
+        <a href="https://metics.ucr.ac.cr/es/"> <img src="~/Imagenes/logoMETICS.png" style="width: 15%; margin-right: 1%;" alt="Logo METICS" /> </a>
+        <a href="https://metics.ucr.ac.cr/es/"> <img src="~/Imagenes/logosVC.png" style="width: 8%; margin-right: 1%;" alt="Logo Vicerrectoria de Docencia" /> </a>
+    </div>
+
+    <style>
+        .navbar-custom {
+            background: #f4f4f4;
+        }
+
+        .navbar-dark .navbar-text {
+            color: black;
+        }
+
+        .dropdown-item:hover {
+            color: black !important;
+            background-color: lightgray !important;
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <!-- Avatar -->
+                    @{
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
+                                   role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="~/Imagenes/avatar.png" class="rounded-circle"
+                                         height="22" alt="Avatar" loading="lazy" />
+                                </a>
+
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <li>
+                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    }
+
+                    @if (rolCookie == 1)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones admin</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/TipoActividad/ListaTiposActividad">Tipos de actividad</a>
+                                <a class="dropdown-item" href="/Categoria/ListaCategorias">Categorías</a>
+                                <a class="dropdown-item" href="/Asesor/ListaAsesores">Asesores</a>
+                                <a class="dropdown-item" href="/Participante/VerParticipantes">Participantes</a>
+                                <a class="dropdown-item" href="/Tema/CrearTema">Crear tema</a>
+                                <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
+                            </div>
+                        </li>
+                    }
+                    @if (rolCookie == 2)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones asesor</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/Grupo/ListaGruposDisponibles">Mis grupos</a>
+                                <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
+                            </div>
+                        </li>
+                    }
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/Home/Index">
+                            Inicio
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content" style="min-height: 80vh">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-lg-start text-white" id="footer" style="background-color: #3e4551; bottom: 0px; width: 100%; height: 100%;">
+        <div class="container p-4 pb-5">
+            <section class="">
+                <div class="row h-100">
+                    <div class="col-md-4">
+                        <!-- Información de los contactos  -->
+                        @{Html.RenderPartial("~/Views/Shared/Info.cshtml"); }
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="text-uppercase" style="color: #CED4DA">Ubicación</h5>
+
+                        <p>
+                            De la Rotonda de la Hispanidad 100 metros al este, 100 metros al norte y 100 metros al este. Antiguos apartamentos Pachecho Dominguez, San Pedro de Montes de Oca.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="text-uppercase" style="color: #CED4DA">Enlaces de interés</h5>
+
+                        <ul class="list-unstyled mb-0">
+                            <li>
+                                <a href="https://metics.ucr.ac.cr/es/mediacion-virtual" class="text-white">Mediacion Virtual</a>
+                            </li>
+                            <li>
+                                <a href="https://sibdi.ucr.ac.cr" class="text-white">SIBDI</a>
+                            </li>
+                            <li>
+                                <a href="https://ematricula.ucr.ac.cr/ematricula/" class="text-white">eMatricula</a>
+                            </li>
+                            <li>
+                                <a href="https://ori.ucr.ac.cr" class="text-white">Oficina de Registro</a>
+                            </li>
+                            <li>
+                                <a href="https://ci.ucr.ac.cr" class="text-white">Centro de Informática</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <hr class="mb-4" />
+        </div>
+        <div class="text-center p-1"
+             style="background-color: rgba(0, 0, 0, 0.2)">
+            <p>&copy; @DateTime.Now.Year METICS</p>
+        </div>
+    </footer>
+    <script src="~/js/bundles.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

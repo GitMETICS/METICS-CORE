@@ -1,0 +1,30 @@
+﻿@model webMetics.Models.ExportarCalificacionesModel
+
+<h2>Calificaciones</h2>
+<h4> Grupo: @Model.nombreGrupo</h4>
+<h4> Asesor: @Model.nombreAsesorAsociado</h4>
+
+<table border='1' cellpadding='5' cellspacing='0' style='border: 1px solid #ccc;font-family: Arial; font-size: 10pt;'>
+    <tr>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Identificación</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Nombre completo</th>
+        <th style='background-color: #B8DBFD;border: 1px solid #ccc'>Calificación</th>
+    </tr>
+
+    @foreach (var calificacion in Model.listaCalificaciones)
+    {
+        <tr>
+            <td style='border: 1px solid #ccc'>
+                @calificacion.participante.idParticipante
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @calificacion.participante.nombre @calificacion.participante.apellido_1 @calificacion.participante.apellido_2
+            </td>
+
+            <td style='border: 1px solid #ccc'>
+                @calificacion.calificacion
+            </td>
+        </tr>
+    }
+</table>

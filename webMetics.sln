@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webMetics", "webMetics\webMetics.csproj", "{5245B856-6EB2-4919-93E8-2B75B9FB30F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{29106A56-C19C-48F3-9438-E98800493A57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5245B856-6EB2-4919-93E8-2B75B9FB30F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5245B856-6EB2-4919-93E8-2B75B9FB30F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5245B856-6EB2-4919-93E8-2B75B9FB30F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5245B856-6EB2-4919-93E8-2B75B9FB30F6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2793A800-4144-48C0-9FBC-FEC0757C2395}
+	EndGlobalSection
+EndGlobal

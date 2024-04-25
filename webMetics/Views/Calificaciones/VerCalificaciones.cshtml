@@ -1,0 +1,156 @@
+﻿@using webMetics.Controllers;
+@{
+    int rolCookie = 1;
+}
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+    @if (true) // ToDo
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (true) // To Do
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
+            <h1>@ViewBag.NombreGrupo</h1>
+            <h2>@ViewBag.Title</h2>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong> @TempData["Message"] </strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            <hr />
+            <div class="table-responsive">
+                @if (ViewBag.ListaCalificaciones == null)
+                {
+                    <h5 class="text-center">No hay personas inscritas</h5>
+                }
+                else
+                {
+                    if (ViewBag.ErrorMessage != null)
+                    {
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+                    }
+                    if (ViewBag.SuccessMessage != null)
+                    {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+                    }
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            @using (Html.BeginForm("CargarDesdeExcel", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <form>
+                                    <div class="mb-3 d-flex">
+                                        <label for="file"></label>
+                                        <input type="file" class="form-control" name="file" id="file">
+                                        <input class="btn btn-info ms-2" type="submit" value="Subir archivo">
+
+                                        <input type="hidden" name="idGrupo" id="idGrupo" value="ViewBag.IdGrupo">
+                                    </div>
+                                </form>
+
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <div class="mx-1">
+                                @using (Html.BeginForm("ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                        <i class="bi bi-download me-1"></i>
+                                        PDF
+                                    </button>
+                                }
+                            </div>
+                            <div class="mx-1">
+                                @using (Html.BeginForm("ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                        <i class="bi bi-download me-1"></i>
+                                        Excel
+                                    </button>
+                                }
+                            </div>
+                            <div class="mx-1">
+                                @using (Html.BeginForm("ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                        <i class="bi bi-download me-1"></i>
+                                        Word
+                                    </button>
+                                }
+                            </div>
+                            <div class="mx-1">
+                                @using (Html.BeginForm("EnviarCalificaciones", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">  
+                                        <i class="bi bi-send me-1"></i>
+                                        Enviar
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 20%;">Identificación</th>
+                                <th scope="col" style="width: 30%;">Nombre completo</th>
+                                <th class="text-center" scope="col" style="width: 45%;">Calificación</th>
+                                <th scope="col" style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var calificacion in ViewBag.ListaCalificaciones)
+                            {
+                                var nombreCompleto = calificacion.participante.nombre;
+                                nombreCompleto += " " + calificacion.participante.apellido_1;
+                                if (calificacion.participante.apellido_2 != "-")
+                                {
+                                    nombreCompleto += " " + calificacion.participante.apellido_2;
+                                }
+                                <tr>
+                                    <td class="titulo-listas">@calificacion.participante.idParticipante</td>
+                                    <td class="titulo-listas">@nombreCompleto</td>
+                                    <td class="titulo-listas text-center">@calificacion.calificacion</td>
+                                    <td class="titulo-listas">
+                                        @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <div class="d-flex justify-content-center">
+                    <a href="../Participante/ListaParticipantes" class="btn btn-primary">Regresar</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>

@@ -1,0 +1,27 @@
+﻿<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    @if (ViewBag.ListaGrupos != null && ViewBag.ListaGrupos.Count > 0)
+    {
+        <span>Este participante está inscrito en los siguientes grupos:</span>
+        <ul>
+            @foreach (var grupo in ViewBag.ListaGrupos)
+            {
+                <li>@grupo.nombre (Grupo @grupo.idGrupo)</li>
+            }
+        </ul>
+        <span>¿Está seguro de que desea eliminarlo?</span>
+    }
+    else
+    {
+        <span>¿Está seguro de que desea eliminar a este participante?</span>
+    }
+    <br />
+
+    <div class="modal-footer">
+        @Html.ActionLink("Aceptar", "EliminarParticipante", "Participante", new { idParticipante = ViewBag.IdParticipante }, new { @class = "btn btn-primary" })
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    </div>
+</div>

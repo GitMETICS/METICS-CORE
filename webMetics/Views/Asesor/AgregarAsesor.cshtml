@@ -1,0 +1,121 @@
+﻿@model webMetics.Models.AsesorModel
+@using webMetics.Controllers
+
+<!--
+    Vista del formulario para crear a un asesor
+-->
+
+@{
+    ViewBag.Title = "Crear asesor";
+    int rolCookie = 1;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+</head>
+<body>
+    @if (true) // ToDo
+    {
+        using (Html.BeginForm("CrearAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1 class="mt-5">Crear asesor</h1>
+                <h5>Inserte los siguientes datos:</h5>
+                <h5 class="alertaCrearAsesor">@Html.Raw(TempData["msg"])</h5>
+                <hr />
+
+                @if (ViewBag.Message != null)
+                {
+                    if (ViewBag.ExitoAlCrear != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                }
+                <div class="row mt-1" style="margin-bottom:10%">
+                    <div class="col">
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.identificacion, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.identificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.identificacion, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.nombre, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.apellido1, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.apellido1, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.apellido1, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.apellido2, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(asesorModel => asesorModel.apellido2, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.apellido2, "", new { @class = "text-danger", @maxlength = "64" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.temaAsociado, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownList("temaAsociado", ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema asociado...", new { @class = "form-select", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.temaAsociado, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.asistentesAsociados, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.asistentesAsociados, new { @class = "form-control", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.asistentesAsociados, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.telefonos, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.telefonos, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(asesorModel => asesorModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
+
+                        </div>
+                    </div>
+                    <div class="row justify-content-center" style="margin-top:20px">
+                        @Html.ActionLink("Cancelar", "ListaAsesores", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                    </div>
+                </div>
+            </div>
+        }
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+        <script src="~/Scripts/validate.es.js"></script>
+        <script src="//ajax.aspnetcdn.com/ajax/mvc/4.0/jquery.validate.unobtrusive.min.js"></script>
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>
+
+<style>
+    .alertaCrearAsesor {
+        color: red;
+        font-size: 16px;
+    }
+</style>

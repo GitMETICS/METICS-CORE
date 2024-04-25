@@ -1,0 +1,70 @@
+﻿@model webMetics.Models.TipoActividadModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Agregar tipo de actividad";
+    int rolCookie = 1;// To Do
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+</head>
+<body>
+    @if (User.Identity.IsAuthenticated && rolCookie == 1)// To Do
+    {
+        if (ViewBag.Message != null)
+        {
+            if (ViewBag.ExitoAlCrear != null)
+            {
+                <div class="alert-success">
+                    <h3> @ViewBag.Message </h3>
+                </div>
+            }
+            else
+            {
+                <div class="alert-danger">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>@ViewBag.Message</strong>
+                        <span type="button" class="close" data-bs-dismiss="alert" aria-label="Close" style="float:right"><span aria-hidden="true">&times;</span></span>
+                    </div>
+                </div>
+            }
+        }
+        using (Html.BeginForm("CrearTipoActividad", "TipoActividad", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1>Creación de tipo de actividad</h1>
+                <h5>Inserte los siguientes datos</h5>
+                <h6 style="color:red"> * Son campos obligatorios</h6>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            @Html.LabelFor(tipoActividadModel => tipoActividadModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(tipoActividadModel => tipoActividadModel.nombre, new { @class = "form-control", @maxlength = "80" })
+                            @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.nombre, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(tipoActividadModel => tipoActividadModel.descripcion, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextAreaFor(tipoActividadModel => tipoActividadModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300" })
+                            @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.descripcion, "", new { @class = "text-danger" })
+
+                        </div>
+                    </div>
+                    <div class="row justify-content-center" style="margin-top:20px">
+                        @Html.ActionLink("Cancelar", "ListaTiposActividad", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+
+</body>
+</html>

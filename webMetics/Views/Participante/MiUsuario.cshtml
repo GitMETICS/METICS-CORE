@@ -1,0 +1,143 @@
+﻿@using webMetics.Controllers
+@{
+    ViewBag.Title = "Mi usuario";
+
+    int rolCookie =1; // To Do
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (true) // To Do
+        {
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+        }
+        <h1>@ViewBag.Title</h1>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+    <div class="table-responsive">
+
+        @if (ViewBag.Participante == null)
+        {
+            <h5 class="text-center">Sus datos no están disponibles.</h5>
+        }
+        else
+        {
+            var nombreCompleto = ViewBag.Participante.nombre;
+            nombreCompleto += " " + ViewBag.Participante.apellido_1;
+
+            <div>
+                <h3 class="my-3">Datos personales</h3>
+                <table class="table table-striped" id="tblCustomers">
+                    <thead>
+                        <tr>
+                            <th scope="col">Identificación</th>
+                            <th scope="col">Nombre completo</th>
+                            <th scope="col">Condición</th>
+                            <th scope="col">Unidad académica</th>
+                            <th scope="col">Correo institucional</th>
+                            <th scope="col">Teléfono</th>
+                            <th scope="col" style="width:5%"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (ViewBag.Participante.apellido_2 != "-")
+                        {
+                            nombreCompleto += " " + ViewBag.Participante.apellido_2;
+                        }
+                        <tr>
+                            <td class="titulo-listas">@ViewBag.Participante.idParticipante</td>
+                            <td class="titulo-listas">@nombreCompleto</td>
+                            <td class="titulo-listas">@ViewBag.Participante.condicion</td>
+                            <td class="titulo-listas">@ViewBag.Participante.unidadAcademica</td>
+                            <td class="titulo-listas">@ViewBag.Participante.correo</td>
+                            <td class="titulo-listas">@ViewBag.Participante.telefonos</td>
+                            <td class="titulo-listas">
+                                @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <hr />
+
+            <div>
+                <h3 class="mt-4 mb-3">Inscripciones</h3>
+                <table class="table table-striped" id="tblCustomers">
+                    <thead>
+                        <tr>
+                            <th scope="col">Módulos inscritos</th>
+                            <th class="text-center" scope="col">Horas por módulo</th>
+                            <th class="text-center" scope="col">Total de horas inscritas</th>
+                            <th class="text-center" scope="col">Horas aprobadas</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="align-middle">
+                        <tr>
+                            <td class="titulo-listas">
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    foreach (var grupo in ViewBag.ListaGrupos)
+                                    {
+                                        <span>@grupo.nombre (Grupo @grupo.idGrupo)</span><br>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>Sin grupos inscritos</span>
+                                }
+                            </td>
+                            <td class="titulo-listas text-center">
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    foreach (var grupo in ViewBag.ListaGrupos)
+                                    {
+                                        <span>@grupo.cantidadHoras</span><br>
+                                    }
+                                }
+                                else
+                                {
+                                    <span>0</span>
+                                }
+                            </td>
+                            <td class="titulo-listas text-center">
+                                <span>@ViewBag.Participante.horasMatriculadas</span>
+                            </td>
+                            <td class="titulo-listas text-center">
+                                <span>@ViewBag.Participante.horasAprobadas</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="d-flex justify-content-center">
+            <a href="../Grupo/ListaGruposDisponibles" class="btn btn-primary mt-2">Regresar</a>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+﻿@model webMetics.Models.NewLoginModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Mi contraseña";
+
+    int rolCookie = 1;
+    string idCookie;
+
+    // if (Request.Cookies.Get("rolUsuario") != null)
+    // {
+    //     rolCookie = Convert.ToInt32(Request.Cookies["rolUsuario"].Value);
+    // }
+    // if (Request.Cookies.Get("idUsuario") != null)
+    // {
+    //     idCookie = Convert.ToString(Request.Cookies["idUsuario"].Value);
+    // }
+}
+<!DOCTYPE html>
+<html>
+<body>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (true) // ToDO
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
+
+            @using (Html.BeginForm("CambiarContrasena", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <h1>@ViewBag.Title</h1>
+                <hr />
+
+                if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.ErrorMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.SuccessMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="row mb-1">
+                    <div class="col">
+                        <div class="container">
+                            <div class="form-group mt-1 mb-3">
+                                <label style="font-size: 22px">Nombre de usuario (identificación)</label>
+                                @Html.TextBoxFor(model => model.identificacion, new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col">
+                                    <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col">
+                                    <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.nuevaContrasena, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col">
+                                    <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.confirmarContrasena, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center m-4 mb-0">
+                            @Html.ActionLink("Cancelar", "../Home/Index", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                            <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>

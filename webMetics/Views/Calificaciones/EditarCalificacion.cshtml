@@ -1,0 +1,88 @@
+﻿@using webMetics.Controllers
+@{
+    ViewBag.Title = "Editar calificación";
+
+    int rolCookie = 1; //To Do
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+    @if (true) //To Do
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (/*Request.UrlReferrer != null*/ true) //ToDo
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
+            <h1>@ViewBag.NombreGrupo</h1>
+            <h2>@ViewBag.Title</h2>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                    <strong> @TempData["Message"] </strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            <hr />
+            <div class="table-responsive">
+                @if (ViewBag.Calificacion == null)
+                {
+                    <h5 class="text-center">No hay una calificación registrada.</h5>
+                }
+                else
+                {
+                    var nombreCompleto = ViewBag.Calificacion.participante.nombre;
+                    nombreCompleto += " " + ViewBag.Calificacion.participante.apellido_1;
+
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 20%;">Identificación</th>
+                                <th scope="col" style="width: 47.5%;">Nombre completo</th>
+                                <th scope="col" style="width: 12.5%;">Calificación actual</th>
+                                <th scope="col" style="width: 12.5%;">Nueva calificación</th>
+                                <th scope="col" style="width: 7.5%;"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (ViewBag.Calificacion.participante.apellido_2 != "-")
+                            {
+                                nombreCompleto += " " + ViewBag.Calificacion.participante.apellido_2;
+                            }
+                            <tr>
+                                <td class="titulo-listas">@ViewBag.Calificacion.participante.idParticipante</td>
+                                <td class="titulo-listas">@nombreCompleto</td>
+                                <td class="titulo-listas text-center">@ViewBag.Calificacion.calificacion</td>
+                                @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <td class="titulo-listas">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" name="calificacion" id="calificacion">
+                                        </div>
+                                    </td>
+                                    <td class="titulo-listas">
+                                        <button type="submit" class="btn btn-info">Aceptar</button>
+                                    </td>
+                                }
+                            </tr>
+                        </tbody>
+                    </table>
+                }
+                <div class="d-flex justify-content-center">
+                    <a href="../Calificaciones/VerCalificaciones" class="btn btn-primary">Regresar</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>

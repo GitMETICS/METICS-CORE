@@ -1,0 +1,77 @@
+﻿@model webMetics.Models.CategoriaModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Editar categoría";
+    int rolCookie = 1;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    @if (true) // ToDo
+    {
+        using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1 class="mt-5">Editar categoría</h1>
+                <h5>Inserte los siguientes datos:</h5>
+                <h6 style="color:red"> * Son campos obligatorios</h6>
+                <hr />
+
+                @if (ViewBag.Message != null)
+                {
+                    if (ViewBag.ExitoAlCrear != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                }
+
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64" })
+                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
+                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="row justify-content-center" style="margin-top:20px">
+                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                        @Html.ActionLink("Cancelar", "ListaCategorias",
+                 new { },
+                 new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group" style="visibility:hidden">
+                <a style="color:red;font-size:22px">*</a> @Html.LabelFor(categoriaModel => categoriaModel.idGenerado, new { Style = "font-size:22px" })
+                @Html.TextBoxFor(categoriaModel => categoriaModel.idGenerado, new { @class = "form-control", @maxlength = "64" })
+                @Html.ValidationMessageFor(categoriaModel => categoriaModel.idGenerado, "", new { @class = "text-danger" })
+            </div>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");    
+    }
+    </body>
+</html>

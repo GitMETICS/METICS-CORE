@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "Inscribir";
+}
+
+<html>
+<head>
+</head>
+<body>
+    <div class="card text-center" style="margin-top:5%">
+        <div class="card-header">
+            <h2>@ViewBag.Titulo</h2>
+        </div>
+        <div class="card-body ">
+            <h5> @ViewBag.Message</h5>
+            @if (ViewBag.Participante != null)
+            {
+                <p>@ViewBag.Participante.correo</p>
+            }
+        </div>
+        <div class="card-footer text-muted">
+            <a href="../Grupo/ListaGruposDisponibles" class="btn btn-primary">Regresar</a>
+        </div>
+    </div>
+</body>
+</html>

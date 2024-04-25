@@ -1,0 +1,145 @@
+﻿@using webMetics.Controllers
+@{
+
+    ViewBag.Title = "Participantes";
+    int rolCookie = 1;
+}
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+
+    @if (User.Identity.IsAuthenticated && rolCookie == 1)
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (true)// Todo
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
+            <h1>@ViewBag.Title</h1>
+            <hr />
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                    @ViewBag.ErrorMessage
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                    @ViewBag.SuccessMessage
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                @if (ViewBag.ListaParticipantes == null)
+                {
+                    <h5 class="text-center">No hay personas inscritas en ningún grupo.</h5>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-end">
+                        <div class="mx-1">
+                            @using (Html.BeginForm("CrearParticipante", "Participante", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-person-plus me-1"></i>
+                                    Agregar
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col">Identificación</th>
+                                <th scope="col">Nombre completo</th>
+                                <th scope="col">Condición</th>
+                                <th scope="col">Unidad académica</th>
+                                <th scope="col">Correo institucional</th>
+                                <th scope="col">Teléfono</th>
+                                <th scope="col" style="width:5%;"></th>
+                                <th scope="col" style="width:5%;"></th>
+                                <th scope="col" style="width:5%;"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var participante in ViewBag.ListaParticipantes)
+                            {
+                                var gruposInscritos = participante.gruposInscritos;
+                                var nombreCompleto = participante.nombre;
+                                nombreCompleto += " " + participante.apellido_1;
+                                if (participante.apellido_2 != "-")
+                                {
+                                    nombreCompleto += " " + participante.apellido_2;
+                                }
+                                <tr>
+                                    <td class="titulo-listas">@participante.idParticipante</td>
+                                    <td class="titulo-listas">@nombreCompleto</td>
+                                    <td class="titulo-listas">@participante.condicion</td>
+                                    <td class="titulo-listas">@participante.unidadAcademica</td>
+                                    <td class="titulo-listas">@participante.correo</td>
+                                    <td class="titulo-listas">@participante.telefonos</td>
+                                    <td class="titulo-listas">
+                                        @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-info bi bi-search" })
+                                    </td>
+                                    <td class="titulo-listas">
+                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    </td>
+                                    <td class="titulo-listas">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@participante.idParticipante')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <div class="d-flex justify-content-center">
+                    <a href="../Grupo/ListaGruposDisponibles" class="btn btn-primary">Regresar</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    function actualizarModal(idParticipante) {
+        $.ajax({
+            type: "POST",
+            url: "/Participante/DisplayModal",
+            data: '{idParticipante: "' + idParticipante + '" }',
+            contentType: "application/json; charset=utf-8",
+            dataType: "html",
+            success: function (response) {
+                $("#modalEliminar").find(".modal-content").html(response);
+                $("#modalEliminar").modal('show');
+            },
+            failure: function (response) {
+                alert(response.responseText);
+            },
+            error: function (response) {
+                alert(response.responseText);
+            }
+        });
+    }
+</script>

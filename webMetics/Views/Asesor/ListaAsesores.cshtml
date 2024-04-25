@@ -1,0 +1,149 @@
+﻿@using webMetics.Controllers
+
+<!--
+    Vista para mostrar la lista de todos los asesores con la información personal de cada uno
+    Se muestran las opciones de poder eliminar, editar o crear un asesor
+-->
+
+@{
+    ViewBag.Title = "Asesores";
+
+    int rolCookie = 1; // ToDo
+}
+
+<!DOCTYPE html>
+<html>
+<body>
+    @if (rolCookie == 1) // ToDo
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (true /*request.Headers["Referer"] != null*/) //ToDo
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
+            <h1>@ViewBag.Title</h1>
+            <hr />
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                    @TempData["Message"]
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                    @ViewBag.ErrorMessage
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    @ViewBag.SuccessMessage
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="d-flex justify-content-end">
+                <div class="mx-1">
+                    @using (Html.BeginForm("AgregarAsesor", "Asesor", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-1"></i>
+                            Agregar
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                @if (ViewBag.Asesores == null)
+                {
+                    <h5 class="text-center">No hay asesores.</h5>
+                }
+                else
+                {
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Identificación</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Teléfonos</th>
+                                <th scope="col" style="width:5%;"></th>
+                                <th scope="col" style="width:5%;"></th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var asesor in ViewBag.Asesores)
+                            {
+                                var nombreCompleto = asesor.nombre;
+                                nombreCompleto += " " + asesor.apellido1;
+                                if (asesor.apellido2 != "-")
+                                {
+                                    nombreCompleto += " " + asesor.apellido2;
+                                }
+
+                                <tr>
+                                    <td class="titulo-listas">@asesor.identificacion</td>
+                                    <td class="titulo-listas">@nombreCompleto</td>
+                                    <td class="titulo-listas">@asesor.descripcion</td>
+                                    <td class="titulo-listas">@asesor.telefonos</td>
+                                    <td class="titulo-listas">
+                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = asesor.identificacion }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    </td>
+                                    <td class="titulo-listas">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@asesor.identificacion')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Eliminar asesor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar a este asesor?
+                        <br />
+                        @using (Html.BeginForm("EliminarAsesor", "Asesor"))
+                        {
+                            <div class="modal-footer">
+                                <input type="hidden" id="idAsesor" name="idAsesor">
+                                <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>
+<script type="text/javascript">
+    function actualizarModal(idGenerado) {
+        document.getElementById("idAsesor").value = idGenerado;
+    }
+
+</script>

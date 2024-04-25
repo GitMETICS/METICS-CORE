@@ -1,0 +1,473 @@
+﻿@using webMetics.Models
+
+<!--
+    Vista para mostrar la lista de todos los grupos disponibles
+    El administrador puede modificar los grupos
+    Los usuarios se pueden inscribir en un grupo y ver el programa del grupo
+-->
+
+@{
+    ViewBag.Title = "Módulos disponibles";
+
+    int rolCookie = 0;
+    string idCookie = "";
+
+    // if (Request.Cookies.Get("rolUsuario") != null)
+    // {
+    //     rolCookie = Convert.ToInt32(Request.Cookies["rolUsuario"].Value);
+    // }
+
+    // if (Request.Cookies.Get("idUsuario") != null)
+    // {
+    //     idCookie = Convert.ToString(Request.Cookies["idUsuario"].Value);
+    // }
+}
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/8c4f35eae8.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    @* @if (HttpContext.Current.User.Identity.IsAuthenticated) *@
+    @if (true) // to do
+    {
+        if (ViewBag.ListaGrupos == null)
+        {
+            <div class="justify-content-center" style="margin-top:3%">
+                <h2 class="text-center">No hay grupos disponibles en este momento.</h2>
+                <br />
+                <div style="text-align:center; align-items:center">
+                    @if (rolCookie == 1 || rolCookie == 2)
+                    {
+                        <a href="/Grupo/AgregarGrupo" class="btn btn-primary" role="button" style="align-content:center; width:20%;height:105%">Crear grupo</a>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            if (TempData["Message"] != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                    <strong> @TempData["Message"] </strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                    @ViewBag.SuccessMessage
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            if (ViewBag.GruposInscritos != null)
+            {
+                <h1 class="mt-5">Módulos inscritos</h1>
+                <br>
+                <div class="row row-cols-1 row-cols-md-2">
+                    @foreach (var grupo in ViewBag.GruposInscritos)
+                    {
+                        if (grupo.esVisible == 1)
+                        {
+                            var visible = "";
+                            if (grupo.esVisible == 0)
+                            {
+                                visible = "opacity: 0.5";
+                            }
+                            <div class="col mb-4">
+                                <div id="@grupo.idGrupo" class="card text-center" style="margin-bottom:0px; @visible ">
+                                    <div class="card-header bg-info bg-opacity-90 border-white text-light">
+                                        <div>
+                                            <div style="float:left">
+                                                @if (grupo.cupoActual < grupo.cupo)
+                                                {
+                                                    <span class="badge bg-info" style="float:right">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger" style="float:right">Sin cupo</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="justify-content-center">
+                                            Duración del módulo: @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h4 class="card-title">@grupo.nombre</h4>
+                                        <p class="card-text">@grupo.descripcion</p>
+                                        <p class="card-text">Cantidad de horas: @grupo.cantidadHoras</p>
+                                        <p class="card-text">Asesor: @grupo.nombreAsesorAsociado</p>
+                                        <p class="card-text">Área de competencia: @grupo.temaAsociado</p>
+
+                                        @if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
+                                        {
+                                            if (grupo.cupoActual < grupo.cupo)
+                                            {
+                                                if (ViewBag.ParticipantesEnGrupos != null)
+                                                {
+                                                    var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
+                                                    var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == ViewBag.IdParticipante);
+                                                    var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
+
+                                                    if (inscripcionesDelUsuarioEnEsteGrupo != null)
+                                                    {
+                                                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.IdParticipante }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.IdParticipante }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                            }
+                                        }
+                                        else if (ViewBag.DateNow < grupo.fechaInicioInscripcion)
+                                        {
+                                            <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                            <p>Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</p>
+                                        }
+                                        else
+                                        {
+                                            <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                            <p>La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy") </p>
+                                        }
+                                        <div>
+                                            <a href="@Url.Action("DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo })">Ver el programa del módulo</a>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            @grupo.lugar
+                                        }
+                                        else
+                                        {
+                                            @grupo.modalidad
+                                        }
+                                        <br />
+                                        @grupo.horario
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            }
+
+            <h1 class="mt-5">@ViewBag.Title</h1>
+            <br>
+            <div>
+                <div class="row row-cols-1 row-cols-md-2">
+                    @{
+                        var contadorGrupoOcultos = 0;
+
+                    }
+                    @foreach (var grupo in ViewBag.ListaGrupos)
+                    {
+                        if (grupo.esVisible == 1 || rolCookie == 1)
+                        {
+                            var visible = "";
+                            if (grupo.esVisible == 0)
+                            {
+                                visible = "opacity: 0.5";
+                            }
+                            <div class="col mb-4">
+                                <div id="@grupo.idGrupo" class="card text-center" style="margin-bottom:10px; @visible ">
+                                    <div class="card-header">
+                                        <div>
+                                            <div style="float:left">
+                                                @if (grupo.cupoActual < grupo.cupo)
+                                                {
+                                                    <span class="badge bg-info" style="float:right">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger" style="float:right">Sin cupo</span>
+                                                }
+                                            </div>
+                                            @if (rolCookie == 1 || rolCookie == 2)
+                                            {
+                                                <div style="float:right">
+                                                    <i class="bi bi-pencil-square" type="button" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModalEditar(@grupo.idGrupo)" style="padding-right:4px;"></i>
+                                                    @if (rolCookie == 1)
+                                                    {
+                                                        <i class="bi bi-trash3" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@grupo.idGrupo)"></i>
+                                                        if (grupo.esVisible == 1)
+                                                        {
+                                                            <!--El grupo no esta visible -->
+                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })" onclick="opacarGrupo(@grupo.idGrupo)"><i class="bi bi-eye"></i></a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <!--El grupo esta visible -->
+                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })"><i class="bi bi-eye-slash" style="color:red"></i></a>
+                                                        }
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                        <br />
+                                        <div class="justify-content-center">
+                                            Duración del módulo: @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h4 class="card-title">@grupo.nombre</h4>
+                                        <p class="card-text">@grupo.descripcion</p>
+                                        <p class="card-text">Cantidad de horas: @grupo.cantidadHoras</p>
+                                        <p class="card-text">Asesor: @grupo.nombreAsesorAsociado</p>
+                                        <p class="card-text">Área de competencia: @grupo.temaAsociado</p>
+                                        @if (rolCookie == 1 || rolCookie == 2)
+                                        {
+                                            @Html.ActionLink("Ver participantes", "../Participante/ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                        }
+                                        else
+                                        {
+                                            if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
+                                            {
+                                                if (grupo.cupoActual < grupo.cupo)
+                                                {
+                                                    if (ViewBag.ParticipantesEnGrupos != null)
+                                                    {
+                                                        var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
+                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == idCookie);
+                                                        var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
+
+                                                        if (inscripcionesDelUsuarioEnEsteGrupo != null)
+                                                        {
+                                                            <i class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</i>
+                                                        }
+                                                        else
+                                                        {
+                                                            @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.IdParticipante }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.IdParticipante }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                }
+                                            }
+                                            else if (ViewBag.DateNow < grupo.fechaInicioInscripcion)
+                                            {
+                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <p>Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</p>
+                                            }
+                                            else
+                                            {
+                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <p>La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy") </p>
+                                            }
+                                        }
+                                        <div>
+                                            @if (rolCookie == 1 || rolCookie == 2)
+                                            {
+                                                <div>
+                                                    <div class="d-flex align-items-center justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#modalEditarAdjunto" onclick="actualizarModalEditarAdjunto(@grupo.idGrupo)">
+                                                        <i class="bi bi-pencil-square" style="padding-right:6px;"></i>
+                                                        <span>Editar programa del módulo</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo })">Ver el programa del curso</a>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            @grupo.lugar
+                                        }
+                                        else
+                                        {
+                                            @grupo.modalidad
+                                        }
+                                        <br />
+                                        @grupo.horario
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            contadorGrupoOcultos++;
+                        }
+                        if (contadorGrupoOcultos == ViewBag.ListaGrupos.Count)
+                        {
+                            <h2>No hay módulos disponibles en este momento</h2>
+                        }
+                    }
+
+                </div>
+            </div>
+        }
+        <!-- Modal para confirmar eliminar un grupo-->
+        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Eliminar módulo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar este módulo?
+
+                        @using (Html.BeginForm("EliminarGrupo", "Grupo"))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="modal-footer">
+                                <input type="hidden" id="valueGrupoEliminar" name="idGrupo">
+                                <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal para confirmar editar un grupo-->
+        <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editarModalLabel">Editar módulo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h8 style="padding-bottom:5px">
+                            ¿Está seguro de que desea editar los datos del módulo?
+                        </h8>
+                        <br />
+                        @using (Html.BeginForm("EditarGrupo", "Grupo", FormMethod.Get, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="modal-footer">
+                                <input type="hidden" id="valueGrupoEditar" name="idGrupo">
+                                <input type="submit" class="btn btn-primary" value="Aceptar" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Modal para confirmar añadir un archivo al grupo-->
+        <div class="modal fade" id="modalDesinscribir" tabindex="-1" aria-labelledby="modalDesinscribirLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editarAdjuntoModalLabel">Desinscribirse del módulo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h8 style="padding-bottom:5px">
+                            ¿Está seguro de que desea desinscribirse de este módulo?
+                        </h8>
+                        <br />
+                        @using (Html.BeginForm("DesinscribirParticipante", "Inscripcion", FormMethod.Get, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="modal-footer">
+                                <input type="hidden" id="valueGrupoDesinscribir" name="idGrupo">
+                                <input type="hidden" name="idParticipante" value="@ViewBag.IdParticipante">
+                                <input type="submit" class="btn btn-primary" value="Aceptar" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Eliminar módulo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar este módulo?
+
+                        @using (Html.BeginForm("EliminarGrupo", "Grupo"))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="modal-footer">
+                                <input type="hidden" id="valueGrupoEliminar" name="idGrupo">
+                                <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        if (ViewBag.ShowPopup == true)
+        {
+            <div class="modal fade" id="modalCrearGrupoFailed" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" style="margin-top: 5%">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">No se puede crear un módulo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="font-size:20px;">@ViewBag.Message</div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function () {
+                    $('#modalCrearGrupoFailed').modal('show');
+                });
+            </script>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>
+
+<script type="text/javascript">
+    function actualizarModalEditar(idGrupo) {
+        document.getElementById("valueGrupoEditar").value = idGrupo;
+    }
+    function actualizarModalEliminar(idGrupo) {
+        document.getElementById("valueGrupoEliminar").value = idGrupo;
+    }
+    function actualizarModalEditarAdjunto(idGrupo) {
+        document.getElementById("valueGrupoAdjunto").value = idGrupo;
+    }
+    function actualizarModalDesinscribir(idGrupo) {
+        document.getElementById("valueGrupoDesinscribir").value = idGrupo;
+    }
+
+</script>

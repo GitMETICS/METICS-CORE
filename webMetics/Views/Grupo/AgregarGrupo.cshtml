@@ -1,0 +1,182 @@
+﻿@model webMetics.Models.GrupoModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Crear módulo";
+    int rolCookie = 1;
+}
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    @if (true) // To do
+    {
+        <!-- ** BEGIN POP-UP LOADING AREA ** -->
+        <div id="loading" style="display:none;">
+            <div class="loading-modal">
+                <div class="spinnerContainer">
+                    <div class="spinner-border" role="status">
+                    </div>
+                </div>
+                <div class="loading-text">Guardando...</div>
+            </div>
+        </div>
+        <!-- ** END POP-UP LOADING AREA ** -->
+
+        
+
+        using (Html.BeginForm("AgregarGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1 class="mt-5">Crear grupo</h1>
+                <h5>Inserte los siguientes datos:</h5>
+                @if (Html.Raw(TempData["msg"]) != null)
+                {
+                    <h5 class="alertaFechas">@Html.Raw(TempData["msg"])</h5>
+                }
+                <hr />
+
+                <div class="row mt-1" style="margin-bottom:10%">
+                    <div class="col">
+                        <div class="container">
+                            <div class="form-group">
+                                @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
+                                @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="row mt-1" style="margin-top:5px">
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
+                                    @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new List<SelectListItem> { new SelectListItem { Text = "Presencial", Value = "Presencial" }, new SelectListItem { Text = "Virtual", Value = "Virtual" }, new SelectListItem { Text = "AltoVirtual", Value = "AltoVirtual" } }, "Seleccione una modalidad", new { @class = "form-select" })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" })
+                                    @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @value = "" })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" })
+                                    @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @value = "" })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top:5px">
+                                @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group" style="margin-top:5px">
+                                @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejm: L - V de 7am a 9am", @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group" style="margin-top:5px">
+                                @Html.LabelFor(grupoModel => grupoModel.temaAsociado, new { Style = "font-size:22px" })
+                                @Html.DropDownList("temaAsociado", ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema...", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.temaAsociado, "", new { @class = "text-danger" })
+                            </div>
+
+                            <br />
+                            <div class="row" style="margin-top:25px">
+                                <h4>Fechas de inscripción</h4>
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
+
+                                </div>
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:25px">
+                                <h4>Fecha de inicio y fin del grupo</h4>
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <br />
+                            <div>
+                                <h4>Adjuntar archivo del grupo</h4>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.archivoAdjunto, new { @class = "form-label" })
+                                    @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.archivoAdjunto, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row justify-content-center" style="margin-top:20px">
+                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                            <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+</body>
+</html>
+
+<style>
+    .alertaFechas {
+        color: red;
+        padding-bottom: 10px;
+        font-size: 16px;
+    }
+
+    #loading {
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .loading-modal {
+        background-color: #fff;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+    .loading-text {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+</style>

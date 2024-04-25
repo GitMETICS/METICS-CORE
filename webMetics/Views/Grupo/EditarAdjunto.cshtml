@@ -1,0 +1,92 @@
+@model webMetics.Models.GrupoModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Editar archivo adjunto";
+    int rolCookie = 0;
+}
+<!DOCTYPE html>
+<html>
+<body>
+    @if (true) // To Do
+    {
+        <!-- ** BEGIN POP-UP LOADING AREA ** -->
+        <div id="loading" style="display:none;">
+            <div class="loading-modal">
+                <div class="spinnerContainer">
+                    <div class="spinner-border" role="status">
+                    </div>
+                </div>
+                <div class="loading-text">Guardando...</div>
+            </div>
+        </div>
+        <!-- ** END POP-UP LOADING AREA ** -->
+
+        using (Html.BeginForm("EditarAdjunto", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h1 class="mt-5">Editar archivo adjunto del módulo</h1>
+                <h5 class="alertaAdjunto">@Html.Raw(TempData["msg"])</h5>
+                <hr />
+                <div class="row" style="margin-bottom:10%">
+                    <div class="col">
+                        <div class="container">
+                            <div>
+                                <h4>Adjuntar archivo del módulo:</h4>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.archivoAdjunto, new { @class = "form-label" })
+                                    @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control", name = "archivoAdjunto" })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.archivoAdjunto, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            @Html.HiddenFor(grupoModel => grupoModel.idGrupo)
+                        </div>
+                        <div class="row justify-content-center" style="margin-top:20px">
+                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                            <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        Html.RenderPartial("~/Views/Login/Login.cshtml");
+    }
+    </body>
+</html>
+
+<style>
+    .alertaAdjunto {
+        color: red;
+        padding-bottom: 10px;
+        font-size: 16px;
+    }
+
+    #loading {
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .loading-modal {
+        background-color: #fff;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px;
+    }
+
+    .loading-text {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+</style>
