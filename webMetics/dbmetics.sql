@@ -322,9 +322,18 @@ ON dbo.AspNetUsers
 AFTER UPDATE
 AS
 BEGIN
-	DECLARE @id NVARCHAR(450) = (SELECT Id FROM inserted)
+    SET NOCOUNT ON;
 
-	UPDATE participante SET id_participante_PK =  @id WHERE id_usuario_FK = @id
+    DECLARE @UpdatedId TABLE (Id NVARCHAR(450));
+
+    INSERT INTO @UpdatedId (Id)
+    SELECT Id
+    FROM inserted;
+
+    UPDATE p
+    SET id_participante_PK = i.Id
+    FROM participante p
+    INNER JOIN @UpdatedId i ON p.id_usuario_FK = i.Id;
 END
 GO
 
