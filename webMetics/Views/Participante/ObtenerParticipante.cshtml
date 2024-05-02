@@ -2,14 +2,12 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Obtener participante";
-
-    int rolCookie = 1; // To do
 }
 
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && rolCookie == 1) // To do
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         using (Html.BeginForm("ObtenerParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {

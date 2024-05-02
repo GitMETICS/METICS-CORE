@@ -1,21 +1,15 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Categorías";
-
-    int rolCookie = 1; // To Do
 }
+
 <!DOCTYPE html>
 <html>
 <body>
-    @if (true) // To Do
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
-
-
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (true) // To Do
-            {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-            }
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
 
             <h1>Categorías</h1>
             <hr />

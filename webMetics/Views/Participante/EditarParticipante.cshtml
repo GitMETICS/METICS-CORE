@@ -2,13 +2,11 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Editar datos";
-
-    int rolCookie = 1; // Todo
 }
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && rolCookie == 1)
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         <div class="contenedor-tipos-actividades container-fluid">
             @* @if (Request.UrlReferrer != null) *@

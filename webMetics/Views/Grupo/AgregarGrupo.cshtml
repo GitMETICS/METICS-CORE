@@ -2,14 +2,14 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Crear módulo";
-    int rolCookie = 1;
 }
+
 <!DOCTYPE html>
 <html>
 <head>
 </head>
 <body>
-    @if (true) // To do
+    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
     {
         <!-- ** BEGIN POP-UP LOADING AREA ** -->
         <div id="loading" style="display:none;">

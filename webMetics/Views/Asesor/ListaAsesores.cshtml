@@ -7,14 +7,12 @@
 
 @{
     ViewBag.Title = "Asesores";
-
-    int rolCookie = 1; // ToDo
 }
 
 <!DOCTYPE html>
 <html>
 <body>
-    @if (rolCookie == 1) // ToDo
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         <div class="contenedor-tipos-actividades container-fluid">
             @if (true /*request.Headers["Referer"] != null*/) //ToDo

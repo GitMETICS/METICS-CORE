@@ -2,7 +2,6 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Editar categoría";
-    int rolCookie = 1;
 }
 
 <!DOCTYPE html>
@@ -10,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (true) // ToDo
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {

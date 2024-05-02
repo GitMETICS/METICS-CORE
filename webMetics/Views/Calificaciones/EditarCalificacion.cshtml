@@ -1,8 +1,6 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Editar calificación";
-
-    int rolCookie = 1; //To Do
 }
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,13 +9,12 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
-    @if (true) //To Do
+    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (/*Request.UrlReferrer != null*/ true) //ToDo
-            {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-            }
+            
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+
             <h1>@ViewBag.NombreGrupo</h1>
             <h2>@ViewBag.Title</h2>
             @if (TempData["Message"] != null)

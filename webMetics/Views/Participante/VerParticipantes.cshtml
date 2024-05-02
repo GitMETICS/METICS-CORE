@@ -1,8 +1,6 @@
 ﻿@using webMetics.Controllers
 @{
-
     ViewBag.Title = "Participantes";
-    int rolCookie = 1;
 }
 
 
@@ -12,13 +10,11 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
-    @if (User.Identity.IsAuthenticated && rolCookie == 1)
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (true)// Todo
-            {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-            }
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+
             <h1>@ViewBag.Title</h1>
             <hr />
 

@@ -1,14 +1,12 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Temas";
-
-    int rolCookie = 1;// To Do
 }
 
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && rolCookie == 1)// To Do
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         if (ViewBag.Message != null)
         {

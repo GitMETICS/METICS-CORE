@@ -1,4 +1,5 @@
 ﻿@using webMetics.Models
+@using Microsoft.AspNetCore.Identity
 
 <!--
     Vista para mostrar la lista de todos los grupos disponibles
@@ -8,19 +9,6 @@
 
 @{
     ViewBag.Title = "Módulos disponibles";
-
-    int rolCookie = 0;
-    string idCookie = "";
-
-    // if (Request.Cookies.Get("rolUsuario") != null)
-    // {
-    //     rolCookie = Convert.ToInt32(Request.Cookies["rolUsuario"].Value);
-    // }
-
-    // if (Request.Cookies.Get("idUsuario") != null)
-    // {
-    //     idCookie = Convert.ToString(Request.Cookies["idUsuario"].Value);
-    // }
 }
 <html>
 <head>
@@ -28,8 +16,7 @@
     <script src="https://kit.fontawesome.com/8c4f35eae8.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    @* @if (HttpContext.Current.User.Identity.IsAuthenticated) *@
-    @if (true) // to do
+    @if (User.Identity.IsAuthenticated)
     {
         if (ViewBag.ListaGrupos == null)
         {
@@ -37,7 +24,7 @@
                 <h2 class="text-center">No hay grupos disponibles en este momento.</h2>
                 <br />
                 <div style="text-align:center; align-items:center">
-                    @if (rolCookie == 1 || rolCookie == 2)
+                    @if (User.IsInRole("Admin") || User.IsInRole("Asesor"))
                     {
                         <a href="/Grupo/AgregarGrupo" class="btn btn-primary" role="button" style="align-content:center; width:20%;height:105%">Crear grupo</a>
                     }
@@ -176,7 +163,7 @@
                     }
                     @foreach (var grupo in ViewBag.ListaGrupos)
                     {
-                        if (grupo.esVisible == 1 || rolCookie == 1)
+                        if (grupo.esVisible == 1 || User.IsInRole("Admin"))
                         {
                             var visible = "";
                             if (grupo.esVisible == 0)
@@ -197,11 +184,11 @@
                                                     <span class="badge bg-danger" style="float:right">Sin cupo</span>
                                                 }
                                             </div>
-                                            @if (rolCookie == 1 || rolCookie == 2)
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Asesor"))
                                             {
                                                 <div style="float:right">
                                                     <i class="bi bi-pencil-square" type="button" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModalEditar(@grupo.idGrupo)" style="padding-right:4px;"></i>
-                                                    @if (rolCookie == 1)
+                                                    @if (User.IsInRole("Admin"))
                                                     {
                                                         <i class="bi bi-trash3" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@grupo.idGrupo)"></i>
                                                         if (grupo.esVisible == 1)
@@ -229,7 +216,7 @@
                                         <p class="card-text">Cantidad de horas: @grupo.cantidadHoras</p>
                                         <p class="card-text">Asesor: @grupo.nombreAsesorAsociado</p>
                                         <p class="card-text">Área de competencia: @grupo.temaAsociado</p>
-                                        @if (rolCookie == 1 || rolCookie == 2)
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Asesor"))
                                         {
                                             @Html.ActionLink("Ver participantes", "../Participante/ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
                                         }
@@ -242,7 +229,7 @@
                                                     if (ViewBag.ParticipantesEnGrupos != null)
                                                     {
                                                         var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
-                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == idCookie);
+                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == ViewBag.IdParticipante);
                                                         var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
 
                                                         if (inscripcionesDelUsuarioEnEsteGrupo != null)
@@ -276,7 +263,7 @@
                                             }
                                         }
                                         <div>
-                                            @if (rolCookie == 1 || rolCookie == 2)
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Asesor"))
                                             {
                                                 <div>
                                                     <div class="d-flex align-items-center justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#modalEditarAdjunto" onclick="actualizarModalEditarAdjunto(@grupo.idGrupo)">

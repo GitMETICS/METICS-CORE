@@ -2,7 +2,6 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Agregar tipo de actividad";
-    int rolCookie = 1;// To Do
 }
 <!DOCTYPE html>
 
@@ -10,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated && rolCookie == 1)// To Do
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         if (ViewBag.Message != null)
         {

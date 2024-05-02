@@ -4,22 +4,8 @@
 //-->
 @using webMetics.Controllers
 @{
-    int rolCookie = 0;
-    string idCookie = "";
-
-    // if (HttpContext.Current.User.Identity.IsAuthenticated)
-    // {
-    //     if (Request.Cookies.Get("rolUsuario") != null)
-    //     {
-    //         rolCookie = Convert.ToInt32(Request.Cookies["rolUsuario"].Value);
-    //     }
-
-    //     if (Request.Cookies.Get("idUsuario") != null)
-    //     {
-    //         idCookie = Convert.ToString(Request.Cookies["idUsuario"].Value);
-    //     }
-    // }
 }
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -27,6 +13,8 @@
     <title>@ViewBag.Title</title>
     <link href="~/Content/bootstrap-chosen.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="logos_wrapper" style="background-color: #44beef ">
@@ -69,10 +57,10 @@
 
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <li>
-                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = ViewBag.IdParticipante }, new { @class = "dropdown-item" })
                                     </li>
                                     <li>
-                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.IdParticipante }, new { @class = "dropdown-item" })
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
@@ -83,7 +71,7 @@
                         }
                     }
 
-                    @if (rolCookie == 1)
+                    @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones admin</a>
@@ -97,7 +85,7 @@
                             </div>
                         </li>
                     }
-                    @if (rolCookie == 2)
+                    @if (User.IsInRole("Asesor"))
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones asesor</a>

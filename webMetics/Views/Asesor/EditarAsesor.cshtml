@@ -6,15 +6,13 @@
 
 @{
     ViewBag.Title = "Editar asesor";
-
-    int rolCookie = 1;
 }
 <!DOCTYPE html>
 <html>
 <head>
 </head>
 <body>
-    @if (rolCookie == 1) // ToDo
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {

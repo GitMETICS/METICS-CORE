@@ -2,7 +2,6 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Agregar tema";
-    int rolCookie = 1;// To Do
 }
 <!DOCTYPE html>
 
@@ -10,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated && rolCookie == 1)// To Do
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
     {
         using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {

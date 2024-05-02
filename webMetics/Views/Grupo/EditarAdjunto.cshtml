@@ -2,12 +2,11 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Editar archivo adjunto";
-    int rolCookie = 0;
 }
 <!DOCTYPE html>
 <html>
 <body>
-    @if (true) // To Do
+    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
     {
         <!-- ** BEGIN POP-UP LOADING AREA ** -->
         <div id="loading" style="display:none;">
