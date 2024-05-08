@@ -65,8 +65,13 @@
                                         @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.IdParticipante }, new { @class = "dropdown-item" })
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
+                                    <li class="dropdown-item">
+                                        <form method="post" asp-area="Identity" asp-page="/Account/Logout">
+                                            <button type="submit" style="width:auto"
+                                                    class="nav-link btn btn-link py-0">
+                                                Cerrar Sesión
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </li>

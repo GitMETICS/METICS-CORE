@@ -8,6 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\css\site.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\site.css" />
+    <None Include="wwwroot\Imagenes\avatar.png" />
+    <None Include="wwwroot\Imagenes\fondo_login.jpg" />
+    <None Include="wwwroot\Imagenes\logoMETICS.png" />
+    <None Include="wwwroot\Imagenes\logos.png" />
+    <None Include="wwwroot\Imagenes\logosVC.png" />
+    <None Include="wwwroot\Imagenes\logoUCR.png" />
+    <None Include="wwwroot\Imagenes\logo_metics.png" />
+    <None Include="wwwroot\Imagenes\logo_UCR.webp" />
+    <None Include="wwwroot\Imagenes\vc_logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="HtmlTextWriter" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
@@ -15,6 +32,7 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Novell.Directory.Ldap" Version="2.2.1" />
   </ItemGroup>
