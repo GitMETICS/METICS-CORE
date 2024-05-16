@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /*
  * Handler de los asesores

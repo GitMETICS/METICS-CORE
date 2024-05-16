@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace webMetics.Handlers
 {
@@ -10,11 +10,13 @@ namespace webMetics.Handlers
         // Constructor de la clase BaseDeDatosHandler
         public BaseDeDatosHandler()
         {
-            // Obtiene la cadena de conexión de la configuración    // TODO
-            string RutaConexion = "Server=(localdb)\\mssqllocaldb;Database=aspnet-webMetics-2793fa9b-a054-47cf-8443-da5f8bca4169;Trusted_Connection=True;MultipleActiveResultSets=true";
+            // Obtiene la cadena de conexión de la configuración
+            string connectionString = "Data Source=localhost;Initial Catalog=METICS;User ID=sa;Password=*******;Encrypt=False;Trust Server Certificate=True";
+
+            // string RutaConexion = ConfigurationManager.ConnectionStrings["MeticsConnection"].ToString();
 
             // Inicializa la conexión con la base de datos usando la cadena de conexión
-            ConexionMetics = new SqlConnection(RutaConexion);
+            ConexionMetics = new SqlConnection(connectionString);
         }
 
         // Método para ejecutar una consulta SELECT y retornar los resultados en una DataTable

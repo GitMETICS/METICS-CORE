@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /*
  * Handler para los grupos
@@ -56,7 +55,7 @@ namespace webMetics.Handlers
 
             // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
             MemoryStream ms = new MemoryStream();
-            grupo.archivoAdjunto.CopyTo(ms);
+            grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
 
@@ -429,7 +428,7 @@ namespace webMetics.Handlers
 
             // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
             MemoryStream ms = new MemoryStream();
-            grupo.archivoAdjunto.CopyTo(ms);
+            grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
 

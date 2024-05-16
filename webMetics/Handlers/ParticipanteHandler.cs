@@ -1,10 +1,8 @@
 ﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.Data.SqlClient;
-using Microsoft.AspNetCore.Hosting;
 
 
 namespace webMetics.Handlers
@@ -325,7 +323,7 @@ namespace webMetics.Handlers
         public object GetJsonFile()
         {
             // Obtener la ruta del archivo JSON
-            string path = Path.Combine("App_Data", "dataAreas.json");
+            string path = ""/*HttpContext.Current.Server.MapPath("~/App_Data/dataAreas.json")*/;
             // Leer todo el contenido del archivo como una cadena
             string allText = System.IO.File.ReadAllText(path);
             // Deserializar el contenido del archivo JSON en un objeto genérico

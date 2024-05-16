@@ -1,9 +1,7 @@
 ﻿using System.Data;
-using webMetics.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
-
+using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace webMetics.Handlers
 {
     public class TemaHandler : BaseDeDatosHandler

@@ -1,9 +1,6 @@
 ﻿using System.Data;
-using webMetics.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Microsoft.Data.SqlClient;
-
+using webMetics.Models;
 
 namespace webMetics.Handlers
 {

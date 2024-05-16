@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace webMetics.Handlers
 {
     public class TipoActividadHandler : BaseDeDatosHandler

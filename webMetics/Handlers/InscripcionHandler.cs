@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
-namespace webMetics.Handlers
+using webMetics.Handlers;
 {
     public class InscripcionHandler : BaseDeDatosHandler
     {
