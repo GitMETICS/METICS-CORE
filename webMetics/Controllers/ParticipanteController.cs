@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using webMetics.Handlers;
+﻿using webMetics.Handlers;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc;
 
 /* 
  * Controlador de la entidad Participante
@@ -92,7 +92,7 @@ namespace webMetics.Controllers
             ViewBag.Participante = participante;
             ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
 
-            if (true) //ToDo
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
             {
                 int rolUsuario = Convert.ToInt32(Request.Cookies["rolUsuario"]);
 
@@ -268,7 +268,7 @@ namespace webMetics.Controllers
 
         // Métodos AJAX para obtener tipos de participantes, departamentos y secciones según el área seleccionada en el formulario
         [HttpGet]
-        public ActionResult GetTiposParticipante(string tipoParticipante)
+        public JsonResult GetTiposParticipante(string tipoParticipante)
         {
             string[] tipoDeParticipantes = Enum.GetNames(typeof(TipoDeParticipantes));
             List<string> tipoDeParticipantesLista = new List<string>(tipoDeParticipantes);
@@ -277,14 +277,14 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDepartamentosByArea(string areaName)
+        public JsonResult GetDepartamentosByArea(string areaName)
         {
             List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
             return Json(departamentos);
         }
 
         [HttpGet]
-        public ActionResult GetSeccionesByDepartamento(string areaName, string departamentoName)
+        public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
             List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
             return Json(secciones);

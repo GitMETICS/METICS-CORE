@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -29,7 +27,6 @@ namespace webMetics.Controllers
         /* Método de la vista ListaGruposDisponibles que muestra todos los grupos disponibles para inscribirse.
          * Un grupo es disponible si la fecha de inscripción y el día de inicio aún no han pasado y si el estado es visible.
          */
-        [Authorize]
         public ActionResult ListaGruposDisponibles()
         {
             // Obtener y mostrar mensajes de alerta si es necesario
@@ -49,28 +46,30 @@ namespace webMetics.Controllers
             ViewBag.ParticipantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
             ViewBag.IdParticipante = "";
 
-            string rolUsuario = User.FindFirstValue(ClaimTypes.Role);
-            string idUsuario = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            ViewBag.IdParticipante = idUsuario;
-
-            if (rolUsuario == "Participante")
+            if (/*Request.Cookies.Get("rolUsuario") != null && Request.Cookies.Get("idUsuario") != null*/true)
             {
-                List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                int rolUsuario = Convert.ToInt32("1"/*Request.Cookies["rolUsuario"].Value*/);
+                string idUsuario = Convert.ToString(1/*Request.Cookies["idUsuario"].Value*/);
+                ViewBag.IdParticipante = idUsuario;
 
-                if (listaGruposInscritos != null)
+                if (rolUsuario == 0)
                 {
-                    ViewBag.GruposInscritos = listaGruposInscritos;
-                    ViewBag.ListaGrupos = listaGrupos.Where(p => !listaGruposInscritos.Any(x => x.idGrupo == p.idGrupo)).ToList();
+                    List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+
+                    if (listaGruposInscritos != null)
+                    {
+                        ViewBag.GruposInscritos = listaGruposInscritos;
+                        ViewBag.ListaGrupos = listaGrupos.Where(p => !listaGruposInscritos.Any(x => x.idGrupo == p.idGrupo)).ToList();
+                    }
+                }
+                else
+                {
+                    if (rolUsuario == 2)
+                    {
+                        ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
+                    }
                 }
             }
-            else
-            {
-                if (rolUsuario == "Asesor")
-                {
-                    ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
-                }
-            }
-            
             
             DateTime now = DateTime.Now;
             ViewBag.DateNow = now;
@@ -133,7 +132,7 @@ namespace webMetics.Controllers
                 if (ModelState.IsValid)
                 {
                     // Validar tamaño del archivo adjunto
-                    if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
+                    if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB en bytes
                     {
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
@@ -371,7 +370,7 @@ namespace webMetics.Controllers
         {
             try
             {
-                if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB in bytes
+                if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB in bytes
                 {
                     ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                     return View(grupo);

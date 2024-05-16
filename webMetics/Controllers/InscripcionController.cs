@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using webMetics.Handlers;
+﻿using webMetics.Handlers;
 using webMetics.Models;
-using System.Data;
-using System.Web.UI;
+using Microsoft.AspNetCore.Mvc;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -197,7 +195,69 @@ namespace webMetics.Controllers
         /* Método para enviar confirmación de inscripción al usuario*/
         private void SendEmail(GrupoModel grupo, string mensaje, string correoParticipante)
         {
-            
+            /*// Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Se utiliza la librería MimeKit para construir el mensaje
+            // El mensaje incluye una versión en HTML y texto plano
+
+            // Contenido base del mensaje en HTML y texto plano
+            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+            const string BASE_MESSAGE_TEXT = "";
+            const string BASE_SUBJECT = "Comprobante de inscripción"; // Asunto del correo
+
+            MimeMessage message = new MimeMessage();
+
+            // Configurar el remitente y el destinatario
+            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
+            message.From.Add(from);
+            MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
+            message.To.Add(to);
+
+            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + mensaje;
+            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+            bodyBuilder.HtmlBody += "</p>";
+
+            // Obtener los datos del archivo adjunto (si existe) y agregarlo al mensaje
+            byte[] attachmentData = accesoAGrupo.ObtenerArchivo(grupo);
+            if (attachmentData != null)
+            {
+                // Crear la parte adjunta del mensaje
+                var attachment = new MimeKit.MimePart("application", "octet-stream")
+                {
+                    Content = new MimeContent(new MemoryStream(attachmentData)),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName = accesoAGrupo.ObtenerNombreArchivo(grupo) // Nombre del archivo adjunto
+                };
+
+                // Crear una parte multipart para incluir tanto el cuerpo del mensaje como el archivo adjunto
+                var multipart = new Multipart("mixed");
+                multipart.Add(bodyBuilder.ToMessageBody());
+                multipart.Add(attachment);
+                message.Body = multipart;
+            }
+            else
+            {
+                // Si no hay archivo adjunto, solo agregar el cuerpo del mensaje al mensaje principal
+                message.Body = bodyBuilder.ToMessageBody();
+            }
+
+            // Enviar el correo electrónico utilizando un cliente SMTP
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, "pass"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }*/
         }
 
         //Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
@@ -381,6 +441,57 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
+            /*// Obtener la lista de participantes del grupo y la información del grupo
+            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            StringWriter sw = new StringWriter();
+            HtmlTextWriter htw = new HtmlTextWriter(sw);
+
+            // Crear una tabla de datos para los participantes
+            DataTable dt = new DataTable("Participantes");
+            dt.Columns.AddRange(new DataColumn[6] {
+                new DataColumn("Identificación", typeof(string)),
+                new DataColumn("Nombre", typeof(string)),
+                new DataColumn("Condición", typeof(string)),
+                new DataColumn("Unidad académica", typeof(string)),
+                new DataColumn("Correo institucional", typeof(string)),
+                new DataColumn("Teléfono", typeof(int))
+            });
+
+            foreach (var participante in lista)
+            {
+                dt.Rows.Add(participante.idParticipante, 
+                    participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2, 
+                    participante.condicion, 
+                    participante.unidadAcademica, 
+                    participante.correo, 
+                    participante.telefonos);
+            }
+            
+            // Creamos el archivo de Excel
+            var grid = new GridView();
+            grid.DataSource = dt;
+            grid.DataBind();
+
+            // Generamos un nombre de archivo único
+            string fileName = "Lista_de_Participantes_" + grupo.nombre + ".xlsx";
+            
+            // Configurar la respuesta HTTP para descargar el archivo
+            Response.ClearContent();
+            Response.Buffer = true;
+            Response.AddHeader("content-disposition", "attachment; filename=" + fileName);
+            Response.ContentType = "application/ms-excel";
+
+            // Agregar títulos y encabezados a la respuesta Excel
+            htw.WriteLine($"<div>Nombre del módulo: {grupo.nombre}</div>");
+            htw.WriteLine($"<div>Nombre del asesor asociado: {grupo.nombreAsesorAsociado}</div><br>");
+            grid.RenderControl(htw);
+            
+            Response.Output.Write(sw.ToString());
+
+            Response.Flush();
+            Response.End();*/
+
             return new EmptyResult();
         }
     }
