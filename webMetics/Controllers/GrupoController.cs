@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Net;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -24,11 +25,38 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         /* Método de la vista ListaGruposDisponibles que muestra todos los grupos disponibles para inscribirse.
          * Un grupo es disponible si la fecha de inscripción y el día de inicio aún no han pasado y si el estado es visible.
          */
         public ActionResult ListaGruposDisponibles()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Obtener y mostrar mensajes de alerta si es necesario
             ViewBag.Message = "";
             if (TempData["showPopup"] != null && TempData["showPopup"] is bool showPopup && showPopup)
@@ -46,10 +74,10 @@ namespace webMetics.Controllers
             ViewBag.ParticipantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
             ViewBag.IdParticipante = "";
 
-            if (/*Request.Cookies.Get("rolUsuario") != null && Request.Cookies.Get("idUsuario") != null*/true)
+            if (GetRole() != 0 && GetId() != "")
             {
-                int rolUsuario = Convert.ToInt32("1"/*Request.Cookies["rolUsuario"].Value*/);
-                string idUsuario = Convert.ToString(1/*Request.Cookies["idUsuario"].Value*/);
+                int rolUsuario = GetRole();
+                string idUsuario = GetId();
                 ViewBag.IdParticipante = idUsuario;
 
                 if (rolUsuario == 0)
@@ -95,6 +123,9 @@ namespace webMetics.Controllers
         /* Vista del formulario para crear un grupo */
         public ActionResult AgregarGrupo()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Obtener la lista de temas y asesores disponibles para crear un grupo
             List<SelectListItem> temas = accesoATema.ObtenerListaSeleccionTemas();
             List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
@@ -131,6 +162,8 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
                     // Validar tamaño del archivo adjunto
                     if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB en bytes
                     {
@@ -197,6 +230,8 @@ namespace webMetics.Controllers
             ViewBag.ExitoAlCrear = false;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Eliminar el grupo y verificar el éxito de la operación
                 ViewBag.ExitoAlCrear = accesoAGrupo.EliminarGrupo(idGrupo.Value);
                 if (ViewBag.ExitoAlCrear)
@@ -222,6 +257,8 @@ namespace webMetics.Controllers
             ViewBag.ExitoAlCrear = false;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Cambiar el estado de visibilidad del grupo y verificar el éxito de la operación
                 ViewBag.ExitoAlCrear = accesoAGrupo.CambiarEstadoVisible(idGrupo);
                 if (ViewBag.ExitoAlCrear)
@@ -248,6 +285,8 @@ namespace webMetics.Controllers
             ActionResult vista;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Obtener información del grupo a editar
                 GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
@@ -288,6 +327,8 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Validar fechas de inicio y finalización
                 if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
                 {
@@ -345,6 +386,8 @@ namespace webMetics.Controllers
             ActionResult vista;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Obtener información del grupo para editar el adjunto
                 GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
@@ -370,6 +413,8 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB in bytes
                 {
                     ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");

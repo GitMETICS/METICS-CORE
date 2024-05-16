@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
+    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
     {
         <!-- ** BEGIN POP-UP LOADING AREA ** -->
         <div id="loading" style="display:none;">
@@ -89,3 +89,19 @@
         margin-top: 20px;
     }
 </style>
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
+
+    <script type="text/javascript">
+
+        $(function () {
+            $("form").submit(function () {
+                if ($(this).valid()) {
+                    $("#loading").show();
+                }
+            });
+        });
+
+    </script>
+}
