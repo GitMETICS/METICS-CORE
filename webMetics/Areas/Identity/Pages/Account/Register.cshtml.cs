@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -18,22 +18,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using webMetics.Areas.Identity.Data;
+using static System.Collections.Specialized.BitVector32;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using webMetics.Models;
 
 namespace webMetics.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<webMeticsUser> _signInManager;
+        private readonly UserManager<webMeticsUser> _userManager;
+        private readonly IUserStore<webMeticsUser> _userStore;
+        private readonly IUserEmailStore<webMeticsUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<webMeticsUser> userManager,
+            IUserStore<webMeticsUser> userStore,
+            SignInManager<webMeticsUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -70,6 +74,64 @@ namespace webMetics.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Display(Name = "Número de identificación")]
+            public string idParticipante { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
+            [Display(Name = "Nombre")]
+            public string nombre { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un apellido.")]
+            [Display(Name = "Primer apellido")]
+            public string apellido_1 { get; set; }
+
+            [Display(Name = "Segundo apellido")]
+            public string apellido_2 { get; set; }
+
+            [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+            [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+            [Display(Name = "Correo institucional")]
+            public string correo { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
+            [Display(Name = "Tipo de identificación")]
+            public string tipoIdentificacion { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
+            [Display(Name = "Tipo de participante")]
+            public string tipoParticipante { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar una unidad académica.")]
+            [Display(Name = "Unidad académica")]
+            public string unidadAcademica { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un área.")]
+            [Display(Name = "Área a la que pertenece")]
+            public string area { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un departamento.")]
+            [Display(Name = "Departamento al que pertenece")]
+            public string departamento { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar una sección.")]
+            [Display(Name = "Sección a la que pertenece")]
+            public string seccion { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar una condición actual.")]
+            [Display(Name = "Condición actual")]
+            public string condicion { get; set; }
+
+            [Required(ErrorMessage = "Es necesario ingresar un número de teléfono.")]
+            [Display(Name = "Número de teléfono")]
+            public string telefonos { get; set; }
+
+            [Display(Name = "Horas matriculadas")]
+            public int horasMatriculadas { get; set; }
+
+            [Display(Name = "Horas aprobadas")]
+            public int horasAprobadas { get; set; }
+
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -114,6 +176,18 @@ namespace webMetics.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                user.nombre = Input.nombre;
+                user.apellido_1 = Input.apellido_1;
+                user.apellido_2 = Input.apellido_2;
+                user.correo = Input.Email;
+                user.tipoIdentificacion = Input.tipoIdentificacion;
+                user.unidadAcademica = Input.unidadAcademica;
+                user.telefonos = Input.telefonos;
+                user.condicion = Input.condicion;
+                user.area = Input.area;
+                user.departamento = Input.departamento;
+                user.seccion = Input.seccion;
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -154,27 +228,41 @@ namespace webMetics.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private webMeticsUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<webMeticsUser>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(webMeticsUser)}'. " +
+                    $"Ensure that '{nameof(webMeticsUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<webMeticsUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<webMeticsUser>)_userStore;
+        }
+
+        public enum TipoIdentificacion
+        {
+            Cédula,
+            Residente,
+            Pasaporte
+        }
+
+        public enum TipoDeParticipantes
+        {
+            Profesor,
+            Director,
+            Asistente
         }
     }
 }
