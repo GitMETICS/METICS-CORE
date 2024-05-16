@@ -49,7 +49,7 @@ namespace webMetics
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
 
-            using (var scope = app.Services.CreateScope())
+            /* using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -81,7 +81,7 @@ namespace webMetics
                     await userManager.AddToRoleAsync(user, "Admin");
 
                 }
-            }
+            }*/
 
             app.Run();
 
