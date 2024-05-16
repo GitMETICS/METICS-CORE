@@ -156,7 +156,7 @@ namespace webMetics.Controllers
         // Método para validar el usuario y realizar el inicio de sesión
         public LoginModel ValidacionUsuario(LoginModel usuario)
         {
-            // Verificar si se proporcionaron la identificación del usuario y la contraseña
+            /*// Verificar si se proporcionaron la identificación del usuario y la contraseña
             if (usuario.identificacion != null && usuario.contrasena != null)
             {
                 bool exito = accesoAUsuario.Login(usuario.identificacion, usuario.contrasena);
@@ -196,13 +196,15 @@ namespace webMetics.Controllers
             {
                 // Si no se proporcionó la identificación del usuario o la contraseña, retorna null (usuario no válido)
                 return null;
-            }
+            }*/
+
+            return null;
         }
 
         // Método para cerrar la sesión del usuario
         public ActionResult Logout()
         {
-            // Limpiar la información del usuario y cerrar la sesión
+            /*// Limpiar la información del usuario y cerrar la sesión
             HttpContext.User = new GenericPrincipal(new GenericIdentity(""), null);
             FormsAuthentication.SignOut();
 
@@ -218,7 +220,7 @@ namespace webMetics.Controllers
             {
                 cookieRol.Expires = DateTime.Now.AddYears(-1);
                 Response.Cookies.Add(cookieRol);
-            }
+            }*/
 
             // Redirigir a la página de inicio de sesión
             return Redirect("/Login/Login");
@@ -285,7 +287,7 @@ namespace webMetics.Controllers
         /* Método para enviar confirmación de registro al usuario*/
         private void EnviarCorreoRegistro(string mensaje, string correoParticipante)
         {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            /*// Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje
             // El mensaje incluye una versión en HTML y texto plano
 
@@ -324,7 +326,7 @@ namespace webMetics.Controllers
 
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
-            }
+            }*/
         }
 
         private string ConstructorDelMensajeRegistro(string contrasena, ParticipanteModel participante)
