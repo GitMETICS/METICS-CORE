@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         if (ViewBag.Message != null)
         {
@@ -15,7 +15,7 @@
             </div>
         }
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (Context.Request.Headers["Referer"] != "")
+            @if (/*Request.UrlReferrer != null*/true)
             {
                 <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
             }

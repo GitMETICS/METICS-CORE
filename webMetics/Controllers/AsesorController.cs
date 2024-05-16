@@ -26,9 +26,36 @@ namespace webMetics.Controllers
             GrupoHandler = new GrupoHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         /* Método de la vista ListaAsesores que muestra todos los asesores */
         public ActionResult ListaAsesores()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -46,6 +73,9 @@ namespace webMetics.Controllers
         /* Método de la vista del formulario para crear un asesor */
         public ActionResult AgregarAsesor()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -70,6 +100,9 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     if (accesoAUsuario.ExisteUsuario(asesor.identificacion))
                     {
                         // Verificar si ya existe un asesor con los mismos datos en la base de datos
@@ -121,6 +154,9 @@ namespace webMetics.Controllers
         /* Método para eliminar un asesor */
         public ActionResult EliminarAsesor(string idAsesor)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Verificar si se puede eliminar el asesor (no está asignado a ningún grupo)
             bool eliminar = accesoAAsesor.PuedeEliminarAsesor(idAsesor);
 
@@ -153,6 +189,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Buscar el asesor a editar en la lista de asesores y obtenerlo
                 AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.identificacion == idAsesor);
 
@@ -183,6 +222,9 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid) 
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     bool exito = accesoAAsesor.EditarAsesor(asesor);
 
                     if (exito)

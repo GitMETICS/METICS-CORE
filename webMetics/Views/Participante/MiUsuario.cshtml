@@ -10,8 +10,10 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
     <div class="contenedor-tipos-actividades container-fluid">
-        <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-        
+        @if (/*Request.UrlReferrer != null*/ true)
+        {
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+        }
         <h1>@ViewBag.Title</h1>
         <hr />
 

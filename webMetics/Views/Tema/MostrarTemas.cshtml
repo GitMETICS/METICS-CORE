@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         if (ViewBag.Message != null)
         {

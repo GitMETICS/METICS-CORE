@@ -21,9 +21,35 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         /* Método para mostrar la lista de participantes inscritos en un grupo */
         public ActionResult ListaDeParticipantesInscritos(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
 
             // Obtener la lista de participantes inscritos en el grupo especificado por idGrupo
             ViewBag.InscritosEnGrupo = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
@@ -34,6 +60,9 @@ namespace webMetics.Controllers
         /* Método para inscribir a un usuario a un grupo */
         public ActionResult Inscribir(int idGrupo, string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
@@ -88,6 +117,9 @@ namespace webMetics.Controllers
 
         private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             bool noEstaInscrito = false;
 
             List<InscripcionModel> listaInscritos = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
@@ -106,6 +138,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Intentar eliminar la inscripción del usuario con el idGenerado en el grupo especificado por idGrupo
                 ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
 
@@ -141,6 +176,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Intentar eliminar la inscripción del participante con el idParticipante en el grupo especificado por idGrupo
                 ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
 

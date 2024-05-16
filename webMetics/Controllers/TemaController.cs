@@ -26,9 +26,36 @@ namespace webMetics.Controllers
             grupoHandler = new GrupoHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         /* Vista del formulario para crear un tema */
         public ActionResult CrearTema()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Cargar los datos necesarios para llenar las opciones del formulario (categorias, tipos de actividad y asesores)
             ViewData["Categorias"] = null;
             ViewData["TipoActividad"] = null;
@@ -49,6 +76,9 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     // Intenta crear el tema y su relación con el asesor asociado
                     ViewBag.ExitoAlCrear = temaHandler.CrearTema(tema);
                     ViewBag.ExitoAlCrear2 = temaHandler.CrearRelacionTemaAsesor(tema);
@@ -81,6 +111,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Muestra los temas asignados a la categoría proporcionada
                 ViewBag.Nombre = nombre;
                 ViewBag.Temas = temaHandler.RecuperarTemasDeCategoria(nombre);
@@ -98,6 +131,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Verificar si el tema puede ser eliminado (no está asociado a un grupo)
                 bool canBeDeleted = grupoHandler.CanEliminarTema(Int32.Parse(nombre));
                 if (!canBeDeleted)

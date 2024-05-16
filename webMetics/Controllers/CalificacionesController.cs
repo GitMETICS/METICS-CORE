@@ -19,8 +19,35 @@ namespace webMetics.Controllers
             accesoACalificaciones = new CalificacionesHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         public ActionResult VerCalificaciones(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             ViewBag.ListaCalificaciones = calificaciones;
             ViewBag.IdGrupo = idGrupo;
@@ -41,6 +68,9 @@ namespace webMetics.Controllers
 
         public ActionResult EditarCalificacion(int idGrupo, string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             CalificacionModel calificacion = calificaciones.Find(calificacionModel => calificacionModel.participante.idParticipante == idParticipante);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
@@ -56,6 +86,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
             }
             catch
@@ -314,6 +347,9 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult EnviarCalificaciones(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 

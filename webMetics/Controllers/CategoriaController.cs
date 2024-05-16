@@ -29,6 +29,30 @@ namespace webMetics.Controllers
             grupoHandler = new GrupoHandler();
         }
 
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         /* Método de la vista CrearCategoría que muestra el formulario para crear una categoría */
         public ActionResult CrearCategoria()
         {
@@ -45,6 +69,9 @@ namespace webMetics.Controllers
                 // Si los datos ingresados son válidos por el Modelo
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     // Recuperar la lista de categorías en minúsculas
                     List<CategoriaModel> categorias = categoriaHandler.RecuperarCategoriasLowerCase();
 
@@ -78,6 +105,9 @@ namespace webMetics.Controllers
         /* Método de la vista ListaCategorias que muestra todas las categorías */
         public ActionResult ListaCategorias()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Recuperar todas las categorías y almacenarlas en ViewBag.Categorias para mostrarlas en la vista
             ViewBag.Categorias = categoriaHandler.RecuperarCategorias();
             return View();
@@ -86,6 +116,9 @@ namespace webMetics.Controllers
         /* Método para eliminar una categoría */
         public ActionResult EliminarCategoria(string nombreCategoria)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Recuperar la lista de categorías
             List<CategoriaModel> categorias = categoriaHandler.RecuperarCategorias();
 
@@ -138,6 +171,9 @@ namespace webMetics.Controllers
 
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Encontrar la categoría correspondiente al nombre proporcionado
                 CategoriaModel modificarCategoria = categoriaHandler.RecuperarCategorias().Find(categoriaModel => categoriaModel.nombre == nombre);
 
@@ -165,6 +201,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Si están vacíos devuelve la vista con los mensajes de validación del modelo
                 if (categoria.nombre == null || categoria.descripcion == null)
                 {

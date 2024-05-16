@@ -14,7 +14,7 @@
 <head>
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         using (Html.BeginForm("CrearAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
@@ -118,3 +118,17 @@
         font-size: 16px;
     }
 </style>
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $("form").submit(function () {
+                if ($(this).valid()) {
+                    $("#loading").show();
+                }
+            });
+        });
+    </script>
+}

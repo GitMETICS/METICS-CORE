@@ -1,4 +1,4 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
 using System.Security.Principal;
@@ -16,13 +16,11 @@ namespace webMetics.Controllers
         private protected CookiesController cookiesController = new CookiesController();
         private protected UsuarioHandler accesoAUsuario = new UsuarioHandler();
         private protected ParticipanteHandler accesoAParticipante = new ParticipanteHandler();
-        private readonly LdapAuthenticationService _ldapAuthenticationService;
 
         // Constructor del controlador
         public LoginController()
         {
-            // Inicializar el servicio de autenticación LDAP con la información del servidor LDAP
-            _ldapAuthenticationService = new LdapAuthenticationService("localhost", 389, "your_ldap_base_dn"); // Cambiar por datos reales
+
         }
 
         // Método para mostrar la vista de inicio de sesión
@@ -71,35 +69,6 @@ namespace webMetics.Controllers
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 
-        // Método para procesar el inicio de sesión utilizando el servicio de autenticación LDAP
-        [HttpPost]
-        public ActionResult Login02(string username, string password)
-        {
-            // Verificar las credenciales del usuario utilizando el servicio de autenticación LDAP
-            if (_ldapAuthenticationService.Authenticate(username, password))
-            {
-                // Si la autenticación es exitosa, obtener los detalles del usuario
-                var user = _ldapAuthenticationService.GetUser(username, password);
-
-                if (user != null)
-                {
-                    // Si se encuentra el usuario, redirigir a la página de inicio
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
-                }
-                else
-                {
-                    // Si el usuario no se encuentra, mostrar un mensaje de error y redirigir al formulario de usuario
-                    ModelState.AddModelError("Error", "Número de identificación o contraseña inválidos.");
-                    return Redirect("/Participante/FormularioDeUsuario");
-                }
-            }
-            else
-            {
-                // Si la autenticación falla, mostrar un mensaje de error y volver a mostrar la vista de inicio de sesión
-                ViewBag.ErrorMessage = "Invalid username or password";
-                return View();
-            }
-        }
 
         // --------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -155,7 +124,7 @@ namespace webMetics.Controllers
         {
             bool exitoUsuario;
             bool exitoParticipante;
-            string contrasena = Membership.GeneratePassword(15, 3);
+            string contrasena = "pass";/*Membership.GeneratePassword(15, 3);*/
 
             if (accesoAUsuario.ExisteUsuario(usuario.identificacion))
             {

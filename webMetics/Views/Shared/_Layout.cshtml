@@ -4,19 +4,17 @@
 //-->
 @using webMetics.Controllers
 @{
-}
 
+}
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/bootstrap-chosen.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
 <body>
     <div class="logos_wrapper" style="background-color: #44beef ">
@@ -48,7 +46,7 @@
                 <ul class="navbar-nav me-auto">
                     <!-- Avatar -->
                     @{
-                        if (User.Identity.IsAuthenticated)
+                        if (ViewBag.Id != "")
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
@@ -59,26 +57,21 @@
 
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <li>
-                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = ViewBag.IdParticipante }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
                                     </li>
                                     <li>
-                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.IdParticipante }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = idCookie }, new { @class = "dropdown-item" })
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li class="dropdown-item">
-                                        <form method="post" asp-area="Identity" asp-page="/Account/Logout">
-                                            <button type="submit" style="width:auto"
-                                                    class="nav-link btn btn-link py-0">
-                                                Cerrar Sesión
-                                            </button>
-                                        </form>
+                                    <li>
+                                        <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
                                     </li>
                                 </ul>
                             </li>
                         }
                     }
 
-                    @if (User.IsInRole("Admin"))
+                    @if (ViewBag.Role == 1)
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones admin</a>
@@ -92,7 +85,7 @@
                             </div>
                         </li>
                     }
-                    @if (User.IsInRole("Asesor"))
+                    @if (ViewBag.Role == 2)
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones asesor</a>
@@ -162,7 +155,10 @@
             <p>&copy; @DateTime.Now.Year METICS</p>
         </div>
     </footer>
-    <script src="~/js/bundles.min.js"></script>
+
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/chosen.jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

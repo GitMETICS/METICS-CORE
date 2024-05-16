@@ -9,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (!User.Identity.IsAuthenticated)
+    @if (ViewBag.Id == "")
     {
         if (ViewBag.Message != null)
         {
@@ -121,7 +121,7 @@
     }
     else
     {
-        Context.Response.Redirect("~/Grupo/ListaGruposDisponibles");
+        Response.Redirect("~/Grupo/ListaGruposDisponibles");
     }
 </body>
 </html>
