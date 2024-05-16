@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Web;
-using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace webMetics.Models
@@ -13,7 +10,7 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Es necesario seleccionar una modalidad.")]
         [Display(Name = "Modalidad")]
-        public string? modalidad { get; set; }
+        public string modalidad { get; set; }
 
         [Required(ErrorMessage = "Ingrese el cupo.")]
         [Display(Name = "Cupo")]
@@ -25,21 +22,21 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Agregue la descripción del módulo.")]
         [Display(Name = "Descripción")]
-        public string? descripcion { get; set; }
+        public string descripcion { get; set; }
 
         public int esVisible { get; set; }
 
         [Required(ErrorMessage = "Agregue el lugar o enlace donde se imparte el curso.")]
         [Display(Name = "Lugar")]
-        public string? lugar { get; set; }
+        public string lugar { get; set; }
 
         [Required(ErrorMessage = "Es necesario que ingrese el nombre del módulo.")]
         [Display(Name = "Nombre del módulo")]
-        public string? nombre { get; set; }
+        public string nombre { get; set; }
 
         [Required(ErrorMessage = "Es necesario que ingrese el horario del módulo.")]
         [Display(Name = "Horario")]
-        public string? horario { get; set; }
+        public string horario { get; set; }
 
         [Required(ErrorMessage = "Es necesario que seleccione la fecha de inicio de la actividad.")]
         [Display(Name = "Fecha de inicio")]
@@ -72,17 +69,17 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
         [Display(Name = "Tema asociado")]
-        public string? temaAsociado { get; set; }
+        public string temaAsociado { get; set; }
 
-        public string? nombreAsesorAsociado { get; set; }
+        public string nombreAsesorAsociado { get; set; }
 
-        public string? tipoActividadAsociado { get; set; }
+        public string tipoActividadAsociado { get; set; }
 
         [Required(ErrorMessage = "Debe adjuntar el documento del módulo.")]
         [Display(Name = "Archivo adjunto")]
-        public IFormFile? archivoAdjunto { get; set; }
+        public string/*HttpPostedFileBase*/ archivoAdjunto { get; set; }
 
-        public string? nombreArchivo { get; set; }
+        public string nombreArchivo { get; set; }
 
     }
 
