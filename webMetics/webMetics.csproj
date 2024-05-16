@@ -37,4 +37,9 @@
     <PackageReference Include="Novell.Directory.Ldap" Version="2.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

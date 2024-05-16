@@ -138,6 +138,7 @@ namespace webMetics.Areas.Identity.Pages.Account.Manage
                 apellido_2 = user.apellido_2,
                 correo = user.correo,
                 tipoIdentificacion = user.tipoIdentificacion,
+                idParticipante = user.id,
                 unidadAcademica = user.unidadAcademica,
                 telefonos = user.telefonos,
                 condicion = user.condicion,
@@ -209,6 +210,11 @@ namespace webMetics.Areas.Identity.Pages.Account.Manage
             if (Input.tipoIdentificacion != user.tipoIdentificacion)
             {
                 user.tipoIdentificacion = Input.tipoIdentificacion;
+            }
+
+            if (Input.idParticipante != user.id)
+            {
+                user.id = Input.idParticipante;
             }
 
             if (Input.unidadAcademica != user.unidadAcademica)

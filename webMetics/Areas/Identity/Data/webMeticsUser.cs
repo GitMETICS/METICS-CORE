@@ -18,6 +18,8 @@ public class webMeticsUser : IdentityUser
     [PersonalData]
     public string? correo { get; set; }
     [PersonalData]
+    public string? id { get; set; }
+    [PersonalData]
     public string? tipoIdentificacion { get; set; }
     [PersonalData]
     public string? unidadAcademica { get; set; }
