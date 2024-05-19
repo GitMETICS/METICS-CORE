@@ -7,6 +7,10 @@ namespace webMetics.Handlers
 {
     public class TipoActividadHandler : BaseDeDatosHandler
     {
+        public TipoActividadHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         public bool CrearTipoActividad(TipoActividadModel tipoActividad)
         {
             bool consultaExitosa;

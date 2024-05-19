@@ -10,15 +10,19 @@ namespace webMetics.Controllers
 {
     public class InscripcionController : Controller
     {
-        public InscripcionHandler accesoAInscripcion;
-        public GrupoHandler accesoAGrupo;
-        public ParticipanteHandler accesoAParticipante;
+        private InscripcionHandler accesoAInscripcion;
+        private GrupoHandler accesoAGrupo;
+        private ParticipanteHandler accesoAParticipante;
 
-        public InscripcionController()
+        private readonly IWebHostEnvironment _environment;
+
+        public InscripcionController(IWebHostEnvironment environment)
         {
-            accesoAInscripcion = new InscripcionHandler();
-            accesoAGrupo = new GrupoHandler();
-            accesoAParticipante = new ParticipanteHandler();
+            _environment = environment;
+
+            accesoAInscripcion = new InscripcionHandler(environment);
+            accesoAGrupo = new GrupoHandler(environment);
+            accesoAParticipante = new ParticipanteHandler(environment);
         }
 
         public int GetRole()

@@ -11,7 +11,13 @@ namespace webMetics.Handlers
 {
     public class AsesorHandler : BaseDeDatosHandler
     {
-        private GrupoHandler accesoAGrupo = new GrupoHandler();
+        private GrupoHandler accesoAGrupo;
+
+        public AsesorHandler(IWebHostEnvironment environment) : base(environment)
+        {
+            accesoAGrupo = new GrupoHandler(environment);
+        }
+
 
         // Crear la consulta para crear el asesor en la base de datos
         public bool CrearAsesor(AsesorModel asesor)

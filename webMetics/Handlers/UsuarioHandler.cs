@@ -7,6 +7,10 @@ namespace webMetics.Handlers
     public class UsuarioHandler : BaseDeDatosHandler
         
     {
+        public UsuarioHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         public bool CrearUsuario(string id, string contrasena)
         {
             int exito;

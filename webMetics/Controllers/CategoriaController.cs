@@ -19,14 +19,17 @@ namespace webMetics.Controllers
         public TipoActividadHandler tipoActividadHandler;
         public GrupoHandler grupoHandler;
 
-        // Constructor del controlador, inicializa los handlers
-        public CategoriaController()
+        private readonly IWebHostEnvironment _environment;
+
+        public CategoriaController(IWebHostEnvironment environment)
         {
-            categoriaHandler = new CategoriaHandler();
-            asesorHandler = new AsesorHandler();
-            temaHandler = new TemaHandler();
-            tipoActividadHandler = new TipoActividadHandler();
-            grupoHandler = new GrupoHandler();
+            _environment = environment;
+
+            categoriaHandler = new CategoriaHandler(environment);
+            asesorHandler = new AsesorHandler(environment);
+            temaHandler = new TemaHandler(environment);
+            tipoActividadHandler = new TipoActividadHandler(environment);
+            grupoHandler = new GrupoHandler(environment);
         }
 
         public int GetRole()

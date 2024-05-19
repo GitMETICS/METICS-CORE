@@ -6,11 +6,15 @@ namespace webMetics.Handlers
 {
     public class CalificacionesHandler : BaseDeDatosHandler
     {
+        public CalificacionesHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         // Método para obtener la calificación de un participante
         public CalificacionModel ObtenerCalificacionParticipante(DataRow filaCalificacion)
         {
             string idParticipante = Convert.ToString(filaCalificacion["id_participante_FK"]);
-            ParticipanteHandler participanteHandler = new ParticipanteHandler();
+            ParticipanteHandler participanteHandler = new ParticipanteHandler(_environment);
 
             ParticipanteModel participante = participanteHandler.ObtenerParticipante(idParticipante);
 

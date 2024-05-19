@@ -13,14 +13,19 @@ namespace webMetics.Controllers
         // Controlador encargado de la funcionalidad de inicio de sesión
 
         // Controladores y Handlers utilizados en el controlador
-        private protected CookiesController cookiesController = new CookiesController();
-        private protected UsuarioHandler accesoAUsuario = new UsuarioHandler();
-        private protected ParticipanteHandler accesoAParticipante = new ParticipanteHandler();
+        private protected CookiesController cookiesController;
+        private protected UsuarioHandler accesoAUsuario;
+        private protected ParticipanteHandler accesoAParticipante;
 
-        // Constructor del controlador
-        public LoginController()
+        private readonly IWebHostEnvironment _environment;
+
+        public LoginController(IWebHostEnvironment environment)
         {
+            _environment = environment;
 
+            cookiesController = new CookiesController(environment);
+            accesoAUsuario = new UsuarioHandler(environment);
+            accesoAParticipante = new ParticipanteHandler(environment);
         }
 
         // Método para mostrar la vista de inicio de sesión
@@ -75,7 +80,7 @@ namespace webMetics.Controllers
         /* Método para procesar el formulario de creación de usuario con los datos ingresados */
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult FormularioDeUsuario(UsuarioModel usuario)
+        public ActionResult CrearUsuario(UsuarioModel usuario)
         {
             try
             {
@@ -99,7 +104,7 @@ namespace webMetics.Controllers
                 else
                 {
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View("FormularioDeUsuario");
+                    return View("CrearUsuario");
                 }
             }
             catch (Exception e)
@@ -117,7 +122,7 @@ namespace webMetics.Controllers
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
 
-            return View("FormularioDeUsuario");
+            return View("CrearUsuario");
         }
 
         private bool RegistrarUsuario(UsuarioModel usuario)

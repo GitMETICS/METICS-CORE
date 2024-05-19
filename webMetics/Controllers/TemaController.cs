@@ -10,20 +10,23 @@ namespace webMetics.Controllers
     public class TemaController : Controller
     {
         // Declaración de objetos de acceso a datos para manejar las entidades relacionadas
-        public CategoriaHandler categoriaHandler;
-        public TipoActividadHandler tipoActividadHandler;
-        public AsesorHandler asesorHandler;
-        public TemaHandler temaHandler;
-        public GrupoHandler grupoHandler;
+        private CategoriaHandler categoriaHandler;
+        private TipoActividadHandler tipoActividadHandler;
+        private AsesorHandler asesorHandler;
+        private TemaHandler temaHandler;
+        private GrupoHandler grupoHandler;
 
-        // Constructor para inicializar los objetos de acceso a datos
-        public TemaController()
+        private readonly IWebHostEnvironment _environment;
+
+        public TemaController(IWebHostEnvironment environment)
         {
-            categoriaHandler = new CategoriaHandler();
-            tipoActividadHandler = new TipoActividadHandler();
-            asesorHandler = new AsesorHandler();
-            temaHandler = new TemaHandler();
-            grupoHandler = new GrupoHandler();
+            _environment = environment;
+
+            categoriaHandler = new CategoriaHandler(environment);
+            tipoActividadHandler = new TipoActividadHandler(environment);
+            asesorHandler = new AsesorHandler(environment);
+            temaHandler = new TemaHandler(environment);
+            grupoHandler = new GrupoHandler(environment);
         }
 
         public int GetRole()

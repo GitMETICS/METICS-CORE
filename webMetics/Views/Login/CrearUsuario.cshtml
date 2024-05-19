@@ -8,7 +8,7 @@
 <head>
 </head>
 <body>
-    @using (Html.BeginForm("FormularioDeUsuario", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    @using (Html.BeginForm("CrearUsuario", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
         <div class="form-horizontal">

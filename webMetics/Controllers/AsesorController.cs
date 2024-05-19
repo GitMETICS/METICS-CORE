@@ -11,19 +11,21 @@ namespace webMetics.Controllers
     // Controlador para gestionar las operaciones relacionadas con los asesores
     public class AsesorController : Controller
     {
-        // Instancias de los Handlers para acceder a la capa de lógica de negocio
         public UsuarioHandler accesoAUsuario;
         public TemaHandler accesoATema;
         public AsesorHandler accesoAAsesor;
         public GrupoHandler GrupoHandler;
 
-        // Constructor del controlador que inicializa las instancias de los Handlers
-        public AsesorController()
+        private readonly IWebHostEnvironment _environment;
+
+        public AsesorController(IWebHostEnvironment environment)
         {
-            accesoATema = new TemaHandler();
-            accesoAUsuario = new UsuarioHandler();
-            accesoAAsesor = new AsesorHandler();
-            GrupoHandler = new GrupoHandler();
+            _environment = environment;
+
+            accesoATema = new TemaHandler(environment);
+            accesoAUsuario = new UsuarioHandler(environment);
+            accesoAAsesor = new AsesorHandler(environment);
+            GrupoHandler = new GrupoHandler(environment);
         }
 
         public int GetRole()

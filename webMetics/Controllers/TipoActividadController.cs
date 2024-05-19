@@ -10,13 +10,17 @@ namespace webMetics.Controllers
 {
     public class TipoActividadController : Controller
     {
-        public TipoActividadHandler tipoActividadHandler;
-        public GrupoHandler grupoHandler;
+        private TipoActividadHandler tipoActividadHandler;
+        private GrupoHandler grupoHandler;
 
-        public TipoActividadController()
+        private readonly IWebHostEnvironment _environment;
+
+        public TipoActividadController(IWebHostEnvironment environment)
         {
-            tipoActividadHandler = new TipoActividadHandler();
-            grupoHandler = new GrupoHandler();
+            _environment = environment;
+
+            tipoActividadHandler = new TipoActividadHandler(environment);
+            grupoHandler = new GrupoHandler(environment);
         }
 
         public int GetRole()

@@ -5,6 +5,10 @@ using webMetics.Handlers;
 
 public class InscripcionHandler : BaseDeDatosHandler
 {
+    public InscripcionHandler(IWebHostEnvironment environment) : base(environment)
+    {
+    }
+
     // Método para insertar una nueva inscripción en un grupo
     public bool InsertarInscripcion(InscripcionModel inscripcion)
     {

@@ -6,16 +6,15 @@ namespace webMetics.Handlers
 {
     public class TemaHandler : BaseDeDatosHandler
     {
-
-        public CategoriaHandler categoriaHandler;
-        public TipoActividadHandler tipoActividadHandler;
+        private CategoriaHandler categoriaHandler;
+        private TipoActividadHandler tipoActividadHandler;
 
         // Constructor de la clase TemaHandler
-        public TemaHandler()
+        public TemaHandler(IWebHostEnvironment environment) : base(environment)
         {
             // Se inicializan los objetos categoriaHandler y tipoActividadHandler.
-            categoriaHandler = new CategoriaHandler();
-            tipoActividadHandler = new TipoActividadHandler();
+            categoriaHandler = new CategoriaHandler(environment);
+            tipoActividadHandler = new TipoActividadHandler(environment);
         }
 
         // Método para obtener una lista de objetos SelectListItem que representan los temas.

@@ -11,6 +11,10 @@ namespace webMetics.Handlers
 {
     public class CategoriaHandler : BaseDeDatosHandler
     {
+        public CategoriaHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         // Método para obtener una instancia de la clase CategoriaModel a partir de un DataRow
         public CategoriaModel ObtenerCategorias(DataRow filaCategoria)
         {

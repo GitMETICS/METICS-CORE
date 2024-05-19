@@ -13,16 +13,19 @@ namespace webMetics.Controllers
 {
     public class GrupoController : Controller
     {
-        public GrupoHandler accesoAGrupo;
-        public TemaHandler accesoATema;
-        public AsesorHandler accesoAAsesor;
+        private GrupoHandler accesoAGrupo;
+        private TemaHandler accesoATema;
+        private AsesorHandler accesoAAsesor;
 
-        public GrupoController()
+        private readonly IWebHostEnvironment _environment;
+
+        public GrupoController(IWebHostEnvironment environment)
         {
-            // Inicialización de los controladores de acceso a los datos
-            accesoAGrupo = new GrupoHandler();
-            accesoATema = new TemaHandler();
-            accesoAAsesor = new AsesorHandler();
+            _environment = environment;
+
+            accesoAGrupo = new GrupoHandler(environment);
+            accesoATema = new TemaHandler(environment);
+            accesoAAsesor = new AsesorHandler(environment);
         }
 
         public int GetRole()

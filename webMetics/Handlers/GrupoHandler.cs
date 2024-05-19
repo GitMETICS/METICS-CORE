@@ -12,6 +12,10 @@ namespace webMetics.Handlers
 {
     public class GrupoHandler : BaseDeDatosHandler
     {
+        public GrupoHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         // Método para crear la consulta a la BD para crear un grupo
         public bool CrearGrupo(GrupoModel grupo)
         {

@@ -3,13 +3,17 @@ using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Hosting;
 
 
 namespace webMetics.Handlers
 {
     public class ParticipanteHandler : BaseDeDatosHandler
-        
     {
+        public ParticipanteHandler(IWebHostEnvironment environment) : base(environment)
+        {
+        }
+
         // Método para verificar si existe un nuevo participante en la base de datos
         public bool ExisteParticipante(ParticipanteModel participante)
         {
@@ -322,10 +326,9 @@ namespace webMetics.Handlers
         // Método para obtener el contenido de un archivo JSON y deserializarlo en un objeto genérico
         public object GetJsonFile()
         {
-            // Obtener la ruta del archivo JSON
-            string path = ""/*HttpContext.Current.Server.MapPath("~/App_Data/dataAreas.json")*/;
+            string path = Path.Combine(_environment.WebRootPath, "data/dataAreas.json");
             // Leer todo el contenido del archivo como una cadena
-            string allText = System.IO.File.ReadAllText(path);
+            string allText = File.ReadAllText(path);
             // Deserializar el contenido del archivo JSON en un objeto genérico
             object jsonObject = JsonConvert.DeserializeObject(allText);
             return jsonObject;
