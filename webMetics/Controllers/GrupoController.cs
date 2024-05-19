@@ -18,14 +18,17 @@ namespace webMetics.Controllers
         private AsesorHandler accesoAAsesor;
 
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public GrupoController(IWebHostEnvironment environment)
+        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
 
-            accesoAGrupo = new GrupoHandler(environment);
-            accesoATema = new TemaHandler(environment);
-            accesoAAsesor = new AsesorHandler(environment);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoATema = new TemaHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
+
         }
 
         public int GetRole()

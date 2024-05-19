@@ -7,7 +7,7 @@ namespace webMetics.Handlers
     public class UsuarioHandler : BaseDeDatosHandler
         
     {
-        public UsuarioHandler(IWebHostEnvironment environment) : base(environment)
+        public UsuarioHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 

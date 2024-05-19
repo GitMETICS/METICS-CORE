@@ -10,7 +10,7 @@ namespace webMetics.Handlers
 {
     public class ParticipanteHandler : BaseDeDatosHandler
     {
-        public ParticipanteHandler(IWebHostEnvironment environment) : base(environment)
+        public ParticipanteHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 

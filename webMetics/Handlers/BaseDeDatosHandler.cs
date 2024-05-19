@@ -8,19 +8,15 @@ namespace webMetics.Handlers
     {
         protected readonly SqlConnection ConexionMetics;
         protected readonly IWebHostEnvironment _environment;
+        protected readonly IConfiguration _configuration;
 
-        // Constructor de la clase BaseDeDatosHandler
-        public BaseDeDatosHandler(IWebHostEnvironment environment)
+        public BaseDeDatosHandler(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            // Obtiene la cadena de conexión de la configuración
-            string connectionString = "Data Source=127.0.0.1;Initial Catalog=METICS;User ID=sa;Password=*****;Encrypt=False;Trust Server Certificate=True";
-
-            // string RutaConexion = ConfigurationManager.ConnectionStrings["MeticsConnection"].ToString();
-
-            // Inicializa la conexión con la base de datos usando la cadena de conexión
-            ConexionMetics = new SqlConnection(connectionString);
-
             _environment = environment;
+            _configuration = configuration;
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            ConexionMetics = new SqlConnection(connectionString);
         }
 
         // Método para ejecutar una consulta SELECT y retornar los resultados en una DataTable

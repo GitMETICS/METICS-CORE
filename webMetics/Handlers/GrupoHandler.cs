@@ -12,7 +12,7 @@ namespace webMetics.Handlers
 {
     public class GrupoHandler : BaseDeDatosHandler
     {
-        public GrupoHandler(IWebHostEnvironment environment) : base(environment)
+        public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 

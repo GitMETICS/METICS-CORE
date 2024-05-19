@@ -7,7 +7,7 @@ namespace webMetics.Handlers
 {
     public class TipoActividadHandler : BaseDeDatosHandler
     {
-        public TipoActividadHandler(IWebHostEnvironment environment) : base(environment)
+        public TipoActividadHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 

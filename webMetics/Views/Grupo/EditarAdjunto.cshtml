@@ -90,18 +90,16 @@
     }
 </style>
 
-@section Scripts{
-    <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
+<script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        $(function () {
-            $("form").submit(function () {
-                if ($(this).valid()) {
-                    $("#loading").show();
-                }
-            });
+    $(function () {
+        $("form").submit(function () {
+            if ($(this).valid()) {
+                $("#loading").show();
+            }
         });
+    });
 
-    </script>
-}
+</script>

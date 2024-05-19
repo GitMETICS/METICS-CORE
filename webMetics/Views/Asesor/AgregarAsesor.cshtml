@@ -118,17 +118,14 @@
         font-size: 16px;
     }
 </style>
+<script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
 
-@section Scripts{
-    <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
-
-    <script type="text/javascript">
-        $(function () {
-            $("form").submit(function () {
-                if ($(this).valid()) {
-                    $("#loading").show();
-                }
-            });
+<script type="text/javascript">
+    $(function () {
+        $("form").submit(function () {
+            if ($(this).valid()) {
+                $("#loading").show();
+            }
         });
-    </script>
-}
+    });
+</script>

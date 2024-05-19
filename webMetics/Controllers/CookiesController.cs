@@ -6,10 +6,12 @@ namespace webMetics.Controllers
     public class CookiesController : Controller
     {
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public CookiesController(IWebHostEnvironment environment)
+        public CookiesController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
         }
 
         public IActionResult CreateCookie(string cookieName, string cookieValue, DateTimeOffset expirationTime)

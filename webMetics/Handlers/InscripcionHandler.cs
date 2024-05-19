@@ -5,7 +5,7 @@ using webMetics.Handlers;
 
 public class InscripcionHandler : BaseDeDatosHandler
 {
-    public InscripcionHandler(IWebHostEnvironment environment) : base(environment)
+    public InscripcionHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
     {
     }
 

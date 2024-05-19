@@ -20,16 +20,18 @@ namespace webMetics.Controllers
         public GrupoHandler grupoHandler;
 
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public CategoriaController(IWebHostEnvironment environment)
+        public CategoriaController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
 
-            categoriaHandler = new CategoriaHandler(environment);
-            asesorHandler = new AsesorHandler(environment);
-            temaHandler = new TemaHandler(environment);
-            tipoActividadHandler = new TipoActividadHandler(environment);
-            grupoHandler = new GrupoHandler(environment);
+            categoriaHandler = new CategoriaHandler(environment, configuration);
+            asesorHandler = new AsesorHandler(environment, configuration);
+            temaHandler = new TemaHandler(environment, configuration);
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
+            grupoHandler = new GrupoHandler(environment, configuration);
         }
 
         public int GetRole()

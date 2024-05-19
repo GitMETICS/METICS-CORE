@@ -13,9 +13,9 @@ namespace webMetics.Handlers
     {
         private GrupoHandler accesoAGrupo;
 
-        public AsesorHandler(IWebHostEnvironment environment) : base(environment)
+        public AsesorHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
-            accesoAGrupo = new GrupoHandler(environment);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
         }
 
 

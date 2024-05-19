@@ -18,14 +18,16 @@ namespace webMetics.Controllers
         private protected ParticipanteHandler accesoAParticipante;
 
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public LoginController(IWebHostEnvironment environment)
+        public LoginController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
 
-            cookiesController = new CookiesController(environment);
-            accesoAUsuario = new UsuarioHandler(environment);
-            accesoAParticipante = new ParticipanteHandler(environment);
+            cookiesController = new CookiesController(environment, configuration);
+            accesoAUsuario = new UsuarioHandler(environment, configuration);
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
         }
 
         // Método para mostrar la vista de inicio de sesión

@@ -11,7 +11,7 @@ namespace webMetics.Handlers
 {
     public class CategoriaHandler : BaseDeDatosHandler
     {
-        public CategoriaHandler(IWebHostEnvironment environment) : base(environment)
+        public CategoriaHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 

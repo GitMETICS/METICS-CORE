@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Configuration;
+using System;
+using System.Data;
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
 
@@ -6,7 +8,7 @@ namespace webMetics.Handlers
 {
     public class CalificacionesHandler : BaseDeDatosHandler
     {
-        public CalificacionesHandler(IWebHostEnvironment environment) : base(environment)
+        public CalificacionesHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
 
@@ -14,7 +16,7 @@ namespace webMetics.Handlers
         public CalificacionModel ObtenerCalificacionParticipante(DataRow filaCalificacion)
         {
             string idParticipante = Convert.ToString(filaCalificacion["id_participante_FK"]);
-            ParticipanteHandler participanteHandler = new ParticipanteHandler(_environment);
+            ParticipanteHandler participanteHandler = new ParticipanteHandler(_environment, _configuration);
 
             ParticipanteModel participante = participanteHandler.ObtenerParticipante(idParticipante);
 

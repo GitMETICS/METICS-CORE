@@ -14,13 +14,15 @@ namespace webMetics.Controllers
         private GrupoHandler grupoHandler;
 
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public TipoActividadController(IWebHostEnvironment environment)
+        public TipoActividadController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
 
-            tipoActividadHandler = new TipoActividadHandler(environment);
-            grupoHandler = new GrupoHandler(environment);
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
+            grupoHandler = new GrupoHandler(environment, configuration);
         }
 
         public int GetRole()

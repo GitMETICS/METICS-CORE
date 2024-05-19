@@ -10,11 +10,11 @@ namespace webMetics.Handlers
         private TipoActividadHandler tipoActividadHandler;
 
         // Constructor de la clase TemaHandler
-        public TemaHandler(IWebHostEnvironment environment) : base(environment)
+        public TemaHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
             // Se inicializan los objetos categoriaHandler y tipoActividadHandler.
-            categoriaHandler = new CategoriaHandler(environment);
-            tipoActividadHandler = new TipoActividadHandler(environment);
+            categoriaHandler = new CategoriaHandler(environment, configuration);
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
         }
 
         // Método para obtener una lista de objetos SelectListItem que representan los temas.

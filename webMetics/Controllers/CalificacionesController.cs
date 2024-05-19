@@ -11,15 +11,17 @@ namespace webMetics.Controllers
         private ParticipanteHandler accesoAParticipante;
         private CalificacionesHandler accesoACalificaciones;
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        public CalificacionesController(IWebHostEnvironment environment)
+        public CalificacionesController(IWebHostEnvironment environment, IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
 
-            accesoAInscripcion = new InscripcionHandler(environment);
-            accesoAGrupo = new GrupoHandler(environment);
-            accesoAParticipante = new ParticipanteHandler(environment);
-            accesoACalificaciones = new CalificacionesHandler(environment);
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            accesoACalificaciones = new CalificacionesHandler(environment, configuration);
         }
 
         public int GetRole()
