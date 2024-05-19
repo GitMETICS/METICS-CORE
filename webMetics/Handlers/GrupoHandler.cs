@@ -54,7 +54,7 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
 
             // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
-            MemoryStream ms = new MemoryStream();
+            /* MemoryStream ms = new MemoryStream();
             grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
@@ -63,7 +63,7 @@ namespace webMetics.Handlers
             string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
             string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
             string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);*/
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             exito = comandoConsulta.ExecuteNonQuery() >= 1;
@@ -427,7 +427,7 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
 
             // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
-            MemoryStream ms = new MemoryStream();
+            /*MemoryStream ms = new MemoryStream();
             grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
@@ -436,7 +436,7 @@ namespace webMetics.Handlers
             string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
             string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
             string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);*/
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;

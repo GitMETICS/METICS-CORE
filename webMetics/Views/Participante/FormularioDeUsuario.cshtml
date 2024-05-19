@@ -121,7 +121,7 @@
     }
     else
     {
-        Response.Redirect("~/Grupo/ListaGruposDisponibles");
+        @Html.Raw("window.location.href = '" + Url.Action("ListaGruposDisponibles", "Grupo") + "';")
     }
 </body>
 </html>

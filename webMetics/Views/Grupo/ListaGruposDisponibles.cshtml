@@ -229,7 +229,7 @@
                                                     if (ViewBag.ParticipantesEnGrupos != null)
                                                     {
                                                         var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
-                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == idCookie);
+                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == ViewBag.Id);
                                                         var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
 
                                                         if (inscripcionesDelUsuarioEnEsteGrupo != null)
