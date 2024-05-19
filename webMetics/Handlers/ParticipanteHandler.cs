@@ -15,13 +15,13 @@ namespace webMetics.Handlers
         }
 
         // Método para verificar si existe un nuevo participante en la base de datos
-        public bool ExisteParticipante(ParticipanteModel participante)
+        public bool ExisteParticipante(string identificacion)
         {
             bool existeEnBaseDatos = false;
 
             try
             {
-                string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + participante.idParticipante;
+                string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + identificacion;
                 SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
                 DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
 

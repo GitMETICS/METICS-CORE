@@ -92,7 +92,7 @@ namespace webMetics.Controllers
 
                     if (registrado)
                     {
-                        ViewBag.Participante = usuario.participante;
+                        ViewBag.Correo = usuario.correo;
                         ViewBag.Titulo = "Registro realizado";
                         ViewBag.Message = "Los datos fueron guardados éxitosamente. La contraseña será enviada al correo";
                     }
@@ -129,35 +129,20 @@ namespace webMetics.Controllers
 
         private bool RegistrarUsuario(UsuarioModel usuario)
         {
-            bool exitoUsuario;
-            bool exitoParticipante;
-            string contrasena = "pass";/*Membership.GeneratePassword(15, 3);*/
+            bool exitoUsuario = false;
 
-            if (accesoAUsuario.ExisteUsuario(usuario.identificacion))
+            if (!accesoAUsuario.ExisteUsuario(usuario.identificacion))
             {
-                exitoUsuario = accesoAUsuario.EditarUsuario(usuario.identificacion, contrasena);
-            }
-            else
-            {
-                exitoUsuario = accesoAUsuario.CrearUsuario(usuario.identificacion, contrasena);
+                exitoUsuario = accesoAUsuario.CrearUsuario(usuario.identificacion, usuario.contrasena);
             }
 
-            if (accesoAParticipante.ExisteParticipante(usuario.participante))
+            if (exitoUsuario)
             {
-                exitoParticipante = accesoAParticipante.EditarParticipante(usuario.participante);
-            }
-            else
-            {
-                exitoParticipante = accesoAParticipante.CrearParticipante(usuario.participante);
+                string mensaje = "Se ha registrado en el proyecto METICS.";
+                EnviarCorreoRegistro(mensaje, usuario.correo);
             }
 
-            if (exitoUsuario && exitoParticipante)
-            {
-                string mensaje = ConstructorDelMensajeRegistro(contrasena, usuario.participante);
-                EnviarCorreoRegistro(mensaje, usuario.participante.correo);
-            }
-
-            return exitoUsuario && exitoParticipante;
+            return exitoUsuario;
         }
 
         // Método para validar el usuario y realizar el inicio de sesión
@@ -334,19 +319,6 @@ namespace webMetics.Controllers
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
             }*/
-        }
-
-        private string ConstructorDelMensajeRegistro(string contrasena, ParticipanteModel participante)
-        {
-            string mensaje = "" +
-                "<h2>Nuevo usuario registrado</h2> " +
-                "<p>Nombre: " + participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2 + "</p>" +
-                "<p>Cédula: " + participante.idParticipante + "</p>" +
-                "<p>Datos de inicio de sesión:</p>" +
-                "<ul><li>Nombre de usuario: " + participante.idParticipante + "</li>" +
-                "<li>Contraseña: " + contrasena + "</li></ul>";
-
-            return mensaje;
         }
     }
 }

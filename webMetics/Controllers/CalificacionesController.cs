@@ -28,7 +28,7 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario") != null)
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
             {
                 role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
             }
@@ -40,7 +40,7 @@ namespace webMetics.Controllers
         {
             string id = "";
 
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario") != null)
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
             {
                 id = Convert.ToString(Request.Cookies["idUsuario"]);
             }

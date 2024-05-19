@@ -10,6 +10,12 @@ namespace webMetics.Models
         [Display(Name = "Número de identificación")]
         public string identificacion { get; set; }
 
-        public ParticipanteModel participante { get; set; }
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional de la Universidad de Costa Rica.")]
+        [Display(Name = "Correo institucional")]
+        public string correo { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
+        [Display(Name = "Contraseña")]
+        public string contrasena {  get; set; }
     }
 }
