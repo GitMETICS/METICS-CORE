@@ -37,74 +37,77 @@
             background-color: lightgray !important;
         }
     </style>
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarColor01">
-                <ul class="navbar-nav me-auto">
-                    <!-- Avatar -->
-                    @{
-                        if (ViewBag.Id != "")
+    @if (@ViewBag.Title != "Login")
+    {
+        <nav class="navbar navbar-expand-lg navbar-custom">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <!-- Avatar -->
+                        @{
+                            if (ViewBag.Id != "")
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
+                                       role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src="~/images/avatar.png" class="rounded-circle"
+                                             height="22" alt="Avatar" loading="lazy" />
+                                    </a>
+
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        <li>
+                                            @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+
+                        @if (ViewBag.Role == 1)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
-                                   role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <img src="~/images/avatar.png" class="rounded-circle"
-                                         height="22" alt="Avatar" loading="lazy" />
-                                </a>
-
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <li>
-                                        @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
-                                    </li>
-                                    <li>
-                                        @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
-                                    </li>
-                                </ul>
+                                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones admin</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="/TipoActividad/ListaTiposActividad">Tipos de actividad</a>
+                                    <a class="dropdown-item" href="/Categoria/ListaCategorias">Categorías</a>
+                                    <a class="dropdown-item" href="/Asesor/ListaAsesores">Asesores</a>
+                                    <a class="dropdown-item" href="/Participante/VerParticipantes">Participantes</a>
+                                    <a class="dropdown-item" href="/Tema/CrearTema">Crear tema</a>
+                                    <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
+                                </div>
                             </li>
                         }
-                    }
+                        @if (ViewBag.Role == 2)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones asesor</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="/Grupo/ListaGruposDisponibles">Mis grupos</a>
+                                    <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
+                                </div>
+                            </li>
+                        }
 
-                    @if (ViewBag.Role == 1)
-                    {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones admin</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/TipoActividad/ListaTiposActividad">Tipos de actividad</a>
-                                <a class="dropdown-item" href="/Categoria/ListaCategorias">Categorías</a>
-                                <a class="dropdown-item" href="/Asesor/ListaAsesores">Asesores</a>
-                                <a class="dropdown-item" href="/Participante/VerParticipantes">Participantes</a>
-                                <a class="dropdown-item" href="/Tema/CrearTema">Crear tema</a>
-                                <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/Home/Index">
+                                Inicio
+                            </a>
                         </li>
-                    }
-                    @if (ViewBag.Role == 2)
-                    {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Funciones asesor</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/Grupo/ListaGruposDisponibles">Mis grupos</a>
-                                <a class="dropdown-item" href="/Grupo/AgregarGrupo">Crear grupo</a>
-                            </div>
-                        </li>
-                    }
-
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/Home/Index">
-                            Inicio
-                        </a>
-                    </li>
-                </ul>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    }
     <div class="container body-content" style="min-height: 80vh">
         @RenderBody()
     </div>
