@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
-using System.Security.Principal;
 
 /* 
  * Controlador del proceso de login y logout del sistema
@@ -19,11 +20,13 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IDataProtectionProvider _protector;
 
-        public LoginController(IWebHostEnvironment environment, IConfiguration configuration)
+        public LoginController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector)
         {
             _environment = environment;
             _configuration = configuration;
+            _protector = protector;
 
             cookiesController = new CookiesController(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
@@ -54,8 +57,9 @@ namespace webMetics.Controllers
             if (ModelState.IsValid)
             {
                 // Validar el usuario y contraseña ingresados
-                LoginModel usuarioValido = ValidacionUsuario(usuario);
-                if (usuarioValido != null)
+                bool auth = ValidacionUsuario(usuario);
+
+                if (auth)
                 {
                     // Si el usuario y contraseña son válidos, redirigir a la página de inicio
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
@@ -73,11 +77,6 @@ namespace webMetics.Controllers
                 return View(usuario);
             }
         }
-
-        // --------------------------------------------------------------------------------------------------------------------------------------------
-
-
-        // --------------------------------------------------------------------------------------------------------------------------------------------
 
         /* Método para procesar el formulario de creación de usuario con los datos ingresados */
         [HttpPost]
@@ -146,51 +145,38 @@ namespace webMetics.Controllers
         }
 
         // Método para validar el usuario y realizar el inicio de sesión
-        public LoginModel ValidacionUsuario(LoginModel usuario)
+        public bool ValidacionUsuario(LoginModel usuario)
         {
-            /*// Verificar si se proporcionaron la identificación del usuario y la contraseña
-            if (usuario.identificacion != null && usuario.contrasena != null)
+            try
             {
-                bool exito = accesoAUsuario.Login(usuario.identificacion, usuario.contrasena);
+                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
 
-                if (exito)
+                int rolUsuario = usuario.rol;
+                string idUsuario = usuario.identificacion;
+                string idEncriptado = protector.Protect(idUsuario);
+
+                // Create and add a cookie for USUARIOAUTORIZADO
+                Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
                 {
-                    // Si se encontró el participante, crear la autenticación y agregar la cookie del usuario
-                    FormsAuthenticationTicket idUsuario = new FormsAuthenticationTicket(1, usuario.identificacion.ToString(), DateTime.Now, DateTime.Now.AddHours(2), true, usuario.identificacion.ToString());
-                    string idEcrypt = FormsAuthentication.Encrypt(idUsuario);
-                    HttpCookie cookie = new HttpCookie("USUARIOAUTORIZADO", idEcrypt);
-                    Response.Cookies.Add(cookie);
+                    Expires = DateTime.Now.AddHours(2)
+                });
 
-                    // Crear y agregar una cookie con el rol del usuario y el id
-                    HttpCookie rolCookie = cookiesController.CreateCookie("rolUsuario", accesoAUsuario.ObtenerUsuario(usuario.identificacion).rol.ToString(), DateTime.Now.AddHours(2));
-                    HttpCookie idCookie = cookiesController.CreateCookie("idUsuario", accesoAUsuario.ObtenerUsuario(usuario.identificacion).identificacion.ToString(), DateTime.Now.AddHours(2));
-
-                    if (rolCookie != null)
-                    {
-                        Response.Cookies.Add(rolCookie);
-                    }
-
-                    if (idCookie != null)
-                    {
-                        Response.Cookies.Add(idCookie);
-                    }
-
-                    // Retorna el modelo del usuario (inicio de sesión exitoso)
-                    return usuario;
-                }
-                else
+                Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
                 {
-                    // Si no se encontró el usuario, retorna null (usuario no válido)
-                    return null;
-                }
+                    Expires = DateTime.Now.AddHours(2)
+                });
+
+                Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
+                {
+                    Expires = DateTime.Now.AddHours(2)
+                });
+
+                return true;
             }
-            else
+            catch
             {
-                // Si no se proporcionó la identificación del usuario o la contraseña, retorna null (usuario no válido)
-                return null;
-            }*/
-
-            return null;
+                return false;
+            }
         }
 
         // Método para cerrar la sesión del usuario
@@ -240,7 +226,7 @@ namespace webMetics.Controllers
             bool exito = false;
             string errorMessage = "";
 
-            if (accesoAUsuario.Login(usuario.identificacion, usuario.contrasena))
+            if (accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena))
             {
                 if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {

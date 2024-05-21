@@ -120,7 +120,7 @@ namespace webMetics.Handlers
             return exito == 1;
         }
 
-        public bool Login(string id, string contrasena)
+        public bool AutenticarUsuario(string id, string contrasena)
         {
             int exito;
             var command = new SqlCommand("ValidarUsuario", ConexionMetics);

@@ -51,7 +51,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
                                    role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <img src="~/Imagenes/avatar.png" class="rounded-circle"
+                                    <img src="~/images/avatar.png" class="rounded-circle"
                                          height="22" alt="Avatar" loading="lazy" />
                                 </a>
 
@@ -116,7 +116,7 @@
                 <div class="row h-100">
                     <div class="col-md-4">
                         <!-- Información de los contactos  -->
-                        @{Html.RenderPartial("~/Views/Shared/Info.cshtml"); }
+                        @{await Html.RenderPartialAsync("~/Views/Shared/Info.cshtml"); }
                     </div>
                     <div class="col-md-4">
                         <h5 class="text-uppercase" style="color: #CED4DA">Ubicación</h5>
