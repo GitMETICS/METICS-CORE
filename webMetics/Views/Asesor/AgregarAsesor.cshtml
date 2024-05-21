@@ -111,17 +111,11 @@
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>
 
-<style>
-    .alertaCrearAsesor {
-        color: red;
-        font-size: 16px;
-    }
-</style>
 <script src="https://code.jquery.com/jquery-migrate-3.0.1.js"></script>
 
 <script type="text/javascript">

@@ -87,21 +87,18 @@
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>
 
-@section scripts{
+<script>
+    $(function () {
+        $('#multiSelectAsesores').chosen({ placeholder_text_multiple: "  ---" });
+        document.getElementById("multiSelectAsesores_chosen").style["width"] = "100%";
+    });
 
-    <script>
-        $(function () {
-            $('#multiSelectAsesores').chosen({ placeholder_text_multiple: "  ---" });
-            document.getElementById("multiSelectAsesores_chosen").style["width"] = "100%";
-        });
-
-    </script>
-}
+</script>
 
 
 
