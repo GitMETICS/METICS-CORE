@@ -189,25 +189,11 @@ namespace webMetics.Controllers
         // Método para cerrar la sesión del usuario
         public ActionResult Logout()
         {
-            /*// Limpiar la información del usuario y cerrar la sesión
-            HttpContext.User = new GenericPrincipal(new GenericIdentity(""), null);
-            FormsAuthentication.SignOut();
-
             // Eliminar las cookies del usuario
-            HttpCookie cookie = Request.Cookies["USUARIOAUTORIZADO"];
-            HttpCookie cookieRol = Request.Cookies["rolUsuario"];
-            if (cookie != null)
-            {
-                cookie.Expires = DateTime.Now.AddYears(-1);
-                Response.Cookies.Add(cookie);
-            }
-            if (cookieRol != null)
-            {
-                cookieRol.Expires = DateTime.Now.AddYears(-1);
-                Response.Cookies.Add(cookieRol);
-            }*/
+            Response.Cookies.Delete("USUARIOAUTORIZADO");
+            Response.Cookies.Delete("rolUsuario");
+            Response.Cookies.Delete("idUsuario");
 
-            // Redirigir a la página de inicio de sesión
             return Redirect("/Login/Login");
         }
 
