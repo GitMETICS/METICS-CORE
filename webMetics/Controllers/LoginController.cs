@@ -118,12 +118,12 @@ namespace webMetics.Controllers
         }
 
         /* Método para mostrar el formulario para crear un nuevo usuario */
-        public ActionResult CrearUsuario()
+        public ActionResult Registrarse()
         {
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
 
-            return View("CrearUsuario");
+            return View("Registrarse");
         }
 
         private bool RegistrarUsuario(UsuarioModel usuario)
