@@ -52,9 +52,13 @@
 
                         </div>
                     </div>
-                    <div class="row justify-content-center" style="margin-top:20px">
-                        @Html.ActionLink("Cancelar", "ListaTiposActividad", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
-                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "ListaTiposActividad", "TipoActividad", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
                     </div>
                 </div>
             </div>

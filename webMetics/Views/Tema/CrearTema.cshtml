@@ -72,9 +72,13 @@
                             </div>
                         </div>
 
-                        <div class="row justify-content-center" style="margin-top:20px">
-                            <a class="btn boton-formulario" style="margin-right: 20px; width: 20%; height: 105%; background-color: grey; color: white; text-decoration: none; " onclick="history.go(-1); return false;" href="#">Cancelar</a><br />
-                            <input type="submit" class="btn btn-primary" value="Guardar" style="float: right; margin-right: 20px;width:20%;height:105%" />
+                        <div class="row justify-content-center m-4">
+                            <div class="col-auto">
+                                @Html.ActionLink("Cancelar", "Index", "Home", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            </div>
                         </div>
                     </div>
                 </div>
