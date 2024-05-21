@@ -38,31 +38,31 @@
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.contrasena, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.contrasena, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
                     <div class="row justify-content-center m-4">
-                        @Html.ActionLink("Cancelar", "../Home/Index", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
-                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar"></input>
+                        @Html.ActionLink("Cancelar", "Login", "Login", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
+                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar">
                     </div>
                 </div>
             </div>
