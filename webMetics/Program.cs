@@ -19,6 +19,7 @@ namespace webMetics
             
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
+            builder.Services.AddDataProtection();
 
             var app = builder.Build();
 

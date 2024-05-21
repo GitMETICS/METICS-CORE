@@ -60,8 +60,11 @@ namespace webMetics.Controllers
          */
         public ActionResult ListaGruposDisponibles()
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
+            int rolUsuario = GetRole();
+            string idUsuario = GetId();
+
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
 
             // Obtener y mostrar mensajes de alerta si es necesario
             ViewBag.Message = "";
@@ -80,13 +83,11 @@ namespace webMetics.Controllers
             ViewBag.ParticipantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
             ViewBag.IdParticipante = "";
 
-            if (GetRole() != 0 && GetId() != "")
+            if (rolUsuario != 0 && idUsuario != "")
             {
-                int rolUsuario = GetRole();
-                string idUsuario = GetId();
                 ViewBag.IdParticipante = idUsuario;
 
-                if (rolUsuario == 0)
+                if (rolUsuario == 1)
                 {
                     List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
 

@@ -57,9 +57,9 @@ namespace webMetics.Controllers
             if (ModelState.IsValid)
             {
                 // Validar el usuario y contraseña ingresados
-                bool auth = ValidacionUsuario(usuario);
+                LoginModel usuarioAutorizado = ValidacionUsuario(usuario);
 
-                if (auth)
+                if (usuarioAutorizado != null)
                 {
                     // Si el usuario y contraseña son válidos, redirigir a la página de inicio
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
@@ -145,38 +145,45 @@ namespace webMetics.Controllers
         }
 
         // Método para validar el usuario y realizar el inicio de sesión
-        public bool ValidacionUsuario(LoginModel usuario)
+        public LoginModel ValidacionUsuario(LoginModel usuario)
         {
             try
             {
-                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
+                bool autorizado = accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena);
 
-                int rolUsuario = usuario.rol;
-                string idUsuario = usuario.identificacion;
-                string idEncriptado = protector.Protect(idUsuario);
-
-                // Create and add a cookie for USUARIOAUTORIZADO
-                Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
+                if (autorizado)
                 {
-                    Expires = DateTime.Now.AddHours(2)
-                });
+                    LoginModel usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.identificacion);
+                    int rolUsuario = usuarioAutorizado.rol;
+                    string idUsuario = usuarioAutorizado.identificacion;
 
-                Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
-                {
-                    Expires = DateTime.Now.AddHours(2)
-                });
+                    IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
+                    string idEncriptado = protector.Protect(idUsuario);
 
-                Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
-                {
-                    Expires = DateTime.Now.AddHours(2)
-                });
+                    Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddHours(2)
+                    });
 
-                return true;
+                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddHours(2)
+                    });
+
+                    Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddHours(2)
+                    });
+
+                    return usuarioAutorizado;
+                }
             }
             catch
             {
-                return false;
+                return null;
             }
+
+            return null;
         }
 
         // Método para cerrar la sesión del usuario
