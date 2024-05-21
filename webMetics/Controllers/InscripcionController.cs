@@ -64,16 +64,16 @@ namespace webMetics.Controllers
         }
 
         /* Método para inscribir a un usuario a un grupo */
-        public ActionResult Inscribir(int idGrupo, string idParticipante)
+        public ActionResult Inscribir(int idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
             
-            if (NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+            if (NoEstaInscritoEnGrupo(idGrupo, ViewBag.Id))
             {
                 if (MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
@@ -81,7 +81,7 @@ namespace webMetics.Controllers
                     InscripcionModel inscripcion = new InscripcionModel
                     {
                         idGrupo = idGrupo,
-                        idParticipante = idParticipante
+                        idParticipante = ViewBag.Id
                     };
 
                     bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
@@ -99,7 +99,7 @@ namespace webMetics.Controllers
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
-                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
                         }
                         catch
                         {
@@ -186,13 +186,13 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 // Intentar eliminar la inscripción del participante con el idParticipante en el grupo especificado por idGrupo
-                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
+                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(ViewBag.Id, idGrupo);
 
                 // Si la desinscripción fue exitosa, redirigir a la lista de grupos disponibles
                 if (ViewBag.ExitoAlCrear)
                 {
                     GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
