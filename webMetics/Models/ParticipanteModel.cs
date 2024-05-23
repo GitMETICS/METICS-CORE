@@ -63,7 +63,7 @@ namespace webMetics.Models
         [Display(Name = "Horas aprobadas")]
         public int horasAprobadas { get; set; }
 
-        public List<GrupoModel> gruposInscritos { get; set; }
+        public List<GrupoModel>? gruposInscritos { get; set; }
 
         public int rol;
     }
