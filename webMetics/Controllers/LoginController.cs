@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
+using MimeKit;
 
 /* 
  * Controlador del proceso de login y logout del sistema
@@ -93,7 +93,7 @@ namespace webMetics.Controllers
                     {
                         ViewBag.Correo = usuario.correo;
                         ViewBag.Titulo = "Registro realizado";
-                        ViewBag.Message = "Los datos fueron guardados éxitosamente. La contraseña será enviada al correo";
+                        ViewBag.Message = "Los datos fueron guardados éxitosamente. La confirmación será enviada al correo";
                     }
                     else
                     {
@@ -161,7 +161,7 @@ namespace webMetics.Controllers
 
             if (exitoUsuario && exitoParticipante)
             {
-                string mensaje = "Se ha registrado en el proyecto METICS.";
+                string mensaje = "Se ha registrado al usuario con identificación " + usuario.identificacion + " en el proyecto Módulos.";
                 EnviarCorreoRegistro(mensaje, usuario.correo);
             }
 
@@ -282,19 +282,19 @@ namespace webMetics.Controllers
         /* Método para enviar confirmación de registro al usuario*/
         private void EnviarCorreoRegistro(string mensaje, string correoParticipante)
         {
-            /*// Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje
             // El mensaje incluye una versión en HTML y texto plano
 
             // Contenido base del mensaje en HTML y texto plano
             const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
             const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Registro realizado"; // Asunto del correo
+            const string BASE_SUBJECT = "Registro en Proyecto Módulos"; // Asunto del correo
 
             MimeMessage message = new MimeMessage();
 
             // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
+            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
             message.From.Add(from);
             MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
             message.To.Add(to);
@@ -314,14 +314,14 @@ namespace webMetics.Controllers
             {
                 // Configurar el cliente SMTP para el servidor de correo de la UCR
                 client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, "4r7QaF4.NhnJkH!"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
+                client.Authenticate(from.Address, "pass"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
 
                 // Enviar el mensaje
                 client.Send(message);
 
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
-            }*/
+            }
         }
     }
 }

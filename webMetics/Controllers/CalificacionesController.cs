@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
+using MimeKit;
 
 namespace webMetics.Controllers
 {
@@ -277,7 +278,7 @@ namespace webMetics.Controllers
         /* Método para enviar calificación y estado de un grupo */
         private void SendEmail(string grupo, string mensaje, string correoParticipante)
         {
-            /*// Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje
             // El mensaje incluye una versión en HTML y texto plano
 
@@ -316,7 +317,7 @@ namespace webMetics.Controllers
 
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
-            }*/
+            }
         }
 
         // Método del constructor del mensaje del correo que será enviado al usuario con la calificación

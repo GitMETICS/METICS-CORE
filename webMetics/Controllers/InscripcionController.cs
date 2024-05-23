@@ -1,6 +1,7 @@
 ﻿using webMetics.Handlers;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -239,7 +240,7 @@ namespace webMetics.Controllers
         /* Método para enviar confirmación de inscripción al usuario*/
         private void SendEmail(GrupoModel grupo, string mensaje, string correoParticipante)
         {
-            /*// Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje
             // El mensaje incluye una versión en HTML y texto plano
 
@@ -301,7 +302,7 @@ namespace webMetics.Controllers
 
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
-            }*/
+            }
         }
 
         //Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
