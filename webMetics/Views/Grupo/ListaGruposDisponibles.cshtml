@@ -218,7 +218,7 @@
                                         <p class="card-text">Área de competencia: @grupo.temaAsociado</p>
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                                         {
-                                            @Html.ActionLink("Ver participantes", "../Participante/ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                            @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
                                         }
                                         else
                                         {
