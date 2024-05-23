@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -12,26 +12,69 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Asesor\AgregarAsesor.cshtml" />
+    <None Include="Views\Asesor\EditarAsesor.cshtml" />
+    <None Include="Views\Asesor\ListaAsesores.cshtml" />
+    <None Include="Views\Calificaciones\EditarCalificacion.cshtml" />
+    <None Include="Views\Calificaciones\ExportarCalificaciones.cshtml" />
+    <None Include="Views\Calificaciones\VerCalificaciones.cshtml" />
+    <None Include="Views\Categoria\CrearCategoria.cshtml" />
+    <None Include="Views\Categoria\EditarCategoria.cshtml" />
+    <None Include="Views\Categoria\ListaCategorias.cshtml" />
+    <None Include="Views\Grupo\AgregarGrupo.cshtml" />
+    <None Include="Views\Grupo\EditarAdjunto.cshtml" />
+    <None Include="Views\Grupo\EditarGrupo.cshtml" />
+    <None Include="Views\Grupo\ListaGruposDisponibles.cshtml" />
+    <None Include="Views\Home\Index.cshtml" />
+    <None Include="Views\Inscripcion\ExportarParticipantes.cshtml" />
+    <None Include="Views\Inscripcion\Inscribir.cshtml" />
+    <None Include="Views\Login\Registrarse.cshtml" />
+    <None Include="Views\Login\GestionarContrasena.cshtml" />
+    <None Include="Views\Login\Login.cshtml" />
+    <None Include="Views\Login\ParticipanteRegistrado.cshtml" />
+    <None Include="Views\Participante\EditarParticipante.cshtml" />
+    <None Include="Views\Participante\CrearUsuario.cshtml" />
+    <None Include="Views\Participante\ListaParticipantes.cshtml" />
+    <None Include="Views\Participante\MiUsuario.cshtml" />
+    <None Include="Views\Participante\ObtenerParticipante.cshtml" />
+    <None Include="Views\Participante\VerDatosParticipante.cshtml" />
+    <None Include="Views\Participante\VerParticipantes.cshtml" />
+    <None Include="Views\Shared\Error.cshtml" />
+    <None Include="Views\Shared\Info.cshtml" />
+    <None Include="Views\Shared\_Layout.cshtml" />
+    <None Include="Views\Shared\_LoginPartial.cshtml" />
+    <None Include="Views\Shared\_Modal.cshtml" />
+    <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Views\Tema\CrearTema.cshtml" />
+    <None Include="Views\Tema\MostrarTemas.cshtml" />
+    <None Include="Views\TipoActividad\CrearTipoActividad.cshtml" />
+    <None Include="Views\TipoActividad\EditarTipoActividad.cshtml" />
+    <None Include="Views\TipoActividad\ListaTiposActividad.cshtml" />
+    <None Include="Views\Web.config" />
+    <None Include="Views\_ViewImports.cshtml" />
+    <None Include="Views\_ViewStart.cshtml" />
     <None Include="wwwroot\css\site.css" />
-    <None Include="wwwroot\Imagenes\avatar.png" />
-    <None Include="wwwroot\Imagenes\fondo_login.jpg" />
-    <None Include="wwwroot\Imagenes\logoMETICS.png" />
-    <None Include="wwwroot\Imagenes\logos.png" />
-    <None Include="wwwroot\Imagenes\logosVC.png" />
-    <None Include="wwwroot\Imagenes\logoUCR.png" />
-    <None Include="wwwroot\Imagenes\logo_metics.png" />
-    <None Include="wwwroot\Imagenes\logo_UCR.webp" />
-    <None Include="wwwroot\Imagenes\vc_logo.png" />
+    <None Include="wwwroot\images\avatar.png" />
+    <None Include="wwwroot\images\fondo_login.jpg" />
+    <None Include="wwwroot\images\logoMETICS.png" />
+    <None Include="wwwroot\images\logos.png" />
+    <None Include="wwwroot\images\logosVC.png" />
+    <None Include="wwwroot\images\logoUCR.png" />
+    <None Include="wwwroot\images\logo_metics.png" />
+    <None Include="wwwroot\images\logo_UCR.webp" />
+    <None Include="wwwroot\images\vc_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="HtmlTextWriter" Version="3.0.1" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.4" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="8.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Novell.Directory.Ldap" Version="2.2.1" />
