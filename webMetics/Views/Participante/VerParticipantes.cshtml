@@ -82,20 +82,20 @@
                                     nombreCompleto += " " + participante.apellido_2;
                                 }
                                 <tr>
-                                    <td class="titulo-listas">@participante.idParticipante</td>
-                                    <td class="titulo-listas">@nombreCompleto</td>
-                                    <td class="titulo-listas">@participante.condicion</td>
-                                    <td class="titulo-listas">@participante.unidadAcademica</td>
-                                    <td class="titulo-listas">@participante.correo</td>
-                                    <td class="titulo-listas">@participante.telefonos</td>
-                                    <td class="titulo-listas">
-                                        @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-info bi bi-search" })
+                                    <td>@participante.idParticipante</td>
+                                    <td>@nombreCompleto</td>
+                                    <td>@participante.condicion</td>
+                                    <td>@participante.unidadAcademica</td>
+                                    <td>@participante.correo</td>
+                                    <td>@participante.telefonos</td>
+                                    <td>
+                                        @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-primary bi bi-search" })
                                     </td>
-                                    <td class="titulo-listas">
-                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    <td>
+                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
                                     </td>
-                                    <td class="titulo-listas">
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@participante.idParticipante')">
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@participante.idParticipante')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>

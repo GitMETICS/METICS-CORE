@@ -36,19 +36,6 @@
     text-align: justify;
 }
 
-.titulo-listas {
-    font-size: 1.2rem;
-    font-weight: 900;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    text-align: left;
-}
-
-@media only screen and (max-width: 580px) {
-    .titulo-listas {
-        font-size: 1rem;
-    }
-}
-
 .boton-formularios {
     float: right;
     margin-right: 20px;

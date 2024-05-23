@@ -64,13 +64,13 @@
                             nombreCompleto += " " + ViewBag.Participante.apellido_2;
                         }
                         <tr>
-                            <td class="titulo-listas">@ViewBag.Participante.idParticipante</td>
-                            <td class="titulo-listas">@nombreCompleto</td>
-                            <td class="titulo-listas">@ViewBag.Participante.condicion</td>
-                            <td class="titulo-listas">@ViewBag.Participante.unidadAcademica</td>
-                            <td class="titulo-listas">@ViewBag.Participante.correo</td>
-                            <td class="titulo-listas">@ViewBag.Participante.telefonos</td>
-                            <td class="titulo-listas">
+                            <td class=" ">@ViewBag.Participante.idParticipante</td>
+                            <td class=" ">@nombreCompleto</td>
+                            <td class=" ">@ViewBag.Participante.condicion</td>
+                            <td class=" ">@ViewBag.Participante.unidadAcademica</td>
+                            <td class=" ">@ViewBag.Participante.correo</td>
+                            <td class=" ">@ViewBag.Participante.telefonos</td>
+                            <td class=" ">
                                 @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
                             </td>
                         </tr>
@@ -94,7 +94,7 @@
 
                     <tbody class="align-middle">
                         <tr>
-                            <td class="titulo-listas">
+                            <td class=" ">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -107,7 +107,7 @@
                                     <span>Sin grupos inscritos</span>
                                 }
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -120,10 +120,10 @@
                                     <span>0</span>
                                 }
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 <span>@ViewBag.Participante.horasMatriculadas</span>
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 <span>@ViewBag.Participante.horasAprobadas</span>
                             </td>
                         </tr>

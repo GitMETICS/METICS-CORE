@@ -72,7 +72,7 @@
                                 @using (Html.BeginForm("ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                    <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
                                         <i class="bi bi-download me-1"></i>
                                         PDF
                                     </button>
@@ -82,7 +82,7 @@
                                 @using (Html.BeginForm("ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                    <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
                                         <i class="bi bi-download me-1"></i>
                                         Excel
                                     </button>
@@ -92,7 +92,7 @@
                                 @using (Html.BeginForm("ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">
+                                    <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
                                         <i class="bi bi-download me-1"></i>
                                         Word
                                     </button>
@@ -102,7 +102,7 @@
                                 @using (Html.BeginForm("EnviarCalificaciones", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" id="btnSubmit" class="btn btn-info" value="Export">  
+                                    <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
                                         <i class="bi bi-send me-1"></i>
                                         Enviar
                                     </button>
@@ -131,11 +131,11 @@
                                     nombreCompleto += " " + calificacion.participante.apellido_2;
                                 }
                                 <tr>
-                                    <td class="titulo-listas">@calificacion.participante.idParticipante</td>
-                                    <td class="titulo-listas">@nombreCompleto</td>
-                                    <td class="titulo-listas text-center">@calificacion.calificacion</td>
-                                    <td class="titulo-listas">
-                                        @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    <td class=" ">@calificacion.participante.idParticipante</td>
+                                    <td class=" ">@nombreCompleto</td>
+                                    <td class="  text-center">@calificacion.calificacion</td>
+                                    <td class=" ">
+                                        @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
                                     </td>
                                 </tr>
                             }

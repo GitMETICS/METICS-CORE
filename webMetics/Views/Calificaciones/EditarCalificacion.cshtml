@@ -53,19 +53,19 @@
                                 nombreCompleto += " " + ViewBag.Calificacion.participante.apellido_2;
                             }
                             <tr>
-                                <td class="titulo-listas">@ViewBag.Calificacion.participante.idParticipante</td>
-                                <td class="titulo-listas">@nombreCompleto</td>
-                                <td class="titulo-listas text-center">@ViewBag.Calificacion.calificacion</td>
+                                <td class=" ">@ViewBag.Calificacion.participante.idParticipante</td>
+                                <td class=" ">@nombreCompleto</td>
+                                <td class="  text-center">@ViewBag.Calificacion.calificacion</td>
                                 @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <td class="titulo-listas">
+                                    <td class=" ">
                                         <div class="input-group">
                                             <input type="number" class="form-control" name="calificacion" id="calificacion">
                                         </div>
                                     </td>
-                                    <td class="titulo-listas">
-                                        <button type="submit" class="btn btn-info">Aceptar</button>
+                                    <td class=" ">
+                                        <button type="submit" class="btn btn-primary">Aceptar</button>
                                     </td>
                                 }
                             </tr>
