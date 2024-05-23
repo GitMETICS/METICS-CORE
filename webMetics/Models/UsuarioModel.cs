@@ -10,7 +10,8 @@ namespace webMetics.Models
         [Display(Name = "Número de identificación")]
         public string identificacion { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un correo institucional de la Universidad de Costa Rica.")]
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string correo { get; set; }
 
