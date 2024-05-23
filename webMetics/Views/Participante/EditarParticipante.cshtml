@@ -1,12 +1,12 @@
 ﻿@model webMetics.Models.ParticipanteModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar datos";
+    ViewBag.Title = "Editar mis datos";
 }
 <!DOCTYPE html>
 <html>
 <body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+    @if (ViewBag.Id != "")
     {
         <div class="contenedor-tipos-actividades container-fluid">
             @if (/*Request.UrlReferrer != null*/true)

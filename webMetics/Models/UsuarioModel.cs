@@ -17,5 +17,7 @@ namespace webMetics.Models
         [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
         [Display(Name = "Contraseña")]
         public string contrasena {  get; set; }
+
+        public ParticipanteModel? participante { get; set; }
     }
 }

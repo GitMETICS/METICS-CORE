@@ -105,7 +105,7 @@ namespace webMetics.Controllers
                 else
                 {
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View("CrearUsuario");
+                    return View("Registrarse");
                 }
             }
             catch (Exception e)
@@ -129,13 +129,37 @@ namespace webMetics.Controllers
         private bool RegistrarUsuario(UsuarioModel usuario)
         {
             bool exitoUsuario = false;
+            bool exitoParticipante = false;
 
             if (!accesoAUsuario.ExisteUsuario(usuario.identificacion))
             {
                 exitoUsuario = accesoAUsuario.CrearUsuario(usuario.identificacion, usuario.contrasena);
+
+                ParticipanteModel participante = new ParticipanteModel()
+                {
+                    idParticipante = usuario.identificacion,
+                    nombre = "",
+                    apellido_1 = "",
+                    apellido_2 = "",
+                    correo = usuario.correo,
+                    tipoIdentificacion = "",
+                    tipoParticipante = "",
+                    unidadAcademica = "",
+                    area = "",
+                    departamento = "",
+                    seccion = "",
+                    condicion = "",
+                    telefonos = "",
+                    horasMatriculadas = 0,
+                    horasAprobadas = 0
+                };
+
+                exitoParticipante = accesoAParticipante.CrearParticipante(participante);
+
+                usuario.participante = participante;
             }
 
-            if (exitoUsuario)
+            if (exitoUsuario && exitoParticipante)
             {
                 string mensaje = "Se ha registrado en el proyecto METICS.";
                 EnviarCorreoRegistro(mensaje, usuario.correo);
