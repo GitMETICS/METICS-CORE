@@ -240,7 +240,7 @@ namespace webMetics.Controllers
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
             // Creamos el archivo de Excel
-            var workbook = new XSSFWorkbook();
+            XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet(grupo.nombre);
 
             IRow row1 = sheet.CreateRow(0);
