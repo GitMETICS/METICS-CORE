@@ -232,8 +232,8 @@ namespace webMetics.Controllers
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre");
             headerRow.GetCell(2).SetText("Calificación");
-            headerRow.GetCell(2).SetText("Nombre del módulo:");
-            headerRow.GetCell(2).SetText("Nombre del asesor asociado:");
+            headerRow.GetCell(3).SetText("Nombre del módulo:");
+            headerRow.GetCell(4).SetText("Nombre del asesor asociado:");
 
             for (int i = 0; i < calificaciones.Count; i++)
             {
@@ -241,8 +241,8 @@ namespace webMetics.Controllers
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.apellido_1 + " " + calificaciones[i].participante.apellido_2);
                 row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
-                row.GetCell(2).SetText(grupo.nombre);
-                row.GetCell(2).SetText(grupo.nombreAsesorAsociado[i].ToString());
+                row.GetCell(3).SetText(grupo.nombre);
+                row.GetCell(4).SetText(grupo.nombreAsesorAsociado[i].ToString());
             }
 
             var stream = new MemoryStream();

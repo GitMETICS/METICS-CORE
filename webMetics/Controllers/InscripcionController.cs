@@ -6,6 +6,7 @@ using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.Util;
+using NPOI.XWPF.UserModel;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -465,54 +466,48 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarParticipantesWord(int idGrupo)
         {
-            /*// Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            // Obtener la lista de participantes del grupo y la información del grupo
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
-            // Crear un nuevo documento Word
-            using (var doc = DocX.Create(Server.MapPath("~/App_Data/ListaParticipantes.docx")))
-            {
-                // Agregar el contenido al documento Word
-                doc.InsertParagraph($"Nombre del módulo: {grupo.nombre}");
-                doc.InsertParagraph($"Nombre del asesor asociado: {grupo.nombreAsesorAsociado}\n");
-                doc.InsertParagraph("Lista de participantes: ");
-
-                var table = doc.AddTable(lista.Count + 1, 6);
-
-                table.Design = TableDesign.TableGrid;
-                table.Design = TableDesign.ColorfulList;
-                table.AutoFit = AutoFit.ColumnWidth;
-
-                var headerRow = table.Rows[0];
-                headerRow.Cells[0].Paragraphs[0].Append("Identificación");
-                headerRow.Cells[1].Paragraphs[0].Append("Nombre");
-                headerRow.Cells[2].Paragraphs[0].Append("Condición");
-                headerRow.Cells[3].Paragraphs[0].Append("Unidad académica");
-                headerRow.Cells[4].Paragraphs[0].Append("Correo institucional");
-                headerRow.Cells[5].Paragraphs[0].Append("Teléfono");
-
-                for (int i = 0; i < lista.Count; i++)
-                {
-                    var row = table.Rows[i + 1];
-                    row.Cells[0].Paragraphs[0].Append(lista[i].idParticipante);
-                    row.Cells[1].Paragraphs[0].Append(lista[i].nombre + " " + lista[i].apellido_1 + " " + lista[i].apellido_2);
-                    row.Cells[2].Paragraphs[0].Append(lista[i].condicion);
-                    row.Cells[3].Paragraphs[0].Append(lista[i].unidadAcademica);
-                    row.Cells[4].Paragraphs[0].Append(lista[i].correo);
-                    row.Cells[5].Paragraphs[0].Append(lista[i].telefonos);
-                }
-
-                doc.InsertTable(table);
-                doc.Save();
-            }
-        
-            // Descargar el archivo Word
-            var filePath = Server.MapPath("~/App_Data/ListaParticipantes.docx");
             var fileName = "Lista_de_Participantes_" + grupo.nombre + ".docx";
 
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+            XWPFDocument wordDoc = new XWPFDocument();
+
+            // Create a table
+            XWPFTable table = wordDoc.CreateTable(grupo.cupo + 3, 6);
+            var headerRow0 = table.Rows[0];
+            headerRow0.GetCell(0).SetText("Nombre del Asesor");
+            headerRow0.GetCell(1).SetText("Nombre del Módulo");
+            var row0 = table.Rows[1];
+            row0.GetCell(0).SetText(grupo.nombreAsesorAsociado);
+            row0.GetCell(1).SetText(grupo.nombre);
+
+
+            var headerRow = table.Rows[2];
+            headerRow.GetCell(0).SetText("Identificación");
+            headerRow.GetCell(1).SetText("Nombre del participante");
+            headerRow.GetCell(2).SetText("Condición");
+            headerRow.GetCell(3).SetText("Unidad académica");
+            headerRow.GetCell(4).SetText("Correo institucional");
+            headerRow.GetCell(5).SetText("Teléfono");
+
+
+            for (int i = 0; i < participantes.Count; i++)
+            {
+                var row = table.Rows[i + 3];
+                row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
+                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].apellido_1 + " " + participantes[i].apellido_2);
+                row.GetCell(2).SetText(participantes[i].condicion.ToString());
+                row.GetCell(3).SetText(participantes[i].unidadAcademica);
+                row.GetCell(4).SetText(participantes[i].correo.ToString());
+                row.GetCell(5).SetText(participantes[i].telefonos.ToString());
+            }
+
+            var stream = new MemoryStream();
+            wordDoc.Write(stream);
+            var file = stream.ToArray();
+            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
         [HttpPost]
