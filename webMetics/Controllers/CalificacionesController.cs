@@ -166,7 +166,7 @@ namespace webMetics.Controllers
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
-            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_De_Participantes.docx");
+            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Calificaciones.docx");
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
             iText.Layout.Document document = new iText.Layout.Document(pdf);

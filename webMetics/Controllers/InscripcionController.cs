@@ -3,6 +3,9 @@ using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using NPOI.XSSF.UserModel;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using NPOI.Util;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -411,24 +414,48 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarParticipantesPDF(int idGrupo)
         {
-            /*// Exportar la lista de participantes de un grupo a un archivo PDF
-
-            // Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
-            ExportarParticipantesModel datosExportar = new ExportarParticipantesModel()
-            {
-                nombreGrupo = grupo.nombre,
-                nombreAsesorAsociado = grupo.nombreAsesorAsociado,
-                listaParticipantes = lista
-            };
+            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdf = new PdfDocument(writer);
+            iText.Layout.Document document = new iText.Layout.Document(pdf);
 
-            return new Rotativa.PartialViewAsPdf("ExportarParticipantes", datosExportar)
+            // Add content to the PDF
+            Paragraph header1 = new Paragraph("Nombre del grupo: " + grupo.nombre)
+                .SetFontSize(12);
+            document.Add(header1);
+
+            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
+                .SetFontSize(12);
+            document.Add(header2);
+
+            Table table = new Table(6, true);
+            table.AddHeaderCell("Identificación").SetFontSize(12);
+            table.AddHeaderCell("Nombre del participante").SetFontSize(12);
+            table.AddHeaderCell("Condición").SetFontSize(12);
+            table.AddHeaderCell("Unidad académica").SetFontSize(12);
+            table.AddHeaderCell("Correo institucional").SetFontSize(12);
+            table.AddHeaderCell("Teléfono").SetFontSize(12);
+
+            foreach (var participante in participantes)
             {
-                FileName = "Lista_de_Participantes_" + grupo.nombre + ".pdf"
-            };*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+                table.AddCell(participante.idParticipante);
+                table.AddCell(participante.nombre + " " + participante.apellido_1 + " " +.participante.apellido_2);
+                table.AddCell(participante.condicion);
+                table.AddCell(participante.unidadAcademica);
+                table.AddCell(participante.correo);
+                table.AddCell(participante.telefonos);
+            }
+
+            document.Add(table);
+
+            document.Close();
+
+            string fileName = "Lista_de_Participantes_" + grupo.nombre + ".pdf";
+
+            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
         [HttpPost]
