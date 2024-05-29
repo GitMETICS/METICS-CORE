@@ -2,14 +2,7 @@
 using webMetics.Models;
 using webMetics.Handlers;
 using MimeKit;
-using NPOI.XSSF;
-using OfficeOpenXml;
-using System.Web.UI;
-using System.Data;
 using NPOI.XSSF.UserModel;
-using NPOI.SS.UserModel;
-using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 
 namespace webMetics.Controllers
 {
@@ -243,41 +236,41 @@ namespace webMetics.Controllers
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet(grupo.nombre);
 
-            IRow row1 = sheet.CreateRow(0);
-            ICell cell11 = row1.CreateCell(0);
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
             cell11.SetCellValue("Nombre del módulo:");
 
-            ICell cell12 = row1.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell12 = row1.CreateCell(1);
             cell12.SetCellValue(grupo.nombre);
 
-            IRow row2 = sheet.CreateRow(1);
-            ICell cell21 = row2.CreateCell(0);
+            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(1);
+            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
             cell21.SetCellValue("Nombre del asesor asociado:");
 
-            ICell cell22 = row2.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
             cell22.SetCellValue(grupo.nombreAsesorAsociado);
 
-            IRow row3 = sheet.CreateRow(3);
-            ICell cell31 = row3.CreateCell(0);
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Identificación");
 
-            ICell cell32 = row3.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
             cell32.SetCellValue("Nombre del participante");
 
-            ICell cell33 = row3.CreateCell(2);
+            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
             cell33.SetCellValue("Calificación");
 
             int rowN = 4;
             foreach (var calificacion in calificaciones)
             {
-                IRow row = sheet.CreateRow(rowN);
-                ICell cell1 = row.CreateCell(0);
+                NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
+                NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
                 cell1.SetCellValue(calificacion.participante.idParticipante);
 
-                ICell cell2 = row.CreateCell(1);
+                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
                 cell2.SetCellValue(calificacion.participante.nombre + " " + calificacion.participante.apellido_1 + " " + calificacion.participante.apellido_2);
 
-                ICell cell3 = row.CreateCell(2);
+                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
                 cell3.SetCellValue(calificacion.calificacion);
 
                 rowN++;

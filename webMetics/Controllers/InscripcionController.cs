@@ -2,9 +2,7 @@
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
-using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using NPOI.SS.Formula.Functions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -497,59 +495,59 @@ namespace webMetics.Controllers
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet(grupo.nombre);
 
-            IRow row1 = sheet.CreateRow(0);
-            ICell cell11 = row1.CreateCell(0);
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
             cell11.SetCellValue("Nombre del módulo:");
 
-            ICell cell12 = row1.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell12 = row1.CreateCell(1);
             cell12.SetCellValue(grupo.nombre);
 
-            IRow row2 = sheet.CreateRow(1);
-            ICell cell21 = row2.CreateCell(0);
+            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(1);
+            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
             cell21.SetCellValue("Nombre del asesor asociado:");
 
-            ICell cell22 = row2.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
             cell22.SetCellValue(grupo.nombreAsesorAsociado);
 
-            IRow row3 = sheet.CreateRow(3);
-            ICell cell31 = row3.CreateCell(0);
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Identificación");
 
-            ICell cell32 = row3.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
             cell32.SetCellValue("Nombre del participante");
 
-            ICell cell33 = row3.CreateCell(2);
+            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
             cell33.SetCellValue("Condición");
 
-            ICell cell34 = row3.CreateCell(3);
+            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
             cell34.SetCellValue("Unidad académica");
 
-            ICell cell35 = row3.CreateCell(4);
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
             cell35.SetCellValue("Correo institucional");
 
-            ICell cell36 = row3.CreateCell(5);
+            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
             cell36.SetCellValue("Teléfono");
 
             int rowN = 4;
             foreach (var participante in participantes)
             {
-                IRow row = sheet.CreateRow(rowN);
-                ICell cell1 = row.CreateCell(0);
+                NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
+                NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
                 cell1.SetCellValue(participante.idParticipante);
 
-                ICell cell2 = row.CreateCell(1);
+                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
                 cell2.SetCellValue(participante.nombre + ' ' + participante.apellido_1 + ' ' + participante.apellido_2);
 
-                ICell cell3 = row.CreateCell(2);
+                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
                 cell3.SetCellValue(participante.condicion);
 
-                ICell cell4 = row.CreateCell(3);
+                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
                 cell4.SetCellValue(participante.unidadAcademica);
 
-                ICell cell5 = row.CreateCell(4);
+                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
                 cell5.SetCellValue(participante.correo);
 
-                ICell cell6 = row.CreateCell(5);
+                NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
                 cell6.SetCellValue(participante.telefonos);
 
                 rowN++;
