@@ -291,7 +291,7 @@ namespace webMetics.Controllers
         }
 
         /* Método para que un administrador elimine un participante */
-        [HttpGet]
+        [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
             try
