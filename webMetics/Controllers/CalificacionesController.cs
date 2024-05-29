@@ -5,6 +5,9 @@ using MimeKit;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
 using System.IO;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using NPOI.HPSF;
 
 namespace webMetics.Controllers
 {
@@ -160,24 +163,42 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarCalificacionesPDF(int idGrupo)
         {
-            /*// Exportar la lista de calificaciones de un grupo a un archivo PDF
-
-            // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
-            ExportarCalificacionesModel datosExportar = new ExportarCalificacionesModel()
-            {
-                nombreGrupo = grupo.nombre,
-                nombreAsesorAsociado = grupo.nombreAsesorAsociado,
-                listaCalificaciones = calificaciones
-            };
+            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_De_Participantes.docx");
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdf = new PdfDocument(writer);
+            iText.Layout.Document document = new iText.Layout.Document(pdf);
 
-            return new Rotativa.PartialViewAsPdf("ExportarCalificaciones", datosExportar)
+            // Add content to the PDF
+            Paragraph header1 = new Paragraph("Nombre del grupo: " + grupo.nombre)
+                .SetFontSize(12);
+            document.Add(header1);
+
+            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
+                .SetFontSize(12);
+            document.Add(header2);
+
+            Table table = new Table(3, true);
+            table.AddHeaderCell("Identificación").SetFontSize(12);
+            table.AddHeaderCell("Nombre del participante").SetFontSize(12);
+            table.AddHeaderCell("Calificación").SetFontSize(12);
+
+            foreach (var calificacion in calificaciones)
             {
-                FileName = "Lista_de_Calificaciones_" + grupo.nombre + ".pdf"
-            };*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+                table.AddCell(calificacion.participante.idParticipante);
+                table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.apellido_1 + " " + calificacion.participante.apellido_2);
+                table.AddCell(calificacion.calificacion.ToString());
+            }
+
+            document.Add(table);
+
+            document.Close();
+
+            string fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".pdf";
+
+            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
         public ActionResult ExportarCalificacionesWord(int idGrupo)
