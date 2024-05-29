@@ -423,26 +423,30 @@ namespace webMetics.Controllers
             iText.Layout.Document document = new iText.Layout.Document(pdf);
 
             // Add content to the PDF
-            Paragraph header1 = new Paragraph("Nombre del grupo: " + grupo.nombre)
-                .SetFontSize(12);
+            Paragraph header1 = new Paragraph("Nombre del módulo: " + grupo.nombre)
+                .SetFontSize(10);
             document.Add(header1);
 
             Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
-                .SetFontSize(12);
+                .SetFontSize(10);
             document.Add(header2);
 
+            Paragraph header3 = new Paragraph("")
+                .SetFontSize(10);
+            document.Add(header3);
+
             Table table = new Table(6, true);
-            table.AddHeaderCell("Identificación").SetFontSize(12);
-            table.AddHeaderCell("Nombre del participante").SetFontSize(12);
-            table.AddHeaderCell("Condición").SetFontSize(12);
-            table.AddHeaderCell("Unidad académica").SetFontSize(12);
-            table.AddHeaderCell("Correo institucional").SetFontSize(12);
-            table.AddHeaderCell("Teléfono").SetFontSize(12);
+            table.AddHeaderCell("Identificación").SetFontSize(8);
+            table.AddHeaderCell("Nombre del participante").SetFontSize(8);
+            table.AddHeaderCell("Condición").SetFontSize(8);
+            table.AddHeaderCell("Unidad académica").SetFontSize(8);
+            table.AddHeaderCell("Correo institucional").SetFontSize(8);
+            table.AddHeaderCell("Teléfono").SetFontSize(8);
 
             foreach (var participante in participantes)
             {
                 table.AddCell(participante.idParticipante);
-                table.AddCell(participante.nombre + " " + participante.apellido_1 + " " +.participante.apellido_2);
+                table.AddCell(participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2);
                 table.AddCell(participante.condicion);
                 table.AddCell(participante.unidadAcademica);
                 table.AddCell(participante.correo);
