@@ -2,6 +2,9 @@
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.SS.Formula.Functions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -486,58 +489,78 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
-            /*// Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            // Obtener la lista de participantes del grupo y la información del grupo
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
-            StringWriter sw = new StringWriter();
-            HtmlTextWriter htw = new HtmlTextWriter(sw);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
-            // Crear una tabla de datos para los participantes
-            DataTable dt = new DataTable("Participantes");
-            dt.Columns.AddRange(new DataColumn[6] {
-                new DataColumn("Identificación", typeof(string)),
-                new DataColumn("Nombre", typeof(string)),
-                new DataColumn("Condición", typeof(string)),
-                new DataColumn("Unidad académica", typeof(string)),
-                new DataColumn("Correo institucional", typeof(string)),
-                new DataColumn("Teléfono", typeof(int))
-            });
-
-            foreach (var participante in lista)
-            {
-                dt.Rows.Add(participante.idParticipante, 
-                    participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2, 
-                    participante.condicion, 
-                    participante.unidadAcademica, 
-                    participante.correo, 
-                    participante.telefonos);
-            }
-            
             // Creamos el archivo de Excel
-            var grid = new GridView();
-            grid.DataSource = dt;
-            grid.DataBind();
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet(grupo.nombre);
 
-            // Generamos un nombre de archivo único
+            IRow row1 = sheet.CreateRow(0);
+            ICell cell11 = row1.CreateCell(0);
+            cell11.SetCellValue("Nombre del módulo:");
+
+            ICell cell12 = row1.CreateCell(1);
+            cell12.SetCellValue(grupo.nombre);
+
+            IRow row2 = sheet.CreateRow(1);
+            ICell cell21 = row2.CreateCell(0);
+            cell21.SetCellValue("Nombre del asesor asociado:");
+
+            ICell cell22 = row2.CreateCell(1);
+            cell22.SetCellValue(grupo.nombreAsesorAsociado);
+
+            IRow row3 = sheet.CreateRow(3);
+            ICell cell31 = row3.CreateCell(0);
+            cell31.SetCellValue("Identificación");
+
+            ICell cell32 = row3.CreateCell(1);
+            cell32.SetCellValue("Nombre del participante");
+
+            ICell cell33 = row3.CreateCell(2);
+            cell33.SetCellValue("Condición");
+
+            ICell cell34 = row3.CreateCell(3);
+            cell34.SetCellValue("Unidad académica");
+
+            ICell cell35 = row3.CreateCell(4);
+            cell35.SetCellValue("Correo institucional");
+
+            ICell cell36 = row3.CreateCell(5);
+            cell36.SetCellValue("Teléfono");
+
+            int rowN = 4;
+            foreach (var participante in participantes)
+            {
+                IRow row = sheet.CreateRow(rowN);
+                ICell cell1 = row.CreateCell(0);
+                cell1.SetCellValue(participante.idParticipante);
+
+                ICell cell2 = row.CreateCell(1);
+                cell2.SetCellValue(participante.nombre + ' ' + participante.apellido_1 + ' ' + participante.apellido_2);
+
+                ICell cell3 = row.CreateCell(2);
+                cell3.SetCellValue(participante.condicion);
+
+                ICell cell4 = row.CreateCell(3);
+                cell4.SetCellValue(participante.unidadAcademica);
+
+                ICell cell5 = row.CreateCell(4);
+                cell5.SetCellValue(participante.correo);
+
+                ICell cell6 = row.CreateCell(5);
+                cell6.SetCellValue(participante.telefonos);
+
+                rowN++;
+            }
+
             string fileName = "Lista_de_Participantes_" + grupo.nombre + ".xlsx";
-            
-            // Configurar la respuesta HTTP para descargar el archivo
-            Response.ClearContent();
-            Response.Buffer = true;
-            Response.AddHeader("content-disposition", "attachment; filename=" + fileName);
-            Response.ContentType = "application/ms-excel";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
 
-            // Agregar títulos y encabezados a la respuesta Excel
-            htw.WriteLine($"<div>Nombre del módulo: {grupo.nombre}</div>");
-            htw.WriteLine($"<div>Nombre del asesor asociado: {grupo.nombreAsesorAsociado}</div><br>");
-            grid.RenderControl(htw);
-            
-            Response.Output.Write(sw.ToString());
-
-            Response.Flush();
-            Response.End();*/
-
-            return new EmptyResult();
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }
