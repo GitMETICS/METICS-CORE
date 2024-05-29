@@ -8,6 +8,7 @@ using System.IO;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.HPSF;
+using OfficeOpenXml;
 
 namespace webMetics.Controllers
 {
@@ -112,50 +113,56 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult CargarDesdeExcel(string/*HttpPostedFileBase*/ file, int idGrupo)
+        public async Task<IActionResult> CargarDesdeExcel(IFormFile file, int idGrupo)
         {
-            /*if (file != null && file.ContentLength > 0)
+            if (file != null)
             {
                 try
                 {
-                    using (var package = new ExcelPackage(file.InputStream))
+                    using (var stream = new MemoryStream())
                     {
-                        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                        await file.CopyToAsync(stream);
+                        stream.Position = 0;
 
-                        int rowBegin = 0;
-                        int colId = 0;
-                        int colCalificacion = 0;
-                        bool seguir = true;
-                        for (int row = 1; row <= worksheet.Dimension.End.Row && seguir; row++)
+                        using (var package = new ExcelPackage(stream))
                         {
-                            for (int col = 1; col <= worksheet.Dimension.End.Column && seguir; col++)
+                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                            int rowBegin = 0;
+                            int colId = 0;
+                            int colCalificacion = 0;
+                            bool seguir = true;
+                            for (int row = 1; row <= worksheet.Dimension.End.Row && seguir; row++)
                             {
-                                if (worksheet.Cells[row, col].Text == "Identificación") { rowBegin = row; colId = col; }
-                                if (worksheet.Cells[row, col].Text == "Calificación") { rowBegin = row; colCalificacion = col; seguir = false; }
+                                for (int col = 1; col <= worksheet.Dimension.End.Column && seguir; col++)
+                                {
+                                    if (worksheet.Cells[row, col].Text == "Identificación") { rowBegin = row; colId = col; }
+                                    if (worksheet.Cells[row, col].Text == "Calificación") { rowBegin = row; colCalificacion = col; seguir = false; }
+                                }
                             }
-                        }
-                        for (int row = rowBegin + 1; row <= worksheet.Dimension.End.Row; row++)
-                        {
-                            string idParticipante = worksheet.Cells[row, colId].Text;
-                            int calificacion = int.Parse(worksheet.Cells[row, colCalificacion].Text);
+                            for (int row = rowBegin + 1; row <= worksheet.Dimension.End.Row; row++)
+                            {
+                                string idParticipante = worksheet.Cells[row, colId].Text;
+                                int calificacion = int.Parse(worksheet.Cells[row, colCalificacion].Text);
 
-                            bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                                bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                            }
+
+                            TempData["successMessage"] = "El archivo fue subido éxitosamente.";
                         }
-                        TempData["successMessage"] = "El archivo fue subido éxitosamente.";
                     }
                 }
                 catch (Exception ex)
                 {
-                    TempData["errorMessage"] = "Error al cargar los datos desde Excel: " + ex.Message;
+                    TempData["errorMessage"] = "Error al cargar los datos.";
                 }
             }
             else
             {
-                TempData["errorMessage"] = "Por favor, seleccione un archivo de Excel válido.";
+                TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
             }
 
-            // Redirige a la vista adecuada.*/
             return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
         }
 
@@ -172,7 +179,7 @@ namespace webMetics.Controllers
             iText.Layout.Document document = new iText.Layout.Document(pdf);
 
             // Add content to the PDF
-            Paragraph header1 = new Paragraph("Nombre del grupo: " + grupo.nombre)
+            Paragraph header1 = new Paragraph("Nombre del módulo: " + grupo.nombre)
                 .SetFontSize(12);
             document.Add(header1);
 
@@ -180,10 +187,14 @@ namespace webMetics.Controllers
                 .SetFontSize(12);
             document.Add(header2);
 
+            Paragraph header3 = new Paragraph("")
+                .SetFontSize(12);
+            document.Add(header3);
+
             Table table = new Table(3, true);
-            table.AddHeaderCell("Identificación").SetFontSize(12);
-            table.AddHeaderCell("Nombre del participante").SetFontSize(12);
-            table.AddHeaderCell("Calificación").SetFontSize(12);
+            table.AddHeaderCell("Identificación").SetFontSize(10);
+            table.AddHeaderCell("Nombre del participante").SetFontSize(10);
+            table.AddHeaderCell("Calificación").SetFontSize(10);
 
             foreach (var calificacion in calificaciones)
             {
