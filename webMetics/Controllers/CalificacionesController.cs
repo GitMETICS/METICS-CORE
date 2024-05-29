@@ -3,6 +3,8 @@ using webMetics.Models;
 using webMetics.Handlers;
 using MimeKit;
 using NPOI.XSSF.UserModel;
+using NPOI.XWPF.UserModel;
+using System.IO;
 
 namespace webMetics.Controllers
 {
@@ -178,51 +180,43 @@ namespace webMetics.Controllers
             return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
         }
 
-        [HttpPost]
         public ActionResult ExportarCalificacionesWord(int idGrupo)
         {
-            /*// Obtener la lista de participantes del grupo y la información del grupo
+            // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
-            // Crear un nuevo documento Word
-            using (var doc = DocX.Create(Server.MapPath("~/App_Data/ListaCalificaciones.docx")))
-            {
-                // Agregar el contenido al documento Word
-                doc.InsertParagraph($"Nombre del módulo: {grupo.nombre}");
-                doc.InsertParagraph($"Nombre del asesor asociado: {grupo.nombreAsesorAsociado}\n");
-                doc.InsertParagraph("Lista de participantes:");
-
-                var table = doc.AddTable(calificaciones.Count + 1, 3);
-
-                table.Design = TableDesign.TableGrid;
-                table.Design = TableDesign.ColorfulList;
-                table.AutoFit = AutoFit.ColumnWidth;
-
-                var headerRow = table.Rows[0];
-                headerRow.Cells[0].Paragraphs[0].Append("Identificación");
-                headerRow.Cells[1].Paragraphs[0].Append("Nombre");
-                headerRow.Cells[2].Paragraphs[0].Append("Calificación");
-
-                for (int i = 0; i < calificaciones.Count; i++)
-                {
-                    var row = table.Rows[i + 1];
-                    row.Cells[0].Paragraphs[0].Append(calificaciones[i].participante.idParticipante.ToString());
-                    row.Cells[1].Paragraphs[0].Append(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.apellido_1 + " " + calificaciones[i].participante.apellido_2);
-                    row.Cells[2].Paragraphs[0].Append(calificaciones[i].calificacion.ToString());
-                }
-
-                doc.InsertTable(table);
-                doc.Save();
-            }
-
-            // Descargar el archivo Word
-            var filePath = Server.MapPath("~/App_Data/ListaCalificaciones.docx");
             var fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".docx";
 
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+            XWPFDocument wordDoc = new XWPFDocument();
+
+            // Create a table
+            XWPFTable table = wordDoc.CreateTable(calificaciones.Count+1, 5);
+            table.SetColumnWidth(0, 3500);
+            table.SetColumnWidth(1, 7000);
+            // Set Table Layout to fixed
+
+            var headerRow = table.Rows[0];
+            headerRow.GetCell(0).SetText("Identificación");
+            headerRow.GetCell(1).SetText("Nombre");
+            headerRow.GetCell(2).SetText("Calificación");
+            headerRow.GetCell(2).SetText("Nombre del módulo:");
+            headerRow.GetCell(2).SetText("Nombre del asesor asociado:");
+
+            for (int i = 0; i < calificaciones.Count; i++)
+            {
+                var row = table.Rows[i + 1];
+                row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
+                row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.apellido_1 + " " + calificaciones[i].participante.apellido_2);
+                row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
+                row.GetCell(2).SetText(grupo.nombre);
+                row.GetCell(2).SetText(grupo.nombreAsesorAsociado[i].ToString());
+            }
+
+            var stream = new MemoryStream();
+            wordDoc.Write(stream);
+            var file = stream.ToArray();
+            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
         [HttpPost]
