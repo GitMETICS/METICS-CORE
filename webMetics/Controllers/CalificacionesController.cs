@@ -224,11 +224,20 @@ namespace webMetics.Controllers
 
             // Create a table
             XWPFTable table = wordDoc.CreateTable(calificaciones.Count+1, 5);
-            table.SetColumnWidth(0, 3500);
-            table.SetColumnWidth(1, 7000);
-            // Set Table Layout to fixed
+            table.SetColumnWidth(0, 2000);
+            table.SetColumnWidth(1, 2000);
+            table.SetColumnWidth(2, 1500);
+            table.SetColumnWidth(3, 1500);
+            table.SetColumnWidth(4, 1500);
 
-            var headerRow = table.Rows[0];
+            var headerRow0 = table.Rows[0];
+            headerRow0.GetCell(0).SetText("Nombre del Asesor");
+            headerRow0.GetCell(1).SetText("Nombre del Módulo");
+            var row0 = table.Rows[1];
+            row0.GetCell(0).SetText(grupo.nombreAsesorAsociado);
+            row0.GetCell(1).SetText(grupo.nombre);
+
+            var headerRow = table.Rows[2];
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre");
             headerRow.GetCell(2).SetText("Calificación");
@@ -237,12 +246,12 @@ namespace webMetics.Controllers
 
             for (int i = 0; i < calificaciones.Count; i++)
             {
-                var row = table.Rows[i + 1];
+                var row = table.Rows[i + 3];
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.apellido_1 + " " + calificaciones[i].participante.apellido_2);
                 row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
                 row.GetCell(3).SetText(grupo.nombre);
-                row.GetCell(4).SetText(grupo.nombreAsesorAsociado[i].ToString());
+                row.GetCell(4).SetText(grupo.nombreAsesorAsociado);
             }
 
             var stream = new MemoryStream();

@@ -476,6 +476,15 @@ namespace webMetics.Controllers
 
             // Create a table
             XWPFTable table = wordDoc.CreateTable(grupo.cupo + 3, 6);
+            var tblLayout1 = table.GetCTTbl().tblPr.AddNewTblLayout();
+            table.SetColumnWidth(0, 2000);
+            table.SetColumnWidth(1, 2000);
+            table.SetColumnWidth(2, 1500);
+            table.SetColumnWidth(3, 1500);
+            table.SetColumnWidth(4, 1500);
+            table.SetColumnWidth(5, 1500);
+
+
             var headerRow0 = table.Rows[0];
             headerRow0.GetCell(0).SetText("Nombre del Asesor");
             headerRow0.GetCell(1).SetText("Nombre del Módulo");
