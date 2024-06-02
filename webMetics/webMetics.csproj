@@ -8,6 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\**" />
+    <Compile Remove="Migrations\**" />
+    <Content Remove="Data\**" />
+    <Content Remove="Migrations\**" />
+    <EmbeddedResource Remove="Data\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Data\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\css\site.css" />
   </ItemGroup>
 
@@ -83,11 +94,6 @@
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPOI" Version="2.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
