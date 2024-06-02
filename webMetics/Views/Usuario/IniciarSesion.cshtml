@@ -1,14 +1,17 @@
 ﻿@model webMetics.Models.LoginModel
+@{
+    ViewBag.Title = "Iniciar sesión";
+}
 
 <body style="background-image: url('/images/fondo_login.jpg')">
     <div class="d-flex justify-content-center align-items-center" style="height: 75vh;">
         <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
             <div class="card shadow" style="width: 450px;">
                 <div class="card-header text-center pt-4 pb-3">
-                    <h2>Iniciar sesión</h2>
+                    <h2>@ViewBag.Title</h2>
                 </div>
                 <div class="card-body p-4">
-                    @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
                         <div class="text-center mb-1">
                             @Html.LabelFor(loginModel => loginModel.identificacion, new { @class = "text-center" })
@@ -43,7 +46,7 @@
                 <div class="card-footer text-center pt-2 pb-3">
                     <small>
                         ¿No tiene un usuario?
-                        @Html.ActionLink("Registrarse", "Registrarse", "Login", new { }, new { @class = "link-info" })
+                        @Html.ActionLink("Registrarse", "Registrarse", "Usuario", new { }, new { @class = "link-info" })
                     </small>
                 </div>
             </div>

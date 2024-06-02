@@ -37,7 +37,7 @@
             background-color: lightgray !important;
         }
     </style>
-    @if (@ViewBag.Title != "Login")
+    @if (ViewBag.Title != "Iniciar sesión" || ViewBag.Title != "Registrarse")
     {
         <nav class="navbar navbar-expand-lg navbar-custom">
             <div class="container-fluid">
@@ -62,11 +62,11 @@
                                             @Html.ActionLink("Mi usuario", "MiUsuario", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
                                         </li>
                                         <li>
-                                            @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Login", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                            @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Usuario", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <a class="dropdown-item" href="/Login/Logout">Cerrar sesión</a>
+                                            @Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item" })
                                         </li>
                                     </ul>
                                 </li>

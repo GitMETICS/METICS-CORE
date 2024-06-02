@@ -14,7 +14,7 @@
                 <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
             }
 
-            @using (Html.BeginForm("CambiarContrasena", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
                 <h1>@ViewBag.Title</h1>
@@ -75,7 +75,7 @@
     }
     else
     {
-        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
     }
 </body>
 </html>

@@ -9,7 +9,7 @@ using MimeKit;
  */
 namespace webMetics.Controllers
 {
-    public class LoginController : Controller
+    public class UsuarioController : Controller
     {
         // Controlador encargado de la funcionalidad de inicio de sesión
 
@@ -22,7 +22,7 @@ namespace webMetics.Controllers
         private readonly IConfiguration _configuration;
         private readonly IDataProtectionProvider _protector;
 
-        public LoginController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector)
+        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector)
         {
             _environment = environment;
             _configuration = configuration;
@@ -34,7 +34,7 @@ namespace webMetics.Controllers
         }
 
         // Método para mostrar la vista de inicio de sesión
-        public ActionResult Login()
+        public ActionResult IniciarSesion()
         {
             // Retorna la vista de inicio de sesión
             if (TempData["errorMessage"] != null)
@@ -46,18 +46,18 @@ namespace webMetics.Controllers
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
 
-            return View();
+            return View("IniciarSesion");
         }
 
         // Método para procesar el inicio de sesión cuando se envía el formulario de inicio de sesión
         [HttpPost]
-        public ActionResult Login(LoginModel usuario)
+        public ActionResult IniciarSesion(LoginModel usuario)
         {
             // Verificar si el modelo enviado desde el formulario es válido
             if (ModelState.IsValid)
             {
                 // Validar el usuario y contraseña ingresados
-                LoginModel usuarioAutorizado = ValidacionUsuario(usuario);
+                LoginModel usuarioAutorizado = AutenticarUsuario(usuario);
 
                 if (usuarioAutorizado != null)
                 {
@@ -68,7 +68,7 @@ namespace webMetics.Controllers
                 {
                     // Si el usuario y contraseña son inválidos, mostrar un mensaje de error
                     TempData["errorMessage"] = "Número de identificación o contraseña inválidos.";
-                    return RedirectToAction("Login");
+                    return RedirectToAction("IniciarSesion", "Usuario");
                 }
             }
             else
@@ -168,8 +168,8 @@ namespace webMetics.Controllers
             return exitoUsuario;
         }
 
-        // Método para validar el usuario y realizar el inicio de sesión
-        public LoginModel ValidacionUsuario(LoginModel usuario)
+        // Método para autenticar el usuario y realizar el inicio de sesión
+        public LoginModel AutenticarUsuario(LoginModel usuario)
         {
             try
             {
@@ -211,14 +211,14 @@ namespace webMetics.Controllers
         }
 
         // Método para cerrar la sesión del usuario
-        public ActionResult Logout()
+        public ActionResult CerrarSesion()
         {
-            // Eliminar las cookies del usuario
+            // Eliminar datos del usuario
             Response.Cookies.Delete("USUARIOAUTORIZADO");
             Response.Cookies.Delete("rolUsuario");
             Response.Cookies.Delete("idUsuario");
 
-            return Redirect("/Login/Login");
+            return RedirectToAction("IniciarSesion");
         }
 
         public ActionResult GestionarContrasena(string idParticipante)

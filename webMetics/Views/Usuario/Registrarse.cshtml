@@ -1,6 +1,6 @@
 ﻿@model webMetics.Models.UsuarioModel
 @{
-    ViewBag.Title = "Registrar usuario";
+    ViewBag.Title = "Registrarse";
 }
 
 <!DOCTYPE html>
@@ -8,7 +8,7 @@
 <head>
 </head>
 <body>
-    @using (Html.BeginForm("CrearUsuario", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    @using (Html.BeginForm("CrearUsuario", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
         <div class="form-horizontal">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "Login", "Login", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                            @Html.ActionLink("Cancelar", "IniciarSesion", "Usuario", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
                         </div>
                         <div class="col-auto">
                             <input type="submit" class="btn btn-primary btn-block" value="Guardar"/>
