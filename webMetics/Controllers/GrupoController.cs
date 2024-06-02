@@ -128,106 +128,97 @@ namespace webMetics.Controllers
         }
 
         /* Vista del formulario para crear un grupo */
-        public ActionResult AgregarGrupo()
+        public ActionResult CrearGrupo()
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            // Obtener la lista de temas y asesores disponibles para crear un grupo
-            List<SelectListItem> temas = accesoATema.ObtenerListaSeleccionTemas();
             List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
-
-            // Verificar si existen temas y asesores disponibles para crear un grupo
-            if (asesores == null)
+            if (asesores.Count == 0)
             {
-                TempData["msgNoSePuedeCrearGrupo"] = "No hay asesores disponibles para crear un módulo.";
-                TempData["showPopup"] = true;
-                return Redirect("~/Grupo/ListaGruposDisponibles");
+                TempData["errorMessage"] = "No hay asesores disponibles para crear un módulo.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
+
+            List<SelectListItem> temas = accesoATema.ObtenerListaSeleccionTemas();
             if (temas.Count == 0)
             {
-                TempData["msgNoSePuedeCrearGrupo"] = "No hay temas disponibles para crear un módulo.";
-                TempData["showPopup"] = true;
-                return Redirect("~/Grupo/ListaGruposDisponibles");
-            }
-            else
-            {
-                // Pasar la lista de temas disponibles a la vista
-                ViewData["Temas"] = temas;
+                TempData["errorMessage"] = "No hay temas disponibles para crear un módulo.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
 
-            // Devolver la vista con la lista de temas disponibles para crear un grupo
+            ViewData["Temas"] = temas;
             return View();
         }
 
         /* Vista del formulario para crear un grupo con los datos ingresados del modelo */
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult AgregarGrupo(GrupoModel grupo)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+                
+                // Validar tamaño del archivo adjunto
+                /*if (/*grupo.archivoAdjunto != null && grupo.archivoAdjunto.ContentLength > 5242880) // 5MB en bytes
                 {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
-                    // Validar tamaño del archivo adjunto
-                    if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB en bytes
+                    ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    return View(grupo);
+                }*/
+
+                // Validar fechas de inicio y finalización
+                if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                {
+                    ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de la fecha de inicio.";
+                    
+                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
                     {
-                        ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        return View(grupo);
+                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
                     }
 
-                    // Validar fechas de inicio y finalización
-                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                    if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
                     {
-                        TempData["msg"] = "La fecha de finalización no puede ser antes de la fecha de inicio.";
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-
-                        if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
-                        {
-                            ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
-                        }
-
-                        if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
-                        {
-                            ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio de grupo debe ser antes de la fecha de finalización.");
-                        }
-
-                        return View(grupo);
+                        ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
                     }
 
-                    // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
-                    if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
-                    {
-                        TempData["msg"] = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
-                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
-                        ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        return View(grupo);
-                    }
-
-                    // Crear el grupo y verificar el éxito de la operación
-                    ViewBag.Msg = "El formulario ha sido enviado.";
-                    ViewBag.ExitoAlCrear = accesoAGrupo.CrearGrupo(grupo);
-                    if (ViewBag.ExitoAlCrear)
-                    {
-                        ViewBag.Message = "El módulo fue creado con éxito.";
-                        ModelState.Clear();
-                        return Redirect("~/Grupo/ListaGruposDisponibles");
-                    }
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    return View("CrearGrupo", grupo);
                 }
 
-                // Mostrar mensaje de error si la creación del grupo no tuvo éxito
-                ViewBag.ExitoAlCrear = false;
-                TempData["msg"] = "<script>alert('No se pudo crear el módulo, intente de nuevo.');</script>";
-                return Redirect("/Grupo/AgregarGrupo");
+                // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
+                if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
+                {
+                    ViewBag.ErrorMessage = "La fecha final de la inscripción no puede ser después de la fecha de inicio del módulo.";
+
+                    ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
+                    ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
+                    
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    return View("CrearGrupo", grupo);
+                }
+
+                bool exito = accesoAGrupo.CrearGrupo(grupo);
+                if (exito)
+                {
+                    TempData["successMessage"] = "Se ha creado el módulo.";
+                } 
+                else
+                {
+                    TempData["errorMessage"] = "Ocurrió un error y no se pudo crear el módulo.";
+                }
+
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
-            catch (Exception e)
+            else
             {
-                // Manejar excepciones si ocurren durante el proceso
-                return View(e);
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+
+                // TODO: Debe retornar mensajes de error
+                return View("CrearGrupo", grupo);
             }
         }
 

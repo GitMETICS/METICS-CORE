@@ -9,6 +9,7 @@ namespace webMetics.Models
 
         public ParticipanteModel participante { get; set; }
 
+        [Range(0, 100, ErrorMessage = "Debe ser un número entre 0 y 100.")]
         public double calificacion { get; set; }
     }
 }

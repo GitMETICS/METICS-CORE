@@ -69,17 +69,16 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
         [Display(Name = "Tema asociado")]
-        public string temaAsociado { get; set; }
+        public string? temaAsociado { get; set; }
 
-        public string nombreAsesorAsociado { get; set; }
+        public string? nombreAsesorAsociado { get; set; }
 
-        public string tipoActividadAsociado { get; set; }
+        public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar contra requerimientos
 
-        [Required(ErrorMessage = "Debe adjuntar el documento del módulo.")]
-        [Display(Name = "Archivo adjunto")]
-        public string/*HttpPostedFileBase*/ archivoAdjunto { get; set; }
+        //[Required(ErrorMessage = "Debe adjuntar el documento del módulo.")]
+        public IFormFile? archivoAdjunto { get; set; }
 
-        public string nombreArchivo { get; set; }
+        public string? nombreArchivo { get; set; }
 
     }
 

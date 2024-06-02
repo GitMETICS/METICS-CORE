@@ -1,0 +1,133 @@
+﻿@model webMetics.Models.GrupoModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Crear módulo";
+}
+
+@if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
+{
+    <div class="form-horizontal">
+        <h1 class="mt-5">@ViewBag.Title</h1>
+        <h5>Inserte los siguientes datos:</h5>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @using (Html.BeginForm("AgregarGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="row mt-1" style="margin-bottom:10%">
+                <div class="col">
+                    <div class="container">
+                        <div class="form-group">
+                            @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
+                            @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row mt-1" style="margin-top:5px">
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
+                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new List<SelectListItem> { new SelectListItem { Text = "Presencial", Value = "Presencial" }, new SelectListItem { Text = "Virtual", Value = "Virtual" }, new SelectListItem { Text = "AltoVirtual", Value = "Alto Virtual" } }, "Seleccione una modalidad...", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @value = "" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @value = "" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:5px">
+                            @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group" style="margin-top:5px">
+                            @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group" style="margin-top:5px">
+                            @Html.LabelFor(grupoModel => grupoModel.temaAsociado, new { Style = "font-size:22px" })
+                            @Html.DropDownList("temaAsociado", ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema...", new { @class = "form-select" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.temaAsociado, "", new { @class = "text-danger" })
+                        </div>
+
+                        <br />
+                        <div class="row" style="margin-top:25px">
+                            <h4>Fechas de inscripción</h4>
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
+                                <br />
+                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
+
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
+                                <br />
+                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top:25px">
+                            <h4>Fecha de inicio y fin del grupo</h4>
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
+                                <br />
+                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
+                                <br />
+                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <br />
+                        <div>
+                            <h4>Adjuntar archivo del módulo</h4>
+                            <div class="form-group">
+                                @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

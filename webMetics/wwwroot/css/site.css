@@ -8,6 +8,19 @@
     margin: 0;
 }
 
+.navbar-custom {
+    background: #f4f4f4;
+}
+
+.navbar-dark .navbar-text {
+    color: black;
+}
+
+.dropdown-item:hover {
+    color: black !important;
+    background-color: lightgray !important;
+}
+
 .container-cards {
     margin: 15vh auto;
     border-radius: 15px;
@@ -49,5 +62,11 @@
 
 .alertaCrearAsesor {
     color: red;
+    font-size: 16px;
+}
+
+.alertaFechas {
+    color: red;
+    padding-bottom: 10px;
     font-size: 16px;
 }
