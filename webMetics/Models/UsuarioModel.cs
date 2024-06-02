@@ -19,6 +19,42 @@ namespace webMetics.Models
         [Display(Name = "Contraseña")]
         public string contrasena {  get; set; }
 
+        [Required(ErrorMessage = "Es necesario confirmar la contraseña.")]
+        [Display(Name = "Confirmar contraseña")]
+        public string confirmarContrasena { get; set; }
+
         public ParticipanteModel? participante { get; set; }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Es necesario ingresar una identificación.")]
+        [Display(Name = "Identificación")]
+        public string identificacion { get; set; }
+
+        [Display(Name = "Rol")]
+        public int rol { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
+        [Display(Name = "Contraseña")]
+        public string contrasena { get; set; }
+    }
+
+    public class NewLoginModel
+    {
+        [Display(Name = "Identificación")]
+        public string identificacion { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar su contraseña actual.")]
+        [Display(Name = "Contraseña actual")]
+        public string contrasena { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
+        [Display(Name = "Nueva contraseña")]
+        public string nuevaContrasena { get; set; }
+
+        [Required(ErrorMessage = "Es necesario confirmar la nueva contraseña.")]
+        [Display(Name = "Confirmar nueva contraseña")]
+        public string confirmarContrasena { get; set; }
     }
 }

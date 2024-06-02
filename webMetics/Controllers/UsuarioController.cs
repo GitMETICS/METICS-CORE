@@ -81,39 +81,40 @@ namespace webMetics.Controllers
         /* Método para procesar el formulario de creación de usuario con los datos ingresados */
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CrearUsuario(UsuarioModel usuario)
+        public ActionResult Registrarse(UsuarioModel usuario)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid) 
+                if (usuario.contrasena == usuario.confirmarContrasena)
                 {
-                    bool registrado = RegistrarUsuario(usuario);
+                    bool exito = CrearUsuario(usuario);
 
-                    if (registrado)
+                    if (exito)
                     {
                         ViewBag.Correo = usuario.correo;
                         ViewBag.Titulo = "Registro realizado";
                         ViewBag.Message = "Los datos fueron guardados éxitosamente. La confirmación será enviada al correo";
+                        EnviarCorreoRegistro(usuario.identificacion, usuario.correo);
                     }
                     else
                     {
                         ViewBag.Titulo = "No se pudo realizar el registro";
-                        ViewBag.Message = "Los datos no pudieron ser guardados. Por favor, inténtelo nuevamente.";
+                        ViewBag.Message = "Ocurrió un error y los datos no pudieron ser guardados. Por favor, inténtelo nuevamente.";
                     }
+
                     return View("ParticipanteRegistrado");
                 }
                 else
                 {
+                    ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                     return View("Registrarse");
                 }
             }
-            catch (Exception e)
+            else
             {
-                // Si ocurre una excepción, mostrar el mensaje de error en la vista
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                ViewBag.ErrorMessage = e;
-                return View();
+                return View("Registrarse");
             }
         }
 
@@ -123,10 +124,10 @@ namespace webMetics.Controllers
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
 
-            return View("Registrarse");
+            return View();
         }
 
-        private bool RegistrarUsuario(UsuarioModel usuario)
+        private bool CrearUsuario(UsuarioModel usuario)
         {
             bool exitoUsuario = false;
             bool exitoParticipante = false;
@@ -159,13 +160,7 @@ namespace webMetics.Controllers
                 usuario.participante = participante;
             }
 
-            if (exitoUsuario && exitoParticipante)
-            {
-                string mensaje = "Se ha registrado al usuario con identificación " + usuario.identificacion + " en el proyecto Módulos.";
-                EnviarCorreoRegistro(mensaje, usuario.correo);
-            }
-
-            return exitoUsuario;
+            return exitoUsuario && exitoParticipante;
         }
 
         // Método para autenticar el usuario y realizar el inicio de sesión
@@ -280,38 +275,40 @@ namespace webMetics.Controllers
         }
 
         /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarCorreoRegistro(string mensaje, string correoParticipante)
+        private void EnviarCorreoRegistro(string identificacion, string correo)
         {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
-
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Registro en Proyecto Módulos"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + mensaje;
-            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            try
             {
+                // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+                // Se utiliza la librería MimeKit para construir el mensaje
+                // El mensaje incluye una versión en HTML y texto plano
+
+                // Contenido base del mensaje en HTML y texto plano
+                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+                const string BASE_MESSAGE_TEXT = "";
+                const string BASE_SUBJECT = "Registro en Proyecto Módulos"; // Asunto del correo
+
+                MimeMessage message = new MimeMessage();
+
+                // Configurar el remitente y el destinatario
+                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
+                message.From.Add(from);
+                MailboxAddress to = new MailboxAddress("Receiver", correo);
+                message.To.Add(to);
+
+                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+                BodyBuilder bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
+                    "Se ha registrado al usuario con identificación " + identificacion + " en el proyecto Módulos."; ;
+                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+                bodyBuilder.HtmlBody += "</p>";
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // Enviar el correo electrónico utilizando un cliente SMTP
+                using var client = new MailKit.Net.Smtp.SmtpClient();
                 // Configurar el cliente SMTP para el servidor de correo de la UCR
                 client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
                 client.Authenticate(from.Address, "pass"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
@@ -321,6 +318,10 @@ namespace webMetics.Controllers
 
                 // Desconectar el cliente SMTP
                 client.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.ToString();
             }
         }
     }
