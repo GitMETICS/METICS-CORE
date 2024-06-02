@@ -13,7 +13,8 @@
     "inputFiles": [
       "wwwroot/js/site.js",
       "wwwroot/lib/jquery/dist/jquery.js",
-      "wwwroot/lib/jquery/dist/jqueryvalidate.js"
+      "wwwroot/lib/jquery-validation/dist/jquery.validate.js",
+      "wwwroot/lib/jquery-validation-unobstrusive/jquery.validate.unobstrusive.js"
     ],
     // Optionally specify minification options
     "minify": {
@@ -21,6 +22,6 @@
       "renameLocals": true
     },
     // Optionally generate .map file
-    "sourceMap": false
+    "sourceMap": true
   }
 ]
