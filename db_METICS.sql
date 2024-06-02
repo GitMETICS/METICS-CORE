@@ -389,9 +389,9 @@ VALUES('¿Cómo utilizar la plataforma?', 1, 1),
 ('Tema Adicional', 1, 2)
 
 --Declarar archivo que se va a adjuntar (RUTA DEL ARCHIVO, Ejm: C:\Users\UserName\Documents\Folder\FileName.pdf) 
-DECLARE @adjunto varbinary(max)
+/*DECLARE @adjunto varbinary(max)
 SELECT @adjunto = CAST(bulkcolumn AS varbinary(max))
-FROM OPENROWSET(BULK 'FileName.pdf', SINGLE_BLOB) AS x
+FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\FileName.pdf', SINGLE_BLOB) AS x*/
 
 --Crear grupos
 INSERT INTO dbo.grupo(
@@ -400,23 +400,23 @@ INSERT INTO dbo.grupo(
 	nombre, horario,
 	fecha_inicio_grupo, fecha_finalizacion_grupo,
 	fecha_inicio_inscripcion, fecha_finalizacion_inscripcion,
-	nombre_archivo, adjunto)
+	nombre_archivo)
 	VALUES
-	(3,'Presencial', 15, 3,
+	(3, 'Presencial', 15, 3,
 	'Taller de videos interactivos', 1,'Universidad de Costa Rica, Rodrigo Facio',
 	'Capacitación-Plataforma','V-S de 4pm a 7pm',
 	'2023-06-01 00:00:00','2026-12-02 00:00:00',
-	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto),
-	(2,'Virtual',10,3,
+	'2023-01-01 00:00:00','2026-01-01 00:00:00', 'ArchivoPrueba.pdf'),
+	(2, 'Virtual', 10, 3,
 	'Aprenda a realizar evaluaciones en la plataforma',1,'mediación virtual',
 	'Capacitación-Profesores','L-V de 4pm a 7pm',
 	'2023-06-01 00:00:00','2026-12-02 00:00:00',
-	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto),
-	(3,'Virtual',10,3,
+	'2023-01-01 00:00:00','2026-01-01 00:00:00', 'ArchivoPrueba.pdf'),
+	(3, 'Virtual', 10, 3,
 	'Aprenda a realizar videos llamativos e interesantes del temario del curso',1,'mediación virtual',
 	'Capacitaciones-Audiovisuales','L-M de 4pm a 7pm',
 	'2023-06-01 00:00:00','2026-12-02 00:00:00',
-	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto);
+	'2023-01-01 00:00:00','2026-01-01 00:00:00', 'ArchivoPrueba.pdf');
 
 
 --Crear asesor da tema
