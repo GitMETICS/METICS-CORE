@@ -1,25 +1,27 @@
 ﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Hosting;
 
 
 namespace webMetics.Handlers
 {
     public class ParticipanteHandler : BaseDeDatosHandler
-        
     {
+        public ParticipanteHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         // Método para verificar si existe un nuevo participante en la base de datos
-        public bool ExisteParticipante(ParticipanteModel participante)
+        public bool ExisteParticipante(string identificacion)
         {
             bool existeEnBaseDatos = false;
 
             try
             {
-                string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + participante.idParticipante;
+                string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + identificacion;
                 SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
                 DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
 
@@ -324,10 +326,9 @@ namespace webMetics.Handlers
         // Método para obtener el contenido de un archivo JSON y deserializarlo en un objeto genérico
         public object GetJsonFile()
         {
-            // Obtener la ruta del archivo JSON
-            string path = Path.Combine("App_Data", "dataAreas.json");
+            string path = Path.Combine(_environment.WebRootPath, "data/dataAreas.json");
             // Leer todo el contenido del archivo como una cadena
-            string allText = System.IO.File.ReadAllText(path);
+            string allText = File.ReadAllText(path);
             // Deserializar el contenido del archivo JSON en un objeto genérico
             object jsonObject = JsonConvert.DeserializeObject(allText);
             return jsonObject;

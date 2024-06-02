@@ -9,11 +9,13 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
-    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
+    @if (ViewBag.Role == 1 || ViewBag.Role == 2)
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-
+            @if (/*Request.UrlReferrer != null*/true)
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
             <h1>@ViewBag.Title</h1>
             <hr />
 
@@ -61,9 +63,9 @@
                             nombreCompleto += " " + ViewBag.Participante.apellido_2;
                         }
                         <tr>
-                            <td class="titulo-listas">@ViewBag.Participante.idParticipante</td>
-                            <td class="titulo-listas">@nombreCompleto</td>
-                            <td class="titulo-listas">
+                            <td class=" ">@ViewBag.Participante.idParticipante</td>
+                            <td class=" ">@nombreCompleto</td>
+                            <td class=" ">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -76,7 +78,7 @@
                                     <span>Sin grupos inscritos</span>
                                 }
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -89,13 +91,13 @@
                                     <span>0</span>
                                 }
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 <span>@ViewBag.Participante.horasMatriculadas</span>
                             </td>
-                            <td class="titulo-listas text-center">
+                            <td class="  text-center">
                                 <span>@ViewBag.Participante.horasAprobadas</span>
                             </td>
-                            <td class="titulo-listas">
+                            <td class=" ">
                             </td>
                         </tr>
                     </tbody>

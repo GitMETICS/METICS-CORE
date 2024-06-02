@@ -9,12 +9,13 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
-    @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Asesor")))
+    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            
-            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-
+            @if (/*Request.UrlReferrer != null*/true)
+            {
+                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            }
             <h1>@ViewBag.NombreGrupo</h1>
             <h2>@ViewBag.Title</h2>
             @if (TempData["Message"] != null)
@@ -52,19 +53,19 @@
                                 nombreCompleto += " " + ViewBag.Calificacion.participante.apellido_2;
                             }
                             <tr>
-                                <td class="titulo-listas">@ViewBag.Calificacion.participante.idParticipante</td>
-                                <td class="titulo-listas">@nombreCompleto</td>
-                                <td class="titulo-listas text-center">@ViewBag.Calificacion.calificacion</td>
+                                <td class=" ">@ViewBag.Calificacion.participante.idParticipante</td>
+                                <td class=" ">@nombreCompleto</td>
+                                <td class="  text-center">@ViewBag.Calificacion.calificacion</td>
                                 @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
-                                    <td class="titulo-listas">
+                                    <td class=" ">
                                         <div class="input-group">
                                             <input type="number" class="form-control" name="calificacion" id="calificacion">
                                         </div>
                                     </td>
-                                    <td class="titulo-listas">
-                                        <button type="submit" class="btn btn-info">Aceptar</button>
+                                    <td class=" ">
+                                        <button type="submit" class="btn btn-primary">Aceptar</button>
                                     </td>
                                 }
                             </tr>
@@ -72,14 +73,14 @@
                     </table>
                 }
                 <div class="d-flex justify-content-center">
-                    <a href="../Calificaciones/VerCalificaciones" class="btn btn-primary">Regresar</a>
+                    @Html.ActionLink("Cancelar", "VerCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
                 </div>
             </div>
         </div>
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>

@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         if (ViewBag.Message != null)
         {
@@ -52,11 +52,11 @@
                             @foreach (var tema in ViewBag.Temas)
                             {
                                 <tr>
-                                    <td class="titulo-listas">@tema.nombre</td>
-                                    <td class="titulo-listas">@tema.tipoActividad</td>
-                                    <td class="titulo-listas">@tema.asesorPrincipal</td>
-                                    <td class="titulo-listas">@tema.asesores</td>
-                                    <td class="titulo-listas">
+                                    <td>@tema.nombre</td>
+                                    <td>@tema.tipoActividad</td>
+                                    <td>@tema.asesorPrincipal</td>
+                                    <td>@tema.asesores</td>
+                                    <td>
                                         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@tema.idTema')">
                                             Eliminar
                                         </button>
@@ -100,7 +100,7 @@
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>

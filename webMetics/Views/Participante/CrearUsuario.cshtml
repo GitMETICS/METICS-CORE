@@ -9,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (!User.Identity.IsAuthenticated)
+    @if (ViewBag.Id == "")
     {
         if (ViewBag.Message != null)
         {
@@ -27,7 +27,7 @@
             }
         }
 
-        using (Html.BeginForm("FormularioDeUsuario", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        using (Html.BeginForm("CrearUsuario", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <div class="form-horizontal">
@@ -110,9 +110,13 @@
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="row justify-content-center" style="margin-top:20px">
-                            @Html.ActionLink("Cancelar", "../Home/Index", new { }, new { @class = "btn boton-formularios", @style = "background-color:grey" })
-                            <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                        <div class="row justify-content-center m-4">
+                            <div class="col-auto">
+                                @Html.ActionLink("Cancelar", "Index", "Home", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,102 +125,100 @@
     }
     else
     {
-        Context.Response.Redirect("~/Grupo/ListaGruposDisponibles");
+        @Html.Raw("window.location.href = '" + Url.Action("ListaGruposDisponibles", "Grupo") + "';")
     }
 </body>
 </html>
 
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            // Handle change event of area dropdown
-            $('#areaDropdown').change(function () {
-                var areaName = $(this).val();
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Handle change event of area dropdown
+        $('#areaDropdown').change(function () {
+            var areaName = $(this).val();
 
-                // Clear departamento and seccion dropdowns
-                $('#departamentoDropdown').empty().append('<option value="">Elija un departamento...</option>');
-                $('#seccionDropdown').empty().append('<option value="">Elija una seccion...</option>');
+            // Clear departamento and seccion dropdowns
+            $('#departamentoDropdown').empty().append('<option value="">Elija un departamento...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Elija una seccion...</option>');
 
-                if (areaName !== '') {
-                    // Make AJAX request to fetch departamentos for selected area
-                    $.ajax({
-                        url: '/Participante/GetDepartamentosByArea',
-                        type: 'GET',
-                        data: { areaName: areaName },
-                        dataType: 'json',
-                        success: function (data) {
-                            // Update departamento dropdown with fetched data
-                            $.each(data, function (index, value) {
-                                $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'An error occurred while fetching departamentos: ' + error
-                            });
-                        }
-                    });
-                    // Make AJAX request to fetch secciones for selected departamento
-                    $.ajax({
-                        url: '/Participante/GetSeccionesByDepartamento',
-                        type: 'GET',
-                        data: { departamentoName: departamentoName },
-                        dataType: 'json',
-                        success: function (data) {
-                            // Update seccion dropdown with fetched data
-                            $.each(data, function (index, value) {
-                                $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'An error occurred while fetching secciones: ' + error
-                            });
-                        }
-                    });
-                }
-            });
-
-            // Handle change event of departamento dropdown
-            $('#departamentoDropdown').change(function () {
-                var departamentoName = $(this).val();
-                var areaName = $('#areaDropdown').val();
-
-                // Clear seccion dropdown
-                $('#seccionDropdown').empty().append('<option value="">Elija una seccion...</option>');
-
-                if (departamentoName !== '') {
-                    // Make AJAX request to fetch secciones for selected departamento
-                    $.ajax({
-                        url: '/Participante/GetSeccionesByDepartamento',
-                        type: 'GET',
-                        data: { areaName: areaName, departamentoName: departamentoName },
-                        dataType: 'json',
-                        success: function (data) {
-                            // Update seccion dropdown with fetched data
-                            $.each(data, function (index, value) {
-                                $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'An error occurred while fetching secciones: ' + error
-                            });
-                        }
-                    });
-                }
-            });
+            if (areaName !== '') {
+                // Make AJAX request to fetch departamentos for selected area
+                $.ajax({
+                    url: '/Participante/GetDepartamentosByArea',
+                    type: 'GET',
+                    data: { areaName: areaName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update departamento dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching departamentos: ' + error
+                        });
+                    }
+                });
+                // Make AJAX request to fetch secciones for selected departamento
+                $.ajax({
+                    url: '/Participante/GetSeccionesByDepartamento',
+                    type: 'GET',
+                    data: { departamentoName: departamentoName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update seccion dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching secciones: ' + error
+                        });
+                    }
+                });
+            }
         });
-    </script>
-}
+
+        // Handle change event of departamento dropdown
+        $('#departamentoDropdown').change(function () {
+            var departamentoName = $(this).val();
+            var areaName = $('#areaDropdown').val();
+
+            // Clear seccion dropdown
+            $('#seccionDropdown').empty().append('<option value="">Elija una seccion...</option>');
+
+            if (departamentoName !== '') {
+                // Make AJAX request to fetch secciones for selected departamento
+                $.ajax({
+                    url: '/Participante/GetSeccionesByDepartamento',
+                    type: 'GET',
+                    data: { areaName: areaName, departamentoName: departamentoName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update seccion dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching secciones: ' + error
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>

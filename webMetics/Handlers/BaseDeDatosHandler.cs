@@ -1,20 +1,22 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System;
 using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace webMetics.Handlers
 {
     public class BaseDeDatosHandler
     {
         protected readonly SqlConnection ConexionMetics;
+        protected readonly IWebHostEnvironment _environment;
+        protected readonly IConfiguration _configuration;
 
-        // Constructor de la clase BaseDeDatosHandler
-        public BaseDeDatosHandler()
+        public BaseDeDatosHandler(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            // Obtiene la cadena de conexión de la configuración    // TODO
-            string RutaConexion = "Server=(localdb)\\mssqllocaldb;Database=aspnet-webMetics-2793fa9b-a054-47cf-8443-da5f8bca4169;Trusted_Connection=True;MultipleActiveResultSets=true";
+            _environment = environment;
+            _configuration = configuration;
 
-            // Inicializa la conexión con la base de datos usando la cadena de conexión
-            ConexionMetics = new SqlConnection(RutaConexion);
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            ConexionMetics = new SqlConnection(connectionString);
         }
 
         // Método para ejecutar una consulta SELECT y retornar los resultados en una DataTable

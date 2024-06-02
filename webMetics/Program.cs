@@ -1,8 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using webMetics.Areas.Identity.Data;
-using webMetics.Data;
-
 namespace webMetics
 {
     public class Program 
@@ -12,17 +7,19 @@ namespace webMetics
             var builder = WebApplication.CreateBuilder(args);
 
                     // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-                builder.Services.AddDbContext<webMeticsContext>(options =>
+            /*var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<webMeticsUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<webMeticsContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>();*/
             
             builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
+            builder.Services.AddDataProtection();
 
             var app = builder.Build();
 
@@ -50,7 +47,7 @@ namespace webMetics
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
 
-            using (var scope = app.Services.CreateScope())
+            /* using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -62,6 +59,27 @@ namespace webMetics
                         await roleManager.CreateAsync(new IdentityRole(role));
                 }
             }
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+                string email = "admin@admin.com";
+                string password = "Test1234.";
+
+                if(await userManager.FindByEmailAsync(email) == null)
+                {
+                    var user = new IdentityUser();
+                    user.UserName = "Admin";
+                    user.Email = email;
+                    user.EmailConfirmed = true;
+
+                    await userManager.CreateAsync(user, password);
+
+                    await userManager.AddToRoleAsync(user, "Admin");
+
+                }
+            }*/
 
             app.Run();
 

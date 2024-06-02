@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\zmont\\Source\\Repos\\METICS-CORE\\webMetics\\webMetics.csproj": {}
+    "C:\\Users\\yasty\\source\\repos\\METICS-CORE\\webMetics\\webMetics.csproj": {}
   },
   "projects": {
-    "C:\\Users\\zmont\\Source\\Repos\\METICS-CORE\\webMetics\\webMetics.csproj": {
+    "C:\\Users\\yasty\\source\\repos\\METICS-CORE\\webMetics\\webMetics.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\zmont\\Source\\Repos\\METICS-CORE\\webMetics\\webMetics.csproj",
+        "projectUniqueName": "C:\\Users\\yasty\\source\\repos\\METICS-CORE\\webMetics\\webMetics.csproj",
         "projectName": "webMetics",
-        "projectPath": "C:\\Users\\zmont\\Source\\Repos\\METICS-CORE\\webMetics\\webMetics.csproj",
-        "packagesPath": "C:\\Users\\zmont\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\zmont\\Source\\Repos\\METICS-CORE\\webMetics\\obj\\",
+        "projectPath": "C:\\Users\\yasty\\source\\repos\\METICS-CORE\\webMetics\\webMetics.csproj",
+        "packagesPath": "C:\\Users\\yasty\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\yasty\\source\\repos\\METICS-CORE\\webMetics\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\zmont\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\yasty\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -49,6 +53,10 @@
               "target": "Package",
               "version": "[3.0.1, )"
             },
+            "Microsoft.AspNet.Mvc": {
+              "target": "Package",
+              "version": "[5.3.0, )"
+            },
             "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.4, )"
@@ -72,6 +80,22 @@
             "Microsoft.EntityFrameworkCore.Tools": {
               "target": "Package",
               "version": "[8.0.4, )"
+            },
+            "Microsoft.Net.Http.Headers": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.6.0, )"
+            },
+            "NETCore.MailKit": {
+              "target": "Package",
+              "version": "[2.1.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -101,7 +125,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

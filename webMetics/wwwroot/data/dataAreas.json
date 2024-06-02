@@ -1,0 +1,525 @@
+// En este archivo se encuentran las areas y facultades a las que pueden pertenecer los participantes de la aplicacion
+{ // Las Áreas contienen Facultades y las Facultades contienen Escuelas
+  "areas": [
+    {
+      "name": "Área de Artes y Letras",
+      "departamentos": [
+        {
+          "name": "Facultad de Artes",
+          "secciones": [
+            {
+              "name": "Escuela de Artes Dramáticas"
+            },
+            {
+              "name": "Escuela de Artes Musicales"
+            },
+            {
+              "name": "Escuela de Artes Plásticas"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Letras",
+          "secciones": [
+            {
+              "name": "Escuela de Filología, Lingüística y Literatura"
+            },
+            {
+              "name": "Escuela de Filosofía"
+            },
+            {
+              "name": "Escuela de Lenguas Modernas"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Área de Ciencias Agroalimentarias",
+      "departamentos": [
+        {
+          "name": "Facultad de Ciencias Agroalimentarias",
+          "secciones": [
+            {
+              "name": "Escuela de Agronomía"
+            },
+            {
+              "name": "Escuela de Economía Agrícola y Agronegocios"
+            },
+            {
+              "name": "Escuela de Tecnología de Alimentos"
+            },
+            {
+              "name": "Escuela de Zootecnia"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Área de Ciencias Básicas",
+      "departamentos": [
+        {
+          "name": "Facultad de Ciencias",
+          "secciones": [
+            {
+              "name": "Escuela de Biología"
+            },
+            {
+              "name": "Escuela de Física"
+            },
+            {
+              "name": "Escuela de Geología"
+            },
+            {
+              "name": "Escuela de Matemáticas"
+            },
+            {
+              "name": "Escuela de Química"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Área de Ciencias Sociales",
+      "departamentos": [
+        {
+          "name": "Facultad de Ciencias Económicas",
+          "secciones": [
+            {
+              "name": "Escuela de Administración de Negocios"
+            },
+            {
+              "name": "Escuela de Administración Pública"
+            },
+            {
+              "name": "Escuela de Economía"
+            },
+            {
+              "name": "Escuela de Estadística"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Ciencias Sociales",
+          "secciones": [
+            {
+              "name": "Escuela de Ciencias de la Comunicación Colectiva"
+            },
+            {
+              "name": "Escuela de Psicología"
+            },
+            {
+              "name": "Escuela de Ciencias Políticas"
+            },
+            {
+              "name": "Escuela de Historia y Geografía"
+            },
+            {
+              "name": "Escuela de Trabajo Social"
+            },
+            {
+              "name": "Escuela de Antropología y Sociología"
+            },
+            {
+              "name": "Escuela de Historia"
+            },
+            {
+              "name": "Escuela de Geografía"
+            },
+            {
+              "name": "Escuela de Antropología"
+            },
+            {
+              "name": "Escuela de Sociología"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Derecho",
+          "secciones": [
+            {
+              "name": "Escuela de Derecho"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Educación",
+          "secciones": [
+            {
+              "name": "Escuela de Administración Educativa"
+            },
+            {
+              "name": "Escuela de Formación Docente"
+            },
+            {
+              "name": "Escuela de Orientación y Educación Especial"
+            },
+            {
+              "name": "Escuela de Bibliotecología"
+            },
+            {
+              "name": "Escuela de Educación Física y Deportes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Área de Ingeniería",
+      "departamentos": [
+        {
+          "name": "Facultad de Agronomía",
+          "secciones": [
+            {
+              "name": "Escuela de Economía Agrícola"
+            },
+            {
+              "name": "Escuela de Fitotecnia"
+            },
+            {
+              "name": "Escuela de Tecnología de Alimentos"
+            },
+            {
+              "name": "Escuela de Zootecnia"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Ingeniería",
+          "secciones": [
+            {
+              "name": "Escuela de Arquitectura"
+            },
+            {
+              "name": "Escuela de Ciencias de la Computación e Informática"
+            },
+            {
+              "name": "Escuela de Ingeniería de Biosistemas"
+            },
+            {
+              "name": "Escuela de Ingeniería Civil"
+            },
+            {
+              "name": "Escuela de Ingeniería Eléctrica"
+            },
+            {
+              "name": "Escuela de Ingeniería Industrial"
+            },
+            {
+              "name": "Escuela de Ingeniería Mecánica"
+            },
+            {
+              "name": "Escuela de Ingeniería Química"
+            },
+            {
+              "name": "Escuela Ingeniería Topográfica"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Área de Salud",
+      "departamentos": [
+        {
+          "name": "Facultad de Farmacia",
+          "secciones": [
+            {
+              "name": "Escuela de Farmacia"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de medicina",
+          "secciones": [
+            {
+              "name": "Escuela de Enfermería"
+            },
+            {
+              "name": "Escuela de Medicina"
+            },
+            {
+              "name": "Escuela de Nutrición"
+            },
+            {
+              "name": "Escuela de Salud Pública"
+            },
+            {
+              "name": "Escuela de Tecnologías en Salud"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sistema de Educación General: Estudios Generales",
+      "departamentos": [
+        {
+          "name": "Escuela de Estudios Generales"
+        },
+        {
+          "name": "Escuela de Seminarios de Realidad Nacional"
+        }
+      ]
+    },
+    {
+      "name": "Sistema de Estudios de Posgrado",
+      "departamentos": [
+        {
+          "name": "Especialidades de Posgrado",
+          "secciones": [
+            {
+              "name": "Especialidades de Posgrado en Microbiología"
+            },
+            {
+              "name": "Especialidades de Posgrado en Odontología General Avanzada"
+            }
+          ]
+        },
+        {
+          "name": "Programa de Doctorado",
+          "secciones": [
+            {
+              "name": "Programa de Doctorado en Ciencias"
+            },
+            {
+              "name": "Programa de Doctorado en Ciencias Sociales sobre América Central"
+            },
+            {
+              "name": "Programa de Doctorado en Educación"
+            },
+            {
+              "name": "Programa de Doctorado en Estudios de la Sociedad y la Cultura"
+            },
+            {
+              "name": "Programa de Doctorado en Filosofía"
+            },
+            {
+              "name": "Programa de Doctorado en Ingeniería"
+            },
+            {
+              "name": "Programa de Doctorado en Sistemas de Producción Agrícola Tropical Sostenible"
+            }
+          ]
+        },
+        {
+          "name": "Programa de Estudios de Posgrado",
+          "secciones": [
+            {
+              "name": "Programa de Posgrado en Administración Pública"
+            },
+            {
+              "name": "Programa de Posgrado en Administración Universitaria"
+            },
+            {
+              "name": "Programa de Posgrado en Administración y Dirección de Empresas"
+            },
+            {
+              "name": "Programa de Posgrado en Antropología"
+            },
+            {
+              "name": "Programa de Posgrado en Arquitectura"
+            },
+            {
+              "name": "Programa de Posgrado en Artes"
+            },
+            {
+              "name": "Programa de Posgrado en Astrofísica"
+            },
+            {
+              "name": "Programa de Posgrado en Bibliotecología y Estudios de la Información"
+            },
+            {
+              "name": "Programa de Posgrado en Biología"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencia de Alimentos"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias Agrícolas y Recursos Naturales"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias Biomédicas"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias Cognoscitivas"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias de la Atmósfera"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias de la Educación"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias de la Enfermería"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias del Movimiento Humano y Recreación"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias Médicas"
+            },
+            {
+              "name": "Programa de Posgrado en Ciencias Políticas"
+            },
+            {
+              "name": "Programa de Posgrado en Computación e Informática"
+            },
+            {
+              "name": "Programa de Posgrado en Comunicación"
+            },
+            {
+              "name": "Programa de Posgrado en Derecho"
+            },
+            {
+              "name": "Programa de Posgrado en Desarrollo Integrado en Regiones de Bajo Riego"
+            },
+            {
+              "name": "Programa de Posgrado en Desarrollo Sostenible"
+            },
+            {
+              "name": "Programa de Posgrado en Economía"
+            },
+            {
+              "name": "Programa de Posgrado en Educación"
+            },
+            {
+              "name": "Programa de Posgrado en Enseñanza del Castellano y Literatura"
+            },
+            {
+              "name": "Programa de Posgrado en Enseñanza del Inglés como Lengua Extranjera"
+            },
+            {
+              "name": "Programa de Posgrado en Español como Segunda Lengua"
+            },
+            {
+              "name": "Programa de Posgrado en Especialidades Médicas"
+            },
+            {
+              "name": "Programa de Posgrado en Estadística"
+            },
+            {
+              "name": "Programa de Posgrado en Estudios de la Mujer"
+            },
+            {
+              "name": "Programa de Posgrado en Estudios Interdisciplinarios"
+            },
+            {
+              "name": "Programa de Posgrado en Estudios Interdisciplinarios sobre Discapacidad"
+            },
+            {
+              "name": "Programa de Posgrado en Evaluación de Programas y Proyectos"
+            },
+            {
+              "name": "Programa de Posgrado en Evaluación Educativa"
+            },
+            {
+              "name": "Programa de Posgrado en Farmacia"
+            },
+            {
+              "name": "Programa de Posgrado en Filosofía"
+            },
+            {
+              "name": "Programa de Posgrado en Física"
+            },
+            {
+              "name": "Programa de Posgrado en Geografía"
+            },
+            {
+              "name": "Programa de Posgrado en Geología"
+            },
+            {
+              "name": "Programa de Posgrado en Gerencia Agroempresarial"
+            },
+            {
+              "name": "Programa de Posgrado en Gerontología"
+            },
+            {
+              "name": "Programa de Posgrado en Gestión Ambiental y Ecoturismo"
+            },
+            {
+              "name": "Programa de Posgrado en Gestión Hotelera"
+            },
+            {
+              "name": "Programa de Posgrado en Gestión Integrada Áreas Costeras Tropicales"
+            },
+            {
+              "name": "Programa de Posgrado en Gobierno y Políticas Públicas"
+            },
+            {
+              "name": "Programa de Posgrado en Historia"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería Civil"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería Eléctrica"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería en Biosistemas"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería Industrial"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería Mecánica"
+            },
+            {
+              "name": "Programa de Posgrado en Ingeniería Química"
+            },
+            {
+              "name": "Programa de Posgrado en Lingüistica"
+            },
+            {
+              "name": "Programa de Posgrado en Literatura"
+            },
+            {
+              "name": "Programa de Posgrado en Matemática"
+            },
+            {
+              "name": "Programa de Posgrado en Medicina Legal y Patología Forense"
+            },
+            {
+              "name": "Programa de Posgrado en Microbiología, Parasitología, Química Clínica e Inmunología"
+            },
+            {
+              "name": "Programa de Posgrado en Nutrición Humana"
+            },
+            {
+              "name": "Programa de Posgrado en Odontología"
+            },
+            {
+              "name": "Programa de Posgrado en Orientación"
+            },
+            {
+              "name": "Programa de Posgrado en Planificación Curricular"
+            },
+            {
+              "name": "Programa de Posgrado en Psicología"
+            },
+            {
+              "name": "Programa de Posgrado en Química"
+            },
+            {
+              "name": "Programa de Posgrado en Salud Pública"
+            },
+            {
+              "name": "Programa de Posgrado en Sociología"
+            },
+            {
+              "name": "Programa de Posgrado en Tecnologías de Información y Comunicación para la Gestión Organizacional"
+            },
+            {
+              "name": "Programa de Posgrado en Telemática"
+            },
+            {
+              "name": "Programa de Posgrado en Trabajo Social"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace webMetics.Handlers
 {
     public class TipoActividadHandler : BaseDeDatosHandler
     {
+        public TipoActividadHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         public bool CrearTipoActividad(TipoActividadModel tipoActividad)
         {
             bool consultaExitosa;

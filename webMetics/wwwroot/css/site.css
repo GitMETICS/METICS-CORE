@@ -19,7 +19,7 @@
 }
 
 .datos-login {
-    margin-top:20px;
+    margin-top: 20px;
 }
 
 .footer {
@@ -36,25 +36,18 @@
     text-align: justify;
 }
 
-.titulo-listas {
-    font-size: 1.2rem;
-    font-weight: 900;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    text-align: left;
-}
-@media only screen and (max-width: 580px) {
-    .titulo-listas {
-        font-size: 1rem;
-    }
-}
-
 .boton-formularios {
     float: right;
     margin-right: 20px;
-    width:20%;
-    height:105%
+    width: 20%;
+    height: 105%
 }
 
 .hiddenRow {
     padding: 0 !important;
+}
+
+.alertaCrearAsesor {
+    color: red;
+    font-size: 16px;
 }

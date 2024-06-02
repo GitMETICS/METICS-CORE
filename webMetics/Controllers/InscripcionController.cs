@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using webMetics.Handlers;
+﻿using webMetics.Handlers;
 using webMetics.Models;
-using System.Data;
-using System.Web.UI;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using NPOI.XSSF.UserModel;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using NPOI.Util;
+using NPOI.XWPF.UserModel;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -12,20 +16,52 @@ namespace webMetics.Controllers
 {
     public class InscripcionController : Controller
     {
-        public InscripcionHandler accesoAInscripcion;
-        public GrupoHandler accesoAGrupo;
-        public ParticipanteHandler accesoAParticipante;
+        private InscripcionHandler accesoAInscripcion;
+        private GrupoHandler accesoAGrupo;
+        private ParticipanteHandler accesoAParticipante;
 
-        public InscripcionController()
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+
+        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            accesoAInscripcion = new InscripcionHandler();
-            accesoAGrupo = new GrupoHandler();
-            accesoAParticipante = new ParticipanteHandler();
+            _environment = environment;
+            _configuration = configuration;
+
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
+        }
+
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
 
         /* Método para mostrar la lista de participantes inscritos en un grupo */
         public ActionResult ListaDeParticipantesInscritos(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
 
             // Obtener la lista de participantes inscritos en el grupo especificado por idGrupo
             ViewBag.InscritosEnGrupo = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
@@ -34,13 +70,16 @@ namespace webMetics.Controllers
         }
 
         /* Método para inscribir a un usuario a un grupo */
-        public ActionResult Inscribir(int idGrupo, string idParticipante)
+        public ActionResult Inscribir(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
             
-            if (NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+            if (NoEstaInscritoEnGrupo(idGrupo, ViewBag.Id))
             {
                 if (MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
@@ -48,7 +87,7 @@ namespace webMetics.Controllers
                     InscripcionModel inscripcion = new InscripcionModel
                     {
                         idGrupo = idGrupo,
-                        idParticipante = idParticipante
+                        idParticipante = ViewBag.Id
                     };
 
                     bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
@@ -66,7 +105,7 @@ namespace webMetics.Controllers
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
-                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
                         }
                         catch
                         {
@@ -90,6 +129,9 @@ namespace webMetics.Controllers
 
         private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             bool noEstaInscrito = false;
 
             List<InscripcionModel> listaInscritos = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
@@ -108,6 +150,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Intentar eliminar la inscripción del usuario con el idGenerado en el grupo especificado por idGrupo
                 ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
 
@@ -143,14 +188,17 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Intentar eliminar la inscripción del participante con el idParticipante en el grupo especificado por idGrupo
-                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
+                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(ViewBag.Id, idGrupo);
 
                 // Si la desinscripción fue exitosa, redirigir a la lista de grupos disponibles
                 if (ViewBag.ExitoAlCrear)
                 {
                     GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
@@ -197,7 +245,69 @@ namespace webMetics.Controllers
         /* Método para enviar confirmación de inscripción al usuario*/
         private void SendEmail(GrupoModel grupo, string mensaje, string correoParticipante)
         {
-            
+            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Se utiliza la librería MimeKit para construir el mensaje
+            // El mensaje incluye una versión en HTML y texto plano
+
+            // Contenido base del mensaje en HTML y texto plano
+            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+            const string BASE_MESSAGE_TEXT = "";
+            const string BASE_SUBJECT = "Comprobante de inscripción"; // Asunto del correo
+
+            MimeMessage message = new MimeMessage();
+
+            // Configurar el remitente y el destinatario
+            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
+            message.From.Add(from);
+            MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
+            message.To.Add(to);
+
+            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + mensaje;
+            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+            bodyBuilder.HtmlBody += "</p>";
+
+            // Obtener los datos del archivo adjunto (si existe) y agregarlo al mensaje
+            byte[] attachmentData = accesoAGrupo.ObtenerArchivo(grupo);
+            if (attachmentData != null)
+            {
+                // Crear la parte adjunta del mensaje
+                var attachment = new MimeKit.MimePart("application", "octet-stream")
+                {
+                    Content = new MimeContent(new MemoryStream(attachmentData)),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName = accesoAGrupo.ObtenerNombreArchivo(grupo) // Nombre del archivo adjunto
+                };
+
+                // Crear una parte multipart para incluir tanto el cuerpo del mensaje como el archivo adjunto
+                var multipart = new Multipart("mixed");
+                multipart.Add(bodyBuilder.ToMessageBody());
+                multipart.Add(attachment);
+                message.Body = multipart;
+            }
+            else
+            {
+                // Si no hay archivo adjunto, solo agregar el cuerpo del mensaje al mensaje principal
+                message.Body = bodyBuilder.ToMessageBody();
+            }
+
+            // Enviar el correo electrónico utilizando un cliente SMTP
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, "pass"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }
         }
 
         //Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
@@ -305,83 +415,185 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ExportarParticipantesPDF(int idGrupo)
         {
-            /*// Exportar la lista de participantes de un grupo a un archivo PDF
-
-            // Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
 
-            ExportarParticipantesModel datosExportar = new ExportarParticipantesModel()
-            {
-                nombreGrupo = grupo.nombre,
-                nombreAsesorAsociado = grupo.nombreAsesorAsociado,
-                listaParticipantes = lista
-            };
+            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
+            PdfWriter writer = new PdfWriter(filePath);
+            PdfDocument pdf = new PdfDocument(writer);
+            iText.Layout.Document document = new iText.Layout.Document(pdf);
 
-            return new Rotativa.PartialViewAsPdf("ExportarParticipantes", datosExportar)
+            // Add content to the PDF
+            Paragraph header1 = new Paragraph("Nombre del módulo: " + grupo.nombre)
+                .SetFontSize(10);
+            document.Add(header1);
+
+            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
+                .SetFontSize(10);
+            document.Add(header2);
+
+            Paragraph header3 = new Paragraph("")
+                .SetFontSize(10);
+            document.Add(header3);
+
+            Table table = new Table(6, true);
+            table.AddHeaderCell("Identificación").SetFontSize(8);
+            table.AddHeaderCell("Nombre del participante").SetFontSize(8);
+            table.AddHeaderCell("Condición").SetFontSize(8);
+            table.AddHeaderCell("Unidad académica").SetFontSize(8);
+            table.AddHeaderCell("Correo institucional").SetFontSize(8);
+            table.AddHeaderCell("Teléfono").SetFontSize(8);
+
+            foreach (var participante in participantes)
             {
-                FileName = "Lista_de_Participantes_" + grupo.nombre + ".pdf"
-            };*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+                table.AddCell(participante.idParticipante);
+                table.AddCell(participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2);
+                table.AddCell(participante.condicion);
+                table.AddCell(participante.unidadAcademica);
+                table.AddCell(participante.correo);
+                table.AddCell(participante.telefonos);
+            }
+
+            document.Add(table);
+
+            document.Close();
+
+            string fileName = "Lista_de_Participantes_" + grupo.nombre + ".pdf";
+
+            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
         [HttpPost]
         public ActionResult ExportarParticipantesWord(int idGrupo)
         {
-            /*// Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+            // Obtener la lista de participantes del grupo y la información del grupo
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
-            // Crear un nuevo documento Word
-            using (var doc = DocX.Create(Server.MapPath("~/App_Data/ListaParticipantes.docx")))
-            {
-                // Agregar el contenido al documento Word
-                doc.InsertParagraph($"Nombre del módulo: {grupo.nombre}");
-                doc.InsertParagraph($"Nombre del asesor asociado: {grupo.nombreAsesorAsociado}\n");
-                doc.InsertParagraph("Lista de participantes: ");
-
-                var table = doc.AddTable(lista.Count + 1, 6);
-
-                table.Design = TableDesign.TableGrid;
-                table.Design = TableDesign.ColorfulList;
-                table.AutoFit = AutoFit.ColumnWidth;
-
-                var headerRow = table.Rows[0];
-                headerRow.Cells[0].Paragraphs[0].Append("Identificación");
-                headerRow.Cells[1].Paragraphs[0].Append("Nombre");
-                headerRow.Cells[2].Paragraphs[0].Append("Condición");
-                headerRow.Cells[3].Paragraphs[0].Append("Unidad académica");
-                headerRow.Cells[4].Paragraphs[0].Append("Correo institucional");
-                headerRow.Cells[5].Paragraphs[0].Append("Teléfono");
-
-                for (int i = 0; i < lista.Count; i++)
-                {
-                    var row = table.Rows[i + 1];
-                    row.Cells[0].Paragraphs[0].Append(lista[i].idParticipante);
-                    row.Cells[1].Paragraphs[0].Append(lista[i].nombre + " " + lista[i].apellido_1 + " " + lista[i].apellido_2);
-                    row.Cells[2].Paragraphs[0].Append(lista[i].condicion);
-                    row.Cells[3].Paragraphs[0].Append(lista[i].unidadAcademica);
-                    row.Cells[4].Paragraphs[0].Append(lista[i].correo);
-                    row.Cells[5].Paragraphs[0].Append(lista[i].telefonos);
-                }
-
-                doc.InsertTable(table);
-                doc.Save();
-            }
-        
-            // Descargar el archivo Word
-            var filePath = Server.MapPath("~/App_Data/ListaParticipantes.docx");
             var fileName = "Lista_de_Participantes_" + grupo.nombre + ".docx";
 
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);*/
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+            XWPFDocument wordDoc = new XWPFDocument();
+
+            // Create a table
+            XWPFTable table = wordDoc.CreateTable(grupo.cupo + 3, 6);
+            var tblLayout1 = table.GetCTTbl().tblPr.AddNewTblLayout();
+            table.SetColumnWidth(0, 2000);
+            table.SetColumnWidth(1, 2000);
+            table.SetColumnWidth(2, 1500);
+            table.SetColumnWidth(3, 1500);
+            table.SetColumnWidth(4, 1500);
+            table.SetColumnWidth(5, 1500);
+
+
+            var headerRow0 = table.Rows[0];
+            headerRow0.GetCell(0).SetText("Nombre del Asesor");
+            headerRow0.GetCell(1).SetText("Nombre del Módulo");
+            var row0 = table.Rows[1];
+            row0.GetCell(0).SetText(grupo.nombreAsesorAsociado);
+            row0.GetCell(1).SetText(grupo.nombre);
+
+
+            var headerRow = table.Rows[2];
+            headerRow.GetCell(0).SetText("Identificación");
+            headerRow.GetCell(1).SetText("Nombre del participante");
+            headerRow.GetCell(2).SetText("Condición");
+            headerRow.GetCell(3).SetText("Unidad académica");
+            headerRow.GetCell(4).SetText("Correo institucional");
+            headerRow.GetCell(5).SetText("Teléfono");
+
+
+            for (int i = 0; i < participantes.Count; i++)
+            {
+                var row = table.Rows[i + 3];
+                row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
+                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].apellido_1 + " " + participantes[i].apellido_2);
+                row.GetCell(2).SetText(participantes[i].condicion.ToString());
+                row.GetCell(3).SetText(participantes[i].unidadAcademica);
+                row.GetCell(4).SetText(participantes[i].correo.ToString());
+                row.GetCell(5).SetText(participantes[i].telefonos.ToString());
+            }
+
+            var stream = new MemoryStream();
+            wordDoc.Write(stream);
+            var file = stream.ToArray();
+            return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
         [HttpPost]
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
-            return new EmptyResult();
+            // Obtener la lista de participantes del grupo y la información del grupo
+            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+
+            // Creamos el archivo de Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet(grupo.nombre);
+
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
+            cell11.SetCellValue("Nombre del módulo:");
+
+            NPOI.SS.UserModel.ICell cell12 = row1.CreateCell(1);
+            cell12.SetCellValue(grupo.nombre);
+
+            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(1);
+            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
+            cell21.SetCellValue("Nombre del asesor asociado:");
+
+            NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
+            cell22.SetCellValue(grupo.nombreAsesorAsociado);
+
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
+            cell31.SetCellValue("Identificación");
+
+            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
+            cell32.SetCellValue("Nombre del participante");
+
+            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
+            cell33.SetCellValue("Condición");
+
+            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
+            cell34.SetCellValue("Unidad académica");
+
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
+            cell35.SetCellValue("Correo institucional");
+
+            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
+            cell36.SetCellValue("Teléfono");
+
+            int rowN = 4;
+            foreach (var participante in participantes)
+            {
+                NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
+                NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
+                cell1.SetCellValue(participante.idParticipante);
+
+                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
+                cell2.SetCellValue(participante.nombre + ' ' + participante.apellido_1 + ' ' + participante.apellido_2);
+
+                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
+                cell3.SetCellValue(participante.condicion);
+
+                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
+                cell4.SetCellValue(participante.unidadAcademica);
+
+                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
+                cell5.SetCellValue(participante.correo);
+
+                NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
+                cell6.SetCellValue(participante.telefonos);
+
+                rowN++;
+            }
+
+            string fileName = "Lista_de_Participantes_" + grupo.nombre + ".xlsx";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }

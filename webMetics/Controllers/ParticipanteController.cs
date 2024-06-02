@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using webMetics.Handlers;
+﻿using webMetics.Handlers;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc;
 
 /* 
  * Controlador de la entidad Participante
@@ -13,11 +13,41 @@ namespace webMetics.Controllers
         private GrupoHandler accesoAGrupo;
         private AsesorHandler accesoAAsesor;
 
-        public ParticipanteController()
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+
+        public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            accesoAParticipante = new ParticipanteHandler();
-            accesoAGrupo = new GrupoHandler();
-            accesoAAsesor = new AsesorHandler();
+            _environment = environment;
+            _configuration = configuration;
+
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
+        }
+
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
 
         /* Método para ver la lista de participantes de un grupo */
@@ -25,6 +55,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 ViewBag.IdGrupo = idGrupo;
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo.Value);
                 
@@ -43,6 +76,9 @@ namespace webMetics.Controllers
         /* Método para ver todos los participantes y sus horas matriculadas y aprobadas (administrador) */
         public ActionResult VerParticipantes()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
 
             foreach (ParticipanteModel participante in participantes)
@@ -67,6 +103,9 @@ namespace webMetics.Controllers
 
         public ActionResult MiUsuario(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
             ViewBag.Participante = participante;
@@ -87,12 +126,15 @@ namespace webMetics.Controllers
 
         public ActionResult VerDatosParticipante(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
             
             ViewBag.Participante = participante;
             ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
 
-            if (true) //ToDo
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
             {
                 int rolUsuario = Convert.ToInt32(Request.Cookies["rolUsuario"]);
 
@@ -133,6 +175,9 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult SubirHorasAprobadas(string idParticipante, int horasAprobadas)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
             int nuevasHorasAprobadas = participante.horasAprobadas + horasAprobadas;
 
@@ -153,6 +198,9 @@ namespace webMetics.Controllers
         // Vista para buscar y editar los datos de un participante
         public ActionResult ObtenerParticipante()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             return View(); // Muestra la vista para buscar al participante
         }
 
@@ -161,6 +209,9 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ObtenerParticipante(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Busca al participante en la lista de participantes por su ID
             ParticipanteModel getParticipante = accesoAParticipante.ObtenerListaParticipantes().Find(participanteModel => participanteModel.idParticipante == idParticipante);
             if (getParticipante == null)
@@ -181,6 +232,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 ViewBag.IdParticipante = idParticipante;
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
@@ -202,6 +256,9 @@ namespace webMetics.Controllers
 
         public ActionResult DevolverDatosParticipante(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
@@ -215,6 +272,9 @@ namespace webMetics.Controllers
         {
             if (ModelState.IsValid)
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Si el modelo es válido, actualiza los datos del participante utilizando el controlador de acceso a participantes
                 accesoAParticipante.EditarParticipante(participante);
                 // Redirige a la lista de grupos disponibles después de editar el participante exitosamente
@@ -231,11 +291,14 @@ namespace webMetics.Controllers
         }
 
         /* Método para que un administrador elimine un participante */
-        [HttpGet]
+        [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 bool eliminadoExitosamente = accesoAParticipante.EliminarParticipante(idParticipante);
 
                 if (eliminadoExitosamente)
@@ -260,6 +323,9 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult DisplayModal(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
             ViewBag.IdParticipante = idParticipante;
 
@@ -268,7 +334,7 @@ namespace webMetics.Controllers
 
         // Métodos AJAX para obtener tipos de participantes, departamentos y secciones según el área seleccionada en el formulario
         [HttpGet]
-        public ActionResult GetTiposParticipante(string tipoParticipante)
+        public JsonResult GetTiposParticipante(string tipoParticipante)
         {
             string[] tipoDeParticipantes = Enum.GetNames(typeof(TipoDeParticipantes));
             List<string> tipoDeParticipantesLista = new List<string>(tipoDeParticipantes);
@@ -277,14 +343,14 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetDepartamentosByArea(string areaName)
+        public JsonResult GetDepartamentosByArea(string areaName)
         {
             List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
             return Json(departamentos);
         }
 
         [HttpGet]
-        public ActionResult GetSeccionesByDepartamento(string areaName, string departamentoName)
+        public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
             List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
             return Json(secciones);

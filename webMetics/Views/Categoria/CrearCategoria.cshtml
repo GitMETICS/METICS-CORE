@@ -9,7 +9,7 @@
 <head>
 </head>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
@@ -53,11 +53,13 @@
 
                         </div>
                     </div>
-                    <div class="row justify-content-center" style="margin-top:20px">
-                        @Html.ActionLink("Cancelar", "ListaCategorias",
-                        new { },
-                        new { @class = "btn boton-formularios", @style = "background-color:grey" })
-                        <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "ListaCategorias", "Categoria", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
                     </div>
                 </div>
 
@@ -66,7 +68,7 @@
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>

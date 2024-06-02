@@ -10,25 +10,57 @@ namespace webMetics.Controllers
     public class TemaController : Controller
     {
         // Declaración de objetos de acceso a datos para manejar las entidades relacionadas
-        public CategoriaHandler categoriaHandler;
-        public TipoActividadHandler tipoActividadHandler;
-        public AsesorHandler asesorHandler;
-        public TemaHandler temaHandler;
-        public GrupoHandler grupoHandler;
+        private CategoriaHandler categoriaHandler;
+        private TipoActividadHandler tipoActividadHandler;
+        private AsesorHandler asesorHandler;
+        private TemaHandler temaHandler;
+        private GrupoHandler grupoHandler;
 
-        // Constructor para inicializar los objetos de acceso a datos
-        public TemaController()
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+
+        public TemaController(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            categoriaHandler = new CategoriaHandler();
-            tipoActividadHandler = new TipoActividadHandler();
-            asesorHandler = new AsesorHandler();
-            temaHandler = new TemaHandler();
-            grupoHandler = new GrupoHandler();
+            _environment = environment;
+            _configuration = configuration;
+
+            categoriaHandler = new CategoriaHandler(environment, configuration);
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
+            asesorHandler = new AsesorHandler(environment, configuration);
+            temaHandler = new TemaHandler(environment, configuration);
+            grupoHandler = new GrupoHandler(environment, configuration);
+        }
+
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
 
         /* Vista del formulario para crear un tema */
         public ActionResult CrearTema()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Cargar los datos necesarios para llenar las opciones del formulario (categorias, tipos de actividad y asesores)
             ViewData["Categorias"] = null;
             ViewData["TipoActividad"] = null;
@@ -49,6 +81,9 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     // Intenta crear el tema y su relación con el asesor asociado
                     ViewBag.ExitoAlCrear = temaHandler.CrearTema(tema);
                     ViewBag.ExitoAlCrear2 = temaHandler.CrearRelacionTemaAsesor(tema);
@@ -81,6 +116,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Muestra los temas asignados a la categoría proporcionada
                 ViewBag.Nombre = nombre;
                 ViewBag.Temas = temaHandler.RecuperarTemasDeCategoria(nombre);
@@ -98,6 +136,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Verificar si el tema puede ser eliminado (no está asociado a un grupo)
                 bool canBeDeleted = grupoHandler.CanEliminarTema(Int32.Parse(nombre));
                 if (!canBeDeleted)

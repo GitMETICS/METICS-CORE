@@ -1,15 +1,16 @@
 ﻿using System.Data;
-using webMetics.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Microsoft.Data.SqlClient;
-
+using webMetics.Models;
 
 namespace webMetics.Handlers
 {
     public class UsuarioHandler : BaseDeDatosHandler
         
     {
+        public UsuarioHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         public bool CrearUsuario(string id, string contrasena)
         {
             int exito;
@@ -119,7 +120,7 @@ namespace webMetics.Handlers
             return exito == 1;
         }
 
-        public bool Login(string id, string contrasena)
+        public bool AutenticarUsuario(string id, string contrasena)
         {
             int exito;
             var command = new SqlCommand("ValidarUsuario", ConexionMetics);

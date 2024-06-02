@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /*
  * Handler de los asesores
@@ -11,7 +11,13 @@ namespace webMetics.Handlers
 {
     public class AsesorHandler : BaseDeDatosHandler
     {
-        private GrupoHandler accesoAGrupo = new GrupoHandler();
+        private GrupoHandler accesoAGrupo;
+
+        public AsesorHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+        }
+
 
         // Crear la consulta para crear el asesor en la base de datos
         public bool CrearAsesor(AsesorModel asesor)

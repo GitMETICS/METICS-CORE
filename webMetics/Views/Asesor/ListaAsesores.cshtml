@@ -12,10 +12,10 @@
 <!DOCTYPE html>
 <html>
 <body>
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (true /*request.Headers["Referer"] != null*/) //ToDo
+            @if (true/*Request.UrlReferrer != null*/)
             {
                 <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
             }
@@ -89,15 +89,15 @@
                                 }
 
                                 <tr>
-                                    <td class="titulo-listas">@asesor.identificacion</td>
-                                    <td class="titulo-listas">@nombreCompleto</td>
-                                    <td class="titulo-listas">@asesor.descripcion</td>
-                                    <td class="titulo-listas">@asesor.telefonos</td>
-                                    <td class="titulo-listas">
-                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = asesor.identificacion }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                    <td>@asesor.identificacion</td>
+                                    <td>@nombreCompleto</td>
+                                    <td>@asesor.descripcion</td>
+                                    <td>@asesor.telefonos</td>
+                                    <td>
+                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = asesor.identificacion }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
                                     </td>
-                                    <td class="titulo-listas">
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@asesor.identificacion')">
+                                    <td>
+                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@asesor.identificacion')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -135,7 +135,7 @@
     }
     else
     {
-        Html.RenderPartial("~/Views/Login/Login.cshtml");
+        await Html.RenderPartialAsync("~/Views/Login/Login.cshtml");
     }
 </body>
 </html>

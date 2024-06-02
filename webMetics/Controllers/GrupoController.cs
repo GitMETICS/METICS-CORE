@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
+using System.Net;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -14,24 +13,59 @@ namespace webMetics.Controllers
 {
     public class GrupoController : Controller
     {
-        public GrupoHandler accesoAGrupo;
-        public TemaHandler accesoATema;
-        public AsesorHandler accesoAAsesor;
+        private GrupoHandler accesoAGrupo;
+        private TemaHandler accesoATema;
+        private AsesorHandler accesoAAsesor;
 
-        public GrupoController()
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+
+        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            // Inicialización de los controladores de acceso a los datos
-            accesoAGrupo = new GrupoHandler();
-            accesoATema = new TemaHandler();
-            accesoAAsesor = new AsesorHandler();
+            _environment = environment;
+            _configuration = configuration;
+
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoATema = new TemaHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
+
+        }
+
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
 
         /* Método de la vista ListaGruposDisponibles que muestra todos los grupos disponibles para inscribirse.
          * Un grupo es disponible si la fecha de inscripción y el día de inicio aún no han pasado y si el estado es visible.
          */
-        [Authorize]
         public ActionResult ListaGruposDisponibles()
         {
+            int rolUsuario = GetRole();
+            string idUsuario = GetId();
+
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
+
             // Obtener y mostrar mensajes de alerta si es necesario
             ViewBag.Message = "";
             if (TempData["showPopup"] != null && TempData["showPopup"] is bool showPopup && showPopup)
@@ -49,28 +83,28 @@ namespace webMetics.Controllers
             ViewBag.ParticipantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
             ViewBag.IdParticipante = "";
 
-            string rolUsuario = User.FindFirstValue(ClaimTypes.Role);
-            string idUsuario = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            ViewBag.IdParticipante = idUsuario;
-
-            if (rolUsuario == "Participante")
+            if (rolUsuario != 0 && idUsuario != "")
             {
-                List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                ViewBag.IdParticipante = idUsuario;
 
-                if (listaGruposInscritos != null)
+                if (rolUsuario == 1)
                 {
-                    ViewBag.GruposInscritos = listaGruposInscritos;
-                    ViewBag.ListaGrupos = listaGrupos.Where(p => !listaGruposInscritos.Any(x => x.idGrupo == p.idGrupo)).ToList();
+                    List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+
+                    if (listaGruposInscritos != null)
+                    {
+                        ViewBag.GruposInscritos = listaGruposInscritos;
+                        ViewBag.ListaGrupos = listaGrupos.Where(p => !listaGruposInscritos.Any(x => x.idGrupo == p.idGrupo)).ToList();
+                    }
+                }
+                else
+                {
+                    if (rolUsuario == 2)
+                    {
+                        ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
+                    }
                 }
             }
-            else
-            {
-                if (rolUsuario == "Asesor")
-                {
-                    ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
-                }
-            }
-            
             
             DateTime now = DateTime.Now;
             ViewBag.DateNow = now;
@@ -96,6 +130,9 @@ namespace webMetics.Controllers
         /* Vista del formulario para crear un grupo */
         public ActionResult AgregarGrupo()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Obtener la lista de temas y asesores disponibles para crear un grupo
             List<SelectListItem> temas = accesoATema.ObtenerListaSeleccionTemas();
             List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
@@ -132,8 +169,10 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
                     // Validar tamaño del archivo adjunto
-                    if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
+                    if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB en bytes
                     {
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
@@ -198,6 +237,8 @@ namespace webMetics.Controllers
             ViewBag.ExitoAlCrear = false;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Eliminar el grupo y verificar el éxito de la operación
                 ViewBag.ExitoAlCrear = accesoAGrupo.EliminarGrupo(idGrupo.Value);
                 if (ViewBag.ExitoAlCrear)
@@ -223,6 +264,8 @@ namespace webMetics.Controllers
             ViewBag.ExitoAlCrear = false;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Cambiar el estado de visibilidad del grupo y verificar el éxito de la operación
                 ViewBag.ExitoAlCrear = accesoAGrupo.CambiarEstadoVisible(idGrupo);
                 if (ViewBag.ExitoAlCrear)
@@ -249,6 +292,8 @@ namespace webMetics.Controllers
             ActionResult vista;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Obtener información del grupo a editar
                 GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
@@ -289,6 +334,8 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Validar fechas de inicio y finalización
                 if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
                 {
@@ -346,6 +393,8 @@ namespace webMetics.Controllers
             ActionResult vista;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Obtener información del grupo para editar el adjunto
                 GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
@@ -371,7 +420,9 @@ namespace webMetics.Controllers
         {
             try
             {
-                if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB in bytes
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+                if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB in bytes
                 {
                     ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                     return View(grupo);

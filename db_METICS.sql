@@ -1,204 +1,28 @@
-USE METICS
-GO
-/****** Object:  Table [dbo].[AspNetRoleClaims]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetRoleClaims]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetRoleClaims](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[ClaimType] [nvarchar](max) NULL,
-	[ClaimValue] [nvarchar](max) NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
- CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetRoles]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetRoles]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetRoles](
-	[Id] [nvarchar](450) NOT NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[Name] [nvarchar](256) NULL,
-	[NormalizedName] [nvarchar](256) NULL,
- CONSTRAINT [PK_AspNetRoles] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetUserClaims]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserClaims]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetUserClaims](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[ClaimType] [nvarchar](max) NULL,
-	[ClaimValue] [nvarchar](max) NULL,
-	[UserId] [nvarchar](450) NOT NULL,
- CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetUserLogins]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserLogins]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetUserLogins](
-	[LoginProvider] [nvarchar](450) NOT NULL,
-	[ProviderKey] [nvarchar](450) NOT NULL,
-	[ProviderDisplayName] [nvarchar](max) NULL,
-	[UserId] [nvarchar](450) NOT NULL,
- CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY CLUSTERED 
-(
-	[LoginProvider] ASC,
-	[ProviderKey] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetUserRoles]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetUserRoles](
-	[UserId] [nvarchar](450) NOT NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
- CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY CLUSTERED 
-(
-	[UserId] ASC,
-	[RoleId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetUsers]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUsers]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetUsers](
-	[Id] [nvarchar](450) NOT NULL,
-	[AccessFailedCount] [int] NOT NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[Email] [nvarchar](256) NULL,
-	[EmailConfirmed] [bit] NOT NULL,
-	[LockoutEnabled] [bit] NOT NULL,
-	[LockoutEnd] [datetimeoffset](7) NULL,
-	[NormalizedEmail] [nvarchar](256) NULL,
-	[NormalizedUserName] [nvarchar](256) NULL,
-	[PasswordHash] [nvarchar](max) NULL,
-	[PhoneNumber] [nvarchar](max) NULL,
-	[PhoneNumberConfirmed] [bit] NOT NULL,
-	[SecurityStamp] [nvarchar](max) NULL,
-	[TwoFactorEnabled] [bit] NOT NULL,
-	[UserName] [nvarchar](256) NULL,
- CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-/****** Object:  Table [dbo].[AspNetUserTokens]    Script Date: 6/4/2018 10:18:03 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AspNetUserTokens]') AND type in (N'U'))
-BEGIN
-CREATE TABLE [dbo].[AspNetUserTokens](
-	[UserId] [nvarchar](450) NOT NULL,
-	[LoginProvider] [nvarchar](450) NOT NULL,
-	[Name] [nvarchar](450) NOT NULL,
-	[Value] [nvarchar](max) NULL,
- CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY CLUSTERED 
-(
-	[UserId] ASC,
-	[LoginProvider] ASC,
-	[Name] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-END
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetRoleClaims_AspNetRoles_RoleId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetRoleClaims]'))
-ALTER TABLE [dbo].[AspNetRoleClaims]  WITH CHECK ADD  CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId] FOREIGN KEY([RoleId])
-REFERENCES [dbo].[AspNetRoles] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetRoleClaims_AspNetRoles_RoleId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetRoleClaims]'))
-ALTER TABLE [dbo].[AspNetRoleClaims] CHECK CONSTRAINT [FK_AspNetRoleClaims_AspNetRoles_RoleId]
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserClaims_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserClaims]'))
-ALTER TABLE [dbo].[AspNetUserClaims]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY([UserId])
-REFERENCES [dbo].[AspNetUsers] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserClaims_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserClaims]'))
-ALTER TABLE [dbo].[AspNetUserClaims] CHECK CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId]
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserLogins_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserLogins]'))
-ALTER TABLE [dbo].[AspNetUserLogins]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY([UserId])
-REFERENCES [dbo].[AspNetUsers] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserLogins_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserLogins]'))
-ALTER TABLE [dbo].[AspNetUserLogins] CHECK CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId]
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserRoles_AspNetRoles_RoleId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]'))
-ALTER TABLE [dbo].[AspNetUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY([RoleId])
-REFERENCES [dbo].[AspNetRoles] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserRoles_AspNetRoles_RoleId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]'))
-ALTER TABLE [dbo].[AspNetUserRoles] CHECK CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId]
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserRoles_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]'))
-ALTER TABLE [dbo].[AspNetUserRoles]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId] FOREIGN KEY([UserId])
-REFERENCES [dbo].[AspNetUsers] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserRoles_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserRoles]'))
-ALTER TABLE [dbo].[AspNetUserRoles] CHECK CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId]
-GO
-IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserTokens_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserTokens]'))
-ALTER TABLE [dbo].[AspNetUserTokens]  WITH CHECK ADD  CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId] FOREIGN KEY([UserId])
-REFERENCES [dbo].[AspNetUsers] ([Id])
-ON DELETE CASCADE
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_AspNetUserTokens_AspNetUsers_UserId]') AND parent_object_id = OBJECT_ID(N'[dbo].[AspNetUserTokens]'))
-ALTER TABLE [dbo].[AspNetUserTokens] CHECK CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId]
-GO
+/*
+	SCRIPT PARA CREAR LA BASE DE DATOS
+*/
 
-/******************************************************************************************/
+--Creacion de la tabla rol
+CREATE TABLE rol(
+	-- null = usuario sin registrar
+	-- 0 = Rol de participante (Usuario general)
+	-- 1 = Rol de Administrador
+	-- 2 = Rol de Asesor
+	rol_PK INT PRIMARY KEY NOT NULL,
+	nombre_rol VARCHAR(16) NOT NULL,
+);
 
+--Creación de la tabla usuario
+CREATE TABLE usuario(
+	id_usuario_PK VARCHAR(64) PRIMARY KEY NOT NULL,
+	rol_FK INT FOREIGN KEY REFERENCES rol(rol_PK) ON DELETE NO ACTION DEFAULT 0,
+	hash_contrasena BINARY(64) NOT NULL,
+	salt UNIQUEIDENTIFIER
+);
+
+--Creación de la tabla asesor
 CREATE TABLE asesor(
-	id_usuario_FK NVARCHAR(450) NOT NULL FOREIGN KEY REFERENCES dbo.AspNetUsers(Id) ON DELETE CASCADE ON UPDATE CASCADE,
+	id_usuario_FK VARCHAR(64) NOT NULL FOREIGN KEY REFERENCES usuario(id_usuario_PK) ON DELETE CASCADE ON UPDATE CASCADE,
 	id_asesor_PK VARCHAR(64) PRIMARY KEY NOT NULL,
 	nombre NVARCHAR(64) NOT NULL,
 	apellido_1 NVARCHAR(64) NOT NULL,
@@ -209,7 +33,7 @@ CREATE TABLE asesor(
 
 --Creación de la tabla participante
 CREATE TABLE participante(
-	id_usuario_FK NVARCHAR(450) NOT NULL FOREIGN KEY REFERENCES dbo.AspNetUsers(Id) ON DELETE CASCADE ON UPDATE CASCADE,
+	id_usuario_FK VARCHAR(64) NOT NULL FOREIGN KEY REFERENCES usuario(id_usuario_PK) ON DELETE CASCADE ON UPDATE CASCADE,
 	id_participante_PK VARCHAR(64) PRIMARY KEY NOT NULL,
 	tipo_identificacion VARCHAR(16) NOT NULL,
 	correo NVARCHAR(64) NOT NULL,
@@ -318,49 +142,40 @@ CREATE TABLE calificaciones(
 GO
 --Creación de trigger cuando se cambia la identificación de un usuario en tabla de participantes
 CREATE TRIGGER TR_ActualizarIdParticipante
-ON dbo.AspNetUsers
+ON usuario
 AFTER UPDATE
 AS
 BEGIN
-    SET NOCOUNT ON;
+	DECLARE @id VARCHAR(64) = (SELECT id_usuario_PK FROM inserted)
 
-    DECLARE @UpdatedId TABLE (Id NVARCHAR(450));
-
-    INSERT INTO @UpdatedId (Id)
-    SELECT Id
-    FROM inserted;
-
-    UPDATE p
-    SET id_participante_PK = i.Id
-    FROM participante p
-    INNER JOIN @UpdatedId i ON p.id_usuario_FK = i.Id;
+	UPDATE participante SET id_participante_PK =  @id WHERE id_usuario_FK = @id
 END
-GO
 
+GO
 --Creación de trigger para cambiar rol de usuario cuando se agrega un asesor
 CREATE TRIGGER TR_ActualizarRolAsesor
 ON asesor
 AFTER INSERT
 AS
 BEGIN
-	DECLARE @id NVARCHAR(450) = (SELECT id_usuario_FK FROM inserted)
+	DECLARE @id VARCHAR(64) = (SELECT id_asesor_PK FROM inserted)
 
-	UPDATE dbo.AspNetUserRoles SET RoleId = 2 WHERE UserId = @id
+	UPDATE usuario SET rol_FK =  2 WHERE id_usuario_PK = @id
 END
-GO
 
+GO
 --Creación de trigger cuando se cambia la identificación de un usuario en tabla de asesores
 CREATE TRIGGER TR_ActualizarIdAsesor
-ON dbo.AspNetUsers
+ON usuario
 AFTER UPDATE
 AS
 BEGIN
-	DECLARE @id VARCHAR(64) = (SELECT Id FROM inserted)
+	DECLARE @id VARCHAR(64) = (SELECT id_usuario_PK FROM inserted)
 
-	UPDATE asesor SET id_asesor_PK = @id WHERE id_usuario_FK = @id
+	UPDATE asesor SET id_asesor_PK =  @id WHERE id_usuario_FK = @id
 END
-GO
 
+GO
 --Creación de trigger al insertar inscripciones
 CREATE TRIGGER TR_InsertarCalificacion
 ON inscripcion
@@ -371,8 +186,8 @@ BEGIN
 		SELECT id_grupo_FK, id_participante_FK
 		FROM inserted
 END
-GO
 
+GO
 --Creación de trigger al eliminar inscripciones
 CREATE TRIGGER TR_EliminarCalificacion
 ON inscripcion
@@ -383,9 +198,37 @@ BEGIN
 	WHERE id_grupo_FK IN (SELECT id_grupo_FK FROM deleted)
 	AND id_participante_FK IN (SELECT id_participante_FK FROM deleted)
 END
-GO
+
 
 /*
+	Script para crear los procedimientos almacenados de la base de datos
+*/
+
+GO
+--Creación de procedimiento para insertar un usuario
+CREATE PROCEDURE InsertarUsuario
+    @id VARCHAR(64),
+    @contrasena NVARCHAR(64),
+	@exito INT=0 OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON
+
+	DECLARE @salt UNIQUEIDENTIFIER=NEWID()
+    BEGIN TRY
+        INSERT INTO usuario (id_usuario_PK, hash_contrasena, salt)
+        VALUES(@id, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
+
+		SET @exito=1
+    END TRY
+    BEGIN CATCH
+		SET @exito=0
+    END CATCH
+
+	RETURN
+END
+
+GO
 --Creación de procedimiento para editar un usuario
 CREATE PROCEDURE EditarUsuario
     @id VARCHAR(64),
@@ -410,8 +253,7 @@ BEGIN
 
 END
 
-
-
+GO
 --Creación de procedimiento para obtener los datos de un usuario
 CREATE PROCEDURE ObtenerUsuario
     @id VARCHAR(64)
@@ -420,6 +262,7 @@ BEGIN
 	SELECT id_usuario_PK, rol_FK FROM usuario WHERE id_usuario_PK=@id
 END
 
+GO
 --Creación de procedimiento para verificar si existe un usuario
 CREATE PROCEDURE ExisteUsuario
     @id VARCHAR(64),
@@ -434,4 +277,152 @@ BEGIN
 	RETURN
 END
 
+GO
+--Creación de procedimiento para verificar datos de inicio de sesión
+CREATE PROCEDURE ValidarUsuario
+    @id VARCHAR(64),
+    @contrasena NVARCHAR(64),
+    @exito INT=0 OUTPUT
+AS
+BEGIN
+
+    SET NOCOUNT ON
+
+    DECLARE @userID INT
+
+	DECLARE @salt UNIQUEIDENTIFIER = (SELECT TOP 1 salt FROM usuario WHERE id_usuario_PK=@id)
+
+    IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK=@id)
+    BEGIN
+        SET @userID=(SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK=@id AND hash_contrasena=HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
+
+       IF(@userID IS NULL)
+           SET @exito=0
+       ELSE 
+           SET @exito=1
+    END
+    ELSE
+       SET @exito=0
+
+END
+
+
+
+/*
+	SCRIPT SET DE DATOS INICIAL
 */
+
+--Crear roles
+INSERT INTO rol
+(rol_PK, nombre_rol)
+VALUES
+(0, 'Usuario'),
+(1, 'Administrador'),
+(2, 'Asesor')
+
+--Crear usuarios
+	-- admin
+EXEC InsertarUsuario @id='0000', @contrasena='#Q+3n?OWk3i0:qG'
+UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '0000'
+
+EXEC InsertarUsuario @id='1111', @contrasena='1234'
+UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '1111'
+
+EXEC InsertarUsuario @id='2222', @contrasena='1234'
+UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '2222'
+
+EXEC InsertarUsuario @id='3333', @contrasena='1234'
+UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '3333'
+
+EXEC InsertarUsuario @id='4444', @contrasena='1234'
+
+EXEC InsertarUsuario @id='5555', @contrasena='1234'
+
+--Crear asesores
+INSERT INTO asesor
+(id_usuario_FK, id_asesor_PK, nombre, apellido_1, apellido_2, telefonos, descripcion)
+VALUES
+('2222', '2222', 'Julio', 'Castro','Madriz','800800800','Soy asesor en el área de sistemas')
+
+INSERT INTO asesor
+(id_usuario_FK, id_asesor_PK, nombre, apellido_1, apellido_2, telefonos, descripcion)
+VALUES
+('3333', '3333', 'Andrés', 'Quiros','Ruiz','900900900','Soy asesor con mucha experiencia')
+
+--Crear participantes
+INSERT INTO participante(
+    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
+)
+VALUES
+('4444', '4444', 'Cédula','jhondoo@ucr.ac.cr', 'Jhon', 'Doo',' ', 'Interino','CICA', 'Docente','800800800','Área de Artes y Letras','Facultad de Artes','Escuela de Artes Dramáticas')
+
+INSERT INTO participante(
+    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
+)
+VALUES
+('5555', '5555', 'Cédula','armandotorres_rojas@ucr.ac.cr', 'Armando', 'Torres','Rojas', 'Interino','Escuela de Geología', 'Docente','900900900','Área de Artes y Letras','Facultad de Letras','Escuela de Filología, Lingüística y Literatura')
+
+--Crear tipos de actividades
+INSERT INTO tipos_actividad
+(nombre, descripcion)
+VALUES
+('Curso','Los cursos cuentan con una duración de cinco a seis horas semanales, en la que se realizarán tareas, exámenes y quices para evaluar los conceptos aprendidos por los estudiantes'),
+('Taller','Un taller es una metodología de trabajo que se caracteriza por la investigación, el aprendizaje por descubrimiento y el trabajo en equipo'),
+('Taller corto','Un taller de menos duración de dos a tres horas semanales donde se trabajara con un tema en específico, no hay examenes el objetivo es que aprendan el concepto tratado'),
+('Charla','Se realizarán charlas con profesionales invitados')
+
+--Crear categorias
+INSERT INTO categoria
+(nombre, descripcion)
+VALUES
+('Primeros pasos en la plataforma','Apenderá de manera básica las funciones del sitio de Mediación Virtual'),
+('Evaluaciones y calificaciones','Aprenderá a realizar el proceso de evaluacion y calificacion de los trabajos dentro de la plataforma'),
+('Material audio y visual','Utilice las herramientas audiovisuales que cuenta el sistema, suba y comparta material audiovisual a los estudiantes')
+
+--Crear temas
+INSERT INTO tema
+(nombre, id_categoria_FK, id_tipos_actividad_FK)
+VALUES('¿Cómo utilizar la plataforma?', 1, 1),
+('Evaluaciones en la plataforma', 2, 2),
+('Subir material audiovisual a la plataforma', 3, 3),
+('Tema Adicional', 1, 2)
+
+--Declarar archivo que se va a adjuntar (RUTA DEL ARCHIVO, Ejm: C:\Users\UserName\Documents\Folder\FileName.pdf) 
+DECLARE @adjunto varbinary(max)
+SELECT @adjunto = CAST(bulkcolumn AS varbinary(max))
+FROM OPENROWSET(BULK 'FileName.pdf', SINGLE_BLOB) AS x
+
+--Crear grupos
+INSERT INTO dbo.grupo(
+	id_tema_FK, modalidad, cupo,cantidad_horas,
+	descripcion, es_visible, lugar,
+	nombre, horario,
+	fecha_inicio_grupo, fecha_finalizacion_grupo,
+	fecha_inicio_inscripcion, fecha_finalizacion_inscripcion,
+	nombre_archivo, adjunto)
+	VALUES
+	(3,'Presencial', 15, 3,
+	'Taller de videos interactivos', 1,'Universidad de Costa Rica, Rodrigo Facio',
+	'Capacitación-Plataforma','V-S de 4pm a 7pm',
+	'2023-06-01 00:00:00','2026-12-02 00:00:00',
+	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto),
+	(2,'Virtual',10,3,
+	'Aprenda a realizar evaluaciones en la plataforma',1,'mediación virtual',
+	'Capacitación-Profesores','L-V de 4pm a 7pm',
+	'2023-06-01 00:00:00','2026-12-02 00:00:00',
+	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto),
+	(3,'Virtual',10,3,
+	'Aprenda a realizar videos llamativos e interesantes del temario del curso',1,'mediación virtual',
+	'Capacitaciones-Audiovisuales','L-M de 4pm a 7pm',
+	'2023-06-01 00:00:00','2026-12-02 00:00:00',
+	'2023-01-01 00:00:00','2026-01-01 00:00:00','ArchivoPrueba.pdf', @adjunto);
+
+
+--Crear asesor da tema
+INSERT INTO asesor_da_tema
+(id_tema_FK,id_asesor_FK,asesores_asistentes)
+VALUES
+(1, '2222', 'Julio Castro Madriz/Juan Quiros Ruiz/'),
+(2, '3333', 'Juan Quiros Ruiz/Julio Castro Madriz/'),
+(3, '2222', 'Julio Castro Madriz/Juan Quiros Ruiz/'),
+(4, '3333', 'Juan Quiros Ruiz/Julio Castro Madriz/')

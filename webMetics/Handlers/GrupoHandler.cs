@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /*
  * Handler para los grupos
@@ -13,6 +12,10 @@ namespace webMetics.Handlers
 {
     public class GrupoHandler : BaseDeDatosHandler
     {
+        public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         // Método para crear la consulta a la BD para crear un grupo
         public bool CrearGrupo(GrupoModel grupo)
         {
@@ -55,8 +58,8 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
 
             // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
-            MemoryStream ms = new MemoryStream();
-            grupo.archivoAdjunto.CopyTo(ms);
+            /* MemoryStream ms = new MemoryStream();
+            grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
 
@@ -64,7 +67,7 @@ namespace webMetics.Handlers
             string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
             string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
             string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);*/
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             exito = comandoConsulta.ExecuteNonQuery() >= 1;
@@ -103,6 +106,7 @@ namespace webMetics.Handlers
             {
                 return null;
             }
+
             return listaGrupos;
         }
 
@@ -112,7 +116,6 @@ namespace webMetics.Handlers
             // Consulta SQL para obtener la información de un grupo específico y sus asociaciones mediante su ID
             string consulta = "SELECT G.id_grupo_PK, G.id_tema_FK, G.modalidad, G.cupo, G.descripcion, G.es_visible, G.lugar, G.nombre, G.horario, G.fecha_inicio_grupo, G.fecha_finalizacion_grupo, G.fecha_inicio_inscripcion, G.fecha_finalizacion_inscripcion, G.cantidad_horas, G.nombre_archivo, T.nombre AS tema_asociado, A.nombre + ' ' + A.apellido_1 AS asesor, TA.nombre AS tipo_actividad FROM grupo G JOIN tema T ON T.id_tema_PK = G.id_tema_FK JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK WHERE G.id_grupo_PK = " + idGrupo;
 ;
-
             // Crea un nuevo comando SQL con la consulta y la conexión establecida
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
 
@@ -428,8 +431,8 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
 
             // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
-            MemoryStream ms = new MemoryStream();
-            grupo.archivoAdjunto.CopyTo(ms);
+            /*MemoryStream ms = new MemoryStream();
+            grupo.archivoAdjunto.InputStream.CopyTo(ms);
             byte[] data = ms.ToArray();
             comandoConsulta.Parameters.AddWithValue("@adjunto", data);
 
@@ -437,7 +440,7 @@ namespace webMetics.Handlers
             string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
             string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
             string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);*/
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;

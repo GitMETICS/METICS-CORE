@@ -10,18 +10,51 @@ namespace webMetics.Controllers
 {
     public class TipoActividadController : Controller
     {
-        public TipoActividadHandler tipoActividadHandler;
-        public GrupoHandler grupoHandler;
+        private TipoActividadHandler tipoActividadHandler;
+        private GrupoHandler grupoHandler;
 
-        public TipoActividadController()
+        private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
+
+        public TipoActividadController(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            tipoActividadHandler = new TipoActividadHandler();
-            grupoHandler = new GrupoHandler();
+            _environment = environment;
+            _configuration = configuration;
+
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
+            grupoHandler = new GrupoHandler(environment, configuration);
+        }
+
+        public int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        public string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
 
         /* Vista de los tipos de actividades */
         public ActionResult ListaTiposActividad()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Recupera y muestra la lista de tipos de actividad
             ViewBag.TiposActividad = tipoActividadHandler.RecuperarTiposDeActividades();
             return View();
@@ -30,6 +63,9 @@ namespace webMetics.Controllers
         /* Vista del formulario para crear una actividad */
         public ActionResult CrearTipoActividad()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             // Muestra el formulario para crear un nuevo tipo de actividad
             return View();
         }
@@ -43,6 +79,9 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+
                     // Verifica si ya existe una actividad con el mismo nombre (ignorando mayúsculas y espacios)
                     List<TipoActividadModel> tiposActividad = tipoActividadHandler.RecuperarTiposDeActividadesLowerCase();
                     if (tiposActividad.Any(t => t.nombre == tipoActividad.nombre.Replace(" ", "").ToLower()))
@@ -87,6 +126,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Recupera la lista de tipos de actividad y encuentra el tipo de actividad correspondiente al nombre proporcionado
                 List<TipoActividadModel> actividades = tipoActividadHandler.RecuperarTiposDeActividades();
                 TipoActividadModel tipoActividad = actividades.Find(tipoActividadModel => tipoActividadModel.nombre == nombre);
@@ -132,6 +174,9 @@ namespace webMetics.Controllers
             ActionResult vista;
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Recupera el tipo de actividad correspondiente al nombre proporcionado
                 TipoActividadModel modificarTipoActividad = tipoActividadHandler.RecuperarTiposDeActividades().Find(tipoActividadModel => tipoActividadModel.nombre == nombre);
                 if (modificarTipoActividad == null)
@@ -157,6 +202,9 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
                 // Verifica si los campos requeridos están vacíos y muestra mensajes de validación del modelo
                 if (tipoActividad.nombre == null || tipoActividad.descripcion == null)
                 {

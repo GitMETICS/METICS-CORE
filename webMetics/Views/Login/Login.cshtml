@@ -1,65 +1,52 @@
 ﻿@model webMetics.Models.LoginModel
-@{
-    ViewBag.Title = "Login";
-}
 
-<!DOCTYPE html>
-
-<html id="html-login">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body id="body-login" style=" background-image: url('../../Imagenes/fondo_login.jpg')">
-    <div class="container justify-content-center">
-        <div class="container justify-content-center">
-            <div class="text-center container-cards" style="width:50%">
-                <div class="card bg-white" style="background-color:gray">
-                    <div class="container-fluid justify-content-center formulario-login">
-
-                        <div class="card-body">
-
-                            <h1>Inicio de sesión</h1>
-
-                            @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                            {
-                                @Html.AntiForgeryToken()
-                                <div class="form-group datos-login">
-                                    @Html.LabelFor(loginModel => loginModel.identificacion)
-                                    @Html.TextBoxFor(loginModel => loginModel.identificacion, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(loginModel => loginModel.identificacion, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="form-group datos-login">
-                                    @Html.LabelFor(loginModel => loginModel.contrasena)
-                                    <br />
-                                    @Html.PasswordFor(loginModel => loginModel.contrasena, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
-                                </div>
-
-                                if (ViewBag.ErrorMessage != null)
-                                {
-                                    <div class="text-danger mt-2" role="alert">
-                                        @ViewBag.ErrorMessage
-                                    </div>
-                                }
-                                if (ViewBag.SuccessMessage != null)
-                                {
-                                    <div class="text-success mt-2" role="alert">
-                                        @ViewBag.SuccessMessage
-                                    </div>
-                                }
-
-                                <input type="submit" class="btn btn-primary" value="Acceder" style="margin-top:40px" />
-                            }
-                            <div class="mt-2">
-                                ¿No tiene un usuario?
-                                @Html.ActionLink("Registrarse", "../Login/CrearUsuario", new { }, new { @class = "link-info" })
-                            </div>
+<body style="background-image: url('/images/fondo_login.jpg')">
+    <div class="d-flex justify-content-center align-items-center" style="height: 75vh;">
+        <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+            <div class="card shadow" style="width: 450px;">
+                <div class="card-header text-center pt-4 pb-3">
+                    <h2>Iniciar sesión</h2>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <div class="text-center mb-1">
+                            @Html.LabelFor(loginModel => loginModel.identificacion, new { @class = "text-center" })
+                            @Html.TextBoxFor(loginModel => loginModel.identificacion, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(loginModel => loginModel.identificacion, "", new { @class = "text-danger" })
                         </div>
-                    </div>
+                        <div class="text-center mb-1">
+                            @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })
+                            @Html.PasswordFor(loginModel => loginModel.contrasena, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
+                        </div>
+                        @if (ViewBag.ErrorMessage != null)
+                        {
+                            <div class="text-danger text-center">
+                                @ViewBag.ErrorMessage
+                            </div>
+                        }
+                        else
+                        {
+                            @if (ViewBag.SuccessMessage != null)
+                            {
+                                <div class="text-success text-center">
+                                    @ViewBag.SuccessMessage
+                                </div>
+                            }
+                        }
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary btn-block">Acceder</button>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center pt-2 pb-3">
+                    <small>
+                        ¿No tiene un usuario?
+                        @Html.ActionLink("Registrarse", "Registrarse", "Login", new { }, new { @class = "link-info" })
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 </body>
-</html>
-

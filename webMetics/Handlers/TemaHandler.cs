@@ -1,23 +1,20 @@
 ﻿using System.Data;
-using webMetics.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
-
+using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace webMetics.Handlers
 {
     public class TemaHandler : BaseDeDatosHandler
     {
-
-        public CategoriaHandler categoriaHandler;
-        public TipoActividadHandler tipoActividadHandler;
+        private CategoriaHandler categoriaHandler;
+        private TipoActividadHandler tipoActividadHandler;
 
         // Constructor de la clase TemaHandler
-        public TemaHandler()
+        public TemaHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
             // Se inicializan los objetos categoriaHandler y tipoActividadHandler.
-            categoriaHandler = new CategoriaHandler();
-            tipoActividadHandler = new TipoActividadHandler();
+            categoriaHandler = new CategoriaHandler(environment, configuration);
+            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
         }
 
         // Método para obtener una lista de objetos SelectListItem que representan los temas.

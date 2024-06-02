@@ -1,0 +1,81 @@
+// En este archivo se encuentran las sedes y recintos a las que pueden pertenecer los participantes de la aplicacion
+{
+  "sedes": [
+    {
+      "name": "Sedes Regionales",
+      "sedesRegionales": [
+        {
+          "name": "Sede Interuniversitaria de Alajuela",
+          "recinto": [
+            {
+              "name": "Recinto de Alajuela"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional de Guanacaste",
+          "recinto": [
+            {
+              "name": "Recinto de Liberia"
+            },
+            {
+              "name": "Recinto de Santa Cruz"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional de Occidente",
+          "recinto": [
+            {
+              "name": "Recinto de San Ramón"
+            },
+            {
+              "name": "Recinto de Tacares"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Atlántico",
+          "recinto": [
+            {
+              "name": "Recinto de Turrialba"
+            },
+            {
+              "name": "Recinto de Paraíso"
+            },
+            {
+              "name": "Recinto de Guápiles"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Caribe",
+          "recinto": [
+            {
+              "name": "Recinto de Limón"
+            },
+            {
+              "name": "Recinto de Siquires"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Pacífico",
+          "recinto": [
+            {
+              "name": "Recinto de Puntarenas"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Sur",
+          "recinto": [
+            {
+              "name": "Recinto de Golfito"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

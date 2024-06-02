@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
-using System.Data;
 using webMetics.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /*
  * Handler para las categorias
@@ -12,6 +11,10 @@ namespace webMetics.Handlers
 {
     public class CategoriaHandler : BaseDeDatosHandler
     {
+        public CategoriaHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         // Método para obtener una instancia de la clase CategoriaModel a partir de un DataRow
         public CategoriaModel ObtenerCategorias(DataRow filaCategoria)
         {

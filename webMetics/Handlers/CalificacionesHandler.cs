@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using Microsoft.Data.SqlClient;
+﻿using System.Configuration;
+using System;
 using System.Data;
+using Microsoft.Data.SqlClient;
 using webMetics.Models;
 
 namespace webMetics.Handlers
 {
     public class CalificacionesHandler : BaseDeDatosHandler
     {
+        public CalificacionesHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
+        {
+        }
+
         // Método para obtener la calificación de un participante
         public CalificacionModel ObtenerCalificacionParticipante(DataRow filaCalificacion)
         {
             string idParticipante = Convert.ToString(filaCalificacion["id_participante_FK"]);
-            ParticipanteHandler participanteHandler = new ParticipanteHandler();
+            ParticipanteHandler participanteHandler = new ParticipanteHandler(_environment, _configuration);
 
             ParticipanteModel participante = participanteHandler.ObtenerParticipante(idParticipante);
 

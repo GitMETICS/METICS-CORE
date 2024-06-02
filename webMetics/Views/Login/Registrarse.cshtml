@@ -1,0 +1,170 @@
+﻿@model webMetics.Models.UsuarioModel
+@{
+    ViewBag.Title = "Registrar usuario";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    @using (Html.BeginForm("CrearUsuario", "Login", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <h1 class="mt-5">@ViewBag.Title</h1>
+            <h5>Inserte los siguientes datos:</h5>
+            <h6 style="color:red"> * Son campos obligatorios</h6>
+            <hr/>
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.ErrorMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.SuccessMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="row mb-1">
+                <div class="col">
+                    <div class="container">
+                        <div class="row mt-1">
+                            <div class="col">
+                                @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                @Html.LabelFor(usuarioModel => usuarioModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.contrasena, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(usuarioModel => usuarioModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.contrasena, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "Login", "Login", new { }, new { @class = "btn btn-secondary btn-block", @style = "background-color:grey" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // Handle change event of area dropdown
+        $('#areaDropdown').click(function () {
+            var areaName = $(this).val();
+
+            // Clear departamento and seccion dropdowns
+            $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+
+            if (areaName !== '') {
+                // Make AJAX request to fetch departamentos for selected area
+                $.ajax({
+                    url: '/Participante/GetDepartamentosByArea',
+                    type: 'GET',
+                    data: { areaName: areaName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update departamento dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching departamentos: ' + error
+                        });
+                    }
+                });
+                // Make AJAX request to fetch secciones for selected departamento
+                $.ajax({
+                    url: '/Participante/GetSeccionesByDepartamento',
+                    type: 'GET',
+                    data: { departamentoName: departamentoName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update seccion dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching secciones: ' + error
+                        });
+                    }
+                });
+            }
+        });
+
+        // Handle change event of departamento dropdown
+        $('#departamentoDropdown').change(function () {
+            var departamentoName = $(this).val();
+            var areaName = $('#areaDropdown').val();
+
+            // Clear seccion dropdown
+            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+
+            if (departamentoName !== '') {
+                // Make AJAX request to fetch secciones for selected departamento
+                $.ajax({
+                    url: '/Participante/GetSeccionesByDepartamento',
+                    type: 'GET',
+                    data: { areaName: areaName, departamentoName: departamentoName },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Update seccion dropdown with fetched data
+                        $.each(data, function (index, value) {
+                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while fetching secciones: ' + error
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
