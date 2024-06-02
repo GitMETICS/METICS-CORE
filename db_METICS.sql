@@ -312,6 +312,7 @@ END
 	SCRIPT SET DE DATOS INICIAL
 */
 
+GO
 --Crear roles
 INSERT INTO rol
 (rol_PK, nombre_rol)
@@ -426,3 +427,5 @@ VALUES
 (2, '3333', 'Juan Quiros Ruiz/Julio Castro Madriz/'),
 (3, '2222', 'Julio Castro Madriz/Juan Quiros Ruiz/'),
 (4, '3333', 'Juan Quiros Ruiz/Julio Castro Madriz/')
+
+GO
