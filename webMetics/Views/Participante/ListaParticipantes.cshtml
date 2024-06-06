@@ -155,7 +155,7 @@
                         @Html.AntiForgeryToken()
 
                         <div class="modal-footer">
-                            <input type="hidden" id="idGenerado" name="idGenerado">
+                            <input type="hidden" id="idParticipante" name="idParticipante">
                             <input type="hidden" id="idGrupo" name="idGrupo">
                             <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -172,8 +172,8 @@
 
 
 <script type="text/javascript">
-    function actualizarModal(idGenerado, idGrupo) {
-        document.getElementById("idGenerado").value = idGenerado;
+    function actualizarModal(idParticipante, idGrupo) {
+        document.getElementById("idParticipante").value = idParticipante;
         document.getElementById("idGrupo").value = idGrupo;
     }
 </script>
