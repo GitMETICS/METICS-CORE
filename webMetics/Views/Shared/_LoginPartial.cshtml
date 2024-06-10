@@ -1,9 +1,6 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-
+﻿
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@if (ViewBag.Id != "" && ViewBag.Title != "Registrarse" && ViewBag.Title != "Iniciar sesión")
 {
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
