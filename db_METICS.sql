@@ -1,4 +1,4 @@
-/*
+Ôªø/*
 	SCRIPT PARA CREAR LA BASE DE DATOS
 */
 
@@ -12,7 +12,7 @@ CREATE TABLE rol(
 	nombre_rol NVARCHAR(16) NOT NULL,
 );
 
---CreaciÛn de la tabla usuario
+--Creaci√≥n de la tabla usuario
 CREATE TABLE usuario(
 	id_usuario_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
 	rol_FK INT FOREIGN KEY REFERENCES rol(rol_PK) ON DELETE NO ACTION DEFAULT 0,
@@ -20,7 +20,7 @@ CREATE TABLE usuario(
 	salt UNIQUEIDENTIFIER
 );
 
---CreaciÛn de la tabla asesor
+--Creaci√≥n de la tabla asesor
 CREATE TABLE asesor(
 	id_usuario_FK NVARCHAR(64) NOT NULL FOREIGN KEY REFERENCES usuario(id_usuario_PK) ON DELETE CASCADE ON UPDATE CASCADE,
 	id_asesor_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE asesor(
 	descripcion NVARCHAR(256)
 );
 
---CreaciÛn de la tabla participante
+--Creaci√≥n de la tabla participante
 CREATE TABLE participante(
 	id_usuario_FK NVARCHAR(64) NOT NULL FOREIGN KEY REFERENCES usuario(id_usuario_PK) ON DELETE CASCADE ON UPDATE CASCADE,
 	id_participante_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
@@ -51,21 +51,21 @@ CREATE TABLE participante(
 	horas_aprobadas INT DEFAULT 0
 );
 
---CreaciÛn de la tabla tipo_actividad
+--Creaci√≥n de la tabla tipo_actividad
 CREATE TABLE tipos_actividad(
 	id_tipos_actividad_PK INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL UNIQUE,
 	descripcion NVARCHAR(256),
 );
 
---CreaciÛn de la tabla categoria
+--Creaci√≥n de la tabla categoria
 CREATE TABLE categoria(
 	id_categoria_PK INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL UNIQUE,
 	descripcion NVARCHAR(256),
 );
 
---CreaciÛn de la tabla tema
+--Creaci√≥n de la tabla tema
 CREATE TABLE tema(
 	id_tema_PK INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE tema(
 	id_tipos_actividad_FK INT FOREIGN KEY REFERENCES tipos_actividad(id_tipos_actividad_PK) ON DELETE CASCADE ON UPDATE CASCADE,
 );
 
---CreaciÛn de la tabla asesor da tema
+--Creaci√≥n de la tabla asesor da tema
 CREATE TABLE asesor_da_tema(
 	id_tema_FK INT NOT NULL,
 	id_asesor_FK NVARCHAR(64) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE asesor_da_tema(
 	ON UPDATE CASCADE,
 );
 
---CreaciÛn de la tabla grupo
+--Creaci√≥n de la tabla grupo
 CREATE TABLE grupo(
 	id_grupo_PK INT IDENTITY(1,1) PRIMARY KEY,
 	id_tema_FK INT FOREIGN KEY REFERENCES tema(id_tema_PK) ON DELETE NO ACTION,
@@ -122,7 +122,7 @@ CREATE TABLE inscripcion(
 	ON UPDATE CASCADE,
 );
 
---CreaciÛn de la tabla calificaciones
+--Creaci√≥n de la tabla calificaciones
 CREATE TABLE calificaciones(
 	id_grupo_FK INT NOT NULL,
 	id_participante_FK NVARCHAR(64) NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE calificaciones(
 */
 
 GO
---CreaciÛn de trigger cuando se cambia la identificaciÛn de un usuario en tabla de participantes
+--Creaci√≥n de trigger cuando se cambia la identificaci√≥n de un usuario en tabla de participantes
 CREATE TRIGGER TR_ActualizarIdParticipante
 ON usuario
 AFTER UPDATE
@@ -152,7 +152,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de trigger para cambiar rol de usuario cuando se agrega un asesor
+--Creaci√≥n de trigger para cambiar rol de usuario cuando se agrega un asesor
 CREATE TRIGGER TR_ActualizarRolAsesor
 ON asesor
 AFTER INSERT
@@ -164,7 +164,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de trigger cuando se cambia la identificaciÛn de un usuario en tabla de asesores
+--Creaci√≥n de trigger cuando se cambia la identificaci√≥n de un usuario en tabla de asesores
 CREATE TRIGGER TR_ActualizarIdAsesor
 ON usuario
 AFTER UPDATE
@@ -176,7 +176,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de trigger al insertar inscripciones
+--Creaci√≥n de trigger al insertar inscripciones
 CREATE TRIGGER TR_InsertarCalificacion
 ON inscripcion
 AFTER INSERT
@@ -188,7 +188,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de trigger al eliminar inscripciones
+--Creaci√≥n de trigger al eliminar inscripciones
 CREATE TRIGGER TR_EliminarCalificacion
 ON inscripcion
 AFTER DELETE
@@ -205,7 +205,7 @@ END
 */
 
 GO
---CreaciÛn de procedimiento para insertar un usuario
+--Creaci√≥n de procedimiento para insertar un usuario
 CREATE PROCEDURE InsertarUsuario
     @id NVARCHAR(64),
     @contrasena NVARCHAR(64),
@@ -229,7 +229,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de procedimiento para editar un usuario
+--Creaci√≥n de procedimiento para editar un usuario
 CREATE PROCEDURE EditarUsuario
     @id NVARCHAR(64),
     @contrasena NVARCHAR(64),
@@ -254,7 +254,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de procedimiento para obtener los datos de un usuario
+--Creaci√≥n de procedimiento para obtener los datos de un usuario
 CREATE PROCEDURE ObtenerUsuario
     @id NVARCHAR(64)
 AS
@@ -263,7 +263,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de procedimiento para verificar si existe un usuario
+--Creaci√≥n de procedimiento para verificar si existe un usuario
 CREATE PROCEDURE ExisteUsuario
     @id NVARCHAR(64),
     @existe INT=0 OUTPUT
@@ -278,7 +278,7 @@ BEGIN
 END
 
 GO
---CreaciÛn de procedimiento para verificar datos de inicio de sesiÛn
+--Creaci√≥n de procedimiento para verificar datos de inicio de sesi√≥n
 CREATE PROCEDURE ValidarUsuario
     @id NVARCHAR(64),
     @contrasena NVARCHAR(64),
@@ -343,47 +343,47 @@ EXEC InsertarUsuario @id=N'5555', @contrasena=N'1234'
 INSERT INTO asesor
 (id_usuario_FK, id_asesor_PK, nombre, apellido_1, apellido_2, telefonos, descripcion)
 VALUES
-(N'2222', N'2222', N'Julio', N'Castro', N'Madriz', N'800800800', N'Soy asesor en el ·rea de sistemas')
+(N'2222', N'2222', N'Julio', N'Castro', N'Madriz', N'800800800', N'Soy asesor en el √°rea de sistemas')
 
 INSERT INTO asesor
 (id_usuario_FK, id_asesor_PK, nombre, apellido_1, apellido_2, telefonos, descripcion)
 VALUES
-(N'3333', N'3333', N'AndrÈs', N'Quiros', N'Ruiz', N'900900900', N'Soy asesor con mucha experiencia')
+(N'3333', N'3333', N'Andr√©s', N'Quiros', N'Ruiz', N'900900900', N'Soy asesor con mucha experiencia')
 
 --Crear participantes
 INSERT INTO participante(
     id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
 )
 VALUES
-(N'4444', N'4444', N'CÈdula', N'jhondoo@ucr.ac.cr', N'Jhon', N'Doo', N' ', N'Interino', N'CICA', N'Docente', N'800800800', N'¡rea de Artes y Letras', N'Facultad de Artes', N'Escuela de Artes Dram·ticas')
+(N'4444', N'4444', N'C√©dula', N'jhondoo@ucr.ac.cr', N'Jhon', N'Doo', N' ', N'Interino', N'CICA', N'Docente', N'800800800', N'√Årea de Artes y Letras', N'Facultad de Artes', N'Escuela de Artes Dram√°ticas')
 
 INSERT INTO participante(
     id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
 )
 VALUES
-(N'5555', N'5555', N'CÈdula', N'armandotorres_rojas@ucr.ac.cr', N'Armando', N'Torres', N'Rojas', N'Interino', N'Escuela de GeologÌa', N'Docente', N'900900900', N'¡rea de Artes y Letras', N'Facultad de Letras', N'Escuela de FilologÌa, Ling¸Ìstica y Literatura')
+(N'5555', N'5555', N'C√©dula', N'armandotorres_rojas@ucr.ac.cr', N'Armando', N'Torres', N'Rojas', N'Interino', N'Escuela de Geolog√≠a', N'Docente', N'900900900', N'√Årea de Artes y Letras', N'Facultad de Letras', N'Escuela de Filolog√≠a, Ling√º√≠stica y Literatura')
 
 --Crear tipos de actividades
 INSERT INTO tipos_actividad
 (nombre, descripcion)
 VALUES
-(N'Curso', N'Los cursos cuentan con una duraciÛn de cinco a seis horas semanales, en la que se realizar·n tareas, ex·menes y quices para evaluar los conceptos aprendidos por los estudiantes'),
-(N'Taller', N'Un taller es una metodologÌa de trabajo que se caracteriza por la investigaciÛn, el aprendizaje por descubrimiento y el trabajo en equipo'),
-(N'Taller corto', N'Un taller de menos duraciÛn de dos a tres horas semanales donde se trabajara con un tema en especÌfico, no hay examenes el objetivo es que aprendan el concepto tratado'),
-(N'Charla', N'Se realizar·n charlas con profesionales invitados')
+(N'Curso', N'Los cursos cuentan con una duraci√≥n de cinco a seis horas semanales, en la que se realizar√°n tareas, ex√°menes y quices para evaluar los conceptos aprendidos por los estudiantes'),
+(N'Taller', N'Un taller es una metodolog√≠a de trabajo que se caracteriza por la investigaci√≥n, el aprendizaje por descubrimiento y el trabajo en equipo'),
+(N'Taller corto', N'Un taller de menos duraci√≥n de dos a tres horas semanales donde se trabajar√° con un tema en espec√≠fico. No hay ex√°menes, el objetivo es que aprendan el concepto tratado'),
+(N'Charla', N'Se realizar√°n charlas con profesionales invitados')
 
 --Crear categorias
 INSERT INTO categoria
 (nombre, descripcion)
 VALUES
-(N'Primeros pasos en la plataforma', N'Apender· de manera b·sica las funciones del sitio de MediaciÛn Virtual'),
-(N'Evaluaciones y calificaciones', N'Aprender· a realizar el proceso de evaluacion y calificacion de los trabajos dentro de la plataforma'),
+(N'Primeros pasos en la plataforma', N'Aprender√° de manera b√°sica las funciones del sitio de Mediaci√≥n Virtual'),
+(N'Evaluaciones y calificaciones', N'Aprender√° a realizar el proceso de evaluacion y calificacion de los trabajos dentro de la plataforma'),
 (N'Material audio y visual', N'Utilice las herramientas audiovisuales que cuenta el sistema, suba y comparta material audiovisual a los estudiantes')
 
 --Crear temas
 INSERT INTO tema
 (nombre, id_categoria_FK, id_tipos_actividad_FK)
-VALUES(N'øCÛmo utilizar la plataforma?', 1, 1),
+VALUES(N'¬øC√≥mo utilizar la plataforma?', 1, 1),
 (N'Evaluaciones en la plataforma', 2, 2),
 (N'Subir material audiovisual a la plataforma', 3, 3),
 (N'Tema Adicional', 1, 2)
@@ -404,16 +404,16 @@ INSERT INTO dbo.grupo(
 	VALUES
 	(3, N'Presencial', 15, 3,
 	N'Taller de videos interactivos', 1, N'Universidad de Costa Rica, Rodrigo Facio',
-	N'CapacitaciÛn-Plataforma', N'V-S de 4pm a 7pm',
+	N'Capacitaci√≥n-Plataforma', N'V-S de 4pm a 7pm',
 	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
 	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf'),
 	(2, N'Virtual', 10, 3,
-	N'Aprenda a realizar evaluaciones en la plataforma', 1, N'MediaciÛn Virtual',
-	N'CapacitaciÛn-Profesores', N'L-V de 4pm a 7pm',
+	N'Aprenda a realizar evaluaciones en la plataforma', 1, N'Mediaci√≥n Virtual',
+	N'Capacitaci√≥n-Profesores', N'L-V de 4pm a 7pm',
 	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
 	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf'),
 	(3, N'Virtual', 10, 3,
-	N'Aprenda a realizar videos llamativos e interesantes del temario del curso', 1, N'MediaciÛn Virtual',
+	N'Aprenda a realizar videos llamativos e interesantes del temario del curso', 1, N'Mediaci√≥n Virtual',
 	N'Capacitaciones-Audiovisuales', N'L-M de 4pm a 7pm',
 	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
 	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf');
