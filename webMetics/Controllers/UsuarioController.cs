@@ -311,7 +311,7 @@ namespace webMetics.Controllers
                 using var client = new MailKit.Net.Smtp.SmtpClient();
                 // Configurar el cliente SMTP para el servidor de correo de la UCR
                 client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, "pass"); // Cambiar la cuenta de correo y contraseña real para enviar el correo
+                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
 
                 // Enviar el mensaje
                 client.Send(message);
