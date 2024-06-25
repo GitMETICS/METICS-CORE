@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.RegularExpressions;
 
 /*
  * Handler para los grupos
@@ -57,18 +58,20 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
 
             // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
-            MemoryStream ms = new MemoryStream();
+            long fileLength = grupo.archivoAdjunto.Length;
+            byte[] buffer = new byte[fileLength];
+            using (var stream = grupo.archivoAdjunto.OpenReadStream())
+            {
+                stream.Read(buffer, 0, (int)fileLength);
+            }
 
-            // TODO: Habilitar lectura del archivo adjunto
-            // grupo.archivoAdjunto.InputStream.CopyTo(ms);
-            byte[] data = ms.ToArray();
-            comandoConsulta.Parameters.AddWithValue("@adjunto", data);
+            comandoConsulta.Parameters.AddWithValue("@adjunto", buffer);
 
             // Obtiene el nombre y extensión del archivo adjunto para almacenarlos en la base de datos
-            //string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
-            //string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
-            //string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", "ArchivoAdjunto.pdf" /*fileNombreExtension*/);
+            string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
+            string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
+            string fileNombreExtension = fileNombre + fileExtension;
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             exito = comandoConsulta.ExecuteNonQuery() >= 1;
@@ -307,17 +310,16 @@ namespace webMetics.Handlers
         }
 
         // Método para obtener el archivo adjunto de un grupo mediante su ID
-        public byte[] ObtenerArchivo(GrupoModel grupo)
+        public byte[] ObtenerArchivo(int idGrupo)
         {
             // Consulta SQL para obtener el archivo adjunto de un grupo específico mediante su ID
-            string consulta = "SELECT adjunto FROM grupo WHERE id_grupo_PK = " + grupo.idGrupo;
+            string consulta = "SELECT adjunto FROM grupo WHERE id_grupo_PK = " + idGrupo;
 
             // Utiliza la sentencia 'using' para asegurar que los recursos sean liberados correctamente
             using (SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics))
             {
                 using (DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta))
                 {
-
                     byte[] stream;
                     try
                     {
@@ -430,16 +432,20 @@ namespace webMetics.Handlers
             comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
 
             // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
-            /*MemoryStream ms = new MemoryStream();
-            grupo.archivoAdjunto.InputStream.CopyTo(ms);
-            byte[] data = ms.ToArray();
-            comandoConsulta.Parameters.AddWithValue("@adjunto", data);
+            long fileLength = grupo.archivoAdjunto.Length;
+            byte[] buffer = new byte[fileLength];
+            using (var stream = grupo.archivoAdjunto.OpenReadStream())
+            {
+                stream.Read(buffer, 0, (int)fileLength);
+            }
+
+            comandoConsulta.Parameters.AddWithValue("@adjunto", buffer);
 
             // Obtiene el nombre y la extensión del archivo adjunto y lo agrega como parámetro en el comando
             string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
             string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
             string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);*/
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
 
             // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;

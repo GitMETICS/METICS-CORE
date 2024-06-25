@@ -68,10 +68,9 @@ namespace webMetics.Controllers
 
             // Obtener y mostrar mensajes de alerta si es necesario
             ViewBag.Message = "";
-            if (TempData["showPopup"] != null && TempData["showPopup"] is bool showPopup && showPopup)
+            if (TempData["errorMessage"] != null)
             {
-                ViewBag.Message = TempData["msgNoSePuedeCrearGrupo"];
-                ViewBag.ShowPopup = true;
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
             }
             if (TempData["successMessage"] != null)
             {
@@ -123,7 +122,7 @@ namespace webMetics.Controllers
             };
 
             // Obtener el archivo y devolverlo para su descarga
-            byte[] archivo = accesoAGrupo.ObtenerArchivo(grupo);
+            byte[] archivo = accesoAGrupo.ObtenerArchivo(idGrupo);
             return File(archivo, "application/octet-stream", accesoAGrupo.ObtenerNombreArchivo(grupo));
         }
 
@@ -161,12 +160,12 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
                 
                 // Validar tamaño del archivo adjunto
-                /*if (/*grupo.archivoAdjunto != null && grupo.archivoAdjunto.ContentLength > 5242880) // 5MB en bytes
+                if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
                 {
                     ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     return View(grupo);
-                }*/
+                }
 
                 // Validar fechas de inicio y finalización
                 if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
@@ -407,15 +406,17 @@ namespace webMetics.Controllers
         /* Método para añadir un archivo de programa del grupo */
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestFormLimits(MultipartBodyLengthLimit = 5 * 1024 * 1024)]
         public ActionResult EditarAdjunto(GrupoModel grupo)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
-                if (grupo.archivoAdjunto != null /*&& grupo.archivoAdjunto.ContentLength > 5242880*/) // 5MB in bytes
+
+                if (grupo.archivoAdjunto == null) // 5MB in bytes
                 {
-                    ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
+                    ModelState.AddModelError("archivoAdjunto", "Debe seleccionar un archivo adjunto válido.");
                     return View(grupo);
                 }
 
@@ -424,7 +425,7 @@ namespace webMetics.Controllers
 
                 if (ViewBag.ExitoAlCrear)
                 {
-                    ViewBag.Message = "El adjunto fue editado con éxito.";
+                    ViewBag.Message = "El archivo adjunto fue editado con éxito.";
                     ModelState.Clear();
                     return Redirect("~/Grupo/ListaGruposDisponibles");
                 }

@@ -271,7 +271,7 @@ namespace webMetics.Controllers
             bodyBuilder.HtmlBody += "</p>";
 
             // Obtener los datos del archivo adjunto (si existe) y agregarlo al mensaje
-            byte[] attachmentData = accesoAGrupo.ObtenerArchivo(grupo);
+            byte[] attachmentData = accesoAGrupo.ObtenerArchivo(grupo.idGrupo);
             if (attachmentData != null)
             {
                 // Crear la parte adjunta del mensaje

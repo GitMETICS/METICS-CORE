@@ -73,9 +73,9 @@ namespace webMetics.Models
 
         public string? nombreAsesorAsociado { get; set; }
 
-        public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar contra requerimientos
+        public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar según requerimientos
 
-        //[Required(ErrorMessage = "Debe adjuntar el documento del módulo.")]
+        [Required(ErrorMessage = "Debe adjuntar el documento del programa del módulo.")]
         public IFormFile? archivoAdjunto { get; set; }
 
         public string? nombreArchivo { get; set; }

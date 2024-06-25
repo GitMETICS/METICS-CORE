@@ -130,7 +130,7 @@
                                             <p>La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy") </p>
                                         }
                                         <div>
-                                            <a href="@Url.Action("DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo })">Ver el programa del módulo</a>
+                                            @Html.ActionLink("Ver el programa del módulo", "DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
                                         </div>
                                     </div>
                                     <div class="card-footer text-muted">
@@ -267,14 +267,13 @@
                                             {
                                                 <div>
                                                     <div class="d-flex align-items-center justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#modalEditarAdjunto" onclick="actualizarModalEditarAdjunto(@grupo.idGrupo)">
-                                                        <i class="bi bi-pencil-square" style="padding-right:6px;"></i>
-                                                        <span>Editar programa del módulo</span>
+                                                        @Html.ActionLink("   Editar programa del módulo", "EditarAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "bi bi-pencil-square text-secondary link-opacity-50 link-opacity-100-hover link-underline link-underline-opacity-0" })
                                                     </div>
                                                 </div>
                                             }
                                             else
                                             {
-                                                <a href="@Url.Action("DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo })">Ver el programa del curso</a>
+                                                @Html.ActionLink("Ver el programa del módulo", "DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
                                             }
                                         </div>
                                     </div>
