@@ -141,12 +141,10 @@ namespace webMetics.Handlers
         public string ObtenerIDTipoActividad(string nombre)
         {
             string consulta = "SELECT id_tipos_actividad_PK FROM tipos_actividad WHERE nombre= @nombre";
-            ConexionMetics.Open();
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoParaConsulta.Parameters.AddWithValue("@nombre", nombre);
             // Ejecutar la consulta y obtener los resultados en una tabla
             DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
-            ConexionMetics.Close(); // Se cierra la conexión después de obtener los resultados
 
             string id = "";
             foreach (DataRow filaId in tablaResultado.Rows)

@@ -208,7 +208,6 @@ namespace webMetics.Handlers
             {
                 comandoConsulta.Parameters.AddWithValue("@apellido2", "-");
             }
-            ConexionMetics.Close();
             DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
             // Recorre el resultado de la consulta y obtiene el identificador del asesor.
             foreach (DataRow filaResultado in tablaResultado.Rows)
@@ -263,7 +262,7 @@ namespace webMetics.Handlers
                 TemaModel tema = new TemaModel
                 {
                     nombre = Convert.ToString(temas["nombre"]),
-                    asesorPrincipal = Convert.ToString(temas["nombre"]) + " " + Convert.ToString(temas["apellido_1"]) + " " + Convert.ToString(temas["apellido_2"]),
+                    asesorPrincipal = Convert.ToString(temas[2]) + " " + Convert.ToString(temas["apellido_1"]) + " " + Convert.ToString(temas["apellido_2"]),
                     asesores = asesores,
                     idTema = Convert.ToInt32(temas["id_tema_PK"]),
                     tipoActividad = Convert.ToString(temas["nombre2"])

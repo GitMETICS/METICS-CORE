@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
-
 /* 
  * Controlador de la entidad Tema
  */
@@ -77,23 +76,22 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CrearTema(TemaModel tema)
         {
+            tema.idAsesorPrincipal = temaHandler.ObtenerIdAsesor(tema.asesorPrincipal);
             try
             {
-                if (ModelState.IsValid)
-                {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
+                
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
 
-                    // Intenta crear el tema y su relación con el asesor asociado
-                    ViewBag.ExitoAlCrear = temaHandler.CrearTema(tema);
-                    ViewBag.ExitoAlCrear2 = temaHandler.CrearRelacionTemaAsesor(tema);
-                    if (ViewBag.ExitoAlCrear)
-                    {
-                        // Si se crea el tema exitosamente, muestra un mensaje de éxito y redirige a la lista de categorías
-                        TempData["Success"] = "El tema fue creado con éxito.";
-                        ModelState.Clear();
-                        return Redirect("~/Categoria/ListaCategorias");
-                    }
+                // Intenta crear el tema y su relación con el asesor asociado
+                ViewBag.ExitoAlCrear = temaHandler.CrearTema(tema);
+                ViewBag.ExitoAlCrear2 = temaHandler.CrearRelacionTemaAsesor(tema);
+                if (ViewBag.ExitoAlCrear)
+                {
+                    // Si se crea el tema exitosamente, muestra un mensaje de éxito y redirige a la lista de categorías
+                    TempData["Success"] = "El tema fue creado con éxito.";
+                    ModelState.Clear();
+                    return Redirect("~/Categoria/ListaCategorias");
                 }
                 // Si hay errores de validación, recarga los datos necesarios para llenar las opciones del formulario y muestra el formulario con los errores
                 ViewData["Categorias"] = categoriaHandler.RecuperarCategoriasIndexadas();
