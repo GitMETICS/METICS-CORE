@@ -224,29 +224,21 @@ namespace webMetics.Controllers
         {
             try
             {
-                if (ModelState.IsValid) 
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                bool exito = accesoAAsesor.EditarAsesor(asesor);
+
+                if (exito)
                 {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
-
-                    bool exito = accesoAAsesor.EditarAsesor(asesor);
-
-                    if (exito)
-                    {
-                        TempData["SuccessMessage"] = "Los datos fueron guardados.";
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = "No se pudieron actualizar los datos del asesor.";
-                    }
-
-                    return RedirectToAction("ListaAsesores");
-                } 
+                    TempData["SuccessMessage"] = "Los datos fueron guardados.";
+                }
                 else
                 {
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View("EditarAsesor", asesor);
+                    TempData["ErrorMessage"] = "No se pudieron actualizar los datos del asesor.";
                 }
+
+                return RedirectToAction("ListaAsesores");
             }
             catch
             {
