@@ -7,13 +7,10 @@
 <body>
     @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
-
-
         <div class="contenedor-tipos-actividades container-fluid">
             @if (/*Request.UrlReferrer != null*/true)
             {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
-            }
+            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
 
             <h1>Categorías</h1>
             <hr />
@@ -66,9 +63,7 @@
                                     <td>@categoria.nombre</td>
                                     <td>@categoria.descripcion</td>
                                     <td>
-                                        @Html.ActionLink("Temas", "MostrarTemas", "Tema",
-          new { nombre = categoria.nombre },
-          new { @class = "btn btn-primary", @onclick = "" })
+                                        @Html.ActionLink("Temas", "MostrarTemas", "Tema", new { nombre = categoria.nombre }, new { @class = "btn btn-primary", @onclick = "" })
                                     </td>
                                     <td class=" ">
                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModal('@categoria.nombre')">

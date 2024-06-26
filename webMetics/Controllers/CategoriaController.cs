@@ -61,6 +61,9 @@ namespace webMetics.Controllers
         /* Método de la vista CrearCategoría que muestra el formulario para crear una categoría */
         public ActionResult CrearCategoria()
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             return View();
         }
 
@@ -71,33 +74,29 @@ namespace webMetics.Controllers
         {
             try
             {
-                // Si los datos ingresados son válidos por el Modelo
-                if (ModelState.IsValid)
+                // Recuperar la lista de categorías en minúsculas
+                List<CategoriaModel> categorias = categoriaHandler.RecuperarCategoriasLowerCase();
+                int cantidadCategorias = categorias.Count + 1;
+                categoria.idGenerado = cantidadCategorias.ToString();
+
+                // Verificar si ya existe una categoría con el mismo nombre (ignorando mayúsculas y espacios)
+                if (categorias.Any(t => t.nombre == categoria.nombre.Replace(" ", "").ToLower()))
                 {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
-
-                    // Recuperar la lista de categorías en minúsculas
-                    List<CategoriaModel> categorias = categoriaHandler.RecuperarCategoriasLowerCase();
-
-                    // Verificar si ya existe una categoría con el mismo nombre (ignorando mayúsculas y espacios)
-                    if (categorias.Any(t => t.nombre == categoria.nombre.Replace(" ", "").ToLower()))
-                    {
-                        ModelState.AddModelError("nombre", "Ya existe una categoría con ese nombre.");
-                        return View(categoria);
-                    }
-
-                    // Crear la categoría a través del CategoriaHandler y guardar el resultado en ViewBag.ExitoAlCrear
-                    ViewBag.ExitoAlCrear = categoriaHandler.CrearCategoria(categoria);
-
-                    // Si la creación fue exitosa, mostrar mensaje de éxito y redirigir a la lista de categorías
-                    if (ViewBag.ExitoAlCrear)
-                    {
-                        ViewBag.Message = "La categoría fue creada con éxito.";
-                        ModelState.Clear();
-                        return Redirect("~/Categoria/ListaCategorias");
-                    }
+                    ModelState.AddModelError("nombre", "Ya existe una categoría con ese nombre.");
+                    return View(categoria);
                 }
+
+                // Crear la categoría a través del CategoriaHandler y guardar el resultado en ViewBag.ExitoAlCrear
+                ViewBag.ExitoAlCrear = categoriaHandler.CrearCategoria(categoria);
+
+                // Si la creación fue exitosa, mostrar mensaje de éxito y redirigir a la lista de categorías
+                if (ViewBag.ExitoAlCrear)
+                {
+                    ViewBag.Message = "La categoría fue creada con éxito.";
+                    ModelState.Clear();
+                    return Redirect("~/Categoria/ListaCategorias");
+                }
+                
                 return View();
             }
             catch (Exception)
