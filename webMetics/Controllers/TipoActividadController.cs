@@ -77,30 +77,29 @@ namespace webMetics.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                // Verifica si ya existe una actividad con el mismo nombre (ignorando mayúsculas y espacios)
+                List<TipoActividadModel> tiposActividad = tipoActividadHandler.RecuperarTiposDeActividadesLowerCase();
+
+                int id = tiposActividad.Count + 1;
+                tipoActividad.idGenerado = id.ToString();
+                
+                if (tiposActividad.Any(t => t.nombre == tipoActividad.nombre.Replace(" ", "").ToLower()))
                 {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
-
-                    // Verifica si ya existe una actividad con el mismo nombre (ignorando mayúsculas y espacios)
-                    List<TipoActividadModel> tiposActividad = tipoActividadHandler.RecuperarTiposDeActividadesLowerCase();
-                    if (tiposActividad.Any(t => t.nombre == tipoActividad.nombre.Replace(" ", "").ToLower()))
-                    {
-                        // Si ya existe, muestra un mensaje de error y vuelve al formulario con el mismo nombre ingresado
-                        ModelState.AddModelError("nombre", "Ya existe una actividad con ese nombre.");
-                        return View(tipoActividad);
-                    }
-
-                    // Intenta crear el tipo de actividad en la base de datos
-                    ViewBag.ExitoAlCrear = tipoActividadHandler.CrearTipoActividad(tipoActividad);
-                    if (ViewBag.ExitoAlCrear)
-                    {
-                        // Si se crea con éxito, muestra un mensaje de éxito y redirige a la lista de tipos de actividad
-                        TempData["Success"] = "El tipo de actividad fue creado con éxito";
-                        ModelState.Clear();
-                        return Redirect("~/TipoActividad/ListaTiposActividad");
-                    }
+                    // Si ya existe, muestra un mensaje de error y vuelve al formulario con el mismo nombre ingresado
+                    ModelState.AddModelError("nombre", "Ya existe una actividad con ese nombre.");
+                    return View(tipoActividad);
                 }
+
+                // Intenta crear el tipo de actividad en la base de datos
+                ViewBag.ExitoAlCrear = tipoActividadHandler.CrearTipoActividad(tipoActividad);
+                if (ViewBag.ExitoAlCrear)
+                {
+                    // Si se crea con éxito, muestra un mensaje de éxito y redirige a la lista de tipos de actividad
+                    TempData["Success"] = "El tipo de actividad fue creado con éxito";
+                    ModelState.Clear();
+                    return Redirect("~/TipoActividad/ListaTiposActividad");
+                }
+                
                 return View();
             }
             catch (Exception ex)
