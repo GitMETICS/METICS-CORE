@@ -45,14 +45,7 @@
                 {
                     <div class="d-flex justify-content-end">
                         <div class="mx-1">
-                            @using (Html.BeginForm("CrearParticipante", "Participante", FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-person-plus me-1"></i>
-                                    Agregar
-                                </button>
-                            }
+                            @Html.ActionLink("   Agregar", "FormularioUsuario", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
                         </div>
                     </div>
 

@@ -204,6 +204,41 @@ namespace webMetics.Controllers
             return View(); // Muestra la vista para buscar al participante
         }
 
+        public ActionResult FormularioUsuario()
+        {
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+            return View("FormularioUsuario");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AgregarParticipante(ParticipanteModel participante)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                bool exito = accesoAParticipante.CrearParticipante(participante);
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Se ha agregado el nuevo participante.";
+                    return RedirectToAction("VerParticipantes");
+                }
+                else
+                {
+                    TempData["successMessage"] = "No se pudo agregar el participante.";
+                    return RedirectToAction("VerParticipantes");
+                }
+            }
+            catch
+            {
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View("FormularioUsuario");
+            }
+        }
+
         // Método para obtener los datos de un participante según el ID proporcionado
         [HttpPost]
         [ValidateAntiForgeryToken]

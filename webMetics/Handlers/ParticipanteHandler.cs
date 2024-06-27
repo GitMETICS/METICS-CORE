@@ -45,22 +45,13 @@ namespace webMetics.Handlers
         // Método para insertar un nuevo participante en la base de datos
         public bool CrearParticipante(ParticipanteModel participante)
         {
-            bool comprobacionConsultaExitosa;
+            bool exito;
             string consulta = "INSERT INTO participante " +
                               "(id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2, condicion, " +
                               "unidad_academica, tipo_participante, telefonos, area, departamento, seccion) " +
                               "VALUES (@idUsuario, @idParticipante, @tipoIdentificacion, @correo, @nombre, @apellido1, @apellido2, " +
                               "@condicion, @unidadAcademica, @tipoParticipante, @telefonos, @area, @departamento, @seccion)";
-            comprobacionConsultaExitosa = AgregarParticipante(consulta, participante);
-
-
-            return comprobacionConsultaExitosa;
-        }
-
-        // Método auxiliar para agregar un participante en la base de datos
-        public bool AgregarParticipante(string consulta, ParticipanteModel participante)
-        {
-            bool exito;
+            
             ConexionMetics.Open();
 
             // Crear el comando de consulta y establecer los parámetros
@@ -294,7 +285,6 @@ namespace webMetics.Handlers
                               "WHERE EXISTS (SELECT * FROM participante WHERE id_participante_PK = " + identificacion + ");";
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
             DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
-            ParticipanteModel infoParticipante = new ParticipanteModel();
 
             // Obtener la respuesta de la consulta
             DataRow respuesta = tablaResultado.Rows[0];
