@@ -30,17 +30,74 @@
         <div class="row mb-1">
             <div class="col">
                 <div class="container">
+                    <div class="form-group">
+                        @Html.LabelFor(usuarioModel => usuarioModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(usuarioModel => usuarioModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.nombre, "", new { @class = "text-danger" })
+                    </div>
                     <div class="row mt-1">
                         <div class="col">
-                            @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
+                            @Html.LabelFor(usuarioModel => usuarioModel.apellido_1, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.apellido_1, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.apellido_1, "", new { @class = "text-danger" })
                         </div>
                         <div class="col">
-                            @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            @Html.LabelFor(usuarioModel => usuarioModel.apellido_2, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.apellido_2, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.apellido_2, "", new { @class = "text-danger" })
                         </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="row mt-1">
+                        <div class="col">
+                            @Html.LabelFor(usuarioModel => usuarioModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(usuarioModel => usuarioModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.DropDownListFor(usuarioModel => usuarioModel.tipoParticipante, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))), "Seleccione un tipo de participante...", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(usuarioModel => usuarioModel.unidadAcademica, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.DropDownListFor(usuarioModel => usuarioModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.area, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.seccion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.DropDownListFor(usuarioModel => usuarioModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una sección...", new { @class = "form-control", id = "seccionDropdown" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.seccion, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.telefonos, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(usuarioModel => usuarioModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.telefonos, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group mt-1">
+                        @Html.LabelFor(usuarioModel => usuarioModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(usuarioModel => usuarioModel.condicion, new { @class = "form-control", @maxlength = "30", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(usuarioModel => usuarioModel.condicion, "", new { @class = "text-danger" })
                     </div>
                     <div class="row mt-1">
                         <div class="col">

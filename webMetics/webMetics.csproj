@@ -44,7 +44,7 @@
     <None Include="Views\Usuario\IniciarSesion.cshtml" />
     <None Include="Views\Usuario\ParticipanteRegistrado.cshtml" />
     <None Include="Views\Participante\EditarParticipante.cshtml" />
-    <None Include="Views\Participante\CrearUsuario.cshtml" />
+    <None Include="Views\Participante\FormularioUsuario.cshtml" />
     <None Include="Views\Participante\ListaParticipantes.cshtml" />
     <None Include="Views\Participante\MiUsuario.cshtml" />
     <None Include="Views\Participante\ObtenerParticipante.cshtml" />
