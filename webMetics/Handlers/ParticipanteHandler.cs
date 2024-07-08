@@ -4,6 +4,7 @@ using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Hosting;
+using static iText.IO.Image.Jpeg2000ImageData;
 
 
 namespace webMetics.Handlers
@@ -12,116 +13,130 @@ namespace webMetics.Handlers
     {
         public ParticipanteHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
+
         }
 
-        // Método para verificar si existe un nuevo participante en la base de datos
-        public bool ExisteParticipante(string identificacion)
+        // Verificar la existencia de un participante en la base de datos
+        public bool ExisteParticipante(string id)
         {
-            bool existeEnBaseDatos = false;
+            bool existe = false;
 
-            try
+            using (var command = new SqlCommand("ExistsParticipante", ConexionMetics))
             {
-                string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + identificacion;
-                SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
-                DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
+                var existeParam = command.Parameters.Add("@existe", SqlDbType.Int);
+                existeParam.Direction = ParameterDirection.Output;
 
-                // Crear un objeto ParticipanteModel y obtener la información del participante desde la fila de resultados
-                DataRow filaParticipante = tablaResultado.Rows[0];
-                ParticipanteModel infoParticipante = ObtenerInfoParticipante(filaParticipante);
-
-                if (infoParticipante != null)
+                try
                 {
-                    existeEnBaseDatos = true;
+                    ConexionMetics.Open();
+                    command.ExecuteNonQuery();
+                    existe = Convert.ToInt32(existeParam.Value) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in ExisteParticipante: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
                 }
             }
-            catch
-            {
-                existeEnBaseDatos = false;
-            }
 
-            return existeEnBaseDatos;
+            return existe;
         }
 
-        // Método para insertar un nuevo participante en la base de datos
+        // Insertar un nuevo participante en la base de datos
         public bool CrearParticipante(ParticipanteModel participante)
         {
-            bool exito;
-            string consulta = "INSERT INTO participante " +
-                              "(id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2, condicion, " +
-                              "unidad_academica, tipo_participante, telefonos, area, departamento, seccion) " +
-                              "VALUES (@idUsuario, @idParticipante, @tipoIdentificacion, @correo, @nombre, @apellido1, @apellido2, " +
-                              "@condicion, @unidadAcademica, @tipoParticipante, @telefonos, @area, @departamento, @seccion)";
-            
-            ConexionMetics.Open();
+            bool exito = false;
+            using (var command = new SqlCommand("InsertParticipante", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
+                command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                command.Parameters.AddWithValue("@correo", participante.correo);
+                command.Parameters.AddWithValue("@nombre", participante.nombre);
+                command.Parameters.AddWithValue("@apellido1", participante.apellido_1);
+                command.Parameters.AddWithValue("@apellido2", participante.apellido_2);
+                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
+                command.Parameters.AddWithValue("@telefonos", participante.telefonos);
+                command.Parameters.AddWithValue("@area", participante.area);
+                command.Parameters.AddWithValue("@departamento", participante.departamento);
+                command.Parameters.AddWithValue("@seccion", participante.seccion);
+                command.Parameters.AddWithValue("@horasMatriculadas", 0);
+                command.Parameters.AddWithValue("@horasAprobadas", 0);
 
-            // Crear el comando de consulta y establecer los parámetros
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
-            comandoConsulta.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
-            comandoConsulta.Parameters.AddWithValue("@nombre", participante.nombre);
-            comandoConsulta.Parameters.AddWithValue("@apellido1", participante.apellido_1);
-            comandoConsulta.Parameters.AddWithValue("@apellido2", participante.apellido_2);
-            comandoConsulta.Parameters.AddWithValue("@correo", participante.correo);
-            comandoConsulta.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-            comandoConsulta.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-            comandoConsulta.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-            comandoConsulta.Parameters.AddWithValue("@telefonos", participante.telefonos);
-            comandoConsulta.Parameters.AddWithValue("@condicion", participante.condicion);
-            comandoConsulta.Parameters.AddWithValue("@area", participante.area);
-            comandoConsulta.Parameters.AddWithValue("@departamento", participante.departamento);
-            comandoConsulta.Parameters.AddWithValue("@seccion", participante.seccion);
-
-            // Ejecutar la consulta y verificar si se realizó con éxito
-            exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in CrearParticipante: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
 
             return exito;
         }
 
-        // Método para editar la información de un participante existente en la base de datos
+        // Actualizar la información de un participante en la base de datos
         public bool EditarParticipante(ParticipanteModel participante)
         {
-            bool comprobacionConsultaExitosa;
-            string consulta = "UPDATE participante SET tipo_identificacion = @tipoIdentificacion, " +
-                              "correo = @correo, nombre = @nombre, apellido_1 = @apellido_1, apellido_2 = @apellido_2, " +
-                              "condicion = @condicion, unidad_academica = @unidadAcademica, tipo_participante = @tipoParticipante, " +
-                              "telefonos = @telefonos, area = @area, departamento = @departamento, seccion = @seccion, " +
-                              "horas_matriculadas = @horasMatriculadas, horas_aprobadas = @horasAprobadas " +
-                              "WHERE id_participante_PK = @idParticipante";
-
-            // Verificar si los campos opcionales son nulos y establecerlos como cadenas vacías si es necesario
-            if (participante.apellido_2 == null)
+            bool exito = false;
+            using (var command = new SqlCommand("UpdateParticipante", ConexionMetics))
             {
-                participante.apellido_2 = "";
-            }
-            if (participante.seccion == null)
-            {
-                participante.seccion = "";
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
+                command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                command.Parameters.AddWithValue("@correo", participante.correo);
+                command.Parameters.AddWithValue("@nombre", participante.nombre);
+                command.Parameters.AddWithValue("@apellido1", participante.apellido_1);
+                command.Parameters.AddWithValue("@apellido2", participante.apellido_2);
+                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
+                command.Parameters.AddWithValue("@telefonos", participante.telefonos);
+                command.Parameters.AddWithValue("@area", participante.area);
+                command.Parameters.AddWithValue("@departamento", participante.departamento);
+                command.Parameters.AddWithValue("@seccion", participante.seccion);
+                command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
+                command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in EditarParticipante: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
 
-            ConexionMetics.Open();
-            SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoParaConsulta.Parameters.AddWithValue("@nombre", participante.nombre);
-            comandoParaConsulta.Parameters.AddWithValue("@apellido_1", participante.apellido_1);
-            comandoParaConsulta.Parameters.AddWithValue("@apellido_2", participante.apellido_2);
-            comandoParaConsulta.Parameters.AddWithValue("@correo", participante.correo);
-            comandoParaConsulta.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-            comandoParaConsulta.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
-            comandoParaConsulta.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-            comandoParaConsulta.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-            comandoParaConsulta.Parameters.AddWithValue("@telefonos", participante.telefonos);
-            comandoParaConsulta.Parameters.AddWithValue("@condicion", participante.condicion);
-            comandoParaConsulta.Parameters.AddWithValue("@area", participante.area);
-            comandoParaConsulta.Parameters.AddWithValue("@departamento", participante.departamento);
-            comandoParaConsulta.Parameters.AddWithValue("@seccion", participante.seccion);
-            comandoParaConsulta.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
-            comandoParaConsulta.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
-
-            comprobacionConsultaExitosa = comandoParaConsulta.ExecuteNonQuery() >= 1;
-            ConexionMetics.Close();
-            return comprobacionConsultaExitosa;
+            return exito;
         }
+
+
+        /*
+         
+         TODO: Pasar estos métodos a stored procedures en la base de datos.
+         
+         */
 
         // Se encarga de eliminar un participante de la base de datos.
         public bool EliminarParticipante(string idParticipante)

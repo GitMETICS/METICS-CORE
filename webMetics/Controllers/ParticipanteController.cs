@@ -1,6 +1,7 @@
 ﻿using webMetics.Handlers;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 
 /* 
  * Controlador de la entidad Participante
@@ -9,6 +10,7 @@ namespace webMetics.Controllers
 {
     public class ParticipanteController : Controller
     {
+        private UsuarioHandler accesoAUsuario;
         private ParticipanteHandler accesoAParticipante;
         private GrupoHandler accesoAGrupo;
         private AsesorHandler accesoAAsesor;
@@ -21,6 +23,7 @@ namespace webMetics.Controllers
             _environment = environment;
             _configuration = configuration;
 
+            accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
@@ -210,32 +213,133 @@ namespace webMetics.Controllers
             return View("FormularioUsuario");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult AgregarParticipante(ParticipanteModel participante)
+
+        /*public ActionResult AgregarParticipante(ParticipanteModel participante)
         {
+            bool exito = false;
             try
+            {
+                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
+                {
+                    CrearUsuarioDeParticipanteExistente(participante);
+
+                    if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
+                    {
+                        ParticipanteModel nuevoParticipante = new ParticipanteModel()
+                        {
+                            idParticipante = usuario.identificacion,
+                            nombre = "",
+                            apellido_1 = "",
+                            apellido_2 = "",
+                            correo = usuario.correo,
+                            tipoIdentificacion = "",
+                            tipoParticipante = "",
+                            unidadAcademica = "",
+                            area = "",
+                            departamento = "",
+                            seccion = "",
+                            condicion = "",
+                            telefonos = "",
+                            horasMatriculadas = 0,
+                            horasAprobadas = 0
+                        };
+
+                        accesoAParticipante.CrearParticipante(participante);
+                        usuario.participante = participante;
+                        exito = true;
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "Ya existe un participante con los mismos datos.";
+                        return RedirectToAction("VerParticipantes");
+                    }
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional o identificación.";
+                }
+            }
+            catch
+            {
+                TempData["errorMessage"] = "No se pudo crear el usuario. Inténtelo de nuevo.";
+            }
+
+            return exito;
+
+
+
+
+            /*try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
-                bool exito = accesoAParticipante.CrearParticipante(participante);
-
-                if (exito)
+                if (accesoAParticipante.ExisteParticipante(participante.idParticipante))
                 {
-                    TempData["successMessage"] = "Se ha agregado el nuevo participante.";
+                    // Desplegar error de que ya existe participante
+                    TempData["errorMessage"] = "Ya existe un participante con la misma identificación.";
                     return RedirectToAction("VerParticipantes");
                 }
-                else
+                else 
                 {
-                    TempData["successMessage"] = "No se pudo agregar el participante.";
-                    return RedirectToAction("VerParticipantes");
+                    // Si no existe el participante, crearlo
+                    bool exito = accesoAParticipante.CrearParticipante(participante);
+
+                    if (exito)
+                    {
+                        TempData["successMessage"] = "Se ha agregado el nuevo participante.";
+                        return RedirectToAction("VerParticipantes");
+                    }
+                    else
+                    {
+                        TempData["successMessage"] = "No se pudo agregar el participante.";
+                        return RedirectToAction("VerParticipantes");
+                    }
                 }
             }
             catch
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 return View("FormularioUsuario");
+            }
+        }*/
+
+        [HttpPost]
+        public ActionResult AgregarParticipante(ParticipanteModel participante)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante)) // TODO: En caso de que queramos hacer la autenticacion con el correo y no la identificacion, habria que cambiar esto
+                {
+                    // TODO: Usar algo que genere una contraseña random.
+                    string contrasena = "1234";
+
+                    accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                    EnviarCorreoContraseñaRegistro(participante.idParticipante, participante.correo, contrasena);
+                }
+
+                if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
+                {
+                    if (accesoAParticipante.CrearParticipante(participante)) 
+                    {
+                        TempData["successMessage"] = "Se agregó el nuevo participante.";
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "No se pudo agregar el participante.";
+                    }
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Ya existe un participante con los mismos datos.";
+                }
+
+                return RedirectToAction("VerParticipantes");
+            }
+            else
+            {
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View("FormularioUsuario", participante);
             }
         }
 
@@ -389,6 +493,58 @@ namespace webMetics.Controllers
         {
             List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
             return Json(secciones);
+        }
+
+        /* Método para enviar confirmación de registro al usuario*/
+        private void EnviarCorreoContraseñaRegistro(string identificacion, string correo, string contrasena)
+        {
+            try
+            {
+                // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+                // Se utiliza la librería MimeKit para construir el mensaje
+                // El mensaje incluye una versión en HTML y texto plano
+
+                // Contenido base del mensaje en HTML y texto plano
+                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+                const string BASE_MESSAGE_TEXT = "";
+                const string BASE_SUBJECT = "Nuevo Usuario en Proyecto Módulos"; // Asunto del correo
+
+                MimeMessage message = new MimeMessage();
+
+                // Configurar el remitente y el destinatario
+                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
+                message.From.Add(from);
+                MailboxAddress to = new MailboxAddress("Receiver", correo);
+                message.To.Add(to);
+
+                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+                BodyBuilder bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
+                    "Se le ha creado un nuevo usuario con identificación " + identificacion + " en el proyecto Módulos. " +
+                    "Su contraseña temporal es " + contrasena + "." ;
+                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+                bodyBuilder.HtmlBody += "</p>";
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // Enviar el correo electrónico utilizando un cliente SMTP
+                using var client = new MailKit.Net.Smtp.SmtpClient();
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.ToString();
+            }
         }
     }
 }

@@ -11,8 +11,6 @@ namespace webMetics.Controllers
 {
     public class UsuarioController : Controller
     {
-        // Controlador encargado de la funcionalidad de inicio de sesión
-
         // Controladores y Handlers utilizados en el controlador
         private protected CookiesController cookiesController;
         private protected UsuarioHandler accesoAUsuario;
@@ -95,26 +93,25 @@ namespace webMetics.Controllers
                         ViewBag.Titulo = "Registro realizado";
                         ViewBag.Message = "Los datos fueron guardados éxitosamente. La confirmación será enviada al correo";
                         EnviarCorreoRegistro(usuario.identificacion, usuario.correo);
-                    }
-                    else
-                    {
-                        ViewBag.Titulo = "No se pudo realizar el registro";
-                        ViewBag.Message = "Ocurrió un error y los datos no pudieron ser guardados. Por favor, inténtelo nuevamente.";
-                    }
 
-                    return View("ParticipanteRegistrado");
+                        return View("ParticipanteRegistrado");
+                    }
+                    else 
+                    {
+                        return RedirectToAction("IniciarSesion");
+                    }
                 }
                 else
                 {
                     ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View("Registrarse");
+                    return View("Registrarse", usuario);
                 }
             }
             else
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("Registrarse");
+                return View("Registrarse", usuario);
             }
         }
 
@@ -129,50 +126,87 @@ namespace webMetics.Controllers
 
         private bool CrearUsuario(UsuarioModel usuario)
         {
-            bool exitoUsuario = false;
-            bool exitoParticipante = false;
-
-            if (!accesoAUsuario.ExisteUsuario(usuario.identificacion))
+            bool exito = false;
+            try
             {
-                exitoUsuario = accesoAUsuario.CrearUsuario(usuario.identificacion, usuario.contrasena);
-
-                ParticipanteModel participante = new ParticipanteModel()
+                if (!accesoAUsuario.ExisteUsuario(usuario.identificacion))
                 {
-                    idParticipante = usuario.identificacion,
-                    nombre = "",
-                    apellido_1 = "",
-                    apellido_2 = "",
-                    correo = usuario.correo,
-                    tipoIdentificacion = "",
-                    tipoParticipante = "",
-                    unidadAcademica = "",
-                    area = "",
-                    departamento = "",
-                    seccion = "",
-                    condicion = "",
-                    telefonos = "",
-                    horasMatriculadas = 0,
-                    horasAprobadas = 0
-                };
+                    accesoAUsuario.CrearUsuario(usuario.identificacion, usuario.contrasena);
 
-                exitoParticipante = accesoAParticipante.CrearParticipante(participante);
+                    if (!accesoAParticipante.ExisteParticipante(usuario.identificacion))
+                    {
+                        ParticipanteModel participante = new ParticipanteModel()
+                        {
+                            idParticipante = usuario.identificacion,
+                            nombre = usuario.nombre,
+                            apellido_1 = usuario.apellido_1,
+                            apellido_2 = usuario.apellido_2,
+                            correo = usuario.correo,
+                            tipoIdentificacion = usuario.tipoIdentificacion,
+                            tipoParticipante = usuario.tipoParticipante,
+                            unidadAcademica = usuario.unidadAcademica,
+                            area = usuario.area,
+                            departamento = usuario.departamento,
+                            seccion = usuario.seccion,
+                            condicion = usuario.condicion,
+                            telefonos = usuario.telefonos,
+                            horasMatriculadas = 0,
+                            horasAprobadas = 0
+                        };
 
-                usuario.participante = participante;
+                        accesoAParticipante.CrearParticipante(participante);
+                        exito = true;
+                    }
+                    else 
+                    {
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.identificacion);
+
+                        ParticipanteModel participanteActualizado = new ParticipanteModel()
+                        {
+                            idParticipante = participante.idParticipante,
+                            nombre = usuario.nombre,
+                            apellido_1 = usuario.apellido_1,
+                            apellido_2 = usuario.apellido_2,
+                            correo = usuario.correo, // TODO: Cambiar esto en caso de que el nuevo identificador sea el correo
+                            tipoIdentificacion = usuario.tipoIdentificacion,
+                            tipoParticipante = usuario.tipoParticipante,
+                            unidadAcademica = usuario.unidadAcademica,
+                            area = usuario.area,
+                            departamento = usuario.departamento,
+                            seccion = usuario.seccion,
+                            condicion = usuario.condicion,
+                            telefonos = usuario.telefonos,
+                            horasMatriculadas = participante.horasMatriculadas,
+                            horasAprobadas = participante.horasAprobadas
+                        };
+
+                        accesoAParticipante.EditarParticipante(participanteActualizado);
+                        exito = true;
+                    }
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Ya existe un usuario con los mismos datos.";
+                }
+            }
+            catch
+            {
+                TempData["errorMessage"] = "No se pudo crear el usuario. Inténtelo de nuevo.";
             }
 
-            return exitoUsuario && exitoParticipante;
+            return exito;
         }
 
         // Método para autenticar el usuario y realizar el inicio de sesión
         public LoginModel AutenticarUsuario(LoginModel usuario)
         {
+            LoginModel usuarioAutorizado = null;
+
             try
             {
-                bool autorizado = accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena);
-
-                if (autorizado)
+                if (accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena))
                 {
-                    LoginModel usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.identificacion);
+                    usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.identificacion);
                     int rolUsuario = usuarioAutorizado.rol;
                     string idUsuario = usuarioAutorizado.identificacion;
 
@@ -193,16 +227,14 @@ namespace webMetics.Controllers
                     {
                         Expires = DateTime.Now.AddHours(2)
                     });
-
-                    return usuarioAutorizado;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                Console.WriteLine($"Error in AutenticarUsuario: {ex.Message}");
             }
 
-            return null;
+            return usuarioAutorizado;
         }
 
         // Método para cerrar la sesión del usuario

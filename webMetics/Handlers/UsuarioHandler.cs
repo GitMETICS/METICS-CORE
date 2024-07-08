@@ -9,142 +9,165 @@ namespace webMetics.Handlers
     {
         public UsuarioHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
+
         }
 
         public bool CrearUsuario(string id, string contrasena)
         {
-            int exito;
-            var command = new SqlCommand("InsertarUsuario", ConexionMetics);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@contrasena", contrasena);
-            command.Parameters.Add("@exito", SqlDbType.Int).Direction = ParameterDirection.Output;
+            bool exito = false;
 
-            ConexionMetics.Open();
-
-            try
+            using (var command = new SqlCommand("InsertUsuario", ConexionMetics))
             {
-                command.ExecuteNonQuery();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@rol", 0); // TODO: Pasar el rol real. 0 es el default
+                command.Parameters.AddWithValue("@contrasena", contrasena);
 
-                exito = Convert.ToInt32(command.Parameters["@exito"].Value);
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch
+                {
+                    exito = false;
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-            catch
-            {
-                exito = 0;
-            }
 
-            ConexionMetics.Close();
-
-            return exito == 1;
+            return exito;
         }
 
         public LoginModel ObtenerUsuario(string id)
         {
-            LoginModel usuario;
-            var command = new SqlCommand("ObtenerUsuario", ConexionMetics);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@id", id);
-            DataTable tablaResultado = CrearTablaConsulta(command);
+            LoginModel usuario = null;
 
-            ConexionMetics.Open();
-            try
+            using (var command = new SqlCommand("SelectUsuario", ConexionMetics))
             {
-                command.ExecuteNonQuery();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
 
-                DataRow datosUsuario = tablaResultado.Rows[0];
-                usuario = new LoginModel
+                try
                 {
-                    identificacion = Convert.ToString(datosUsuario["id_usuario_PK"]),
-                    rol = Convert.ToInt32(datosUsuario["rol_FK"])
-                };
+                    ConexionMetics.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            usuario = new LoginModel
+                            {
+                                identificacion = Convert.ToString(reader["id_usuario_PK"]),
+                                rol = Convert.ToInt32(reader["rol_FK"])
+                            };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in ObtenerUsuario: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-            catch 
-            {
-                usuario = null;
-            }
-
-            ConexionMetics.Close();
 
             return usuario;
         }
 
         public bool ExisteUsuario(string id)
         {
-            int exito;
-            var command = new SqlCommand("ExisteUsuario", ConexionMetics);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.Add("@existe", SqlDbType.Int).Direction = ParameterDirection.Output;
+            bool existe = false;
 
-            ConexionMetics.Open();
-            try
+            using (var command = new SqlCommand("ExistsUsuario", ConexionMetics))
             {
-                command.ExecuteNonQuery();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
+                var existeParam = command.Parameters.Add("@existe", SqlDbType.Int);
+                existeParam.Direction = ParameterDirection.Output;
 
-                exito = Convert.ToInt32(command.Parameters["@existe"].Value);
+                try
+                {
+                    ConexionMetics.Open();
+                    command.ExecuteNonQuery();
+                    existe = Convert.ToInt32(existeParam.Value) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in ExisteUsuario: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-            catch
-            {
-                exito = 0;
-            }
 
-            ConexionMetics.Close();
-
-            return exito == 1;
+            return existe;
         }
 
         public bool EditarUsuario(string id, string contrasena)
         {
-            int exito;
-            var command = new SqlCommand("EditarUsuario", ConexionMetics);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@contrasena", contrasena);
-            command.Parameters.Add("@exito", SqlDbType.Int).Direction = ParameterDirection.Output;
+            bool exito = false;
 
-            ConexionMetics.Open();
-
-            try
+            using (var command = new SqlCommand("UpdateUsuario", ConexionMetics))
             {
-                command.ExecuteNonQuery();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@contrasena", contrasena);
+                var exitoParam = command.Parameters.Add("@exito", SqlDbType.Int);
+                exitoParam.Direction = ParameterDirection.Output;
 
-                exito = Convert.ToInt32(command.Parameters["@exito"].Value);
+                try
+                {
+                    ConexionMetics.Open();
+                    command.ExecuteNonQuery();
+                    exito = Convert.ToInt32(exitoParam.Value) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in EditarUsuario: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-            catch
-            {
-                exito = 0;
-            }
 
-            ConexionMetics.Close();
-
-            return exito == 1;
+            return exito;
         }
 
         public bool AutenticarUsuario(string id, string contrasena)
         {
-            int exito;
-            var command = new SqlCommand("ValidarUsuario", ConexionMetics);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@contrasena", contrasena);
-            command.Parameters.Add("@exito", SqlDbType.Int).Direction = ParameterDirection.Output;
+            bool autenticado = false;
 
-            ConexionMetics.Open();
-
-            try
+            using (var command = new SqlCommand("AuthUsuario", ConexionMetics))
             {
-                command.ExecuteNonQuery();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@contrasena", contrasena);
+                var authParam = command.Parameters.Add("@auth", SqlDbType.Int);
+                authParam.Direction = ParameterDirection.Output;
 
-                exito = Convert.ToInt32(command.Parameters["@exito"].Value);
+                try
+                {
+                    ConexionMetics.Open();
+                    command.ExecuteNonQuery();
+                    autenticado = Convert.ToInt32(authParam.Value) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in AutenticarUsuario: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-            catch
-            {
-                exito = 0;
-            }
 
-            ConexionMetics.Close();
-
-            return exito == 1;
+            return autenticado;
         }
     }
 }

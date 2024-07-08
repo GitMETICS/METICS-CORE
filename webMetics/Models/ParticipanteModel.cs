@@ -5,7 +5,7 @@ namespace webMetics.Models
     public class ParticipanteModel
     {
         [Required(ErrorMessage = "Es necesario ingresar una identificación.")]
-        [Display(Name = "Número de identificación")]
+        [Display(Name = "Identificación")]
         public required string idParticipante { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]

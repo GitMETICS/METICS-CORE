@@ -4,9 +4,8 @@ namespace webMetics.Models
 {
     public class UsuarioModel
     {
-        // [RegularExpression(@"^\d+-\d+-\d+$", ErrorMessage = "El formato del campo de identificación debe ser 'X-XXXX-XXXX'.")]
         [Required(ErrorMessage = "Es necesario ingresar una identificación.")]
-        [Display(Name = "Número de identificación")]
+        [Display(Name = "Identificación")]
         public required string identificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
