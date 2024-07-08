@@ -30,7 +30,7 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
         }
 
-        public int GetRole()
+        private int GetRole()
         {
             int role = 0;
 
@@ -42,7 +42,7 @@ namespace webMetics.Controllers
             return role;
         }
 
-        public string GetId()
+        private string GetId()
         {
             string id = "";
 
@@ -105,7 +105,7 @@ namespace webMetics.Controllers
             return View();
         }
 
-        public ActionResult MiUsuario(string idParticipante)
+        public ActionResult MiInformacion(string idParticipante)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
@@ -113,7 +113,8 @@ namespace webMetics.Controllers
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
             ViewBag.Participante = participante;
-            ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+            // TODO: Revisar este método del handler de participante porque no funciona
+            // ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
             
 
             if (TempData["errorMessage"] != null)

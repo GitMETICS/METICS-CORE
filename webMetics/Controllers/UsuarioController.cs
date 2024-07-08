@@ -76,7 +76,16 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para procesar el formulario de creación de usuario con los datos ingresados */
+        // Método para mostrar el formulario para crear un nuevo usuario
+        public ActionResult Registrarse()
+        {
+            // Obtener datos necesarios para llenar las opciones del formulario (áreas)
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+
+            return View();
+        }
+
+        // Método para procesar el formulario de creación de usuario con los datos ingresados
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Registrarse(UsuarioModel usuario)
@@ -91,7 +100,7 @@ namespace webMetics.Controllers
                     {
                         ViewBag.Correo = usuario.correo;
                         ViewBag.Titulo = "Registro realizado";
-                        ViewBag.Message = "Los datos fueron guardados éxitosamente. La confirmación será enviada al correo";
+                        ViewBag.Message = "Se registró en el Proyecto Módulos. La confirmación será enviada al correo";
                         EnviarCorreoRegistro(usuario.identificacion, usuario.correo);
 
                         return View("ParticipanteRegistrado");
@@ -115,15 +124,7 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para mostrar el formulario para crear un nuevo usuario */
-        public ActionResult Registrarse()
-        {
-            // Obtener datos necesarios para llenar las opciones del formulario (áreas)
-            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-
-            return View();
-        }
-
+        // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos
         private bool CrearUsuario(UsuarioModel usuario)
         {
             bool exito = false;
@@ -167,7 +168,7 @@ namespace webMetics.Controllers
                             nombre = usuario.nombre,
                             apellido_1 = usuario.apellido_1,
                             apellido_2 = usuario.apellido_2,
-                            correo = usuario.correo, // TODO: Cambiar esto en caso de que el nuevo identificador sea el correo
+                            correo = usuario.correo, // TODO: Cambiar esto a participante.correo en caso de que el nuevo identificador sea el correo
                             tipoIdentificacion = usuario.tipoIdentificacion,
                             tipoParticipante = usuario.tipoParticipante,
                             unidadAcademica = usuario.unidadAcademica,
@@ -333,7 +334,7 @@ namespace webMetics.Controllers
                 // Crear el cuerpo del mensaje con el contenido HTML y texto plano
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "Se ha registrado al usuario con identificación " + identificacion + " en el proyecto Módulos."; ;
+                    "Se ha registrado al usuario con identificación " + identificacion + " en el Proyecto Módulos."; ;
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
 

@@ -46,7 +46,7 @@
     <None Include="Views\Participante\EditarParticipante.cshtml" />
     <None Include="Views\Participante\FormularioUsuario.cshtml" />
     <None Include="Views\Participante\ListaParticipantes.cshtml" />
-    <None Include="Views\Participante\MiUsuario.cshtml" />
+    <None Include="Views\Participante\MiInformacion.cshtml" />
     <None Include="Views\Participante\ObtenerParticipante.cshtml" />
     <None Include="Views\Participante\VerDatosParticipante.cshtml" />
     <None Include="Views\Participante\VerParticipantes.cshtml" />

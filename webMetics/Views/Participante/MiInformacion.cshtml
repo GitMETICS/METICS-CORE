@@ -1,6 +1,6 @@
 ﻿@using webMetics.Controllers
 @{
-    ViewBag.Title = "Mi usuario";
+    ViewBag.Title = "Mi información";
 }
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -71,7 +71,7 @@
                             <td class=" ">@ViewBag.Participante.correo</td>
                             <td class=" ">@ViewBag.Participante.telefonos</td>
                             <td class=" ">
-                                @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "btn btn-outline-info bi bi-pencil-square" })
+                                @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
                             </td>
                         </tr>
                     </tbody>

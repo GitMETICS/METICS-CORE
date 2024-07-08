@@ -199,7 +199,7 @@ namespace webMetics.Handlers
         }
 
         // Método para obtener un participante específico según su ID
-        public ParticipanteModel ObtenerParticipante(string idParticipante)
+        public ParticipanteModel ObtenerParticipante(string idParticipante) // Para este metodo ya existe un stored procedure en la base de datos
         {
             string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + idParticipante;
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
