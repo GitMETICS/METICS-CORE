@@ -1,6 +1,7 @@
 ﻿using webMetics.Handlers;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using MimeKit;
 
 /* 
@@ -213,106 +214,14 @@ namespace webMetics.Controllers
             return View("FormularioUsuario");
         }
 
-
-        /*public ActionResult AgregarParticipante(ParticipanteModel participante)
-        {
-            bool exito = false;
-            try
-            {
-                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
-                {
-                    CrearUsuarioDeParticipanteExistente(participante);
-
-                    if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
-                    {
-                        ParticipanteModel nuevoParticipante = new ParticipanteModel()
-                        {
-                            idParticipante = usuario.identificacion,
-                            nombre = "",
-                            apellido_1 = "",
-                            apellido_2 = "",
-                            correo = usuario.correo,
-                            tipoIdentificacion = "",
-                            tipoParticipante = "",
-                            unidadAcademica = "",
-                            area = "",
-                            departamento = "",
-                            seccion = "",
-                            condicion = "",
-                            telefonos = "",
-                            horasMatriculadas = 0,
-                            horasAprobadas = 0
-                        };
-
-                        accesoAParticipante.CrearParticipante(participante);
-                        usuario.participante = participante;
-                        exito = true;
-                    }
-                    else
-                    {
-                        TempData["errorMessage"] = "Ya existe un participante con los mismos datos.";
-                        return RedirectToAction("VerParticipantes");
-                    }
-                }
-                else
-                {
-                    TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional o identificación.";
-                }
-            }
-            catch
-            {
-                TempData["errorMessage"] = "No se pudo crear el usuario. Inténtelo de nuevo.";
-            }
-
-            return exito;
-
-
-
-
-            /*try
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                if (accesoAParticipante.ExisteParticipante(participante.idParticipante))
-                {
-                    // Desplegar error de que ya existe participante
-                    TempData["errorMessage"] = "Ya existe un participante con la misma identificación.";
-                    return RedirectToAction("VerParticipantes");
-                }
-                else 
-                {
-                    // Si no existe el participante, crearlo
-                    bool exito = accesoAParticipante.CrearParticipante(participante);
-
-                    if (exito)
-                    {
-                        TempData["successMessage"] = "Se ha agregado el nuevo participante.";
-                        return RedirectToAction("VerParticipantes");
-                    }
-                    else
-                    {
-                        TempData["successMessage"] = "No se pudo agregar el participante.";
-                        return RedirectToAction("VerParticipantes");
-                    }
-                }
-            }
-            catch
-            {
-                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("FormularioUsuario");
-            }
-        }*/
-
         [HttpPost]
         public ActionResult AgregarParticipante(ParticipanteModel participante)
         {
             if (ModelState.IsValid)
             {
-                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante)) // TODO: En caso de que queramos hacer la autenticacion con el correo y no la identificacion, habria que cambiar esto
+                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante)) // En caso de que queramos hacer la autenticacion con el correo y no la identificacion, habria que cambiar esto
                 {
-                    // TODO: Usar algo que genere una contraseña random.
-                    string contrasena = "1234";
+                    string contrasena = GenerateRandomPassword();
 
                     accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
                     EnviarCorreoContraseñaRegistro(participante.idParticipante, participante.correo, contrasena);
@@ -320,7 +229,8 @@ namespace webMetics.Controllers
 
                 if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
                 {
-                    if (accesoAParticipante.CrearParticipante(participante)) 
+                    bool creado = accesoAParticipante.CrearParticipante(participante);
+                    if (creado) 
                     {
                         TempData["successMessage"] = "Se agregó el nuevo participante.";
                     }
@@ -545,6 +455,17 @@ namespace webMetics.Controllers
             {
                 TempData["errorMessage"] = ex.ToString();
             }
+        }
+
+        private string GenerateRandomPassword()
+        {
+            int length = 10;
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            var random = new Random();
+            string password = new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            return password;
         }
     }
 }
