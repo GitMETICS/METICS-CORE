@@ -208,7 +208,7 @@ GO
 --Creación de procedimiento para crear un usuario
 CREATE PROCEDURE InsertUsuario
     @id NVARCHAR(64),
-	@rol INT,
+	@rol INT = 0,
     @contrasena NVARCHAR(64)
 AS
 BEGIN
@@ -438,21 +438,17 @@ VALUES
 
 --Crear usuarios
 	-- admin
-EXEC InsertUsuario @id=N'0000', @contrasena=N'#Q+3n?OWk3i0:qG'
-UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '0000'
+EXEC InsertUsuario @id=N'0000', @rol=1, @contrasena=N'#Q+3n?OWk3i0:qG'
 
-EXEC InsertUsuario @id=N'1111', @contrasena=N'1234'
-UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '1111'
+EXEC InsertUsuario @id=N'1111', @rol=1, @contrasena=N'1234'
 
-EXEC InsertUsuario @id=N'2222', @contrasena=N'1234'
-UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '2222'
+EXEC InsertUsuario @id=N'2222', @rol=2, @contrasena=N'1234'
 
-EXEC InsertUsuario @id=N'3333', @contrasena=N'1234'
-UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '3333'
+EXEC InsertUsuario @id=N'3333', @rol=2, @contrasena=N'1234'
 
-EXEC InsertUsuario @id=N'4444', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'4444', @rol=0, @contrasena=N'1234'
 
-EXEC InsertUsuario @id=N'5555', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'5555', @rol=0, @contrasena=N'1234'
 
 --Crear asesores
 INSERT INTO asesor
@@ -510,7 +506,7 @@ FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\Fi
 
 --Crear grupos
 INSERT INTO dbo.grupo(
-	id_tema_FK, modalidad, cupo,cantidad_horas,
+	id_tema_FK, modalidad, cupo, cantidad_horas,
 	descripcion, es_visible, lugar,
 	nombre, horario,
 	fecha_inicio_grupo, fecha_finalizacion_grupo,
