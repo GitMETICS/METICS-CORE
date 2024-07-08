@@ -205,32 +205,22 @@ END
 */
 
 GO
---Creación de procedimiento para insertar un usuario
-CREATE PROCEDURE InsertarUsuario
+--Creación de procedimiento para crear un usuario
+CREATE PROCEDURE InsertUsuario
     @id NVARCHAR(64),
-    @contrasena NVARCHAR(64),
-	@exito INT=0 OUTPUT
+	@rol INT,
+    @contrasena NVARCHAR(64)
 AS
 BEGIN
-    SET NOCOUNT ON
-
 	DECLARE @salt UNIQUEIDENTIFIER=NEWID()
-    BEGIN TRY
-        INSERT INTO usuario (id_usuario_PK, hash_contrasena, salt)
-        VALUES(@id, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
 
-		SET @exito=1
-    END TRY
-    BEGIN CATCH
-		SET @exito=0
-    END CATCH
-
-	RETURN
+    INSERT INTO usuario (id_usuario_PK, rol_FK, hash_contrasena, salt)
+    VALUES(@id, @rol, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
 END
 
 GO
 --Creación de procedimiento para editar un usuario
-CREATE PROCEDURE EditarUsuario
+CREATE PROCEDURE UpdateUsuario
     @id NVARCHAR(64),
     @contrasena NVARCHAR(64),
     @exito INT=0 OUTPUT
@@ -255,21 +245,21 @@ END
 
 GO
 --Creación de procedimiento para obtener los datos de un usuario
-CREATE PROCEDURE ObtenerUsuario
+CREATE PROCEDURE SelectUsuario
     @id NVARCHAR(64)
 AS
 BEGIN
-	SELECT id_usuario_PK, rol_FK FROM usuario WHERE id_usuario_PK=@id
+	SELECT id_usuario_PK, rol_FK FROM usuario WHERE id_usuario_PK = @id
 END
 
 GO
 --Creación de procedimiento para verificar si existe un usuario
-CREATE PROCEDURE ExisteUsuario
+CREATE PROCEDURE ExistsUsuario
     @id NVARCHAR(64),
     @existe INT=0 OUTPUT
 AS
 BEGIN
-    IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK=@id)
+    IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK = @id)
 		SET @existe=1
 	ELSE
 		SET @existe=0
@@ -279,10 +269,10 @@ END
 
 GO
 --Creación de procedimiento para verificar datos de inicio de sesión
-CREATE PROCEDURE ValidarUsuario
+CREATE PROCEDURE AuthUsuario
     @id NVARCHAR(64),
     @contrasena NVARCHAR(64),
-    @exito INT=0 OUTPUT
+    @auth INT=0 OUTPUT
 AS
 BEGIN
 
@@ -297,16 +287,141 @@ BEGIN
         SET @userID=(SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK=@id AND hash_contrasena=HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
 
        IF(@userID IS NULL)
-           SET @exito=0
+           SET @auth = 0
        ELSE 
-           SET @exito=1
+           SET @auth = 1
     END
     ELSE
-       SET @exito=0
+       SET @auth = 0
 
 END
 
+GO
+--Creación de procedimiento para insertar un participante
+CREATE PROCEDURE InsertParticipante
+    @idUsuario NVARCHAR(64),
+    @idParticipante NVARCHAR(64),
+    @tipoIdentificacion NVARCHAR(16),
+    @correo NVARCHAR(64),
+    @nombre NVARCHAR(64),
+    @apellido1 NVARCHAR(64),
+    @apellido2 NVARCHAR(64) = '',
+    @condicion NVARCHAR(64) = '',
+    @unidadAcademica NVARCHAR(64) = '',
+    @tipoParticipante NVARCHAR(64) = '',
+    @telefonos NVARCHAR(64) = '',
+    @area NVARCHAR(64) = '',
+    @departamento NVARCHAR(64) = '',
+    @seccion NVARCHAR(64) = '',
+	@horasMatriculadas INT = 0,
+	@horasAprobadas INT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    INSERT INTO participante
+    (
+        id_usuario_FK,
+        id_participante_PK,
+        tipo_identificacion,
+        correo,
+        nombre,
+        apellido_1,
+        apellido_2,
+        condicion,
+        unidad_academica,
+        tipo_participante,
+        telefonos,
+        area,
+        departamento,
+        seccion,
+		horas_matriculadas,
+		horas_aprobadas
+    )
+    VALUES
+    (
+        @idUsuario,
+        @idParticipante,
+        @tipoIdentificacion,
+        @correo,
+        @nombre,
+        @apellido1,
+        @apellido2,
+        @condicion,
+        @unidadAcademica,
+        @tipoParticipante,
+        @telefonos,
+        @area,
+        @departamento,
+        @seccion,
+		@horasMatriculadas,
+		@horasAprobadas
+    );
+END
+
+GO
+--Creación de procedimiento para actualizar los datos de un participante
+CREATE PROCEDURE UpdateParticipante
+	@idUsuario NVARCHAR(64),
+    @idParticipante NVARCHAR(64),
+    @tipoIdentificacion NVARCHAR(16),
+    @correo NVARCHAR(64),
+    @nombre NVARCHAR(64),
+    @apellido1 NVARCHAR(64),
+    @apellido2 NVARCHAR(64),
+    @condicion NVARCHAR(64),
+    @unidadAcademica NVARCHAR(64),
+    @tipoParticipante NVARCHAR(64),
+    @telefonos NVARCHAR(64),
+    @area NVARCHAR(64),
+    @departamento NVARCHAR(64),
+    @seccion NVARCHAR(64),
+	@horasMatriculadas INT,
+	@horasAprobadas INT
+AS
+BEGIN
+    UPDATE participante
+    SET
+        tipo_identificacion = @tipoIdentificacion,
+        correo = @correo,
+        nombre = @nombre,
+        apellido_1 = @apellido1,
+        apellido_2 = @apellido2,
+        condicion = @condicion,
+        unidad_academica = @unidadAcademica,
+        tipo_participante = @tipoParticipante,
+        telefonos = @telefonos,
+        area = @area,
+        departamento = @departamento,
+        seccion = @seccion,
+		horas_matriculadas = @horasMatriculadas,
+		horas_aprobadas = @horasAprobadas
+    WHERE id_participante_PK = @idParticipante;
+END
+
+GO
+--Creación de procedimiento para obtener los datos de un participante
+CREATE PROCEDURE SelectParticipante
+    @id NVARCHAR(64)
+AS
+BEGIN
+	SELECT id_participante_PK FROM participante WHERE id_participante_PK = @id
+END
+
+GO
+--Creación de procedimiento para verificar si existe un participante
+CREATE PROCEDURE ExistsParticipante
+    @id NVARCHAR(64),
+    @existe INT=0 OUTPUT
+AS
+BEGIN
+    IF EXISTS (SELECT TOP 1 id_participante_PK FROM participante WHERE id_participante_PK = @id)
+		SET @existe = 1
+	ELSE
+		SET @existe = 0
+
+	RETURN
+END
 
 /*
 	SCRIPT SET DE DATOS INICIAL
@@ -323,21 +438,21 @@ VALUES
 
 --Crear usuarios
 	-- admin
-EXEC InsertarUsuario @id=N'0000', @contrasena=N'#Q+3n?OWk3i0:qG'
+EXEC InsertUsuario @id=N'0000', @contrasena=N'#Q+3n?OWk3i0:qG'
 UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '0000'
 
-EXEC InsertarUsuario @id=N'1111', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'1111', @contrasena=N'1234'
 UPDATE usuario SET rol_FK = 1 WHERE id_usuario_PK = '1111'
 
-EXEC InsertarUsuario @id=N'2222', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'2222', @contrasena=N'1234'
 UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '2222'
 
-EXEC InsertarUsuario @id=N'3333', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'3333', @contrasena=N'1234'
 UPDATE usuario SET rol_FK = 2 WHERE id_usuario_PK = '3333'
 
-EXEC InsertarUsuario @id=N'4444', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'4444', @contrasena=N'1234'
 
-EXEC InsertarUsuario @id=N'5555', @contrasena=N'1234'
+EXEC InsertUsuario @id=N'5555', @contrasena=N'1234'
 
 --Crear asesores
 INSERT INTO asesor
