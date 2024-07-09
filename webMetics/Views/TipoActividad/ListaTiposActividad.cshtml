@@ -1,6 +1,8 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Actividades";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 <!DOCTYPE html>
@@ -15,10 +17,15 @@
             </div>
         }
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (/*Request.UrlReferrer != null*/true)
+            @if (urlReferrer != null)
             {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
             }
+
             @if (ViewBag.TiposActividad != null)
             {
                 <a href="/TipoActividad/CrearTipoActividad" class="btn btn-primary" style="float: right;">Crear nueva actividad</a>

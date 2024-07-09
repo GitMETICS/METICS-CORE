@@ -1,6 +1,8 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Módulos y horas inscritas";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -12,10 +14,15 @@
     @if (ViewBag.Role == 1 || ViewBag.Role == 2)
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            @if (/*Request.UrlReferrer != null*/true)
+            @if (urlReferrer != null)
             {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
             }
+
             <h1>@ViewBag.Title</h1>
             <hr />
 

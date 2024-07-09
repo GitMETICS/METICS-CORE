@@ -21,7 +21,7 @@
         <a href="https://metics.ucr.ac.cr/es/"> <img src="~/images/logosVC.png" style="width: 8%; margin-right: 1%;" alt="Logo Vicerrectoria de Docencia" /> </a>
     </div>
 
-    @if (ViewBag.Id != "" && ViewBag.Title != "Registrarse" && ViewBag.Title != "Iniciar sesión")
+    @if (ViewBag.Id != "" && ViewBag.Title != "Formulario de registro" && ViewBag.Title != "Iniciar sesión")
     {
         <nav class="navbar navbar-expand-lg navbar-custom">
             <div class="container-fluid">
@@ -41,10 +41,10 @@
 
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <li>
-                                    @Html.ActionLink("Mi información", "MiInformacion", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Información personal", "MiInformacion", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
                                 </li>
                                 <li>
-                                    @Html.ActionLink("Mi contraseña", "GestionarContrasena", "Usuario", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Cambiar contraseña", "GestionarContrasena", "Usuario", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -58,12 +58,12 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Administrador</a>
                                 <div class="dropdown-menu">
-                                    @Html.ActionLink("Tipos de actividad", "ListaTiposActividad", "TipoActividad", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Tipos de Actividad", "ListaTiposActividad", "TipoActividad", new { }, new { @class = "dropdown-item" })
                                     @Html.ActionLink("Categorías", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Lista de asesores", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un tema", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Lista de Asesores", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Lista de Participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Crear un Tema", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Crear un Módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
                                 </div>
                             </li>
                         }
@@ -72,8 +72,8 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Asesor</a>
                                 <div class="dropdown-menu">
-                                    @Html.ActionLink("Mis módulos", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Mis Módulos", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Crear un Módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
                                 </div>
                             </li>
                         }

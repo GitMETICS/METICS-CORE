@@ -1,81 +1,83 @@
 ﻿@model webMetics.Models.NewLoginModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Mi contraseña";
+    ViewBag.Title = "Cambiar Contraseña";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
-<!DOCTYPE html>
-<html>
-<body>
-    @if (ViewBag.Id != "")
-    {
-        <div class="contenedor-tipos-actividades container-fluid">
-            @if (/*Request.UrlReferrer != null*/true)
+
+@if (ViewBag.Id != "")
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+
+        @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <h1>@ViewBag.Title</h1>
+            <hr />
+
+            if (ViewBag.ErrorMessage != null)
             {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.ErrorMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.SuccessMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
 
-            @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title</h1>
-                <hr />
-
-                if (ViewBag.ErrorMessage != null)
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.ErrorMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                if (ViewBag.SuccessMessage != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.SuccessMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-
-                <div class="row mb-1">
-                    <div class="col">
-                        <div class="container">
-                            <div class="form-group mt-1 mb-3">
-                                <label style="font-size: 22px">Nombre de usuario (identificación)</label>
-                                @Html.TextBoxFor(model => model.identificacion, new { @class = "form-control", @readonly = "readonly" })
+            <div class="row mb-1">
+                <div class="col">
+                    <div class="container">
+                        <div class="form-group mt-1 mb-3">
+                            <label style="font-size: 22px">Identificación</label>
+                            @Html.TextBoxFor(model => model.identificacion, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
                             </div>
-                            <div class="row mt-1">
-                                <div class="col">
-                                    <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col">
-                                    <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.nuevaContrasena, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col">
-                                    <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.confirmarContrasena, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
-                                </div>
+                            <div class="col">
+                                <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(model => model.nuevaContrasena, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(model => model.confirmarContrasena, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="row justify-content-center m-4">
-                            <div class="col-auto">
-                                @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
-                            </div>
-                            <div class="col-auto">
-                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                            </div>
+                    </div>
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
                         </div>
                     </div>
                 </div>
-            }
-        </div>
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-</body>
-</html>
+            </div>
+        }
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

@@ -1,6 +1,8 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Categorías";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 <!DOCTYPE html>
 <html>
@@ -8,8 +10,15 @@
     @if (ViewBag.Id != "" && ViewBag.Role == 1)
     {
         <div class="contenedor-tipos-actividades container-fluid">
-            
-            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+
+            @if (urlReferrer != null)
+            {
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            }
 
             <h1>Categorías</h1>
             <hr />

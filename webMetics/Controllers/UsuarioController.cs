@@ -251,7 +251,7 @@ namespace webMetics.Controllers
 
         public ActionResult GestionarContrasena(string idParticipante)
         {
-            NewLoginModel usuario = new NewLoginModel() { identificacion = idParticipante.ToString() };
+            NewLoginModel usuario = new NewLoginModel() { identificacion = idParticipante };
 
             if (TempData["errorMessage"] != null)
             {

@@ -2,208 +2,350 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Formulario de usuario";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<div class="form-horizontal">
-    <h1 class="mt-5">@ViewBag.Title</h1>
-    <h5>Inserte los siguientes datos:</h5>
-    <h6 style="color:red"> * Son campos obligatorios</h6>
-    <hr />
+@if (ViewBag.Title == "Formulario de usuario")
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
 
-    @if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-dark alert-dismissible fade show" role="alert">
-            @ViewBag.ErrorMessage
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    @if (ViewBag.SuccessMessage != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @ViewBag.SuccessMessage
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+        @using (Html.BeginForm("AgregarParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <h1>@ViewBag.Title</h1>
+            <hr />
 
-    @using (Html.BeginForm("AgregarParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
-        <div class="row mb-1">
-            <div class="col">
-                <div class="container">
-                    <div class="form-group">
-                        @Html.LabelFor(participanteModel => participanteModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(participanteModel => participanteModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.nombre, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col">
-                            @Html.LabelFor(participanteModel => participanteModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.primerApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.primerApellido, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="col">
-                            @Html.LabelFor(participanteModel => participanteModel.segundoApellido, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(participanteModel => participanteModel.segundoApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.segundoApellido, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(participanteModel => participanteModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(participanteModel => participanteModel.correo, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col">
-                            @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="col">
-                            @Html.LabelFor(participanteModel => participanteModel.idParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.idParticipante, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.idParticipante, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.DropDownListFor(participanteModel => participanteModel.tipoParticipante, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))), "Seleccione un tipo de participante...", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.tipoParticipante, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(participanteModel => participanteModel.unidadAcademica, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.DropDownListFor(participanteModel => participanteModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.area, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.seccion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.DropDownListFor(participanteModel => participanteModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una sección...", new { @class = "form-control", id = "seccionDropdown" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.seccion, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.telefonos, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(participanteModel => participanteModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.telefonos, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group mt-1">
-                        @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(participanteModel => participanteModel.condicion, new { @class = "form-control", @maxlength = "30", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
-                    </div>
+            if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.ErrorMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="row justify-content-center m-4">
-                    <div class="col-auto">
-                        @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
+            }
+            if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.SuccessMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="row mb-1">
+                <div class="col">
+                    <div class="container">
+                        <div class="form-group">
+                            @Html.LabelFor(participanteModel => participanteModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.nombre, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                @Html.LabelFor(participanteModel => participanteModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(participanteModel => participanteModel.primerApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.primerApellido, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(participanteModel => participanteModel.segundoApellido, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(participanteModel => participanteModel.segundoApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.segundoApellido, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(participanteModel => participanteModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.correo, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(participanteModel => participanteModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(participanteModel => participanteModel.idParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(participanteModel => participanteModel.idParticipante, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.idParticipante, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.tipoParticipante, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))), "Seleccione un tipo de participante...", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.tipoParticipante, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.unidadAcademica, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.area, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.seccion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una sección...", new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.seccion, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.telefonos, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.telefonos, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.condicion, new { @class = "form-control", @maxlength = "30", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
+        var tipoParticipante = $('#areaDropdown').val();
 
-        // Handle change event of area dropdown
-        $('#areaDropdown').click(function () {
-            var areaName = $(this).val();
+        if (tipoParticipante !== '') {
+            // Make AJAX request to fetch departamentos for selected area
+            $.ajax({
+                url: '/Participante/GetTiposParticipante',
+                type: 'GET',
+                data: { tipoParticipante: tipoParticipante },
+                dataType: 'json',
+                success: function (data) {
+                    // Update departamento dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#tipoParticipanteDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching departamentos: ' + error
+                    });
+                }
+            });
+        }
 
-            // Clear departamento and seccion dropdowns
+        document.getElementById("tipoParticipanteDropdown").innerText = $('#tipoParticipanteDropdown').val();
+        document.getElementById("departamentoDropdown").innerText = $('#departamentoDropdown').val();
+        document.getElementById("seccionDropdown").innerText = $('#seccionDropdown').val();
+    });
+
+    $(document).ready(function () {
+        var areaName = $('#areaDropdown').val();
+
+        if (areaName !== '') {
+            // Make AJAX request to fetch departamentos for selected area
+            $.ajax({
+                url: '/Participante/GetDepartamentosByArea',
+                type: 'GET',
+                data: { areaName: areaName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update departamento dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching departamentos: ' + error
+                    });
+                }
+            });
+        }
+
+        document.getElementById("tipoParticipanteDropdown").innerText = $('#tipoParticipanteDropdown').val();
+        document.getElementById("departamentoDropdown").innerText = $('#departamentoDropdown').val();
+        document.getElementById("seccionDropdown").innerText = $('#seccionDropdown').val();
+    });
+
+    $(document).ready(function () {
+        var departamentoName = $('#departamentoDropdown').val();
+        var areaName = $('#areaDropdown').val();
+
+        if (departamentoName !== '') {
+            // Make AJAX request to fetch secciones for selected departamento
+            $.ajax({
+                url: '/Participante/GetSeccionesByDepartamento',
+                type: 'GET',
+                data: { areaName: areaName, departamentoName: departamentoName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update seccion dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching secciones: ' + error
+                    });
+                }
+            });
+        }
+
+        document.getElementById("tipoParticipanteDropdown").innerText = $('#tipoParticipanteDropdown').val();
+        document.getElementById("departamentoDropdown").innerText = $('#departamentoDropdown').val();
+        document.getElementById("seccionDropdown").innerText = $('#seccionDropdown').val();
+    });
+
+    window.addEventListener('scroll', function () {
+        var seccionName = $('#seccionDropdown').val();
+        var departamentoName = $('#departamentoDropdown').val();
+        var areaName = $('#areaDropdown').val();
+
+        if (seccionName !== '') {
+            document.getElementById("seccionDropdown").innerText = seccionName;
+
+            // Make AJAX request to fetch secciones for selected departamento
+            $.ajax({
+                url: '/Participante/GetSeccionesByDepartamento',
+                type: 'GET',
+                data: { areaName: areaName, departamentoName: departamentoName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update seccion dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching secciones: ' + error
+                    });
+                }
+            });
+        }
+    });
+
+    // Handle change event of area dropdown
+    $('#areaDropdown').change(function () {
+        var areaName = $('#areaDropdown').val();
+        if (areaName !== '') {
+
             $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
             $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
 
-            if (areaName !== '') {
-                // Make AJAX request to fetch departamentos for selected area
-                $.ajax({
-                    url: '/Participante/GetDepartamentosByArea',
-                    type: 'GET',
-                    data: { areaName: areaName },
-                    dataType: 'json',
-                    success: function (data) {
-                        // Update departamento dropdown with fetched data
-                        $.each(data, function (index, value) {
-                            $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred while fetching departamentos: ' + error
-                        });
-                    }
-                });
-                // Make AJAX request to fetch secciones for selected departamento
-                $.ajax({
-                    url: '/Participante/GetSeccionesByDepartamento',
-                    type: 'GET',
-                    data: { departamentoName: departamentoName },
-                    dataType: 'json',
-                    success: function (data) {
-                        // Update seccion dropdown with fetched data
-                        $.each(data, function (index, value) {
-                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred while fetching secciones: ' + error
-                        });
-                    }
-                });
-            }
-        });
+            // Make AJAX request to fetch departamentos for selected area
+            $.ajax({
+                url: '/Participante/GetDepartamentosByArea',
+                type: 'GET',
+                data: { areaName: areaName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update departamento dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching departamentos: ' + error
+                    });
+                }
+            });
 
-        // Handle change event of departamento dropdown
-        $('#departamentoDropdown').change(function () {
-            var departamentoName = $(this).val();
-            var areaName = $('#areaDropdown').val();
+            var departamentoName = $('#departamentoDropdown').val();
 
-            // Clear seccion dropdown
-            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+            // Make AJAX request to fetch secciones for selected departamento
+            $.ajax({
+                url: '/Participante/GetSeccionesByDepartamento',
+                type: 'GET',
+                data: { departamentoName: departamentoName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update seccion dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching secciones: ' + error
+                    });
+                }
+            });
+        }
+    });
 
-            if (departamentoName !== '') {
-                // Make AJAX request to fetch secciones for selected departamento
-                $.ajax({
-                    url: '/Participante/GetSeccionesByDepartamento',
-                    type: 'GET',
-                    data: { areaName: areaName, departamentoName: departamentoName },
-                    dataType: 'json',
-                    success: function (data) {
-                        // Update seccion dropdown with fetched data
-                        $.each(data, function (index, value) {
-                            $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'An error occurred while fetching secciones: ' + error
-                        });
-                    }
-                });
-            }
-        });
+    // Handle change event of departamento dropdown
+    $('#departamentoDropdown').change(function () {
+        var departamentoName = $(this).val();
+        var areaName = $('#areaDropdown').val();
+
+        // Clear seccion dropdown
+        $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+
+        if (departamentoName !== '') {
+            // Make AJAX request to fetch secciones for selected departamento
+            $.ajax({
+                url: '/Participante/GetSeccionesByDepartamento',
+                type: 'GET',
+                data: { areaName: areaName, departamentoName: departamentoName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update seccion dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching secciones: ' + error
+                    });
+                }
+            });
+        }
     });
 </script>

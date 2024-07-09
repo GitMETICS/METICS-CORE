@@ -1,86 +1,85 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Editar calificación";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<body>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+@if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
 
-    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
-    {
-        <div class="contenedor-tipos-actividades container-fluid">
-            @if (/*Request.UrlReferrer != null*/true)
+        <h1>@ViewBag.NombreGrupo</h1>
+        <h2>@ViewBag.Title</h2>
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                <strong> @TempData["Message"] </strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        <hr />
+        <div class="table-responsive">
+            @if (ViewBag.Calificacion == null)
             {
-                <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+                <h5 class="text-center">No hay una calificación registrada.</h5>
             }
-            <h1>@ViewBag.NombreGrupo</h1>
-            <h2>@ViewBag.Title</h2>
-            @if (TempData["Message"] != null)
+            else
             {
-                <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                    <strong> @TempData["Message"] </strong>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            <hr />
-            <div class="table-responsive">
-                @if (ViewBag.Calificacion == null)
-                {
-                    <h5 class="text-center">No hay una calificación registrada.</h5>
-                }
-                else
-                {
-                    var nombreCompleto = ViewBag.Calificacion.participante.nombre;
-                    nombreCompleto += " " + ViewBag.Calificacion.participante.primerApellido;
+                var nombreCompleto = ViewBag.Calificacion.participante.nombre;
+                nombreCompleto += " " + ViewBag.Calificacion.participante.primerApellido;
 
-                    <table class="table table-striped" id="tblCustomers">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 20%;">Identificación</th>
-                                <th scope="col" style="width: 47.5%;">Nombre completo</th>
-                                <th scope="col" style="width: 12.5%;">Calificación actual</th>
-                                <th scope="col" style="width: 12.5%;">Nueva calificación</th>
-                                <th scope="col" style="width: 7.5%;"></th>
-                            </tr>
-                        </thead>
+                <table class="table table-striped" id="tblCustomers">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 20%;">Identificación</th>
+                            <th scope="col" style="width: 47.5%;">Nombre completo</th>
+                            <th scope="col" style="width: 12.5%;">Calificación actual</th>
+                            <th scope="col" style="width: 12.5%;">Nueva calificación</th>
+                            <th scope="col" style="width: 7.5%;"></th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
-                            @if (ViewBag.Calificacion.participante.segundoApellido != "-")
+                    <tbody>
+                        @if (ViewBag.Calificacion.participante.segundoApellido != "-")
+                        {
+                            nombreCompleto += " " + ViewBag.Calificacion.participante.segundoApellido;
+                        }
+                        <tr>
+                            <td class=" ">@ViewBag.Calificacion.participante.idParticipante</td>
+                            <td class=" ">@nombreCompleto</td>
+                            <td class="  text-center">@ViewBag.Calificacion.calificacion</td>
+                            @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
                             {
-                                nombreCompleto += " " + ViewBag.Calificacion.participante.segundoApellido;
+                                @Html.AntiForgeryToken()
+                                <td class=" ">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="calificacion" id="calificacion">
+                                    </div>
+                                </td>
+                                <td class=" ">
+                                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                                </td>
                             }
-                            <tr>
-                                <td class=" ">@ViewBag.Calificacion.participante.idParticipante</td>
-                                <td class=" ">@nombreCompleto</td>
-                                <td class="  text-center">@ViewBag.Calificacion.calificacion</td>
-                                @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
-                                {
-                                    @Html.AntiForgeryToken()
-                                    <td class=" ">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="calificacion" id="calificacion">
-                                        </div>
-                                    </td>
-                                    <td class=" ">
-                                        <button type="submit" class="btn btn-primary">Aceptar</button>
-                                    </td>
-                                }
-                            </tr>
-                        </tbody>
-                    </table>
-                }
-                <div class="d-flex justify-content-center">
-                    @Html.ActionLink("Cancelar", "VerCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-secondary btn-block" })
-                </div>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+            <div class="col-auto">
+                <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
             </div>
         </div>
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-</body>
-</html>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

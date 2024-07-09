@@ -1,19 +1,22 @@
 ﻿@using webMetics.Controllers
 @{
-    ViewBag.Title = "Mi información";
+    ViewBag.Title = "Información Personal";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<body>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-
+@if (ViewBag.Title == "Información Personal")
+{
     <div class="contenedor-tipos-actividades container-fluid">
-        @if (/*Request.UrlReferrer != null*/ true)
+        @if (urlReferrer != null)
         {
-            <a class="bottomNav bi bi-arrow-left" style="color: #5a5a5a; text-decoration: none; " onclick="history.go(-1); return false;" href="#"></a><br />
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
         }
+
         <h1>@ViewBag.Title</h1>
         <hr />
 
@@ -32,110 +35,115 @@
             </div>
         }
 
-    <div class="table-responsive">
+        <div class="table-responsive">
 
-        @if (ViewBag.Participante == null)
-        {
-            <h5 class="text-center">Sus datos no están disponibles.</h5>
-        }
-        else
-        {
-            var nombreCompleto = ViewBag.Participante.nombre;
-            nombreCompleto += " " + ViewBag.Participante.primerApellido;
+            @if (ViewBag.Participante == null)
+            {
+                <h5 class="text-center">Sus datos no están disponibles.</h5>
+            }
+            else
+            {
+                var nombreCompleto = ViewBag.Participante.nombre;
+                nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
-            <div>
-                <h3 class="my-3">Datos personales</h3>
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Identificación</th>
-                            <th scope="col">Nombre completo</th>
-                            <th scope="col">Condición</th>
-                            <th scope="col">Unidad académica</th>
-                            <th scope="col">Correo institucional</th>
-                            <th scope="col">Teléfono</th>
-                            <th scope="col" style="width:5%"></th>
-                        </tr>
-                    </thead>
+                <div>
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col">Identificación</th>
+                                <th scope="col">Nombre completo</th>
+                                <th scope="col">Condición</th>
+                                <th scope="col">Unidad académica</th>
+                                <th scope="col">Correo institucional</th>
+                                <th scope="col" style="width:10%">Teléfono</th>
+                                <th scope="col" style="width:3.3%"></th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        @if (ViewBag.Participante.segundoApellido != "-")
-                        {
-                            nombreCompleto += " " + ViewBag.Participante.segundoApellido;
-                        }
-                        <tr>
-                            <td class=" ">@ViewBag.Participante.idParticipante</td>
-                            <td class=" ">@nombreCompleto</td>
-                            <td class=" ">@ViewBag.Participante.condicion</td>
-                            <td class=" ">@ViewBag.Participante.unidadAcademica</td>
-                            <td class=" ">@ViewBag.Participante.correo</td>
-                            <td class=" ">@ViewBag.Participante.telefonos</td>
-                            <td class=" ">
-                                @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                        <tbody>
+                            @if (ViewBag.Participante.segundoApellido != "-")
+                            {
+                                nombreCompleto += " " + ViewBag.Participante.segundoApellido;
+                            }
+                            <tr>
+                                <td class="">@ViewBag.Participante.idParticipante</td>
+                                <td class="">@nombreCompleto</td>
+                                <td class="">@ViewBag.Participante.condicion</td>
+                                <td class="">@ViewBag.Participante.unidadAcademica</td>
+                                <td class="">@ViewBag.Participante.correo</td>
+                                <td class="">@ViewBag.Participante.telefonos</td>
+                                <td class="">
+                                    @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <hr />
+                <hr />
 
-            <div>
-                <h3 class="mt-4 mb-3">Inscripciones</h3>
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Módulos inscritos</th>
-                            <th class="text-center" scope="col">Horas por módulo</th>
-                            <th class="text-center" scope="col">Total de horas inscritas</th>
-                            <th class="text-center" scope="col">Horas aprobadas</th>
-                        </tr>
-                    </thead>
+                <div>
+                    <h3 class="mt-4 mb-3">Inscripciones</h3>
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col">Módulos inscritos</th>
+                                <th class="text-center" scope="col">Horas por módulo</th>
+                                <th class="text-center" scope="col">Total de horas inscritas</th>
+                                <th class="text-center" scope="col">Horas aprobadas</th>
+                            </tr>
+                        </thead>
 
-                    <tbody class="align-middle">
-                        <tr>
-                            <td class=" ">
-                                @if (ViewBag.ListaGrupos != null)
-                                {
-                                    foreach (var grupo in ViewBag.ListaGrupos)
+                        <tbody class="align-middle">
+                            <tr>
+                                <td class=" ">
+                                    @if (ViewBag.ListaGrupos != null)
                                     {
-                                        <span>@grupo.nombre (Grupo @grupo.idGrupo)</span><br>
-                                    }
-                                }
-                                else
-                                {
-                                    <span>Sin grupos inscritos</span>
-                                }
-                            </td>
-                            <td class="  text-center">
-                                @if (ViewBag.ListaGrupos != null)
-                                {
-                                    foreach (var grupo in ViewBag.ListaGrupos)
-                                    {
-                                        <span>@grupo.cantidadHoras</span><br>
-                                    }
-                                }
-                                else
-                                {
-                                    <span>0</span>
-                                }
-                            </td>
-                            <td class="  text-center">
-                                <span>@ViewBag.Participante.horasMatriculadas</span>
-                            </td>
-                            <td class="  text-center">
-                                <span>@ViewBag.Participante.horasAprobadas</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        }
+                                        foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
 
-        <div class="d-flex justify-content-center">
-            <a href="../Grupo/ListaGruposDisponibles" class="btn btn-primary mt-2">Regresar</a>
+                                            <br>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span>Sin grupos inscritos</span>
+                                    }
+                                </td>
+                                <td class="  text-center">
+                                    @if (ViewBag.ListaGrupos != null)
+                                    {
+                                        foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            <span>@grupo.cantidadHoras</span>
+
+                                            <br>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span>0</span>
+                                    }
+                                </td>
+                                <td class="  text-center">
+                                    <span>@ViewBag.Participante.horasMatriculadas</span>
+                                </td>
+                                <td class="  text-center">
+                                    <span>@ViewBag.Participante.horasAprobadas</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+            <div class="d-flex justify-content-center">
+                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
+            </div>
         </div>
     </div>
-    </div>
-</body>
-</html>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}
