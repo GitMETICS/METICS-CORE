@@ -12,7 +12,7 @@
         {
             @Html.AntiForgeryToken()
             <div class="form-horizontal">
-                <h1 class="mt-5">Editar archivo adjunto del módulo</h1>
+                <h1 class="mt-5">@ViewBag.Title</h1>
                 <h5 class="alertaAdjunto">@Html.Raw(TempData["msg"])</h5>
                 <hr />
                 <div class="row" style="margin-bottom:10%">

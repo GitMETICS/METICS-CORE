@@ -81,7 +81,6 @@ namespace webMetics.Controllers
         {
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-
             return View();
         }
 
