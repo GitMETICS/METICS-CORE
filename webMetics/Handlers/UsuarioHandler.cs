@@ -12,7 +12,7 @@ namespace webMetics.Handlers
 
         }
 
-        public bool CrearUsuario(string id, string contrasena)
+        public bool CrearUsuario(string id, string contrasena, int rol=0)
         {
             bool exito = false;
 
@@ -20,7 +20,7 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@id", id);
-                command.Parameters.AddWithValue("@rol", 0); // TODO: Pasar el rol real. 0 es el default
+                command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
 
                 try

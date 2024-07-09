@@ -68,8 +68,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@area", participante.area);
                 command.Parameters.AddWithValue("@departamento", participante.departamento);
                 command.Parameters.AddWithValue("@seccion", participante.seccion);
-                command.Parameters.AddWithValue("@horasMatriculadas", 0);
-                command.Parameters.AddWithValue("@horasAprobadas", 0);
+                command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
+                command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
                 try
                 {

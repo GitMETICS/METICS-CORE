@@ -1,8 +1,14 @@
-﻿using webMetics.Handlers;
+﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
+using webMetics.Handlers;
 using MimeKit;
+using NPOI.XSSF.UserModel;
+using NPOI.XWPF.UserModel;
+using System.IO;
+using iText.Kernel.Pdf;
+using iText.Layout.Element;
+using NPOI.HPSF;
+using OfficeOpenXml;
 
 /* 
  * Controlador de la entidad Participante
@@ -103,6 +109,81 @@ namespace webMetics.Controllers
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirArchivoExcel(IFormFile file)
+        {
+            if (file == null)
+            {
+                TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
+                return RedirectToAction("VerParticipantes");
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using var package = new ExcelPackage(stream);
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                    var participantes = new List<ParticipanteModel>();
+
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        var participante = new ParticipanteModel
+                        {
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                            tipoIdentificacion = "",
+                            correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
+                            apellido_1 = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
+                            apellido_2 = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo Apellido")].Text,
+                            condicion = "",
+                            tipoParticipante = "",
+                            area = "",
+                            unidadAcademica = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad Académica")].Text,
+                            departamento = "",
+                            seccion = "",
+                            telefonos = "",
+                            horasMatriculadas = 0,
+                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var hours) ? hours : 0,
+                            gruposInscritos = new List<GrupoModel>()
+                        };
+
+                        participantes.Add(participante);
+                    }
+
+                    foreach (var participante in participantes)
+                    {
+                        IngresarParticipante(participante);
+                    }
+                }
+
+                TempData["successMessage"] = "El archivo fue subido éxitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Error al cargar los datos.";
+            }
+
+            return RedirectToAction("VerParticipantes");
+        }
+
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                if (worksheet.Cells[1, col].Text == columnName)
+                {
+                    return col;
+                }
+            }
+            return -1;
         }
 
         public ActionResult MiInformacion(string idParticipante)
@@ -251,6 +332,22 @@ namespace webMetics.Controllers
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 return View("FormularioUsuario", participante);
+            }
+        }
+
+        private void IngresarParticipante(ParticipanteModel participante)
+        {
+            if (!accesoAUsuario.ExisteUsuario(participante.idParticipante)) // En caso de que queramos hacer la autenticacion con el correo y no la identificacion, habria que cambiar esto
+            {
+                string contrasena = GenerateRandomPassword();
+
+                accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                EnviarCorreoContraseñaRegistro(participante.idParticipante, participante.correo, contrasena);
+            }
+
+            if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
+            {
+                accesoAParticipante.CrearParticipante(participante);
             }
         }
 

@@ -30,7 +30,7 @@
             }
             @if (ViewBag.SuccessMessage != null)
             {
-                <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                     @ViewBag.SuccessMessage
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -43,9 +43,34 @@
                 }
                 else
                 {
-                    <div class="d-flex justify-content-end">
-                        <div class="mx-1">
-                            @Html.ActionLink("   Agregar", "FormularioUsuario", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
+                    <div class="d-flex justify-content-between mb-4">
+                        <div>
+                            @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <form>
+                                    <div class="mb-3 d-flex">
+                                        <label for="file"></label>
+                                        <input type="file" class="form-control" name="file" id="file">
+                                        <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
+                                    </div>
+                                </form>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <div class="mx-1">
+                                @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-secondary bi bi-download" })
+                            </div>
+                            <div class="mx-1">
+                                @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-secondary bi bi-download" })
+                            </div>
+                            <div class="mx-1">
+                                @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-secondary bi bi-download" })
+                            </div>
+                            <div class="mx-1">
+                                @Html.ActionLink("   Agregar", "FormularioUsuario", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
+                            </div>
                         </div>
                     </div>
 
