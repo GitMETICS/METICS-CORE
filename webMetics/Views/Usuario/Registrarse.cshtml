@@ -43,24 +43,24 @@
                     <div class="container">
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.nombre, "", new { @class = "text-danger" })
                         </div>
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.primerApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.primerApellido, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.segundoApellido, new { Style = "font-size:22px" })
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.segundoApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.segundoApellido, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
                         </div>
                         <div class="row mt-1">
@@ -71,7 +71,7 @@
                             </div>
                             <div class="col">
                                 @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @maxlength = "15", @autocomplete = "off" })
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.unidadAcademica, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.unidadAcademica, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -102,12 +102,12 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.telefonos, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.telefonos, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.telefonos, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.condicion, new { @class = "form-control", @maxlength = "30", @autocomplete = "off" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.condicion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.condicion, "", new { @class = "text-danger" })
                         </div>
                         <div class="row mt-1 mb-4">
@@ -125,7 +125,7 @@
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "IniciarSesion", "Usuario", new { }, new { @class = "btn btn-secondary btn-block" })
+                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
                         </div>
                         <div class="col-auto">
                             <input type="submit" class="btn btn-primary btn-block" value="Guardar" />

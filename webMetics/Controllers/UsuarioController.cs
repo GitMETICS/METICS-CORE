@@ -198,7 +198,7 @@ namespace webMetics.Controllers
         }
 
         // Método para autenticar el usuario y realizar el inicio de sesión
-        public LoginModel AutenticarUsuario(LoginModel usuario)
+        private LoginModel AutenticarUsuario(LoginModel usuario)
         {
             LoginModel usuarioAutorizado = null;
 
