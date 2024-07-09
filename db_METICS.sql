@@ -275,25 +275,26 @@ CREATE PROCEDURE AuthUsuario
     @auth INT=0 OUTPUT
 AS
 BEGIN
-
     SET NOCOUNT ON
 
-    DECLARE @userID INT
+    DECLARE @userID NVARCHAR(64)
+    DECLARE @salt UNIQUEIDENTIFIER
 
-	DECLARE @salt UNIQUEIDENTIFIER = (SELECT TOP 1 salt FROM usuario WHERE id_usuario_PK=@id)
+    SET @salt = (SELECT TOP 1 salt FROM usuario WHERE id_usuario_PK=@id)
 
     IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK=@id)
     BEGIN
-        SET @userID=(SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK=@id AND hash_contrasena=HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
+        SET @userID = (SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK=@id AND hash_contrasena=HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
 
-       IF(@userID IS NULL)
-           SET @auth = 0
-       ELSE 
-           SET @auth = 1
+        IF(@userID IS NULL)
+            SET @auth = 0
+        ELSE 
+            SET @auth = 1
     END
     ELSE
-       SET @auth = 0
+        SET @auth = 0
 
+    RETURN
 END
 
 GO
