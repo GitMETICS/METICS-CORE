@@ -37,14 +37,14 @@
                     </div>
                     <div class="row mt-1">
                         <div class="col">
-                            @Html.LabelFor(usuarioModel => usuarioModel.apellido_1, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.apellido_1, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.apellido_1, "", new { @class = "text-danger" })
+                            @Html.LabelFor(usuarioModel => usuarioModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.primerApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.primerApellido, "", new { @class = "text-danger" })
                         </div>
                         <div class="col">
-                            @Html.LabelFor(usuarioModel => usuarioModel.apellido_2, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.apellido_2, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.apellido_2, "", new { @class = "text-danger" })
+                            @Html.LabelFor(usuarioModel => usuarioModel.segundoApellido, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(usuarioModel => usuarioModel.segundoApellido, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.segundoApellido, "", new { @class = "text-danger" })
                         </div>
                     </div>
                     <div class="form-group">

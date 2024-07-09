@@ -43,7 +43,7 @@
             else
             {
                 var nombreCompleto = ViewBag.Participante.nombre;
-                nombreCompleto += " " + ViewBag.Participante.apellido_1;
+                nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
@@ -58,9 +58,9 @@
                     </thead>
 
                     <tbody class="align-middle">
-                        @if (ViewBag.Participante.apellido_2 != "-")
+                        @if (ViewBag.Participante.segundoApellido != "-")
                         {
-                            nombreCompleto += " " + ViewBag.Participante.apellido_2;
+                            nombreCompleto += " " + ViewBag.Participante.segundoApellido;
                         }
                         <tr>
                             <td class=" ">@ViewBag.Participante.idParticipante</td>

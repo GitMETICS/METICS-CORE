@@ -199,7 +199,7 @@ namespace webMetics.Controllers
             foreach (var calificacion in calificaciones)
             {
                 table.AddCell(calificacion.participante.idParticipante);
-                table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.apellido_1 + " " + calificacion.participante.apellido_2);
+                table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
                 table.AddCell(calificacion.calificacion.ToString());
             }
 
@@ -248,7 +248,7 @@ namespace webMetics.Controllers
             {
                 var row = table.Rows[i + 3];
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
-                row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.apellido_1 + " " + calificaciones[i].participante.apellido_2);
+                row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.primerApellido + " " + calificaciones[i].participante.segundoApellido);
                 row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
                 row.GetCell(3).SetText(grupo.nombre);
                 row.GetCell(4).SetText(grupo.nombreAsesorAsociado);
@@ -303,7 +303,7 @@ namespace webMetics.Controllers
                 cell1.SetCellValue(calificacion.participante.idParticipante);
 
                 NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
-                cell2.SetCellValue(calificacion.participante.nombre + " " + calificacion.participante.apellido_1 + " " + calificacion.participante.apellido_2);
+                cell2.SetCellValue(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
 
                 NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
                 cell3.SetCellValue(calificacion.calificacion);
@@ -378,7 +378,7 @@ namespace webMetics.Controllers
                 "<th style='border:1px solid;'>Grupo</th>" +
                 "<th style='border:1px solid;'>Calificación final</th>" +
                 "</tr></thead><tbody><tr>" +
-                "<td style='border:1px solid;'>" + calificacion.participante.nombre + " " + calificacion.participante.apellido_1 + " " + calificacion.participante.apellido_2 + "</td>" +
+                "<td style='border:1px solid;'>" + calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido + "</td>" +
                 "<td style='border:1px solid;'>" + calificacion.participante.idParticipante + "</td>" +
                 "<td style='border:1px solid;'>" + grupo.idGrupo+ " " + grupo.nombre + "</td>" +
                 "<td style='border:1px solid;'>" + calificacion.calificacion + "</td>" +

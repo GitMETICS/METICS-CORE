@@ -124,10 +124,10 @@
                             @foreach (var calificacion in ViewBag.ListaCalificaciones)
                             {
                                 var nombreCompleto = calificacion.participante.nombre;
-                                nombreCompleto += " " + calificacion.participante.apellido_1;
-                                if (calificacion.participante.apellido_2 != "-")
+                                nombreCompleto += " " + calificacion.participante.primerApellido;
+                                if (calificacion.participante.segundoApellido != "-")
                                 {
-                                    nombreCompleto += " " + calificacion.participante.apellido_2;
+                                    nombreCompleto += " " + calificacion.participante.segundoApellido;
                                 }
                                 <tr>
                                     <td class=" ">@calificacion.participante.idParticipante</td>

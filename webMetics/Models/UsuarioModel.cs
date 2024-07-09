@@ -14,10 +14,10 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Es necesario ingresar un apellido.")]
         [Display(Name = "Primer apellido")]
-        public required string apellido_1 { get; set; }
+        public required string primerApellido { get; set; }
 
         [Display(Name = "Segundo apellido")]
-        public string? apellido_2 { get; set; }
+        public string? segundoApellido { get; set; }
 
         [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]

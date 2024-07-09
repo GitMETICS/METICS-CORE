@@ -105,10 +105,10 @@
                             @foreach (var participante in ViewBag.ListaParticipantes)
                             {
                                 var nombreCompleto = participante.nombre;
-                                nombreCompleto += " " + participante.apellido_1;
-                                if (participante.apellido_2 != "-")
+                                nombreCompleto += " " + participante.primerApellido;
+                                if (participante.segundoApellido != "-")
                                 {
-                                    nombreCompleto += " " + participante.apellido_2;
+                                    nombreCompleto += " " + participante.segundoApellido;
                                 }
                                 <tr>
                                     <td>@participante.idParticipante</td>

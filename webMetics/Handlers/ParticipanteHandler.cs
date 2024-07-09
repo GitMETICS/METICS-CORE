@@ -59,8 +59,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
                 command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
-                command.Parameters.AddWithValue("@apellido1", participante.apellido_1);
-                command.Parameters.AddWithValue("@apellido2", participante.apellido_2);
+                command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
                 command.Parameters.AddWithValue("@condicion", participante.condicion);
                 command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
@@ -101,8 +101,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
                 command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
-                command.Parameters.AddWithValue("@apellido1", participante.apellido_1);
-                command.Parameters.AddWithValue("@apellido2", participante.apellido_2);
+                command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
                 command.Parameters.AddWithValue("@condicion", participante.condicion);
                 command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
@@ -275,8 +275,8 @@ namespace webMetics.Handlers
                 tipoIdentificacion = Convert.ToString(filaParticipante["tipo_identificacion"]),
                 correo = Convert.ToString(filaParticipante["correo"]),
                 nombre = Convert.ToString(filaParticipante["nombre"]),
-                apellido_1 = Convert.ToString(filaParticipante["apellido_1"]),
-                apellido_2 = Convert.ToString(filaParticipante["apellido_2"]),
+                primerApellido = Convert.ToString(filaParticipante["apellido_1"]),
+                segundoApellido = Convert.ToString(filaParticipante["apellido_2"]),
                 condicion = Convert.ToString(filaParticipante["condicion"]),
                 tipoParticipante = Convert.ToString(filaParticipante["tipo_participante"]),
                 area = Convert.ToString(filaParticipante["area"]),

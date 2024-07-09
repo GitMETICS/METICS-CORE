@@ -320,7 +320,7 @@ namespace webMetics.Controllers
             // Crear el mensaje con información relevante de la inscripción en formato HTML
             string mensaje = "" +
                 "<h2>Comprobante de inscripción</h2> " +
-                "<p>Nombre: " + participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2 + "</p>" +
+                "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
                 "<p>Cédula: " + participante.idParticipante + "</p>" +
                 "<p>Se ha inscrito al módulo: <strong>" + grupo.idGrupo + " " + grupo.nombre + "</strong></p>" +
                 "<ul><li>Horario: " + grupo.horario + "</li>" +
@@ -371,7 +371,7 @@ namespace webMetics.Controllers
                 sb.Append("<tr>");
                 //Append data.
                 sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2);
+                sb.Append(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                 sb.Append("</td>");
 
                 sb.Append("<td style='border: 1px solid #ccc'>");
@@ -447,7 +447,7 @@ namespace webMetics.Controllers
             foreach (var participante in participantes)
             {
                 table.AddCell(participante.idParticipante);
-                table.AddCell(participante.nombre + " " + participante.apellido_1 + " " + participante.apellido_2);
+                table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                 table.AddCell(participante.condicion);
                 table.AddCell(participante.unidadAcademica);
                 table.AddCell(participante.correo);
@@ -506,7 +506,7 @@ namespace webMetics.Controllers
             {
                 var row = table.Rows[i + 3];
                 row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
-                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].apellido_1 + " " + participantes[i].apellido_2);
+                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
                 row.GetCell(2).SetText(participantes[i].condicion.ToString());
                 row.GetCell(3).SetText(participantes[i].unidadAcademica);
                 row.GetCell(4).SetText(participantes[i].correo.ToString());
@@ -571,7 +571,7 @@ namespace webMetics.Controllers
                 cell1.SetCellValue(participante.idParticipante);
 
                 NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
-                cell2.SetCellValue(participante.nombre + ' ' + participante.apellido_1 + ' ' + participante.apellido_2);
+                cell2.SetCellValue(participante.nombre + ' ' + participante.primerApellido + ' ' + participante.segundoApellido);
 
                 NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
                 cell3.SetCellValue(participante.condicion);

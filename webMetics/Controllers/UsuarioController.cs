@@ -140,8 +140,8 @@ namespace webMetics.Controllers
                         {
                             idParticipante = usuario.identificacion,
                             nombre = usuario.nombre,
-                            apellido_1 = usuario.apellido_1,
-                            apellido_2 = usuario.apellido_2,
+                            primerApellido = usuario.primerApellido,
+                            segundoApellido = usuario.segundoApellido,
                             correo = usuario.correo,
                             tipoIdentificacion = usuario.tipoIdentificacion,
                             tipoParticipante = usuario.tipoParticipante,
@@ -166,8 +166,8 @@ namespace webMetics.Controllers
                         {
                             idParticipante = participante.idParticipante,
                             nombre = usuario.nombre,
-                            apellido_1 = usuario.apellido_1,
-                            apellido_2 = usuario.apellido_2,
+                            primerApellido = usuario.primerApellido,
+                            segundoApellido = usuario.segundoApellido,
                             correo = usuario.correo, // TODO: Cambiar esto a participante.correo en caso de que el nuevo identificador sea el correo
                             tipoIdentificacion = usuario.tipoIdentificacion,
                             tipoParticipante = usuario.tipoParticipante,
