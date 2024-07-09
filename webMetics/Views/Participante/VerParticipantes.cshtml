@@ -113,7 +113,7 @@
                                         @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
                                     </td>
                                     <td>
-                                        <i class="btn btn-outline-danger bi bi-trash" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@participante.idParticipante)"></i>
+                                        <i class="btn btn-outline-danger bi bi-trash" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')"></i>
                                     </td>
                                 </tr>
                             }
@@ -142,7 +142,7 @@
                         @Html.AntiForgeryToken()
 
                         <div class="modal-footer">
-                            <input type="hidden" id="valueParticipanteEliminar" name="idParticipante">
+                            <input type="hidden" id="idParticipante" name="idParticipante">
                             <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
@@ -157,6 +157,6 @@
 
 <script type="text/javascript">
     function actualizarModalEliminar(idParticipante) {
-        document.getElementById("valueParticipanteEliminar").value = idParticipante;
+        document.getElementById("idParticipante").value = idParticipante;
     }
 </script>
