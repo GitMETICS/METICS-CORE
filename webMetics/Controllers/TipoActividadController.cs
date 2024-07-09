@@ -77,6 +77,8 @@ namespace webMetics.Controllers
         {
             try
             {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
                 // Verifica si ya existe una actividad con el mismo nombre (ignorando mayúsculas y espacios)
                 List<TipoActividadModel> tiposActividad = tipoActividadHandler.RecuperarTiposDeActividadesLowerCase();
 
