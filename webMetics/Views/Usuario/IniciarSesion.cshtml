@@ -14,9 +14,9 @@
                     @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
                         <div class="text-center mb-1">
-                            @Html.LabelFor(loginModel => loginModel.identificacion, new { @class = "text-center" })
-                            @Html.TextBoxFor(loginModel => loginModel.identificacion, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(loginModel => loginModel.identificacion, "", new { @class = "text-danger" })
+                            @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
+                            @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
                         </div>
                         <div class="text-center mb-1">
                             @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })

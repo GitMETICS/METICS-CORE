@@ -40,13 +40,13 @@
     <None Include="Views\Inscripcion\ExportarParticipantes.cshtml" />
     <None Include="Views\Inscripcion\Inscribir.cshtml" />
     <None Include="Views\Usuario\FormularioRegistro.cshtml" />
-    <None Include="Views\Usuario\GestionarContrasena.cshtml" />
+    <None Include="Views\Usuario\CambiarContrasena.cshtml" />
     <None Include="Views\Usuario\IniciarSesion.cshtml" />
     <None Include="Views\Usuario\ParticipanteRegistrado.cshtml" />
     <None Include="Views\Participante\EditarParticipante.cshtml" />
     <None Include="Views\Participante\FormularioParticipante.cshtml" />
     <None Include="Views\Participante\ListaParticipantes.cshtml" />
-    <None Include="Views\Participante\MiInformacion.cshtml" />
+    <None Include="Views\Participante\InformacionPersonal.cshtml" />
     <None Include="Views\Participante\ObtenerParticipante.cshtml" />
     <None Include="Views\Participante\VerDatosParticipante.cshtml" />
     <None Include="Views\Participante\VerParticipantes.cshtml" />

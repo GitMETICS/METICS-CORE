@@ -59,7 +59,7 @@ namespace webMetics.Handlers
                         {
                             usuario = new LoginModel
                             {
-                                identificacion = Convert.ToString(reader["id_usuario_PK"]),
+                                id = Convert.ToString(reader["id_usuario_PK"]),
                                 rol = Convert.ToInt32(reader["rol_FK"])
                             };
                         }

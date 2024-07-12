@@ -111,6 +111,30 @@ namespace webMetics.Controllers
             return View();
         }
 
+        public ActionResult InformacionPersonal(string id)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);
+
+            ViewBag.Participante = participante;
+
+            // TODO: Revisar este método del handler de participante porque no funciona
+            ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(id);
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcel(IFormFile file)
         {
@@ -187,30 +211,6 @@ namespace webMetics.Controllers
                 }
             }
             return -1;
-        }
-
-        public ActionResult MiInformacion(string idParticipante)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
-            ViewBag.Participante = participante;
-            // TODO: Revisar este método del handler de participante porque no funciona
-            // ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-            
-
-            if (TempData["errorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
-
-            return View();
         }
 
         public ActionResult VerDatosParticipante(string idParticipante)

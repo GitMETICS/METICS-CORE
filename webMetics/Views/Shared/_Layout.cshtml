@@ -41,10 +41,10 @@
 
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <li>
-                                    @Html.ActionLink("Información personal", "MiInformacion", "Participante", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Información personal", "InformacionPersonal", "Participante", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
                                 </li>
                                 <li>
-                                    @Html.ActionLink("Cambiar contraseña", "GestionarContrasena", "Usuario", new { idParticipante = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    @Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>

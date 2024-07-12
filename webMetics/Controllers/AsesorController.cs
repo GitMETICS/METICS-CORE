@@ -108,14 +108,14 @@ namespace webMetics.Controllers
                     ViewBag.Id = GetId();
 
                     // Aquí se define que el correo es la identificación.
-                    asesor.identificacion = asesor.correo;
+                    asesor.id = asesor.correo;
 
-                    if (accesoAUsuario.ExisteUsuario(asesor.identificacion))
+                    if (accesoAUsuario.ExisteUsuario(asesor.id))
                     {
                         // TODO: Pasar esto a un stored procedure en el handler.
                         // Verificar si ya existe un asesor con los mismos datos en la base de datos.
                         List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
-                        if (asesores.Any(a => a.identificacion == asesor.identificacion))
+                        if (asesores.Any(a => a.id == asesor.id))
                         {
                             exito = accesoAAsesor.EditarAsesor(asesor);
                         }
@@ -126,7 +126,7 @@ namespace webMetics.Controllers
                     }
                     else
                     {
-                        accesoAUsuario.CrearUsuario(asesor.identificacion, "pass"); // Esta contraseña es provisional en la base de datos
+                        accesoAUsuario.CrearUsuario(asesor.id, "pass"); // Esta contraseña es provisional en la base de datos
                         exito = accesoAAsesor.CrearAsesor(asesor);
                     }
 
@@ -201,7 +201,7 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 // Buscar el asesor a editar en la lista de asesores y obtenerlo
-                AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.identificacion == idAsesor);
+                AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.id == idAsesor);
 
                 // Si no se encuentra el asesor a editar, redirigir a la lista de asesores
                 if (asesor == null)
@@ -232,7 +232,7 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 // Aquí se define que el correo es la identificación.
-                asesor.identificacion = asesor.correo;
+                asesor.id = asesor.correo;
 
                 bool exito = accesoAAsesor.EditarAsesor(asesor);
 

@@ -31,6 +31,30 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
         }
 
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
+
         // Método para mostrar la vista de inicio de sesión
         public ActionResult IniciarSesion()
         {
@@ -94,7 +118,7 @@ namespace webMetics.Controllers
                 if (usuario.contrasena == usuario.confirmarContrasena)
                 {
                     // Aquí se define que el identificador del usuario es el correo.
-                    usuario.identificacion = usuario.correo;
+                    usuario.id = usuario.correo;
 
                     bool exito = CrearUsuario(usuario);
 
@@ -103,7 +127,7 @@ namespace webMetics.Controllers
                         ViewBag.Correo = usuario.correo;
                         ViewBag.Titulo = "Registro realizado";
                         ViewBag.Message = "Se registró en el Proyecto Módulos. La confirmación será enviada al correo";
-                        EnviarCorreoRegistro(usuario.identificacion, usuario.correo);
+                        EnviarCorreoRegistro(usuario.id, usuario.correo);
 
                         return View("ParticipanteRegistrado");
                     }
@@ -132,15 +156,15 @@ namespace webMetics.Controllers
             bool exito = false;
             try
             {
-                if (!accesoAUsuario.ExisteUsuario(usuario.identificacion))
+                if (!accesoAUsuario.ExisteUsuario(usuario.id))
                 {
-                    accesoAUsuario.CrearUsuario(usuario.identificacion, usuario.contrasena);
+                    accesoAUsuario.CrearUsuario(usuario.id, usuario.contrasena);
 
-                    if (!accesoAParticipante.ExisteParticipante(usuario.identificacion))
+                    if (!accesoAParticipante.ExisteParticipante(usuario.id))
                     {
                         ParticipanteModel participante = new ParticipanteModel()
                         {
-                            idParticipante = usuario.identificacion,
+                            idParticipante = usuario.id,
                             nombre = usuario.nombre,
                             primerApellido = usuario.primerApellido,
                             segundoApellido = usuario.segundoApellido,
@@ -162,7 +186,7 @@ namespace webMetics.Controllers
                     }
                     else 
                     {
-                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.identificacion);
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
 
                         ParticipanteModel participanteActualizado = new ParticipanteModel()
                         {
@@ -207,11 +231,11 @@ namespace webMetics.Controllers
 
             try
             {
-                if (accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena))
+                if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
                 {
-                    usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.identificacion);
+                    usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
                     int rolUsuario = usuarioAutorizado.rol;
-                    string idUsuario = usuarioAutorizado.identificacion;
+                    string idUsuario = usuarioAutorizado.id;
 
                     IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
                     string idEncriptado = protector.Protect(idUsuario);
@@ -251,9 +275,12 @@ namespace webMetics.Controllers
             return RedirectToAction("IniciarSesion");
         }
 
-        public ActionResult GestionarContrasena(string idParticipante)
+        public ActionResult CambiarContrasena(string id)
         {
-            NewLoginModel usuario = new NewLoginModel() { identificacion = idParticipante };
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+
+            NewLoginModel usuario = new NewLoginModel() { id = id };
 
             if (TempData["errorMessage"] != null)
             {
@@ -273,11 +300,11 @@ namespace webMetics.Controllers
             bool exito = false;
             string errorMessage = "";
 
-            if (accesoAUsuario.AutenticarUsuario(usuario.identificacion, usuario.contrasena))
+            if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
             {
                 if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
-                    exito = accesoAUsuario.EditarUsuario(usuario.identificacion, usuario.nuevaContrasena);
+                    exito = accesoAUsuario.EditarUsuario(usuario.id, usuario.nuevaContrasena);
                 }
                 else
                 {
@@ -306,11 +333,11 @@ namespace webMetics.Controllers
                 }
             }
 
-            return RedirectToAction("GestionarContrasena", new { idParticipante = usuario.identificacion });
+            return RedirectToAction("CambiarContrasena", new { idParticipante = usuario.id });
         }
 
         /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarCorreoRegistro(string identificacion, string correo)
+        private void EnviarCorreoRegistro(string id, string correo)
         {
             try
             {
@@ -336,7 +363,7 @@ namespace webMetics.Controllers
                 // Crear el cuerpo del mensaje con el contenido HTML y texto plano
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "Se ha registrado al usuario con identificación " + identificacion + " en el Proyecto Módulos."; ;
+                    "Se ha registrado al usuario con identificación " + id + " en el Proyecto Módulos."; ;
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
 

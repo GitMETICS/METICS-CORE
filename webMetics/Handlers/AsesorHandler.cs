@@ -32,8 +32,8 @@ namespace webMetics.Handlers
 
                 SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
 
-                comandoConsulta.Parameters.AddWithValue("@idUsuario", asesor.identificacion);
-                comandoConsulta.Parameters.AddWithValue("@idAsesor", asesor.identificacion);
+                comandoConsulta.Parameters.AddWithValue("@idUsuario", asesor.id);
+                comandoConsulta.Parameters.AddWithValue("@idAsesor", asesor.id);
                 comandoConsulta.Parameters.AddWithValue("@nombre", asesor.nombre);
                 comandoConsulta.Parameters.AddWithValue("@apellido1", asesor.apellido1);
                 comandoConsulta.Parameters.AddWithValue("@apellido2", asesor.apellido2);
@@ -121,7 +121,7 @@ namespace webMetics.Handlers
             AsesorModel asesor = new AsesorModel
             {
                 // Asignar los valores de las columnas de la fila a las propiedades del objeto AsesorModel
-                identificacion = Convert.ToString(filaAsesor["id_asesor_PK"]),
+                id = Convert.ToString(filaAsesor["id_asesor_PK"]),
                 nombre = Convert.ToString(filaAsesor["nombre"]),
                 apellido1 = Convert.ToString(filaAsesor["apellido_1"]),
                 apellido2 = Convert.ToString(filaAsesor["apellido_2"]),
@@ -199,7 +199,7 @@ namespace webMetics.Handlers
 
             // Asignar los valores de los parámetros con los atributos del objeto AsesorModel
 
-            comandoParaConsulta.Parameters.AddWithValue("@id", asesor.identificacion);
+            comandoParaConsulta.Parameters.AddWithValue("@id", asesor.id);
             comandoParaConsulta.Parameters.AddWithValue("@nombre", asesor.nombre);
             comandoParaConsulta.Parameters.AddWithValue("@apellido1", asesor.apellido1);
             comandoParaConsulta.Parameters.AddWithValue("@apellido2", asesor.apellido2);

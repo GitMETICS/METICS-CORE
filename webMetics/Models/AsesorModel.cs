@@ -4,7 +4,7 @@ namespace webMetics.Models
 {
     public class AsesorModel
     {
-        public string identificacion { get; set; }
+        public string id { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
         [Display(Name = "Nombre")]

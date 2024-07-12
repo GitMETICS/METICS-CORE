@@ -4,7 +4,7 @@ namespace webMetics.Models
 {
     public class UsuarioModel
     {
-        public string? identificacion { get; set; }
+        public string? id { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
         [Display(Name = "Nombre")]
@@ -73,7 +73,7 @@ namespace webMetics.Models
         // [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
-        public string identificacion { get; set; }
+        public string id { get; set; }
 
         [Display(Name = "Rol")]
         public int rol { get; set; }
@@ -88,7 +88,7 @@ namespace webMetics.Models
         // [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
-        public string identificacion { get; set; }
+        public string id { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar su contraseña actual.")]
         [Display(Name = "Contraseña actual")]
