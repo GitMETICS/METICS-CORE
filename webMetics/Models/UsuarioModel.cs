@@ -70,7 +70,7 @@ namespace webMetics.Models
 
     public class LoginModel
     {
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        // [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string identificacion { get; set; }
@@ -85,7 +85,7 @@ namespace webMetics.Models
 
     public class NewLoginModel
     {
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        // [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string identificacion { get; set; }
