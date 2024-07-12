@@ -40,7 +40,6 @@ CREATE TABLE participante(
 	nombre NVARCHAR(64) NOT NULL,
 	apellido_1 NVARCHAR(64) NOT NULL,
 	apellido_2 NVARCHAR(64),
-	unidad_academica NVARCHAR(64),
 	area NVARCHAR(64) NOT NULL,
 	departamento NVARCHAR(64) NOT NULL,
 	telefonos NVARCHAR(64),
@@ -308,7 +307,6 @@ CREATE PROCEDURE InsertParticipante
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
     @condicion NVARCHAR(64) = '',
-    @unidadAcademica NVARCHAR(64) = '',
     @tipoParticipante NVARCHAR(64) = '',
     @telefonos NVARCHAR(64) = '',
     @area NVARCHAR(64) = '',
@@ -330,7 +328,6 @@ BEGIN
         apellido_1,
         apellido_2,
         condicion,
-        unidad_academica,
         tipo_participante,
         telefonos,
         area,
@@ -349,7 +346,6 @@ BEGIN
         @apellido1,
         @apellido2,
         @condicion,
-        @unidadAcademica,
         @tipoParticipante,
         @telefonos,
         @area,
@@ -371,7 +367,6 @@ CREATE PROCEDURE UpdateParticipante
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64),
     @condicion NVARCHAR(64),
-    @unidadAcademica NVARCHAR(64),
     @tipoParticipante NVARCHAR(64),
     @telefonos NVARCHAR(64),
     @area NVARCHAR(64),
@@ -389,7 +384,6 @@ BEGIN
         apellido_1 = @apellido1,
         apellido_2 = @apellido2,
         condicion = @condicion,
-        unidad_academica = @unidadAcademica,
         tipo_participante = @tipoParticipante,
         telefonos = @telefonos,
         area = @area,
@@ -464,16 +458,16 @@ VALUES
 
 --Crear participantes
 INSERT INTO participante(
-    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
+    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, tipo_participante,telefonos,area,departamento,seccion
 )
 VALUES
-(N'4444', N'4444', N'Cédula', N'jhondoo@ucr.ac.cr', N'Jhon', N'Doo', N' ', N'Interino', N'CICA', N'Docente', N'800800800', N'Área de Artes y Letras', N'Facultad de Artes', N'Escuela de Artes Dramáticas')
+(N'4444', N'4444', N'Cédula', N'jhondoo@ucr.ac.cr', N'Jhon', N'Doo', N' ', N'Interino', N'Docente', N'800800800', N'Área de Artes y Letras', N'Facultad de Artes', N'Escuela de Artes Dramáticas')
 
 INSERT INTO participante(
-    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, unidad_academica, tipo_participante,telefonos,area,departamento,seccion
+    id_usuario_FK, id_participante_PK, tipo_identificacion, correo, nombre, apellido_1, apellido_2 ,condicion, tipo_participante,telefonos,area,departamento,seccion
 )
 VALUES
-(N'5555', N'5555', N'Cédula', N'armandotorres_rojas@ucr.ac.cr', N'Armando', N'Torres', N'Rojas', N'Interino', N'Escuela de Geología', N'Docente', N'900900900', N'Área de Artes y Letras', N'Facultad de Letras', N'Escuela de Filología, Lingüística y Literatura')
+(N'5555', N'5555', N'Cédula', N'armandotorres_rojas@ucr.ac.cr', N'Armando', N'Torres', N'Rojas', N'Interino', N'Docente', N'900900900', N'Área de Artes y Letras', N'Facultad de Letras', N'Escuela de Filología, Lingüística y Literatura')
 
 --Crear tipos de actividades
 INSERT INTO tipos_actividad

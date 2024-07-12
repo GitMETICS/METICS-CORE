@@ -449,7 +449,7 @@ namespace webMetics.Controllers
                 table.AddCell(participante.idParticipante);
                 table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                 table.AddCell(participante.condicion);
-                table.AddCell(participante.unidadAcademica);
+                table.AddCell(participante.seccion);
                 table.AddCell(participante.correo);
                 table.AddCell(participante.telefonos);
             }
@@ -508,7 +508,7 @@ namespace webMetics.Controllers
                 row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
                 row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
                 row.GetCell(2).SetText(participantes[i].condicion.ToString());
-                row.GetCell(3).SetText(participantes[i].unidadAcademica);
+                row.GetCell(3).SetText(participantes[i].seccion);
                 row.GetCell(4).SetText(participantes[i].correo.ToString());
                 row.GetCell(5).SetText(participantes[i].telefonos.ToString());
             }
@@ -577,7 +577,7 @@ namespace webMetics.Controllers
                 cell3.SetCellValue(participante.condicion);
 
                 NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
-                cell4.SetCellValue(participante.unidadAcademica);
+                cell4.SetCellValue(participante.seccion);
 
                 NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
                 cell5.SetCellValue(participante.correo);

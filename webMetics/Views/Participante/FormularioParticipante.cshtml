@@ -82,11 +82,6 @@
                             @Html.ValidationMessageFor(participanteModel => participanteModel.tipoParticipante, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.unidadAcademica, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.DropDownListFor(participanteModel => participanteModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.area, "", new { @class = "text-danger" })

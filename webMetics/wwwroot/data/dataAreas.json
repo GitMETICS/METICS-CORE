@@ -254,17 +254,6 @@
       ]
     },
     {
-      "name": "Sistema de Educación General: Estudios Generales",
-      "departamentos": [
-        {
-          "name": "Escuela de Estudios Generales"
-        },
-        {
-          "name": "Escuela de Seminarios de Realidad Nacional"
-        }
-      ]
-    },
-    {
       "name": "Sistema de Estudios de Posgrado",
       "departamentos": [
         {

@@ -61,7 +61,6 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
                 command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
                 command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
                 command.Parameters.AddWithValue("@telefonos", participante.telefonos);
                 command.Parameters.AddWithValue("@area", participante.area);
@@ -104,7 +103,6 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
                 command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
                 command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
                 command.Parameters.AddWithValue("@telefonos", participante.telefonos);
                 command.Parameters.AddWithValue("@area", participante.area);
@@ -224,7 +222,6 @@ namespace webMetics.Handlers
                             tipoIdentificacion = reader.GetString(reader.GetOrdinal("tipo_identificacion")),
                             // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
                             tipoParticipante = reader.GetString(reader.GetOrdinal("tipo_participante")),
-                            unidadAcademica = reader.GetString(reader.GetOrdinal("unidad_academica")),
                             area = reader.GetString(reader.GetOrdinal("area")),
                             departamento = reader.GetString(reader.GetOrdinal("departamento")),
                             seccion = reader.GetString(reader.GetOrdinal("seccion")),
@@ -258,7 +255,6 @@ namespace webMetics.Handlers
                 condicion = Convert.ToString(filaParticipante["condicion"]),
                 tipoParticipante = Convert.ToString(filaParticipante["tipo_participante"]),
                 area = Convert.ToString(filaParticipante["area"]),
-                unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
                 departamento = Convert.ToString(filaParticipante["departamento"]),
                 seccion = Convert.ToString(filaParticipante["seccion"]),
                 telefonos = Convert.ToString(filaParticipante["telefonos"]),

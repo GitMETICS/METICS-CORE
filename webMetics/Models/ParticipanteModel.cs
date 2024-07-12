@@ -33,10 +33,6 @@ namespace webMetics.Models
         [Display(Name = "Número de identificación")]
         public string? numeroIdentificacion { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar una unidad académica.")]
-        [Display(Name = "Unidad académica")]
-        public string? unidadAcademica { get; set; }
-
         [Required(ErrorMessage = "Es necesario ingresar un área.")]
         [Display(Name = "Área a la que pertenece")]
         public string? area { get; set; }

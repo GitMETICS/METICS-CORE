@@ -81,23 +81,18 @@
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.unidadAcademica, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.DropDownListFor(usuarioModel => usuarioModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.area, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
+                            @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una facultad...", new { @class = "form-control", id = "departamentoDropdown" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.seccion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una sección...", new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.DropDownListFor(usuarioModel => usuarioModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.seccion, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -151,8 +146,8 @@ else
             var areaName = $(this).val();
 
             // Clear departamento and seccion dropdowns
-            $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
-            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+            $('#departamentoDropdown').empty().append('<option value="">Seleccione una facultad...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
 
             if (areaName !== '') {
                 // Make AJAX request to fetch departamentos for selected area
@@ -172,7 +167,7 @@ else
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'An error occurred while fetching departamentos: ' + error
+                            text: 'An error occurred while fetching facultades: ' + error
                         });
                     }
                 });
