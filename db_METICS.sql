@@ -406,7 +406,7 @@ CREATE PROCEDURE SelectParticipante
     @id NVARCHAR(64)
 AS
 BEGIN
-	SELECT id_participante_PK FROM participante WHERE id_participante_PK = @id
+	SELECT * FROM participante WHERE id_participante_PK = @id
 END
 
 GO
