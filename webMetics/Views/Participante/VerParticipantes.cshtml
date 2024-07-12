@@ -77,11 +77,13 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col">Nombre completo</th>
-                            <th scope="col">Condición</th>
                             <th scope="col">Unidad académica</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Primer<br>Apellido</th>
+                            <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo institucional</th>
-                            <th scope="col" style="width:10%;">Teléfono</th>
+                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
+                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
                             <th scope="col" style="width:3.33%;"></th>
                             <th scope="col" style="width:3.33%;"></th>
                             <th scope="col" style="width:3.33%;"></th>
@@ -99,11 +101,17 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                <td>@nombreCompleto</td>
-                                <td>@participante.condicion</td>
                                 <td>@participante.unidadAcademica</td>
+                                <td>@participante.nombre</td>
+                                <td>@participante.primerApellido</td>
+                                <td>@participante.segundoApellido</td>
                                 <td>@participante.correo</td>
-                                <td>@participante.telefonos</td>
+                                <td class="text-center">
+                                    <span>@participante.horasMatriculadas</span>
+                                </td>
+                                <td class="text-center">
+                                    <span>@participante.horasAprobadas</span>
+                                </td>
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
                                 </td>
@@ -120,7 +128,7 @@
                     </tbody>
                 </table>
             }
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center my-4">
                 <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
             </div>
         </div>

@@ -103,11 +103,11 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col">Nombre completo</th>
-                            <th scope="col">Condición</th>
                             <th scope="col">Unidad académica</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Primer Apellido</th>
+                            <th scope="col">Segundo Apellido</th>
                             <th scope="col">Correo institucional</th>
-                            <th scope="col">Teléfono</th>
                             <th scope="col" style="width:5%"></th>
                             @if (ViewBag.Role == 1)
                             {
@@ -126,11 +126,11 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                <td>@nombreCompleto</td>
-                                <td>@participante.condicion</td>
                                 <td>@participante.unidadAcademica</td>
+                                <td>@participante.nombre</td>
+                                <td>@participante.primerApellido</td>
+                                <td>@participante.segundoApellido</td>
                                 <td>@participante.correo</td>
-                                <td>@participante.telefonos</td>
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "btn btn-primary bi bi-search" })
                                 </td>

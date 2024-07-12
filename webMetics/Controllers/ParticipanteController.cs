@@ -174,8 +174,8 @@ namespace webMetics.Controllers
                             departamento = "",
                             seccion = "",
                             telefonos = "",
-                            horasMatriculadas = 0,
-                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var hours) ? hours : 0,
+                            horasMatriculadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
+                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
                             gruposInscritos = new List<GrupoModel>()
                         };
 
