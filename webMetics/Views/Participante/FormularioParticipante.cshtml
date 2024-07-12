@@ -106,9 +106,6 @@
                             @Html.TextBoxFor(participanteModel => participanteModel.condicion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
                         </div>
-
-                        <!-- Aquí se define que idParticipante es el correo ingresado. -->
-                        @Html.HiddenFor(participanteModel => participanteModel.idParticipante, Model.correo)
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
