@@ -3,8 +3,6 @@ using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Hosting;
-using static iText.IO.Image.Jpeg2000ImageData;
 
 
 namespace webMetics.Handlers
@@ -57,6 +55,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
@@ -99,6 +98,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
@@ -199,22 +199,76 @@ namespace webMetics.Handlers
         }
 
         // Método para obtener un participante específico según su ID
-        public ParticipanteModel ObtenerParticipante(string idParticipante) // Para este metodo ya existe un stored procedure en la base de datos
+        public ParticipanteModel ObtenerParticipante(string idParticipante)
         {
-            string consulta = "SELECT * FROM participante WHERE id_participante_PK = " + idParticipante;
-            SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
-            DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
-
-            // Crear un objeto ParticipanteModel y obtener la información del participante desde la fila de resultados
             ParticipanteModel participante = null;
 
-            foreach (DataRow fila in tablaResultado.Rows)
+            using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
             {
-                participante = ObtenerInfoParticipante(fila);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", idParticipante);
+
+                ConexionMetics.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        participante = new ParticipanteModel
+                        {
+                            idParticipante = reader.GetString(reader.GetOrdinal("id_participante_PK")),
+                            nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                            primerApellido = reader.GetString(reader.GetOrdinal("apellido_1")),
+                            segundoApellido = reader.GetString(reader.GetOrdinal("apellido_2")),
+                            correo = reader.GetString(reader.GetOrdinal("correo")),
+                            tipoIdentificacion = reader.GetString(reader.GetOrdinal("tipo_identificacion")),
+                            // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                            tipoParticipante = reader.GetString(reader.GetOrdinal("tipo_participante")),
+                            unidadAcademica = reader.GetString(reader.GetOrdinal("unidad_academica")),
+                            area = reader.GetString(reader.GetOrdinal("area")),
+                            departamento = reader.GetString(reader.GetOrdinal("departamento")),
+                            seccion = reader.GetString(reader.GetOrdinal("seccion")),
+                            condicion = reader.GetString(reader.GetOrdinal("condicion")),
+                            telefonos = reader.GetString(reader.GetOrdinal("telefonos")),
+                            horasAprobadas = reader.GetInt32(reader.GetOrdinal("horas_aprobadas")),
+                            horasMatriculadas = reader.GetInt32(reader.GetOrdinal("horas_matriculadas")),
+                            gruposInscritos = new List<GrupoModel>()
+                        };
+                    }
+                }
+
+                ConexionMetics.Close();
             }
 
             return participante;
         }
+
+        // Método para obtener información detallada del participante a partir de una fila de datos
+        public ParticipanteModel ObtenerInfoParticipante(DataRow filaParticipante)
+        {
+            // Crear un objeto ParticipanteModel y asignar valores desde la fila de datos
+            ParticipanteModel info = new ParticipanteModel
+            {
+                idParticipante = Convert.ToString(filaParticipante["id_participante_PK"]),
+                tipoIdentificacion = Convert.ToString(filaParticipante["tipo_identificacion"]),
+                correo = Convert.ToString(filaParticipante["correo"]),
+                nombre = Convert.ToString(filaParticipante["nombre"]),
+                primerApellido = Convert.ToString(filaParticipante["apellido_1"]),
+                segundoApellido = Convert.ToString(filaParticipante["apellido_2"]),
+                condicion = Convert.ToString(filaParticipante["condicion"]),
+                tipoParticipante = Convert.ToString(filaParticipante["tipo_participante"]),
+                area = Convert.ToString(filaParticipante["area"]),
+                unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
+                departamento = Convert.ToString(filaParticipante["departamento"]),
+                seccion = Convert.ToString(filaParticipante["seccion"]),
+                telefonos = Convert.ToString(filaParticipante["telefonos"]),
+                horasMatriculadas = Convert.ToInt32(filaParticipante["horas_matriculadas"]),
+                horasAprobadas = Convert.ToInt32(filaParticipante["horas_aprobadas"]),
+                gruposInscritos = new List<GrupoModel>()
+            };
+            return info;
+        }
+
 
         // Método para obtener una lista de todos los participantes
         public List<ParticipanteModel> ObtenerListaParticipantes()
@@ -265,32 +319,6 @@ namespace webMetics.Handlers
             return infoParticipante;
         }
 
-        // Método para obtener información detallada del participante a partir de una fila de datos
-        public ParticipanteModel ObtenerInfoParticipante(DataRow filaParticipante)
-        {
-            // Crear un objeto ParticipanteModel y asignar valores desde la fila de datos
-            ParticipanteModel info = new ParticipanteModel
-            {
-                idParticipante = Convert.ToString(filaParticipante["id_participante_PK"]),
-                tipoIdentificacion = Convert.ToString(filaParticipante["tipo_identificacion"]),
-                correo = Convert.ToString(filaParticipante["correo"]),
-                nombre = Convert.ToString(filaParticipante["nombre"]),
-                primerApellido = Convert.ToString(filaParticipante["apellido_1"]),
-                segundoApellido = Convert.ToString(filaParticipante["apellido_2"]),
-                condicion = Convert.ToString(filaParticipante["condicion"]),
-                tipoParticipante = Convert.ToString(filaParticipante["tipo_participante"]),
-                area = Convert.ToString(filaParticipante["area"]),
-                unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
-                departamento = Convert.ToString(filaParticipante["departamento"]),
-                seccion = Convert.ToString(filaParticipante["seccion"]),
-                telefonos = Convert.ToString(filaParticipante["telefonos"]),
-                horasMatriculadas = Convert.ToInt32(filaParticipante["horas_matriculadas"]),
-                horasAprobadas = Convert.ToInt32(filaParticipante["horas_aprobadas"]),
-                gruposInscritos = new List<GrupoModel>()
-            };
-            return info;
-        }
-
         // Método para verificar si un usuario está inscrito en la base de datos
         public bool UsuarioEstaInscrito(string identificacion)
         {
@@ -338,6 +366,14 @@ namespace webMetics.Handlers
             object jsonObject = JsonConvert.DeserializeObject(allText);
             return jsonObject;
         }
+
+
+
+
+
+
+        // TODO: Unidad academica, area, sede...
+
 
         // Método para obtener una lista de todas las áreas disponibles del archivo JSON
         public List<string> GetAllAreas()

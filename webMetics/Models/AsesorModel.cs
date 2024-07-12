@@ -1,13 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace webMetics.Models
 {
     public class AsesorModel
     {
-        [Required(ErrorMessage = "Es necesario ingresar un identificador de usuario.")]
-        [Display(Name = "Número de identificación")]
         public string identificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
@@ -20,6 +16,11 @@ namespace webMetics.Models
 
         [Display(Name = "Segundo apellido")]
         public string apellido2 { get; set; }
+
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+        [Display(Name = "Correo institucional")]
+        public required string correo { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un tema asociado.")]
         [Display(Name = "Tema asociado")]

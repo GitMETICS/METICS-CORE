@@ -160,7 +160,10 @@ namespace webMetics.Controllers
 
                     foreach (var participante in participantes)
                     {
-                        IngresarParticipante(participante);
+                        if (participante.idParticipante != "")
+                        {
+                            IngresarParticipante(participante);
+                        }
                     }
                 }
 
@@ -290,18 +293,21 @@ namespace webMetics.Controllers
             return View(); // Muestra la vista para buscar al participante
         }
 
-        public ActionResult FormularioUsuario()
+        public ActionResult FormularioParticipante()
         {
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-            return View("FormularioUsuario");
+            return View("FormularioParticipante");
         }
 
         [HttpPost]
-        public ActionResult AgregarParticipante(ParticipanteModel participante)
+        public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
             if (ModelState.IsValid)
             {
-                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante)) // En caso de que queramos hacer la autenticacion con el correo y no la identificacion, habria que cambiar esto
+                // Aquí se define que el identificador del usuario es el correo.
+                participante.idParticipante = participante.correo;
+
+                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
                 {
                     string contrasena = GenerateRandomPassword();
 
@@ -331,7 +337,7 @@ namespace webMetics.Controllers
             else
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("FormularioUsuario", participante);
+                return View("FormularioParticipante", participante);
             }
         }
 
@@ -374,7 +380,7 @@ namespace webMetics.Controllers
         }
 
         // Vista del formulario para editar los datos de un participante según el id proporcionado
-        [HttpGet]
+        // [HttpGet]
         public ActionResult EditarParticipante(string idParticipante)
         {
             try

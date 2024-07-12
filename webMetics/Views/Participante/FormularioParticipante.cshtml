@@ -1,12 +1,12 @@
 ﻿@model webMetics.Models.ParticipanteModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Formulario de usuario";
+    ViewBag.Title = "Formulario de participante";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Title == "Formulario de usuario")
+@if (ViewBag.Title == "Formulario de participante")
 {
     <div class="contenedor-tipos-actividades container-fluid">
         @if (urlReferrer != null)
@@ -18,7 +18,7 @@
             </div>
         }
 
-        @using (Html.BeginForm("AgregarParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("FormularioParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <h1>@ViewBag.Title</h1>
@@ -71,9 +71,9 @@
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.idParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.idParticipante, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.idParticipante, "", new { @class = "text-danger" })
+                                @Html.LabelFor(participanteModel => participanteModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(participanteModel => participanteModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.numeroIdentificacion, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="form-group mt-1">
@@ -111,6 +111,9 @@
                             @Html.TextBoxFor(participanteModel => participanteModel.condicion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
                         </div>
+
+                        <!-- Aquí se define que idParticipante es el correo ingresado. -->
+                        @Html.HiddenFor(participanteModel => participanteModel.idParticipante, Model.correo)
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">

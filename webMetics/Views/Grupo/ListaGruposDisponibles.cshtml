@@ -21,12 +21,12 @@
         if (ViewBag.ListaGrupos == null)
         {
             <div class="justify-content-center" style="margin-top:3%">
-                <h2 class="text-center">No hay grupos disponibles en este momento.</h2>
+                <h2 class="text-center">No hay módulos disponibles en este momento.</h2>
                 <br />
                 <div style="text-align:center; align-items:center">
                     @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                     {
-                        <a href="/Grupo/AgregarGrupo" class="btn btn-primary" role="button" style="align-content:center; width:20%;height:105%">Crear grupo</a>
+                        @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary" })
                     }
                 </div>
             </div>

@@ -55,8 +55,8 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col">Identificación</th>
                             <th scope="col">Nombre completo</th>
+                            <th scope="col">Correo institucional</th>
                             <th scope="col">Módulos inscritos</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>por módulo</th>
                             <th class="text-center" scope="col" style="width: 10%">Total de<br>horas inscritas</th>
@@ -70,9 +70,9 @@
                             nombreCompleto += " " + ViewBag.Participante.segundoApellido;
                         }
                         <tr>
-                            <td class=" ">@ViewBag.Participante.idParticipante</td>
-                            <td class=" ">@nombreCompleto</td>
-                            <td class=" ">
+                            <td class="">@nombreCompleto</td>
+                            <td class="">@ViewBag.Participante.idParticipante</td>
+                            <td class="">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -85,7 +85,7 @@
                                     <span>Sin grupos inscritos</span>
                                 }
                             </td>
-                            <td class="  text-center">
+                            <td class="text-center">
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     foreach (var grupo in ViewBag.ListaGrupos)
@@ -98,13 +98,13 @@
                                     <span>0</span>
                                 }
                             </td>
-                            <td class="  text-center">
+                            <td class="text-center">
                                 <span>@ViewBag.Participante.horasMatriculadas</span>
                             </td>
-                            <td class="  text-center">
+                            <td class="text-center">
                                 <span>@ViewBag.Participante.horasAprobadas</span>
                             </td>
-                            <td class=" ">
+                            <td class="">
                             </td>
                         </tr>
                     </tbody>

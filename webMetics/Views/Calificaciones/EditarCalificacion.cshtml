@@ -40,11 +40,11 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 20%;">Identificación</th>
-                            <th scope="col" style="width: 47.5%;">Nombre completo</th>
+                            <th scope="col" style="width: 40%;">Nombre completo</th>
+                            <th scope="col" style="width: 30%;">Correo institucional</th>
                             <th scope="col" style="width: 12.5%;">Calificación actual</th>
                             <th scope="col" style="width: 12.5%;">Nueva calificación</th>
-                            <th scope="col" style="width: 7.5%;"></th>
+                            <th scope="col" style="width: 5%;"></th>
                         </tr>
                     </thead>
 
@@ -54,18 +54,18 @@
                             nombreCompleto += " " + ViewBag.Calificacion.participante.segundoApellido;
                         }
                         <tr>
-                            <td class=" ">@ViewBag.Calificacion.participante.idParticipante</td>
-                            <td class=" ">@nombreCompleto</td>
-                            <td class="  text-center">@ViewBag.Calificacion.calificacion</td>
+                            <td class="">@nombreCompleto</td>
+                            <td class="">@ViewBag.Calificacion.participante.idParticipante</td>
+                            <td class="text-center">@ViewBag.Calificacion.calificacion</td>
                             @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
                             {
                                 @Html.AntiForgeryToken()
-                                <td class=" ">
+                                <td class="">
                                     <div class="input-group">
                                         <input type="number" class="form-control" name="calificacion" id="calificacion">
                                     </div>
                                 </td>
-                                <td class=" ">
+                                <td class="">
                                     <button type="submit" class="btn btn-primary">Aceptar</button>
                                 </td>
                             }

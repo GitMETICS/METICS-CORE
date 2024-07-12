@@ -77,7 +77,7 @@ namespace webMetics.Controllers
         }
 
         // Método para mostrar el formulario para crear un nuevo usuario
-        public ActionResult Registrarse()
+        public ActionResult FormularioRegistro()
         {
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
@@ -87,12 +87,15 @@ namespace webMetics.Controllers
         // Método para procesar el formulario de creación de usuario con los datos ingresados
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Registrarse(UsuarioModel usuario)
+        public ActionResult FormularioRegistro(UsuarioModel usuario)
         {
             if (ModelState.IsValid)
             {
                 if (usuario.contrasena == usuario.confirmarContrasena)
                 {
+                    // Aquí se define que el identificador del usuario es el correo.
+                    usuario.identificacion = usuario.correo;
+
                     bool exito = CrearUsuario(usuario);
 
                     if (exito)
@@ -113,13 +116,13 @@ namespace webMetics.Controllers
                 {
                     ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View("Registrarse", usuario);
+                    return View("FormularioRegistro", usuario);
                 }
             }
             else
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("Registrarse", usuario);
+                return View("FormularioRegistro", usuario);
             }
         }
 
@@ -167,7 +170,7 @@ namespace webMetics.Controllers
                             nombre = usuario.nombre,
                             primerApellido = usuario.primerApellido,
                             segundoApellido = usuario.segundoApellido,
-                            correo = usuario.correo, // TODO: Cambiar esto a participante.correo en caso de que el nuevo identificador sea el correo
+                            correo = participante.correo,
                             tipoIdentificacion = usuario.tipoIdentificacion,
                             tipoParticipante = usuario.tipoParticipante,
                             unidadAcademica = usuario.unidadAcademica,

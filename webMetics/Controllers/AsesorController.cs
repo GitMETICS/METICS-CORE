@@ -107,9 +107,13 @@ namespace webMetics.Controllers
                     ViewBag.Role = GetRole();
                     ViewBag.Id = GetId();
 
+                    // Aquí se define que el correo es la identificación.
+                    asesor.identificacion = asesor.correo;
+
                     if (accesoAUsuario.ExisteUsuario(asesor.identificacion))
                     {
-                        // Verificar si ya existe un asesor con los mismos datos en la base de datos
+                        // TODO: Pasar esto a un stored procedure en el handler.
+                        // Verificar si ya existe un asesor con los mismos datos en la base de datos.
                         List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
                         if (asesores.Any(a => a.identificacion == asesor.identificacion))
                         {
@@ -226,6 +230,9 @@ namespace webMetics.Controllers
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
+
+                // Aquí se define que el correo es la identificación.
+                asesor.identificacion = asesor.correo;
 
                 bool exito = accesoAAsesor.EditarAsesor(asesor);
 

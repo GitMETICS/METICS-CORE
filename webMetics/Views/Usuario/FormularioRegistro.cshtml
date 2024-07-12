@@ -17,7 +17,7 @@
             </div>
         }
 
-        @using (Html.BeginForm("Registrarse", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("FormularioRegistro", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <h1>@ViewBag.Title</h1>
@@ -70,9 +70,9 @@
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.identificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.identificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.identificacion, "", new { @class = "text-danger" })
+                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="form-group mt-1">

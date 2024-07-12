@@ -39,12 +39,12 @@
     <None Include="Views\Home\Index.cshtml" />
     <None Include="Views\Inscripcion\ExportarParticipantes.cshtml" />
     <None Include="Views\Inscripcion\Inscribir.cshtml" />
-    <None Include="Views\Usuario\Registrarse.cshtml" />
+    <None Include="Views\Usuario\FormularioRegistro.cshtml" />
     <None Include="Views\Usuario\GestionarContrasena.cshtml" />
     <None Include="Views\Usuario\IniciarSesion.cshtml" />
     <None Include="Views\Usuario\ParticipanteRegistrado.cshtml" />
     <None Include="Views\Participante\EditarParticipante.cshtml" />
-    <None Include="Views\Participante\FormularioUsuario.cshtml" />
+    <None Include="Views\Participante\FormularioParticipante.cshtml" />
     <None Include="Views\Participante\ListaParticipantes.cshtml" />
     <None Include="Views\Participante\MiInformacion.cshtml" />
     <None Include="Views\Participante\ObtenerParticipante.cshtml" />

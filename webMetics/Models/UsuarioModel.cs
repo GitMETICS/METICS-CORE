@@ -4,9 +4,7 @@ namespace webMetics.Models
 {
     public class UsuarioModel
     {
-        [Required(ErrorMessage = "Es necesario ingresar una identificación.")]
-        [Display(Name = "Identificación")]
-        public required string identificacion { get; set; }
+        public string? identificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
         [Display(Name = "Nombre")]
@@ -24,13 +22,16 @@ namespace webMetics.Models
         [Display(Name = "Correo institucional")]
         public required string correo { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
-        [Display(Name = "Tipo de identificación")]
-        public required string tipoIdentificacion { get; set; }
-
         [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
         [Display(Name = "Tipo de participante")]
         public string? tipoParticipante { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
+        [Display(Name = "Tipo de identificación")]
+        public string? tipoIdentificacion { get; set; }
+
+        [Display(Name = "Número de identificación")]
+        public string? numeroIdentificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una unidad académica.")]
         [Display(Name = "Unidad académica")]
@@ -69,9 +70,10 @@ namespace webMetics.Models
 
     public class LoginModel
     {
-        [Required(ErrorMessage = "Es necesario ingresar una identificación.")]
-        [Display(Name = "Identificación")]
-        public required string identificacion { get; set; }
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+        [Display(Name = "Correo institucional")]
+        public string identificacion { get; set; }
 
         [Display(Name = "Rol")]
         public int rol { get; set; }
@@ -83,7 +85,9 @@ namespace webMetics.Models
 
     public class NewLoginModel
     {
-        [Display(Name = "Identificación")]
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+        [Display(Name = "Correo institucional")]
         public string identificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar su contraseña actual.")]

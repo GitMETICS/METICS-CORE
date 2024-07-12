@@ -125,6 +125,7 @@ namespace webMetics.Handlers
                 nombre = Convert.ToString(filaAsesor["nombre"]),
                 apellido1 = Convert.ToString(filaAsesor["apellido_1"]),
                 apellido2 = Convert.ToString(filaAsesor["apellido_2"]),
+                correo = Convert.ToString(filaAsesor["id_asesor_PK"]),
                 descripcion = Convert.ToString(filaAsesor["descripcion"]),
                 telefonos = Convert.ToString(filaAsesor["telefonos"])
             };

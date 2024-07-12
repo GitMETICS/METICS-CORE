@@ -50,11 +50,11 @@
                     <table class="table table-striped" id="tblCustomers">
                         <thead>
                             <tr>
-                                <th scope="col">Identificación</th>
                                 <th scope="col">Nombre completo</th>
-                                <th scope="col">Condición</th>
+                                <th scope="col">Identificación</th>
                                 <th scope="col">Unidad académica</th>
                                 <th scope="col">Correo institucional</th>
+                                <th scope="col">Condición</th>
                                 <th scope="col" style="width:10%">Teléfono</th>
                                 <th scope="col" style="width:3.3%"></th>
                             </tr>
@@ -66,11 +66,11 @@
                                 nombreCompleto += " " + ViewBag.Participante.segundoApellido;
                             }
                             <tr>
-                                <td class="">@ViewBag.Participante.idParticipante</td>
                                 <td class="">@nombreCompleto</td>
-                                <td class="">@ViewBag.Participante.condicion</td>
+                                <td class="">@ViewBag.Participante.numeroIdentificacion</td>
                                 <td class="">@ViewBag.Participante.unidadAcademica</td>
                                 <td class="">@ViewBag.Participante.correo</td>
+                                <td class="">@ViewBag.Participante.condicion</td>
                                 <td class="">@ViewBag.Participante.telefonos</td>
                                 <td class="">
                                     @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })

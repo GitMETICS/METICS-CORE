@@ -71,9 +71,9 @@
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.idParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.idParticipante, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.idParticipante, "", new { @class = "text-danger" })
+                                @Html.LabelFor(participanteModel => participanteModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(participanteModel => participanteModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.numeroIdentificacion, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="form-group mt-1">
