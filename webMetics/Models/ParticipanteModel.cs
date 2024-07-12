@@ -37,12 +37,12 @@ namespace webMetics.Models
         [Display(Name = "Área a la que pertenece")]
         public string? area { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un departamento.")]
-        [Display(Name = "Departamento al que pertenece")]
+        [Required(ErrorMessage = "Es necesario ingresar una Facultad.")]
+        [Display(Name = "Facultad a la que pertenece")]
         public string? departamento { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar una sección.")]
-        [Display(Name = "Sección a la que pertenece")]
+        [Required(ErrorMessage = "Es necesario ingresar una Unidad Académica.")]
+        [Display(Name = "Unidad Académica a la que pertenece")]
         public string? seccion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una condición actual.")]
