@@ -153,7 +153,7 @@ namespace webMetics.Controllers
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     TempData["errorMessage"] = "Error al cargar los datos.";
                 }

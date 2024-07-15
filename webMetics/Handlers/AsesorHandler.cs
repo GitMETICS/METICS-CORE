@@ -18,39 +18,172 @@ namespace webMetics.Handlers
             accesoAGrupo = new GrupoHandler(environment, configuration);
         }
 
+        // Verificar la existencia de un asesor en la base de datos
+        public bool ExisteAsesor(string idAsesor)
+        {
+            bool existe = false;
 
-        // Crear la consulta para crear el asesor en la base de datos
+            using (var command = new SqlCommand("ExistsAsesor", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idAsesor", idAsesor);
+                var existeParam = command.Parameters.Add("@exists", SqlDbType.Int);
+                existeParam.Direction = ParameterDirection.Output;
+
+                try
+                {
+                    ConexionMetics.Open();
+                    command.ExecuteNonQuery();
+                    existe = Convert.ToInt32(existeParam.Value) == 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in ExisteAsesor: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return existe;
+        }
+
+        // Insertar un nuevo asesor en la base de datos
         public bool CrearAsesor(AsesorModel asesor)
         {
-            bool exito;
-            string consulta = "INSERT INTO asesor" +
-                             "(id_usuario_FK, id_asesor_PK, nombre, apellido_1, apellido_2, telefonos, descripcion) " +
-                             "VALUES (@idUsuario, @idAsesor, @nombre, @apellido1, @apellido2, @telefonos, @descripcion)";
-            try
+            bool exito = false;
+            using (var command = new SqlCommand("InsertAsesor", ConexionMetics))
             {
-                ConexionMetics.Open();
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
+                command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
+                command.Parameters.AddWithValue("@nombre", asesor.nombre);
+                command.Parameters.AddWithValue("@primerApellido", asesor.primerApellido);
+                command.Parameters.AddWithValue("@segundoApellido", asesor.segundoApellido);
+                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
+                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
+                command.Parameters.AddWithValue("@correo", asesor.correo);
+                command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
+                command.Parameters.AddWithValue("@condicion", asesor.condicion);
+                command.Parameters.AddWithValue("@telefono", asesor.telefono);
+                command.Parameters.AddWithValue("@area", asesor.area);
+                command.Parameters.AddWithValue("@departamento", asesor.departamento);
+                command.Parameters.AddWithValue("@unidadAcademica", asesor.unidadAcademica);
+                command.Parameters.AddWithValue("@sede", asesor.sede);
 
-                SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-                comandoConsulta.Parameters.AddWithValue("@idUsuario", asesor.id);
-                comandoConsulta.Parameters.AddWithValue("@idAsesor", asesor.id);
-                comandoConsulta.Parameters.AddWithValue("@nombre", asesor.nombre);
-                comandoConsulta.Parameters.AddWithValue("@apellido1", asesor.apellido1);
-                comandoConsulta.Parameters.AddWithValue("@apellido2", asesor.apellido2);
-                comandoConsulta.Parameters.AddWithValue("@telefonos", asesor.telefonos);
-                comandoConsulta.Parameters.AddWithValue("@descripcion", asesor.descripcion);
-
-                exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-                ConexionMetics.Close();
-            } 
-            catch
-            {
-                exito = false;
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in CrearAsesor: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
 
             return exito;
         }
+
+        // Actualizar la información de un asesor en la base de datos
+        public bool EditarAsesor(AsesorModel asesor)
+        {
+            bool exito = false;
+            using (var command = new SqlCommand("UpdateAsesor", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
+                command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
+                command.Parameters.AddWithValue("@nombre", asesor.nombre);
+                command.Parameters.AddWithValue("@primerApellido", asesor.primerApellido);
+                command.Parameters.AddWithValue("@segundoApellido", asesor.segundoApellido);
+                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
+                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
+                command.Parameters.AddWithValue("@correo", asesor.correo);
+                command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
+                command.Parameters.AddWithValue("@condicion", asesor.condicion);
+                command.Parameters.AddWithValue("@telefono", asesor.telefono);
+                command.Parameters.AddWithValue("@area", asesor.area);
+                command.Parameters.AddWithValue("@departamento", asesor.departamento);
+                command.Parameters.AddWithValue("@unidadAcademica", asesor.unidadAcademica);
+                command.Parameters.AddWithValue("@sede", asesor.sede);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in EditarAsesor: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return exito;
+        }
+
+        // Método para obtener un asesor específico según su ID
+        public AsesorModel ObtenerAsesor(string idAsesor)
+        {
+            AsesorModel asesor = null;
+
+            using (SqlCommand command = new SqlCommand("SelectAsesor", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idAsesor", idAsesor);
+
+                ConexionMetics.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        asesor = new AsesorModel
+                        {
+                            idAsesor = reader.GetString(reader.GetOrdinal("id_asesor_PK")),
+                            nombre = reader["nombre"].ToString(),
+                            primerApellido = reader["apellido_1"].ToString(),
+                            segundoApellido = reader["apellido_2"].ToString(),
+                            tipoIdentificacion = reader["tipo_identificacion"].ToString(),
+                            numeroIdentificacion = reader["numero_identificacion"].ToString(),
+                            correo = reader["correo"].ToString(),
+                            descripcion = reader["descripcion"].ToString(),
+                            condicion = reader["condicion"].ToString(),
+                            telefono = reader["telefono"].ToString(),
+                            area = reader["area"].ToString(),
+                            departamento = reader["departamento"].ToString(),
+                            unidadAcademica = reader["unidad_academica"].ToString(),
+                            sede = reader["sede"].ToString()
+                        };
+                    }
+                }
+
+                ConexionMetics.Close();
+            }
+
+            return asesor;
+        }
+
+
+
+
+
+
+
+        /*
+         
+         TODO: Pasar estos métodos a stored procedures en la base de datos.
+         
+         */
 
         /*Consulta en la base de datos para obtener todos los asesores en la tabla asesor
          * Retorna una lista de participantes
@@ -121,13 +254,13 @@ namespace webMetics.Handlers
             AsesorModel asesor = new AsesorModel
             {
                 // Asignar los valores de las columnas de la fila a las propiedades del objeto AsesorModel
-                id = Convert.ToString(filaAsesor["id_asesor_PK"]),
+                idAsesor = Convert.ToString(filaAsesor["id_asesor_PK"]),
                 nombre = Convert.ToString(filaAsesor["nombre"]),
-                apellido1 = Convert.ToString(filaAsesor["apellido_1"]),
-                apellido2 = Convert.ToString(filaAsesor["apellido_2"]),
+                primerApellido = Convert.ToString(filaAsesor["apellido_1"]),
+                segundoApellido = Convert.ToString(filaAsesor["apellido_2"]),
                 correo = Convert.ToString(filaAsesor["id_asesor_PK"]),
                 descripcion = Convert.ToString(filaAsesor["descripcion"]),
-                telefonos = Convert.ToString(filaAsesor["telefonos"])
+                telefono = Convert.ToString(filaAsesor["telefono"])
             };
 
             // Retornar el objeto AsesorModel creado a partir de la fila de la tabla asesor
@@ -177,18 +310,18 @@ namespace webMetics.Handlers
             return eliminar;
         }
 
-        // Método para editar un asesor en la base de datos
+        /*// Método para editar un asesor en la base de datos
         public bool EditarAsesor(AsesorModel asesor)
         {
             bool comprobacionConsultaExitosa;
-            string consulta = "UPDATE asesor SET nombre = @nombre , apellido_1 = @apellido1 , apellido_2 = @apellido2, " +
-                              "telefonos = @telefonos,  descripcion= @descripcion " +
+            string consulta = "UPDATE asesor SET nombre = @nombre , apellido_1 = @primerApellido , apellido_2 = @segundoApellido, " +
+                              "telefono = @telefono,  descripcion= @descripcion " +
                               "WHERE id_asesor_PK = @id";
 
-            // Si el apellido2 es nulo, reemplazarlo con "-"
-            if (asesor.apellido2 == null)
+            // Si el segundoApellido es nulo, reemplazarlo con "-"
+            if (asesor.segundoApellido == null)
             {
-                asesor.apellido2 = "-";
+                asesor.segundoApellido = "-";
             }
 
             // Abrir la conexión a la base de datos
@@ -199,11 +332,11 @@ namespace webMetics.Handlers
 
             // Asignar los valores de los parámetros con los atributos del objeto AsesorModel
 
-            comandoParaConsulta.Parameters.AddWithValue("@id", asesor.id);
+            comandoParaConsulta.Parameters.AddWithValue("@id", asesor.idAsesor);
             comandoParaConsulta.Parameters.AddWithValue("@nombre", asesor.nombre);
-            comandoParaConsulta.Parameters.AddWithValue("@apellido1", asesor.apellido1);
-            comandoParaConsulta.Parameters.AddWithValue("@apellido2", asesor.apellido2);
-            comandoParaConsulta.Parameters.AddWithValue("@telefonos", asesor.telefonos);
+            comandoParaConsulta.Parameters.AddWithValue("@primerApellido", asesor.primerApellido);
+            comandoParaConsulta.Parameters.AddWithValue("@segundoApellido", asesor.segundoApellido);
+            comandoParaConsulta.Parameters.AddWithValue("@telefono", asesor.telefono);
             comandoParaConsulta.Parameters.AddWithValue("@descripcion", asesor.descripcion);
 
             // Ejecutar la consulta y obtener el número de filas afectadas (mayor o igual a 1 si se actualizó correctamente)
@@ -214,7 +347,7 @@ namespace webMetics.Handlers
 
             // Retornar un valor booleano que indica si la consulta se ejecutó exitosamente
             return comprobacionConsultaExitosa;
-        }
+        }*/
 
 
         /*
@@ -265,11 +398,11 @@ namespace webMetics.Handlers
             foreach (DataRow fila in tablaResultado.Rows)
             {
                 string nombre = Convert.ToString(fila["nombre"]);
-                string apellido1 = Convert.ToString(fila["apellido_1"]);
-                string apellido2 = Convert.ToString(fila["apellido_2"]);
+                string primerApellido = Convert.ToString(fila["apellido_1"]);
+                string segundoApellido = Convert.ToString(fila["apellido_2"]);
 
                 // Crear el nombre completo y agregarlo a la lista
-                string nombreCompleto = nombre + " " + apellido1 + " " + apellido2;
+                string nombreCompleto = nombre + " " + primerApellido + " " + segundoApellido;
                 lista.Add(nombreCompleto);
             }
 

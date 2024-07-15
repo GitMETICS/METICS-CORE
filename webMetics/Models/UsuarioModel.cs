@@ -22,10 +22,6 @@ namespace webMetics.Models
         [Display(Name = "Correo institucional")]
         public required string correo { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
-        [Display(Name = "Tipo de participante")]
-        public string? tipoParticipante { get; set; }
-
         [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
         [Display(Name = "Tipo de identificación")]
         public string? tipoIdentificacion { get; set; }
@@ -34,16 +30,20 @@ namespace webMetics.Models
         public string? numeroIdentificacion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un área.")]
-        [Display(Name = "Área Académica a la que pertenece")]
+        [Display(Name = "Área")]
         public string? area { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar una facultad.")]
-        [Display(Name = "Facultad a la que pertenece")]
+        [Required(ErrorMessage = "Es necesario ingresar un departamento.")]
+        [Display(Name = "Departamento")]
         public string? departamento { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una unidad académica.")]
-        [Display(Name = "Unidad Académica a la que pertenece")]
-        public string? seccion { get; set; }
+        [Display(Name = "Unidad académica")]
+        public string? unidadAcademica { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
+        [Display(Name = "Tipo de participante")]
+        public string? tipoParticipante { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una condición actual.")]
         [Display(Name = "Condición actual")]
@@ -51,7 +51,7 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Es necesario ingresar un número de teléfono.")]
         [Display(Name = "Número de teléfono")]
-        public string? telefonos { get; set; }
+        public string? telefono { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
         [Display(Name = "Contraseña")]

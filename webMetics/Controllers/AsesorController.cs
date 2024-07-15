@@ -75,7 +75,7 @@ namespace webMetics.Controllers
         }
 
         /* Método de la vista del formulario para crear un asesor */
-        public ActionResult AgregarAsesor()
+        public ActionResult CrearAsesor()
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
@@ -97,25 +97,26 @@ namespace webMetics.Controllers
         /* Método para procesar el formulario con los datos necesarios para crear un asesor */
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CrearAsesor(AsesorModel asesor)
+        public ActionResult AgregarAsesor(AsesorModel asesor)
         {
             bool exito;
+
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
                 if (ModelState.IsValid)
                 {
-                    ViewBag.Role = GetRole();
-                    ViewBag.Id = GetId();
-
                     // Aquí se define que el correo es la identificación.
-                    asesor.id = asesor.correo;
+                    asesor.idAsesor = asesor.correo;
 
-                    if (accesoAUsuario.ExisteUsuario(asesor.id))
+                    if (accesoAUsuario.ExisteUsuario(asesor.idAsesor))
                     {
                         // TODO: Pasar esto a un stored procedure en el handler.
                         // Verificar si ya existe un asesor con los mismos datos en la base de datos.
                         List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
-                        if (asesores.Any(a => a.id == asesor.id))
+                        if (asesores.Any(a => a.idAsesor == asesor.idAsesor))
                         {
                             exito = accesoAAsesor.EditarAsesor(asesor);
                         }
@@ -126,7 +127,7 @@ namespace webMetics.Controllers
                     }
                     else
                     {
-                        accesoAUsuario.CrearUsuario(asesor.id, "pass"); // Esta contraseña es provisional en la base de datos
+                        accesoAUsuario.CrearUsuario(asesor.idAsesor, "pass"); // Esta contraseña es provisional en la base de datos
                         exito = accesoAAsesor.CrearAsesor(asesor);
                     }
 
@@ -147,7 +148,7 @@ namespace webMetics.Controllers
                 {
                     // Si el formulario no es válido o hubo algún problema, regresar a la vista del formulario
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View(asesor);
+                    return View("CrearAsesor", asesor);
                 }
             }
             catch (Exception)
@@ -155,7 +156,7 @@ namespace webMetics.Controllers
                 ViewBag.Message = "Hubo un error y no se pudo enviar la petición de crear el asesor.";
 
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                return View("AgregarAsesor");
+                return View("CrearAsesor");
             }
         }
 
@@ -201,7 +202,7 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 // Buscar el asesor a editar en la lista de asesores y obtenerlo
-                AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.id == idAsesor);
+                AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.idAsesor == idAsesor);
 
                 // Si no se encuentra el asesor a editar, redirigir a la lista de asesores
                 if (asesor == null)
@@ -232,7 +233,7 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 // Aquí se define que el correo es la identificación.
-                asesor.id = asesor.correo;
+                asesor.idAsesor = asesor.correo;
 
                 bool exito = accesoAAsesor.EditarAsesor(asesor);
 

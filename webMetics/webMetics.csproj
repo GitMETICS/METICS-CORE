@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Views\Asesor\AgregarAsesor.cshtml" />
+    <None Include="Views\Asesor\CrearAsesor.cshtml" />
     <None Include="Views\Asesor\EditarAsesor.cshtml" />
     <None Include="Views\Asesor\ListaAsesores.cshtml" />
     <None Include="Views\Calificaciones\EditarCalificacion.cshtml" />

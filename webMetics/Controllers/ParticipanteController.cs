@@ -170,9 +170,9 @@ namespace webMetics.Controllers
                             condicion = "",
                             tipoParticipante = "",
                             area = "",
-                            seccion = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad Académica")].Text,
+                            unidadAcademica = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad Académica")].Text,
                             departamento = "",
-                            telefonos = "",
+                            telefono = "",
                             horasMatriculadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
                             horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
                             gruposInscritos = new List<GrupoModel>()
@@ -192,7 +192,7 @@ namespace webMetics.Controllers
 
                 TempData["successMessage"] = "El archivo fue subido éxitosamente.";
             }
-            catch (Exception ex)
+            catch
             {
                 TempData["errorMessage"] = "Error al cargar los datos.";
             }

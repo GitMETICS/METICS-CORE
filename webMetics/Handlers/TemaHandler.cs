@@ -194,19 +194,19 @@ namespace webMetics.Handlers
             string[] nombre = asesor.Split(' ');
             // Define la consulta SQL para obtener el identificador del asesor en base a su nombre completo.
             string consulta = "SELECT id_asesor_PK FROM asesor WHERE " +
-                "nombre = @nombre AND apellido_1 = @apellido1 AND apellido_2 = @apellido2 ";
+                "nombre = @nombre AND apellido_1 = @primerApellido AND apellido_2 = @segundoApellido ";
 
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoConsulta.Parameters.AddWithValue("@nombre", nombre[0]);
-            comandoConsulta.Parameters.AddWithValue("@apellido1", nombre[1]);
+            comandoConsulta.Parameters.AddWithValue("@primerApellido", nombre[1]);
             // Verifica si el asesor tiene segundo apellido o no y agrega el parámetro correspondiente.
             if (nombre[2] != "")
             {
-                comandoConsulta.Parameters.AddWithValue("@apellido2", nombre[2]);
+                comandoConsulta.Parameters.AddWithValue("@segundoApellido", nombre[2]);
             }
             else
             {
-                comandoConsulta.Parameters.AddWithValue("@apellido2", "-");
+                comandoConsulta.Parameters.AddWithValue("@segundoApellido", "-");
             }
             DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
             // Recorre el resultado de la consulta y obtiene el identificador del asesor.

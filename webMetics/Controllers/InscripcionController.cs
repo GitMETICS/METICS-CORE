@@ -70,16 +70,15 @@ namespace webMetics.Controllers
         }
 
         /* Método para inscribir a un usuario a un grupo */
-        public ActionResult Inscribir(int idGrupo)
+        public ActionResult Inscribir(int idGrupo, string idParticipante)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-            
-            if (NoEstaInscritoEnGrupo(idGrupo, ViewBag.Id))
+            if (participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
             {
                 if (MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
@@ -87,7 +86,7 @@ namespace webMetics.Controllers
                     InscripcionModel inscripcion = new InscripcionModel
                     {
                         idGrupo = idGrupo,
-                        idParticipante = ViewBag.Id
+                        idParticipante = idParticipante
                     };
 
                     bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
@@ -105,7 +104,7 @@ namespace webMetics.Controllers
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
-                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
+                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                         }
                         catch
                         {
@@ -113,8 +112,6 @@ namespace webMetics.Controllers
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el correo de inscripción.";
                         }
-                        
-                        
                     }
                 }
             }
@@ -389,7 +386,7 @@ namespace webMetics.Controllers
                 sb.Append("</td>");
 
                 sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.telefonos);
+                sb.Append(participante.telefono);
                 sb.Append("</td>");
 
                 sb.Append("</tr>");
@@ -449,9 +446,9 @@ namespace webMetics.Controllers
                 table.AddCell(participante.idParticipante);
                 table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                 table.AddCell(participante.condicion);
-                table.AddCell(participante.seccion);
+                table.AddCell(participante.unidadAcademica);
                 table.AddCell(participante.correo);
-                table.AddCell(participante.telefonos);
+                table.AddCell(participante.telefono);
             }
 
             document.Add(table);
@@ -508,9 +505,9 @@ namespace webMetics.Controllers
                 row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
                 row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
                 row.GetCell(2).SetText(participantes[i].condicion.ToString());
-                row.GetCell(3).SetText(participantes[i].seccion);
+                row.GetCell(3).SetText(participantes[i].unidadAcademica);
                 row.GetCell(4).SetText(participantes[i].correo.ToString());
-                row.GetCell(5).SetText(participantes[i].telefonos.ToString());
+                row.GetCell(5).SetText(participantes[i].telefono.ToString());
             }
 
             var stream = new MemoryStream();
@@ -577,13 +574,13 @@ namespace webMetics.Controllers
                 cell3.SetCellValue(participante.condicion);
 
                 NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
-                cell4.SetCellValue(participante.seccion);
+                cell4.SetCellValue(participante.unidadAcademica);
 
                 NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
                 cell5.SetCellValue(participante.correo);
 
                 NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
-                cell6.SetCellValue(participante.telefonos);
+                cell6.SetCellValue(participante.telefono);
 
                 rowN++;
             }

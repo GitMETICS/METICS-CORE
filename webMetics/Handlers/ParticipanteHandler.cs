@@ -23,7 +23,7 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@id", id);
-                var existeParam = command.Parameters.Add("@existe", SqlDbType.Int);
+                var existeParam = command.Parameters.Add("@exists", SqlDbType.Int);
                 existeParam.Direction = ParameterDirection.Output;
 
                 try
@@ -54,18 +54,19 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
-                command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
                 command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@telefonos", participante.telefonos);
+                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@telefono", participante.telefono);
                 command.Parameters.AddWithValue("@area", participante.area);
                 command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@seccion", participante.seccion);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
+                command.Parameters.AddWithValue("@sede", participante.sede);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
@@ -96,18 +97,19 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
-                command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
                 command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@correo", participante.correo);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@telefonos", participante.telefonos);
+                command.Parameters.AddWithValue("@condicion", participante.condicion);
+                command.Parameters.AddWithValue("@telefono", participante.telefono);
                 command.Parameters.AddWithValue("@area", participante.area);
                 command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@seccion", participante.seccion);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
+                command.Parameters.AddWithValue("@sede", participante.sede);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
@@ -128,6 +130,69 @@ namespace webMetics.Handlers
 
             return exito;
         }
+
+        // Método para obtener un participante específico según su ID
+        public ParticipanteModel ObtenerParticipante(string idParticipante)
+        {
+            ParticipanteModel participante = null;
+
+            using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", idParticipante);
+
+                try
+                {
+                    ConexionMetics.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            participante = new ParticipanteModel
+                            {
+                                idParticipante = reader["id_participante_PK"].ToString(),
+                                nombre = reader["nombre"].ToString(),
+                                primerApellido = reader["apellido_1"].ToString(),
+                                segundoApellido = reader["apellido_2"].ToString(),
+                                tipoIdentificacion = reader["tipo_identificacion"].ToString(),
+                                numeroIdentificacion = reader["numero_identificacion"].ToString(),
+                                correo = reader["correo"].ToString(),
+                                tipoParticipante = reader["tipo_participante"].ToString(),
+                                condicion = reader["condicion"].ToString(),
+                                telefono = reader["telefono"].ToString(),
+                                area = reader["area"].ToString(),
+                                departamento = reader["departamento"].ToString(),
+                                unidadAcademica = reader["unidad_academica"].ToString(),
+                                sede = reader["sede"].ToString(),
+                                horasAprobadas = reader.GetInt32(reader.GetOrdinal("horas_aprobadas")),
+                                horasMatriculadas = reader.GetInt32(reader.GetOrdinal("horas_matriculadas")),
+                                gruposInscritos = new List<GrupoModel>()
+                            };
+                        }
+                    }
+
+                    ConexionMetics.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener el participante: {ex.Message}");
+                    participante = null;
+                }
+            }
+
+            return participante;
+        }
+
+
+
+
+
+
+
+
+
+
 
 
         /*
@@ -196,50 +261,6 @@ namespace webMetics.Handlers
             return exito;
         }
 
-        // Método para obtener un participante específico según su ID
-        public ParticipanteModel ObtenerParticipante(string idParticipante)
-        {
-            ParticipanteModel participante = null;
-
-            using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
-            {
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@id", idParticipante);
-
-                ConexionMetics.Open();
-
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        participante = new ParticipanteModel
-                        {
-                            idParticipante = reader.GetString(reader.GetOrdinal("id_participante_PK")),
-                            nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                            primerApellido = reader.GetString(reader.GetOrdinal("apellido_1")),
-                            segundoApellido = reader.GetString(reader.GetOrdinal("apellido_2")),
-                            correo = reader.GetString(reader.GetOrdinal("correo")),
-                            tipoIdentificacion = reader.GetString(reader.GetOrdinal("tipo_identificacion")),
-                            // command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
-                            tipoParticipante = reader.GetString(reader.GetOrdinal("tipo_participante")),
-                            area = reader.GetString(reader.GetOrdinal("area")),
-                            departamento = reader.GetString(reader.GetOrdinal("departamento")),
-                            seccion = reader.GetString(reader.GetOrdinal("seccion")),
-                            condicion = reader.GetString(reader.GetOrdinal("condicion")),
-                            telefonos = reader.GetString(reader.GetOrdinal("telefonos")),
-                            horasAprobadas = reader.GetInt32(reader.GetOrdinal("horas_aprobadas")),
-                            horasMatriculadas = reader.GetInt32(reader.GetOrdinal("horas_matriculadas")),
-                            gruposInscritos = new List<GrupoModel>()
-                        };
-                    }
-                }
-
-                ConexionMetics.Close();
-            }
-
-            return participante;
-        }
-
         // Método para obtener información detallada del participante a partir de una fila de datos
         public ParticipanteModel ObtenerInfoParticipante(DataRow filaParticipante)
         {
@@ -247,21 +268,24 @@ namespace webMetics.Handlers
             ParticipanteModel info = new ParticipanteModel
             {
                 idParticipante = Convert.ToString(filaParticipante["id_participante_PK"]),
-                tipoIdentificacion = Convert.ToString(filaParticipante["tipo_identificacion"]),
-                correo = Convert.ToString(filaParticipante["correo"]),
                 nombre = Convert.ToString(filaParticipante["nombre"]),
                 primerApellido = Convert.ToString(filaParticipante["apellido_1"]),
                 segundoApellido = Convert.ToString(filaParticipante["apellido_2"]),
-                condicion = Convert.ToString(filaParticipante["condicion"]),
+                tipoIdentificacion = Convert.ToString(filaParticipante["tipo_identificacion"]),
+                numeroIdentificacion = Convert.ToString(filaParticipante["numero_identificacion"]),
+                correo = Convert.ToString(filaParticipante["correo"]),
                 tipoParticipante = Convert.ToString(filaParticipante["tipo_participante"]),
+                condicion = Convert.ToString(filaParticipante["condicion"]),
+                telefono = Convert.ToString(filaParticipante["telefono"]),
                 area = Convert.ToString(filaParticipante["area"]),
                 departamento = Convert.ToString(filaParticipante["departamento"]),
-                seccion = Convert.ToString(filaParticipante["seccion"]),
-                telefonos = Convert.ToString(filaParticipante["telefonos"]),
+                unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
+                sede = Convert.ToString(filaParticipante["sede"]),
                 horasMatriculadas = Convert.ToInt32(filaParticipante["horas_matriculadas"]),
                 horasAprobadas = Convert.ToInt32(filaParticipante["horas_aprobadas"]),
                 gruposInscritos = new List<GrupoModel>()
             };
+
             return info;
         }
 
@@ -442,8 +466,8 @@ namespace webMetics.Handlers
                             {
                                 foreach (JObject seccionObject in seccionesArray)
                                 {
-                                    string seccion = (string)seccionObject["name"];
-                                    seccionesList.Add(seccion);
+                                    string unidadAcademica = (string)seccionObject["name"];
+                                    seccionesList.Add(unidadAcademica);
                                 }
                                 break;
                             }

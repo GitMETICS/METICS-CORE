@@ -173,9 +173,9 @@ namespace webMetics.Controllers
                             tipoParticipante = usuario.tipoParticipante,
                             area = usuario.area,
                             departamento = usuario.departamento,
-                            seccion = usuario.seccion,
+                            unidadAcademica = usuario.unidadAcademica,
                             condicion = usuario.condicion,
-                            telefonos = usuario.telefonos,
+                            telefono = usuario.telefono,
                             horasMatriculadas = 0,
                             horasAprobadas = 0
                         };
@@ -198,9 +198,9 @@ namespace webMetics.Controllers
                             tipoParticipante = usuario.tipoParticipante,
                             area = usuario.area,
                             departamento = usuario.departamento,
-                            seccion = usuario.seccion,
+                            unidadAcademica = usuario.unidadAcademica,
                             condicion = usuario.condicion,
-                            telefonos = usuario.telefonos,
+                            telefono = usuario.telefono,
                             horasMatriculadas = participante.horasMatriculadas,
                             horasAprobadas = participante.horasAprobadas
                         };

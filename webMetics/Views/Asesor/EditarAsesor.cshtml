@@ -71,15 +71,15 @@
                         </div>
 
                         <div class="form-group mt-1">
-                            @Html.LabelFor(asesorModel => asesorModel.apellido1, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(asesorModel => asesorModel.apellido1, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.apellido1, "", new { @class = "text-danger" })
+                            @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group mt-1">
-                            @Html.LabelFor(asesorModel => asesorModel.apellido2, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(asesorModel => asesorModel.apellido2, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.apellido2, "", new { @class = "text-danger", @maxlength = "64" })
+                            @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger", @maxlength = "64" })
                         </div>
 
                         <div class="form-group mt-1">
@@ -101,9 +101,9 @@
                         </div>
 
                         <div class="form-group mt-1">
-                            @Html.LabelFor(asesorModel => asesorModel.telefonos, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(asesorModel => asesorModel.telefonos, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.telefonos, "", new { @class = "text-danger" })
+                            @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "12", @minlength = "7", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group mt-1">

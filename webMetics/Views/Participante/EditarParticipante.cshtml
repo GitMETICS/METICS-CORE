@@ -71,9 +71,12 @@
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                <small class="form-text text-muted">
+                                    Formato de cédula: 1-1100-1100 (con guiones)
+                                </small>
                             </div>
                         </div>
                         <div class="form-group mt-1">
@@ -94,14 +97,14 @@
                             @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.seccion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.seccion, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una sección...", new { @class = "form-control", id = "seccionDropdown" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.seccion, "", new { @class = "text-danger" })
+                            @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Selecciona una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.telefonos, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.telefonos, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.telefonos, "", new { @class = "text-danger" })
+                            @Html.LabelFor(participanteModel => participanteModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(participanteModel => participanteModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.telefono, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
@@ -136,9 +139,9 @@ else
         $('#areaDropdown').click(function () {
             var areaName = $(this).val();
 
-            // Clear departamento and seccion dropdowns
+            // Clear departamento and unidadAcademica dropdowns
             $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
-            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Selecciona una unidad académica...</option>');
 
             if (areaName !== '') {
                 // Make AJAX request to fetch departamentos for selected area
@@ -169,7 +172,7 @@ else
                     data: { departamentoName: departamentoName },
                     dataType: 'json',
                     success: function (data) {
-                        // Update seccion dropdown with fetched data
+                        // Update unidadAcademica dropdown with fetched data
                         $.each(data, function (index, value) {
                             $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
                         });
@@ -191,8 +194,8 @@ else
             var departamentoName = $(this).val();
             var areaName = $('#areaDropdown').val();
 
-            // Clear seccion dropdown
-            $('#seccionDropdown').empty().append('<option value="">Seleccione una sección...</option>');
+            // Clear unidadAcademica dropdown
+            $('#seccionDropdown').empty().append('<option value="">Selecciona una unidad académica...</option>');
 
             if (departamentoName !== '') {
                 // Make AJAX request to fetch secciones for selected departamento
@@ -202,7 +205,7 @@ else
                     data: { areaName: areaName, departamentoName: departamentoName },
                     dataType: 'json',
                     success: function (data) {
-                        // Update seccion dropdown with fetched data
+                        // Update unidadAcademica dropdown with fetched data
                         $.each(data, function (index, value) {
                             $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
                         });
