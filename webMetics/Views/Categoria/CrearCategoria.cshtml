@@ -1,74 +1,73 @@
 ﻿@model webMetics.Models.CategoriaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Crear categoría";
-}
-<!DOCTYPE html>
+    ViewBag.Title = "Crear Categoría";
 
-<html>
-<head>
-</head>
-<body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
-    {
-        using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+
+        @using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <div class="form-horizontal">
-                <h1 class="mt-5">Crear categoría</h1>
-                <h5>Inserte los siguientes datos:</h5>
-                <h6 style="color:red"> * Son campos obligatorios</h6>
-                <hr />
+            <h1>@ViewBag.Title</h1>
+            <hr />
 
-                @if (ViewBag.Message != null)
-                {
-                    if (ViewBag.ExitoAlCrear != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-                            @ViewBag.Message
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
-                            @ViewBag.Message
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                }
+            if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.ErrorMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.SuccessMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
 
-                <div class="row">
-                    <div class="col">
-                        <div class="form-group">
-                            @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+            <div class="row mb-1">
+                <div class="col">
+                    <div class="container">
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px"> *</a>
                             @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64" })
                             @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
                         </div>
-
                         <div class="form-group">
-                            @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px"> *</a>
                             @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300" })
                             @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
 
                         </div>
-                    </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "ListaCategorias", "Categoria", new { }, new { @class = "btn btn-secondary btn-block" })
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        <div class="row justify-content-center m-4">
+                            <div class="col-auto">
+                                <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         }
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-</body>
-</html>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

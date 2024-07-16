@@ -1,62 +1,66 @@
 ﻿@model webMetics.Models.TipoActividadModel
 @{
     ViewBag.Title = "Editar Actividad";
-}
-<!DOCTYPE html>
 
-<html>
-<head>
-</head>
-<body>
-    @if (ViewBag.Message != null)
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (urlReferrer != null)
+{
+    <div class="d-flex justify-content-start mb-3">
+        <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
+}
+
+@if (ViewBag.Message != null)
+{
+    if (ViewBag.ExitoAlCrear != null)
     {
-        if (ViewBag.ExitoAlCrear != null)
-        {
-            <div class="alert-success">
-                <h3> @ViewBag.Message </h3>
-            </div>
-        }
-        else
-        {
-            <div class="alert-danger">
-                <h3> @ViewBag.Message </h3>
-            </div>
-        }
-    }
-    @using (Html.BeginForm("EditarTipoActividad", "TipoActividad", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
-        <div class="form-horizontal">
-            <h1>Edición de tipos de actividad</h1>
-            <h5>Inserte los siguientes datos</h5>
-            <h6 style="color:red"> * Son campos obligatorios</h6>
-            <hr />
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        @Html.LabelFor(tipoActividadModel => tipoActividadModel.nombre, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
-                        @Html.TextBoxFor(tipoActividadModel => tipoActividadModel.nombre, new { @class = "form-control", @maxlength = "64" })
-                        @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.nombre, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(tipoActividadModel => tipoActividadModel.descripcion, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
-                        @Html.TextAreaFor(tipoActividadModel => tipoActividadModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
-                        @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.descripcion, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="row justify-content-center" style="margin-top:20px">
-                    @Html.ActionLink("Cancelar", "ListaTiposActividad",
-                    new { },
-                    new { @class = "btn boton-formularios" })
-                    <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
-                </div>
-            </div>
-        </div>
-        <div class="form-group" style="visibility:hidden">
-            <a style="color:red;font-size:22px">*</a> @Html.LabelFor(tipoActividadModel => tipoActividadModel.idGenerado, new { Style = "font-size:22px" })
-            @Html.TextBoxFor(tipoActividadModel => tipoActividadModel.idGenerado, new { @class = "form-control", @maxlength = "64" })
-            @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.idGenerado, "", new { @class = "text-danger" })
+        <div class="alert-success">
+            <h3> @ViewBag.Message </h3>
         </div>
     }
-</body>
-</html>
+    else
+    {
+        <div class="alert-danger">
+            <h3> @ViewBag.Message </h3>
+        </div>
+    }
+}
+@using (Html.BeginForm("EditarTipoActividad", "TipoActividad", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h1>Edición de tipos de actividad</h1>
+        <h5>Inserte los siguientes datos</h5>
+        <h6 style="color:red"> * Son campos obligatorios</h6>
+        <hr />
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    @Html.LabelFor(tipoActividadModel => tipoActividadModel.nombre, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                    @Html.TextBoxFor(tipoActividadModel => tipoActividadModel.nombre, new { @class = "form-control", @maxlength = "64" })
+                    @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.nombre, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(tipoActividadModel => tipoActividadModel.descripcion, new { Style = "font-size:22px" })  <a style="color:red;font-size:22px">*</a>
+                    @Html.TextAreaFor(tipoActividadModel => tipoActividadModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
+                    @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.descripcion, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="row justify-content-center" style="margin-top:20px">
+                @Html.ActionLink("Cancelar", "ListaTiposActividad",
+                         new { },
+                         new { @class = "btn boton-formularios" })
+                <input type="submit" class="btn btn-primary boton-formularios" value="Guardar" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group" style="visibility:hidden">
+        <a style="color:red;font-size:22px">*</a> @Html.LabelFor(tipoActividadModel => tipoActividadModel.idGenerado, new { Style = "font-size:22px" })
+        @Html.TextBoxFor(tipoActividadModel => tipoActividadModel.idGenerado, new { @class = "form-control", @maxlength = "64" })
+        @Html.ValidationMessageFor(tipoActividadModel => tipoActividadModel.idGenerado, "", new { @class = "text-danger" })
+    </div>
+}

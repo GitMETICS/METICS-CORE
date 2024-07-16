@@ -1,78 +1,82 @@
 ﻿@model webMetics.Models.CategoriaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar categoría";
+    ViewBag.Title = "Editar Categoría";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+@if (urlReferrer != null)
+{
+    <div class="d-flex justify-content-start mb-3">
+        <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
+}
+
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            @Html.AntiForgeryToken()
-            <div class="form-horizontal">
-                <h1 class="mt-5">Editar categoría</h1>
-                <h5>Inserte los siguientes datos:</h5>
-                <h6 style="color:red"> * Son campos obligatorios</h6>
-                <hr />
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <h1 class="mt-5">Editar categoría</h1>
+            <h5>Inserte los siguientes datos:</h5>
+            <h6 style="color:red"> * Son campos obligatorios</h6>
+            <hr />
 
-                @if (ViewBag.Message != null)
+            @if (ViewBag.Message != null)
+            {
+                if (ViewBag.ExitoAlCrear != null)
                 {
-                    if (ViewBag.ExitoAlCrear != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-                            @ViewBag.Message
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
-                            @ViewBag.Message
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                }
-
-                <div class="row">
-                    <div class="col">
-                        <div class="form-group">
-                            @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64" })
-                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
-                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
-                        </div>
+                    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                        @ViewBag.Message
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "ListaCategorias", "Categoria", new { }, new { @class = "btn btn-secondary btn-block" })
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
+                }
+                else
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
+                        @ViewBag.Message
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            }
+
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64" })
+                        @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "256" })
+                        @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="row justify-content-center m-4">
+                    <div class="col-auto">
+                        @Html.ActionLink("Cancelar", "ListaCategorias", "Categoria", new { }, new { @class = "btn btn-secondary btn-block" })
+                    </div>
+                    <div class="col-auto">
+                        <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
                     </div>
                 </div>
             </div>
+        </div>
 
 
-            <div class="form-group" style="visibility:hidden">
-                <a style="color:red;font-size:22px">*</a> @Html.LabelFor(categoriaModel => categoriaModel.idGenerado, new { Style = "font-size:22px" })
-                @Html.TextBoxFor(categoriaModel => categoriaModel.idGenerado, new { @class = "form-control", @maxlength = "64" })
-                @Html.ValidationMessageFor(categoriaModel => categoriaModel.idGenerado, "", new { @class = "text-danger" })
-            </div>
-        }
+        <div class="form-group" style="visibility:hidden">
+            <a style="color:red;font-size:22px">*</a> @Html.LabelFor(categoriaModel => categoriaModel.idGenerado, new { Style = "font-size:22px" })
+            @Html.TextBoxFor(categoriaModel => categoriaModel.idGenerado, new { @class = "form-control", @maxlength = "64" })
+            @Html.ValidationMessageFor(categoriaModel => categoriaModel.idGenerado, "", new { @class = "text-danger" })
+        </div>
     }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-    </body>
-</html>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

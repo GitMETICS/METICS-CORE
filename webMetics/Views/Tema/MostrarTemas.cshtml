@@ -1,109 +1,131 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Temas";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<!DOCTYPE html>
-<html>
-<body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    if (ViewBag.Message != null)
     {
-        if (ViewBag.Message != null)
+        <div class="alert-success">
+            <h3> @ViewBag.Message </h3>
+        </div>
+    }
+
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
         {
-            <div class="alert-success">
-                <h3> @ViewBag.Message </h3>
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
             </div>
         }
 
-        <div class="contenedor-tipos-actividades container-fluid">
-            <a href="/Tema/CrearTema" class="btn btn-primary" style="float: right; margin-right: 20px;width:20%;height:105%">Crear tema</a>
+        <h1>@ViewBag.Title</h1>
+        <hr />
 
-            <h1>@ViewBag.Nombre</h1>
-            <hr />
-            <div class="table-responsive">
-                @if (ViewBag.Temas == null)
-                {
-                    <h5> No hay temas disponibles para esta categoría</h5>
-                    <div class="justify-content-center" style="margin-top:50px;align-content:center">
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-                        @Html.ActionLink("Crear tema", "CrearTema", "Tema",
-                        new { },
-                        new { @class = "btn btn-primary" })
-                        @Html.ActionLink("Volver", "ListaCategorias", "Categoria",
-                        new { },
-                        new { @class = "btn boton-secondary" })
-                    </div>
-                }
-                else
-                {
-                    <table class="table table-striped">
-                        <thead>
+        <a href="/Tema/CrearTema" class="btn btn-primary" style="float: right; margin-right: 20px;width:20%;height:105%">Crear tema</a>
+
+        <div class="table-responsive">
+            @if (ViewBag.Temas == null)
+            {
+                <h5> No hay temas disponibles para esta categoría</h5>
+                <div class="justify-content-center" style="margin-top:50px;align-content:center">
+
+                    @Html.ActionLink("Crear tema", "CrearTema", "Tema",
+                             new { },
+                             new { @class = "btn btn-primary" })
+                    @Html.ActionLink("Volver", "ListaCategorias", "Categoria",
+                             new { },
+                             new { @class = "btn boton-secondary" })
+                </div>
+            }
+            else
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Tipo de actividad</th>
+                            <th scope="col">Asesor principal</th>
+                            <th scope="col">Asesores apoyo</th>
+                            <th scope="col"></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var tema in ViewBag.Temas)
+                        {
                             <tr>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Tipo de actividad</th>
-                                <th scope="col">Asesor principal</th>
-                                <th scope="col">Asesores apoyo</th>
-                                <th scope="col"></th>
+                                <td>@tema.nombre</td>
+                                <td>@tema.tipoActividad</td>
+                                <td>@tema.asesorPrincipal</td>
+                                <td>@tema.asesores</td>
+                                <td>
+                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@tema.idTema')">
+                                        Eliminar
+                                    </button>
+                                </td>
 
                             </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var tema in ViewBag.Temas)
-                            {
-                                <tr>
-                                    <td>@tema.nombre</td>
-                                    <td>@tema.tipoActividad</td>
-                                    <td>@tema.asesorPrincipal</td>
-                                    <td>@tema.asesores</td>
-                                    <td>
-                                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@tema.idTema')">
-                                            Eliminar
-                                        </button>
-                                    </td>
-
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
-
-
-        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Eliminar tema</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        ¿Estás seguro que deseas eliminar este tema?
-
-                        @using (Html.BeginForm("EliminarTema", "Tema"))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <div class="modal-footer">
-                                <input type="hidden" id="nombreTema" name="nombre">
-                                <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-
-                            </div>
                         }
-                    </div>
-                </div>
-
-            </div>
+                    </tbody>
+                </table>
+            }
         </div>
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-</body>
-</html>
+    </div>
+
+
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar tema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro que deseas eliminar este tema?
+
+                    @using (Html.BeginForm("EliminarTema", "Tema"))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-footer">
+                            <input type="hidden" id="nombreTema" name="nombre">
+                            <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}
 
 <script type="text/javascript">
     function actualizarModal(idTema) {

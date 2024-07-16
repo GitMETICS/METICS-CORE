@@ -1,7 +1,7 @@
 ﻿@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Crear módulo";
+    ViewBag.Title = "Crear Módulo";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -129,10 +129,9 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
+                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
                         </div>
                         <div class="col-auto">
                             <input type="submit" class="btn btn-primary btn-block" value="Guardar" />

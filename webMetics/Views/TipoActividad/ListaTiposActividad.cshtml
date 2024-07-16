@@ -5,149 +5,144 @@
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<!DOCTYPE html>
-<html>
-<body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    if (ViewBag.Message != null)
     {
-        if (ViewBag.Message != null)
+        <div class="alert-success">
+            <h3> @ViewBag.Message </h3>
+        </div>
+    }
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
         {
-            <div class="alert-success">
-                <h3> @ViewBag.Message </h3>
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
             </div>
         }
-        <div class="contenedor-tipos-actividades container-fluid">
-            @if (urlReferrer != null)
-            {
-                <div class="d-flex justify-content-start mb-3">
-                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                </div>
-            }
 
-            @if (ViewBag.TiposActividad != null)
+        @if (ViewBag.TiposActividad != null)
+        {
+            <a href="/TipoActividad/CrearTipoActividad" class="btn btn-primary" style="float: right;">Crear nueva actividad</a>
+        }
+        <h1>Actividades</h1>
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong> @TempData["Message"] </strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        <hr />
+        <div class="table-responsive">
+            @if (ViewBag.TiposActividad == null)
             {
-                <a href="/TipoActividad/CrearTipoActividad" class="btn btn-primary" style="float: right;">Crear nueva actividad</a>
-            }
-            <h1>Actividades</h1>
-            @if (TempData["Message"] != null)
-            {
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong> @TempData["Message"] </strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <h5 class="text-center"> No hay actividad disponibles</h5>
+                <div class="d-flex justify-content-center my-4">
+                    <a href="/TipoActividad/CrearTipoActividad" class="btn btn-primary" role="button" style="width:25%;height:105%">Crear nueva actividad</a>
                 </div>
             }
-            <hr />
-            <div class="table-responsive">
-                @if (ViewBag.TiposActividad == null)
-                {
-                    <h5 class="text-center"> No hay actividad disponibles</h5>
-                    <div class="d-flex justify-content-center my-4">
-                        <a href="/TipoActividad/CrearTipoActividad" class="btn btn-primary" role="button" style="width:25%;height:105%">Crear nueva actividad</a>
-                    </div>
-                }
-                else
-                {
-                    <table class="table table-striped">
-                        <thead>
+            else
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var tipoActividad in ViewBag.TiposActividad)
+                        {
                             <tr>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Descripción</th>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
+                                <td>@tipoActividad.nombre</td>
+                                <td>@tipoActividad.descripcion</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModal('@tipoActividad.nombre')">
+                                        Editar
+                                    </button>
+                                </td>
+                                <td>
+                                <td>
+                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@tipoActividad.nombre')">
+                                        Eliminar
+                                    </button>
+                                </td>
 
                             </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var tipoActividad in ViewBag.TiposActividad)
-                            {
-                                <tr>
-                                    <td>@tipoActividad.nombre</td>
-                                    <td>@tipoActividad.descripcion</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModal('@tipoActividad.nombre')">
-                                            Editar
-                                        </button>
-                                    </td>
-                                    <td>
-                                    <td>
-                                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModal('@tipoActividad.nombre')">
-                                            Eliminar
-                                        </button>
-                                    </td>
-
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
-
-
-        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Eliminar tipo de actividad</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        ¿Estás seguro que deseas eliminar este tipo de actividad?
-
-                        @using (Html.BeginForm("EliminarTipoActividad", "TipoActividad"))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <div class="modal-footer">
-                                <input type="hidden" id="nombreTipoactividad" name="nombre">
-                                <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-
-                            </div>
                         }
-                    </div>
-                </div>
-
-            </div>
+                    </tbody>
+                </table>
+            }
         </div>
+    </div>
 
-        <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editarModalLabel">Editar tipo de actividad</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h8 style="padding-bottom:5px">
-                            ¿Estás seguro que deseas editar este tipo de actividad?
-                        </h8>
-                        <br />
-                        @using (Html.BeginForm("EditarTipoActividad", "TipoActividad", FormMethod.Get, new { enctype = "multipart/form-data" }))
-                        {
-                            @Html.AntiForgeryToken()
 
-                            <div class="modal-footer">
-                                <input type="hidden" id="nombreTipoActividadEditar" name="nombre">
-                                <input type="submit" class="btn btn-primary" value="Aceptar" />
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            </div>
-                        }
-                    </div>
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar tipo de actividad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body">
+                    ¿Estás seguro que deseas eliminar este tipo de actividad?
 
+                    @using (Html.BeginForm("EliminarTipoActividad", "TipoActividad"))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-footer">
+                            <input type="hidden" id="nombreTipoactividad" name="nombre">
+                            <input type="submit" class="btn btn-primary" value="Aceptar" onclick="" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                        </div>
+                    }
+                </div>
             </div>
+
         </div>
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-    </body>
-</html>
+    </div>
+
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar tipo de actividad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h8 style="padding-bottom:5px">
+                        ¿Estás seguro que deseas editar este tipo de actividad?
+                    </h8>
+                    <br />
+                    @using (Html.BeginForm("EditarTipoActividad", "TipoActividad", FormMethod.Get, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-footer">
+                            <input type="hidden" id="nombreTipoActividadEditar" name="nombre">
+                            <input type="submit" class="btn btn-primary" value="Aceptar" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}
 
 <script type="text/javascript">
     function actualizarModal(tipoActividad) {
