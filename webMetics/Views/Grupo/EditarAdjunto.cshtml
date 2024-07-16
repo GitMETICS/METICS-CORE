@@ -1,21 +1,45 @@
 @model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar archivo adjunto";
+    ViewBag.Title = "Archivo Adjunto";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
-<!DOCTYPE html>
-<html>
-<body>
-    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
-    {
-        using (Html.BeginForm("EditarAdjunto", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+        <h1>@ViewBag.Title</h1>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @using (Html.BeginForm("EditarAdjunto", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
+
             <div class="form-horizontal">
-                <h1 class="mt-5">@ViewBag.Title</h1>
-                <h5 class="alertaAdjunto">@Html.Raw(TempData["msg"])</h5>
-                <hr />
-                <div class="row" style="margin-bottom:10%">
+                <div class="row mb-3">
                     <div class="col">
                         <div class="container">
                             <div>
@@ -39,10 +63,9 @@
                 </div>
             </div>
         }
-    }
-    else
-    {
-        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-    }
-    </body>
-</html>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+}

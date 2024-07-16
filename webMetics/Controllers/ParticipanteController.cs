@@ -120,7 +120,6 @@ namespace webMetics.Controllers
 
             ViewBag.Participante = participante;
 
-            // TODO: Revisar este método del handler de participante porque no funciona
             ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(id);
 
             if (TempData["errorMessage"] != null)
@@ -378,67 +377,53 @@ namespace webMetics.Controllers
             }
         }
 
-        // Vista del formulario para editar los datos de un participante según el id proporcionado
-        // [HttpGet]
+        // Método de la vista del formulario para editar a un participante
         public ActionResult EditarParticipante(string idParticipante)
-        {
-            try
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                ViewBag.IdParticipante = idParticipante;
-                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
-                if (participante != null)
-                {
-                    ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View(participante);
-                }
-                else
-                {
-                    return RedirectToAction("ObtenerParticipante");
-                }
-            }
-            catch
-            {
-                return RedirectToAction("ObtenerParticipante");
-            }
-        }
-
-        public ActionResult DevolverDatosParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+            try
+            {
+                ViewBag.IdParticipante = idParticipante;
+                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-            return View("EditarParticipante", participante);
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View(participante);
+            }
+            catch
+            {
+                TempData["Message"] = "Ocurrió un error al obtener los datos solicitados.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
-        // Método para procesar el formulario de edición de datos del participante con los datos ingresados
+        // Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarParticipante(ParticipanteModel participante)
         {
-            if (ModelState.IsValid)
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                // Si el modelo es válido, actualiza los datos del participante utilizando el controlador de acceso a participantes
-                accesoAParticipante.EditarParticipante(participante);
-                // Redirige a la lista de grupos disponibles después de editar el participante exitosamente
-                TempData["successMessage"] = "Los datos fueron guardados.";
-
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                if (ModelState.IsValid)
+                {
+                    accesoAParticipante.EditarParticipante(participante);
+                    TempData["successMessage"] = "Los datos fueron guardados.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+                else
+                {
+                    ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                    return View("EditarParticipante", participante);
+                }
             }
-            else
+            catch
             {
-                // Si el modelo no es válido, muestra el formulario de edición con los errores
-                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("EditarParticipante", participante);
+                TempData["Message"] = "Ocurrió un error al editar los datos.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 

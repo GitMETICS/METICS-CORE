@@ -4,7 +4,7 @@ namespace webMetics.Models
 {
     public class ParticipanteModel
     {
-        public required string idParticipante { get; set; }
+        public string? idParticipante { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un nombre.")]
         [Display(Name = "Nombre")]
@@ -41,7 +41,7 @@ namespace webMetics.Models
         [Display(Name = "Unidad académica")]
         public string? unidadAcademica { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar una sede.")]
+        // [Required(ErrorMessage = "Es necesario ingresar una sede.")]
         [Display(Name = "Sede")]
         public string? sede { get; set; }
 

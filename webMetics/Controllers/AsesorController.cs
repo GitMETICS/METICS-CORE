@@ -11,10 +11,10 @@ namespace webMetics.Controllers
     // Controlador para gestionar las operaciones relacionadas con los asesores
     public class AsesorController : Controller
     {
-        public UsuarioHandler accesoAUsuario;
-        public TemaHandler accesoATema;
-        public AsesorHandler accesoAAsesor;
-        public GrupoHandler GrupoHandler;
+        private protected UsuarioHandler accesoAUsuario;
+        private protected TemaHandler accesoATema;
+        private protected AsesorHandler accesoAAsesor;
+        private protected ParticipanteHandler accesoAParticipante;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -27,7 +27,7 @@ namespace webMetics.Controllers
             accesoATema = new TemaHandler(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
-            GrupoHandler = new GrupoHandler(environment, configuration);
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
         }
 
         public int GetRole()
@@ -94,13 +94,11 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Método para procesar el formulario con los datos necesarios para crear un asesor */
+        // Método para procesar el formulario con los datos necesarios para crear un asesor
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AgregarAsesor(AsesorModel asesor)
         {
-            bool exito;
-
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
@@ -111,38 +109,23 @@ namespace webMetics.Controllers
                     // Aquí se define que el correo es la identificación.
                     asesor.idAsesor = asesor.correo;
 
-                    if (accesoAUsuario.ExisteUsuario(asesor.idAsesor))
+                    if (!accesoAAsesor.ExisteAsesor(asesor.idAsesor))
                     {
-                        // TODO: Pasar esto a un stored procedure en el handler.
-                        // Verificar si ya existe un asesor con los mismos datos en la base de datos.
-                        List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
-                        if (asesores.Any(a => a.idAsesor == asesor.idAsesor))
+                        if (!accesoAUsuario.ExisteUsuario(asesor.idAsesor))
                         {
-                            exito = accesoAAsesor.EditarAsesor(asesor);
+                            accesoAUsuario.CrearUsuario(asesor.idAsesor, "1234"); // Esta contraseña es provisional en la base de datos.
                         }
-                        else
-                        {
-                            exito = accesoAAsesor.CrearAsesor(asesor);
-                        }
+
+                        accesoAAsesor.CrearAsesor(asesor);
                     }
                     else
                     {
-                        accesoAUsuario.CrearUsuario(asesor.idAsesor, "pass"); // Esta contraseña es provisional en la base de datos
-                        exito = accesoAAsesor.CrearAsesor(asesor);
+                        TempData["errorMessage"] = "Ya existe un asesor con los mismos datos.";
+                        return RedirectToAction("ListaAsesores");
                     }
 
-                    // Si el asesor se creó correctamente, mostrar el mensaje de exito y redirigir a la lista de asesores
-                    if (exito)
-                    {
-                        ViewBag.ExitoAlCrear = exito;
-                        TempData["successMessage"] = "El asesor fue creado con éxito.";
-                        return RedirectToAction("ListaAsesores");
-                    } 
-                    else
-                    {
-                        TempData["errorMessage"] = "Hubo un error y no se pudo crear el asesor.";
-                        return RedirectToAction("ListaAsesores");
-                    }
+                    TempData["successMessage"] = "El asesor fue agregado con éxito.";
+                    return RedirectToAction("ListaAsesores");
                 }
                 else
                 {
@@ -153,10 +136,8 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
-                ViewBag.Message = "Hubo un error y no se pudo enviar la petición de crear el asesor.";
-
-                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                return View("CrearAsesor");
+                TempData["errorMessage"] = "Hubo un error y no se pudo crear el asesor.";
+                return RedirectToAction("ListaAsesores");
             }
         }
 
@@ -193,66 +174,53 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método de la vista del formulario para editar a un asesor */
+        // Método de la vista del formulario para editar a un asesor
         public ActionResult EditarAsesor(string idAsesor)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                // Buscar el asesor a editar en la lista de asesores y obtenerlo
-                AsesorModel asesor = accesoAAsesor.ObtenerListaAsesores().Find(asesorModel => asesorModel.idAsesor == idAsesor);
-
-                // Si no se encuentra el asesor a editar, redirigir a la lista de asesores
-                if (asesor == null)
-                {
-                    return RedirectToAction("ListaAsesores");
-                }
-                else
-                {
-                    // Mostrar la vista del formulario con los datos del asesor a editar
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View(asesor);
-                }
+                AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idAsesor);
+                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                return View(asesor);
             }
             catch
             {
+                TempData["Message"] = "Ocurrió un error al obtener los datos del asesor.";
                 return RedirectToAction("ListaAsesores");
             }
         }
 
-        /* Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor */
+        // Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarAsesor(AsesorModel asesor)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                // Aquí se define que el correo es la identificación.
-                asesor.idAsesor = asesor.correo;
-
-                bool exito = accesoAAsesor.EditarAsesor(asesor);
-
-                if (exito)
+                if (ModelState.IsValid)
                 {
+                    asesor.idAsesor = asesor.correo; // Aquí se define que el correo es la identificación.
+                    accesoAAsesor.EditarAsesor(asesor);
+
                     TempData["SuccessMessage"] = "Los datos fueron guardados.";
+                    return RedirectToAction("ListaAsesores");
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "No se pudieron actualizar los datos del asesor.";
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    return View("EditarAsesor", asesor);
                 }
-
-                return RedirectToAction("ListaAsesores");
             }
             catch
             {
-                // En caso de error, regresar a la vista del formulario
-                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                return View("EditarAsesor");
+                TempData["Message"] = "Ocurrió un error al editar los datos del asesor.";
+                return RedirectToAction("ListaAsesores");
             }
         }
     }

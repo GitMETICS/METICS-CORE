@@ -1,11 +1,11 @@
 ﻿@model webMetics.Models.UsuarioModel
 @{
-    ViewBag.Title = "Formulario de registro";
+    ViewBag.Title = "Formulario de Registro";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Title == "Formulario de registro")
+@if (ViewBag.Title == "Formulario de Registro")
 {
     <div class="contenedor-tipos-actividades container-fluid">
         @if (urlReferrer != null)

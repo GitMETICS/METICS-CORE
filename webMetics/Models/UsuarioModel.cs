@@ -41,6 +41,10 @@ namespace webMetics.Models
         [Display(Name = "Unidad académica")]
         public string? unidadAcademica { get; set; }
 
+        // [Required(ErrorMessage = "Es necesario ingresar una sede.")]
+        [Display(Name = "Sede")]
+        public string? sede { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
         [Display(Name = "Tipo de participante")]
         public string? tipoParticipante { get; set; }

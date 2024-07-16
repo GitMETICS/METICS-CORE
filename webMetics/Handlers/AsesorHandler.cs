@@ -59,8 +59,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
                 command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
                 command.Parameters.AddWithValue("@nombre", asesor.nombre);
-                command.Parameters.AddWithValue("@primerApellido", asesor.primerApellido);
-                command.Parameters.AddWithValue("@segundoApellido", asesor.segundoApellido);
+                command.Parameters.AddWithValue("@apellido1", asesor.primerApellido);
+                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido);
                 command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
                 command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", asesor.correo);
@@ -100,8 +100,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
                 command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
                 command.Parameters.AddWithValue("@nombre", asesor.nombre);
-                command.Parameters.AddWithValue("@primerApellido", asesor.primerApellido);
-                command.Parameters.AddWithValue("@segundoApellido", asesor.segundoApellido);
+                command.Parameters.AddWithValue("@apellido1", asesor.primerApellido);
+                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido);
                 command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
                 command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", asesor.correo);

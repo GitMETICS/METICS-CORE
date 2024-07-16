@@ -31,34 +31,9 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
         }
 
-        private int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        private string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
         // Método para mostrar la vista de inicio de sesión
         public ActionResult IniciarSesion()
         {
-            // Retorna la vista de inicio de sesión
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -75,27 +50,22 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult IniciarSesion(LoginModel usuario)
         {
-            // Verificar si el modelo enviado desde el formulario es válido
             if (ModelState.IsValid)
             {
-                // Validar el usuario y contraseña ingresados
                 LoginModel usuarioAutorizado = AutenticarUsuario(usuario);
 
                 if (usuarioAutorizado != null)
                 {
-                    // Si el usuario y contraseña son válidos, redirigir a la página de inicio
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
-                    // Si el usuario y contraseña son inválidos, mostrar un mensaje de error
                     TempData["errorMessage"] = "Número de identificación o contraseña inválidos.";
                     return RedirectToAction("IniciarSesion", "Usuario");
                 }
             }
             else
             {
-                // Si el modelo no es válido, volver a mostrar la vista de inicio de sesión con el modelo original
                 return View(usuario);
             }
         }
@@ -117,9 +87,6 @@ namespace webMetics.Controllers
             {
                 if (usuario.contrasena == usuario.confirmarContrasena)
                 {
-                    // Aquí se define que el identificador del usuario es el correo.
-                    usuario.id = usuario.correo;
-
                     bool exito = CrearUsuario(usuario);
 
                     if (exito)
@@ -140,13 +107,13 @@ namespace webMetics.Controllers
                 {
                     ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View("FormularioRegistro", usuario);
+                    return View(usuario);
                 }
             }
             else
             {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View("FormularioRegistro", usuario);
+                return View(usuario);
             }
         }
 
@@ -154,8 +121,11 @@ namespace webMetics.Controllers
         private bool CrearUsuario(UsuarioModel usuario)
         {
             bool exito = false;
+
             try
             {
+                usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo.
+
                 if (!accesoAUsuario.ExisteUsuario(usuario.id))
                 {
                     accesoAUsuario.CrearUsuario(usuario.id, usuario.contrasena);
@@ -168,14 +138,16 @@ namespace webMetics.Controllers
                             nombre = usuario.nombre,
                             primerApellido = usuario.primerApellido,
                             segundoApellido = usuario.segundoApellido,
-                            correo = usuario.correo,
                             tipoIdentificacion = usuario.tipoIdentificacion,
+                            numeroIdentificacion = usuario.numeroIdentificacion,
+                            correo = usuario.correo,
                             tipoParticipante = usuario.tipoParticipante,
+                            condicion = usuario.condicion,
+                            telefono = usuario.telefono,
                             area = usuario.area,
                             departamento = usuario.departamento,
                             unidadAcademica = usuario.unidadAcademica,
-                            condicion = usuario.condicion,
-                            telefono = usuario.telefono,
+                            sede = usuario.sede,
                             horasMatriculadas = 0,
                             horasAprobadas = 0
                         };
@@ -193,14 +165,16 @@ namespace webMetics.Controllers
                             nombre = usuario.nombre,
                             primerApellido = usuario.primerApellido,
                             segundoApellido = usuario.segundoApellido,
-                            correo = participante.correo,
                             tipoIdentificacion = usuario.tipoIdentificacion,
+                            numeroIdentificacion = usuario.numeroIdentificacion,
+                            correo = participante.correo,
                             tipoParticipante = usuario.tipoParticipante,
+                            condicion = usuario.condicion,
+                            telefono = usuario.telefono,
                             area = usuario.area,
                             departamento = usuario.departamento,
                             unidadAcademica = usuario.unidadAcademica,
-                            condicion = usuario.condicion,
-                            telefono = usuario.telefono,
+                            sede = usuario.sede,
                             horasMatriculadas = participante.horasMatriculadas,
                             horasAprobadas = participante.horasAprobadas
                         };
@@ -383,6 +357,30 @@ namespace webMetics.Controllers
             {
                 TempData["errorMessage"] = ex.ToString();
             }
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }

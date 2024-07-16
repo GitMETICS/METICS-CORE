@@ -1,7 +1,7 @@
 ﻿@using webMetics.Controllers
 @{
 
-    ViewBag.Title = "Lista de participantes";
+    ViewBag.Title = "Participantes";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -59,15 +59,17 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <div class="mx-1">
-                            @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        <!--
+                            <div class="mx-1">
+                        @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
+                        -->
                         <div class="mx-1">
                             @Html.ActionLink("   Agregar", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
                         </div>
@@ -84,9 +86,9 @@
                             <th scope="col">Correo institucional</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
-                            <th scope="col" style="width:3.33%;"></th>
-                            <th scope="col" style="width:3.33%;"></th>
-                            <th scope="col" style="width:3.33%;"></th>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
                         </tr>
                     </thead>
 
@@ -128,9 +130,6 @@
                     </tbody>
                 </table>
             }
-            <div class="d-flex justify-content-center my-4">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
-            </div>
         </div>
     </div>
 }
