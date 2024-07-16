@@ -32,30 +32,6 @@ namespace webMetics.Controllers
             accesoACalificaciones = new CalificacionesHandler(environment, configuration);
         }
 
-        public int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        public string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
         public ActionResult VerCalificaciones(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -420,6 +396,30 @@ namespace webMetics.Controllers
 
             // Redirige a la vista adecuada.
             return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }
