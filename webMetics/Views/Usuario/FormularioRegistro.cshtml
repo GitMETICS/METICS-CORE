@@ -98,6 +98,13 @@
                             @Html.DropDownListFor(usuarioModel => usuarioModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
                         </div>
+
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(usuarioModel => usuarioModel.sede, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(usuarioModel => usuarioModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.sede, "", new { @class = "text-danger" })
+                        </div>
+
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(usuarioModel => usuarioModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })

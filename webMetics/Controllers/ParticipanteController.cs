@@ -9,6 +9,7 @@ using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.HPSF;
 using OfficeOpenXml;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /* 
  * Controlador de la entidad Participante
@@ -492,6 +493,38 @@ namespace webMetics.Controllers
             List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
             return Json(secciones);
         }
+
+        [HttpGet]
+        public static List<SelectListItem> GetSedes()
+        {
+            var sedes = new List<SelectListItem>();
+
+            var group1 = new SelectListGroup() { Name = "Sede Central" };
+            var group2 = new SelectListGroup() { Name = "Sede del Sur"};
+            var group3 = new SelectListGroup() { Name = "Sede del Caribe" };
+            var group4 = new SelectListGroup() { Name = "Sede de Guanacaste" };
+            var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
+            var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
+            var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
+
+            sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
+            sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Turrialba", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Paraíso", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
+            sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+
+            return sedes;
+        }
+
+
+
 
         /* Método para enviar confirmación de registro al usuario*/
         private void EnviarCorreoContraseñaRegistro(string identificacion, string correo, string contrasena)
