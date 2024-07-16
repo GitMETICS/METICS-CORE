@@ -33,16 +33,16 @@ namespace webMetics.Models
         [Display(Name = "Área")]
         public string? area { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un departamento.")]
-        [Display(Name = "Departamento")]
+        [Required(ErrorMessage = "Es necesario ingresar el Departamento o Facultad.")]
+        [Display(Name = "Facultad o Departamento")]
         public string? departamento { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar una unidad académica.")]
+        [Required(ErrorMessage = "Es necesario ingresar una Unidad Académica.")]
         [Display(Name = "Unidad académica")]
         public string? unidadAcademica { get; set; }
 
-        // [Required(ErrorMessage = "Es necesario ingresar una sede.")]
-        [Display(Name = "Sede")]
+        [Required(ErrorMessage = "Es necesario ingresar un Recinto.")]
+        [Display(Name = "Sede y Recinto")]
         public string? sede { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
@@ -50,7 +50,7 @@ namespace webMetics.Models
         public string? tipoParticipante { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar una condición actual.")]
-        [Display(Name = "Condición actual")]
+        [Display(Name = "Condición actual en la institución")]
         public string? condicion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un número de teléfono.")]
