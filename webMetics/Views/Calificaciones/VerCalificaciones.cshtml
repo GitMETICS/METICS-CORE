@@ -51,7 +51,7 @@
                     </div>
                 }
 
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-4">
                     <div>
                         @using (Html.BeginForm("CargarDesdeExcel", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
                         {
@@ -60,7 +60,7 @@
                                 <div class="mb-3 d-flex">
                                     <label for="file"></label>
                                     <input type="file" class="form-control" name="file" id="file">
-                                    <input class="btn btn-info ms-2" type="submit" value="Subir archivo">
+                                    <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
 
                                     <input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
                                 </div>
@@ -70,44 +70,16 @@
 
                     <div class="d-flex justify-content-end">
                         <div class="mx-1">
-                            @using (Html.BeginForm("ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
-                                    <i class="bi bi-download me-1"></i>
-                                    PDF
-                                </button>
-                            }
+                            @Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @using (Html.BeginForm("ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
-                                    <i class="bi bi-download me-1"></i>
-                                    Excel
-                                </button>
-                            }
+                            @Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @using (Html.BeginForm("ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
-                                    <i class="bi bi-download me-1"></i>
-                                    Word
-                                </button>
-                            }
+                            @Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @using (Html.BeginForm("EnviarCalificaciones", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, FormMethod.Post))
-                            {
-                                @Html.AntiForgeryToken()
-                                <button type="submit" id="btnSubmit" class="btn btn-primary" value="Export">
-                                    <i class="bi bi-send me-1"></i>
-                                    Enviar
-                                </button>
-                            }
+                            @Html.ActionLink("   Enviar", "EnviarCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-primary bi bi-send" })
                         </div>
                     </div>
                 </div>
@@ -115,10 +87,10 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 30%;">Nombre completo</th>
-                            <th scope="col" style="width: 45%;">Correo institucional</th>
+                            <th scope="col" style="width: 30%;">Nombre Completo</th>
+                            <th scope="col" style="width: 45%;">Correo Institucional</th>
                             <th class="text-center" scope="col" style="width: 20%;">Calificación</th>
-                            <th scope="col" style="width: 5%;"></th>
+                            <th scope="col" style="width: 3.33%;"></th>
                         </tr>
                     </thead>
 
@@ -132,11 +104,11 @@
                                 nombreCompleto += " " + calificacion.participante.segundoApellido;
                             }
                             <tr>
-                                <td class=" ">@nombreCompleto</td>
-                                <td class=" ">@calificacion.participante.idParticipante</td>
-                                <td class="  text-center">@calificacion.calificacion</td>
-                                <td class=" ">
-                                    @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "btn btn-outline-secondary bi bi-pencil-square" })
+                                <td>@nombreCompleto</td>
+                                <td>@calificacion.participante.idParticipante</td>
+                                <td class="text-center">@calificacion.calificacion</td>
+                                <td>
+                                    @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                 </td>
                             </tr>
                         }
@@ -144,7 +116,7 @@
                 </table>
             }
             <div class="d-flex justify-content-center my-4">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
+                <a href="#" class="btn btn-primary btn-block" onclick="history.go(-1); return false;">Regresar</a>
             </div>
         </div>
     </div>

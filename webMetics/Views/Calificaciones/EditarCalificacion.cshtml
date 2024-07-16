@@ -19,14 +19,23 @@
 
         <h1>@ViewBag.NombreGrupo</h1>
         <h2>@ViewBag.Title</h2>
-        @if (TempData["Message"] != null)
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
         {
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                <strong> @TempData["Message"] </strong>
+                @ViewBag.ErrorMessage
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
-        <hr />
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
         <div class="table-responsive">
             @if (ViewBag.Calificacion == null)
             {
@@ -40,11 +49,11 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 40%;">Nombre completo</th>
-                            <th scope="col" style="width: 30%;">Correo institucional</th>
-                            <th scope="col" style="width: 12.5%;">Calificación actual</th>
-                            <th scope="col" style="width: 12.5%;">Nueva calificación</th>
-                            <th scope="col" style="width: 5%;"></th>
+                            <th scope="col">Nombre Completo</th>
+                            <th scope="col">Correo Institucional</th>
+                            <th scope="col" style="width: 12.5%;">Calificación Actual</th>
+                            <th scope="col" style="width: 12.5%;">Nueva Calificación</th>
+                            <th scope="col" style="width: 3.33%;"></th>
                         </tr>
                     </thead>
 
@@ -54,19 +63,17 @@
                             nombreCompleto += " " + ViewBag.Calificacion.participante.segundoApellido;
                         }
                         <tr>
-                            <td class="">@nombreCompleto</td>
-                            <td class="">@ViewBag.Calificacion.participante.idParticipante</td>
+                            <td>@nombreCompleto</td>
+                            <td>@ViewBag.Calificacion.participante.idParticipante</td>
                             <td class="text-center">@ViewBag.Calificacion.calificacion</td>
                             @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = ViewBag.Calificacion.idGrupo, idParticipante = ViewBag.Calificacion.participante.idParticipante }, FormMethod.Post))
                             {
                                 @Html.AntiForgeryToken()
-                                <td class="">
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" name="calificacion" id="calificacion">
-                                    </div>
+                                <td>
+                                    <input type="number" class="form-control" name="calificacion" id="calificacion">
                                 </td>
-                                <td class="">
-                                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                                <td>
+                                    <button type="submit" class="btn btn-outline-primary">Aceptar</button>
                                 </td>
                             }
                         </tr>
@@ -74,7 +81,7 @@
                 </table>
             }
             <div class="d-flex justify-content-center my-4">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
+                <a href="#" class="btn btn-primary btn-block" onclick="history.go(-1); return false;">Regresar</a>
             </div>
         </div>
     </div>
