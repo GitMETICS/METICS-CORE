@@ -117,20 +117,20 @@ CREATE TABLE asesor_da_tema (
 CREATE TABLE grupo (
     id_grupo_PK INT IDENTITY(1, 1) PRIMARY KEY,
     id_tema_FK INT NOT NULL,
-    modalidad NVARCHAR(16) NOT NULL,
-    cupo INT NOT NULL,
-    descripcion NVARCHAR(256),
-    adjunto VARBINARY(MAX),
-    es_visible BIT,
-    lugar NVARCHAR(512),
-    nombre NVARCHAR(64) NOT NULL,
+	nombre NVARCHAR(64) NOT NULL,
     horario NVARCHAR(128) NOT NULL,
     fecha_inicio_grupo DATE NOT NULL,
     fecha_finalizacion_grupo DATE NOT NULL,
     fecha_inicio_inscripcion DATETIME NOT NULL,
     fecha_finalizacion_inscripcion DATETIME NOT NULL,
     cantidad_horas TINYINT NOT NULL,
+    modalidad NVARCHAR(16) NOT NULL,
+    cupo INT NOT NULL,
+    descripcion NVARCHAR(256),
+    lugar NVARCHAR(512),
+    es_visible BIT,
     nombre_archivo NVARCHAR(255),
+	adjunto VARBINARY(MAX),
 
     FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
         ON DELETE NO ACTION
@@ -581,6 +581,111 @@ BEGIN
 
 	RETURN
 END
+
+GO
+--Creación de procedimiento para insertar un grupo
+CREATE OR ALTER PROCEDURE InsertGrupo
+    @idTema INT,
+	@nombre NVARCHAR(64),
+    @horario NVARCHAR(128),
+    @fecha_inicio_grupo DATE,
+    @fecha_finalizacion_grupo DATE,
+    @fecha_inicio_inscripcion DATETIME,
+    @fecha_finalizacion_inscripcion DATETIME,
+    @cantidad_horas TINYINT,
+    @modalidad NVARCHAR(16),
+	@cupo INT,
+	@descripcion NVARCHAR(256) = '',
+	@lugar NVARCHAR(512) = '',
+	@es_visible BIT = 1,
+	@nombre_archivo NVARCHAR(255) = '',
+	@adjunto VARBINARY(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO grupo
+    (
+        id_tema_FK,
+        nombre,
+        horario,
+		fecha_inicio_grupo,
+        fecha_finalizacion_grupo,
+        fecha_inicio_inscripcion,
+        fecha_finalizacion_inscripcion,
+        cantidad_horas,
+		modalidad,
+        cupo,
+        descripcion,
+        lugar,
+        es_visible,
+		nombre_archivo,
+		adjunto
+    )
+    VALUES
+    (
+        @idTema,
+		@nombre,
+		@horario,
+		@fecha_inicio_grupo,
+		@fecha_finalizacion_grupo,
+		@fecha_inicio_inscripcion,
+		@fecha_finalizacion_inscripcion,
+		@cantidad_horas,
+		@modalidad,
+		@cupo,
+		@descripcion,
+		@lugar,
+		@es_visible,
+		@nombre_archivo,
+		@adjunto
+    );
+END
+
+GO
+-- Creación de procedimiento para editar un grupo
+CREATE OR ALTER PROCEDURE UpdateGrupo
+    @idGrupo INT,
+    @idTema INT,
+    @nombre NVARCHAR(64),
+    @horario NVARCHAR(128),
+    @fecha_inicio_grupo DATE,
+    @fecha_finalizacion_grupo DATE,
+    @fecha_inicio_inscripcion DATETIME,
+    @fecha_finalizacion_inscripcion DATETIME,
+    @cantidad_horas TINYINT,
+    @modalidad NVARCHAR(16),
+    @cupo INT,
+    @descripcion NVARCHAR(256) = '',
+    @lugar NVARCHAR(512) = '',
+    @es_visible BIT = 1,
+    @nombre_archivo NVARCHAR(255) = '',
+    @adjunto VARBINARY(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE grupo
+    SET
+        id_tema_FK = @idTema,
+        nombre = @nombre,
+        horario = @horario,
+        fecha_inicio_grupo = @fecha_inicio_grupo,
+        fecha_finalizacion_grupo = @fecha_finalizacion_grupo,
+        fecha_inicio_inscripcion = @fecha_inicio_inscripcion,
+        fecha_finalizacion_inscripcion = @fecha_finalizacion_inscripcion,
+        cantidad_horas = @cantidad_horas,
+        modalidad = @modalidad,
+        cupo = @cupo,
+        descripcion = @descripcion,
+        lugar = @lugar,
+        es_visible = @es_visible,
+        nombre_archivo = @nombre_archivo,
+        adjunto = @adjunto
+    WHERE
+        id_grupo_PK = @idGrupo;
+END
+
 
 /*
 	SCRIPT SET DE DATOS INICIAL

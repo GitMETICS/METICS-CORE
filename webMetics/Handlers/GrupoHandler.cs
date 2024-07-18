@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.RegularExpressions;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 /*
  * Handler para los grupos
@@ -340,7 +341,49 @@ namespace webMetics.Handlers
         // Método para editar un grupo en la base de datos
         public bool EditarGrupo(GrupoModel grupo)
         {
-            bool consultaExitosa;
+            bool exito = false;
+
+            using (var command = new SqlCommand("UpdateGrupo", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
+                command.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
+                command.Parameters.AddWithValue("@nombre", grupo.nombre);
+                command.Parameters.AddWithValue("@horario", grupo.horario);
+                command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
+                command.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
+                command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
+                command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
+                command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
+                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
+                command.Parameters.AddWithValue("@cupo", grupo.cupo);
+                command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
+                command.Parameters.AddWithValue("@lugar", grupo.lugar);
+                command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
+                command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
+                command.Parameters.AddWithValue("@adjunto", grupo.archivoAdjunto);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in EditarGrupo: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return exito;
+
+
+
+
+            /*bool consultaExitosa;
 
             // Consulta SQL para actualizar los datos del grupo en la tabla 'grupo' mediante su ID
             string consulta =
@@ -387,7 +430,7 @@ namespace webMetics.Handlers
             ConexionMetics.Close();
 
             // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
-            return consultaExitosa;
+            return consultaExitosa;*/
         }
 
         // Método para obtener el tema seleccionado del grupo mediante su ID

@@ -1,7 +1,7 @@
 @model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar módulo";
+    ViewBag.Title = "Editar Módulo";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -24,24 +24,6 @@
             <h1>@ViewBag.Title</h1>
             <hr />
 
-            @if (ViewBag.Message != null)
-            {
-                if (ViewBag.ExitoAlCrear != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-                        @ViewBag.Message
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
-                        @ViewBag.Message
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-            }
-
             if (ViewBag.ErrorMessage != null)
             {
                 <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
@@ -61,6 +43,12 @@
                 <div class="col">
                     <div class="container">
                         <div class="form-group mt-1">
+                            @Html.HiddenFor(grupoModel => grupoModel.idGrupo, new { })
+                            @Html.HiddenFor(grupoModel => grupoModel.cupoActual, new { })
+                            @Html.HiddenFor(grupoModel => grupoModel.esVisible, new { })
+
+
+
                             @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" })
                             @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })

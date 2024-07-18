@@ -276,7 +276,6 @@ namespace webMetics.Controllers
         }
 
         /* Vista del formulario para editar un grupo */
-        [HttpGet]
         public ActionResult EditarGrupo(int? idGrupo)
         {
             ActionResult vista;
@@ -322,57 +321,56 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult EditarGrupo(GrupoModel grupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-                // Validar fechas de inicio y finalización
-                if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                if (ModelState.IsValid)
                 {
-                    TempData["msg"] = "La fecha de finalización no puede ser antes de las fechas de inicio.";
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-
-                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
+                    // Validar fechas de inicio y finalización
+                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
                     {
-                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
+                        if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
+                        {
+                            ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
+                        }
+
+                        if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                        {
+                            ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
+                        }
+
+                        ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
                     }
 
-                    if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                    // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
+                    if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
                     {
-                        ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
+                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
+                        ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
+
+                        ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
                     }
 
-                    return View(grupo);
+                    accesoAGrupo.EditarGrupo(grupo);
+                    TempData["successMessage"] = "Los datos del módulo fueron guardados.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
-
-                // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
-                if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
+                else
                 {
-                    TempData["msg"] = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
-                    ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
-                    ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     return View(grupo);
                 }
-
-                // Editar el grupo y verificar el éxito de la operación
-                ViewBag.ExitoAlCrear = accesoAGrupo.EditarGrupo(grupo);
-                if (ViewBag.ExitoAlCrear)
-                {
-                    ViewBag.Message = "El módulo fue editado con éxito.";
-                    ModelState.Clear();
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
-                }
-
-                // Mostrar mensaje de error si la edición del grupo no tuvo éxito
-                ViewBag.ExitoAlCrear = false;
-                TempData["msg"] = "No se pudo editar el módulo, intente de nuevo.";
-                return Redirect("/Grupo/ListaGruposDisponibles");
             }
-            catch (Exception e)
+            catch
             {
-                TempData["msg"] = "<script>alert('\"No se pudo editar el módulo, intente de nuevo\"');</script>";
-                return View(e);
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del módulo.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
