@@ -40,7 +40,7 @@ namespace webMetics.Controllers
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             ViewBag.ListaCalificaciones = calificaciones;
             ViewBag.IdGrupo = idGrupo;
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             ViewBag.Title = "Calificaciones";
             ViewBag.NombreGrupo = grupo.nombre;
 
@@ -62,7 +62,7 @@ namespace webMetics.Controllers
 
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             CalificacionModel calificacion = calificaciones.Find(calificacionModel => calificacionModel.participante.idParticipante == idParticipante);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             ViewBag.Calificacion = calificacion;
             ViewBag.NombreGrupo = grupo.nombre;
@@ -147,7 +147,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarCalificacionesPDF(int idGrupo)
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Calificaciones.docx");
             PdfWriter writer = new PdfWriter(filePath);
@@ -192,7 +192,7 @@ namespace webMetics.Controllers
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".docx";
 
@@ -241,7 +241,7 @@ namespace webMetics.Controllers
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -376,7 +376,7 @@ namespace webMetics.Controllers
             ViewBag.Id = GetId();
 
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             string mensaje;
             try

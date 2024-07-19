@@ -4,6 +4,7 @@ using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.RegularExpressions;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using System.Collections.Generic;
 
 /*
  * Handler para los grupos
@@ -19,7 +20,7 @@ namespace webMetics.Handlers
 
         }
 
-        // Método para editar un grupo en la base de datos
+        // Crea un grupo en la base de datos.
         public bool CrearGrupo(GrupoModel grupo)
         {
             bool exito = false;
@@ -41,7 +42,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
                 command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
 
-                // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
+                // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos.
                 byte[] buffer = new byte[0];
 
                 if (grupo.archivoAdjunto != null)
@@ -75,83 +76,101 @@ namespace webMetics.Handlers
             return exito;
         }
 
-        // Método para obtener la lista de grupos desde la base de datos con información detallada
+        // Obtiene la información detallada de todos los grupos en la base de datos.
         public List<GrupoModel> ObtenerListaGrupos()
         {
-            // Consulta SQL para obtener la información de los grupos y sus asociaciones
-            string consulta = "SELECT G.id_grupo_PK, G.id_tema_FK, G.modalidad, G.cupo, G.descripcion, G.es_visible, G.lugar, G.nombre, G.horario, G.fecha_inicio_grupo, G.fecha_finalizacion_grupo, G.fecha_inicio_inscripcion, G.fecha_finalizacion_inscripcion, G.cantidad_horas, G.nombre_archivo, T.nombre AS tema_asociado, A.nombre + ' ' + A.apellido_1 AS asesor, TA.nombre AS tipo_actividad FROM grupo G JOIN tema T ON T.id_tema_PK = G.id_tema_FK JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK";
+            List<GrupoModel> grupos = new List<GrupoModel>();
 
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
-            SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
+            SqlCommand command = new SqlCommand("SelectAllGrupos", ConexionMetics);
 
-            // Obtiene una tabla con los resultados de la consulta
-            DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
+            DataTable result = CrearTablaConsulta(command);
 
-            // Crea una lista para almacenar los objetos GrupoModel con la información de los grupos
-            List<GrupoModel> listaGrupos = new List<GrupoModel>();
-
-            // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista
-            foreach (DataRow filaGrupo in tablaResultado.Rows)
+            // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
+            foreach (DataRow row in result.Rows)
             {
-                listaGrupos.Add(ObtenerGrupo(filaGrupo));
+                GrupoModel grupo = new GrupoModel
+                {
+                    idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
+                    modalidad = Convert.ToString(row["modalidad"]),
+                    cupo = Convert.ToInt32(row["cupo"]),
+                    descripcion = Convert.ToString(row["descripcion"]),
+                    esVisible = Convert.ToBoolean(row["es_visible"]),
+                    lugar = Convert.ToString(row["lugar"]),
+                    nombre = Convert.ToString(row["nombre"]),
+                    horario = Convert.ToString(row["horario"]),
+                    fechaInicioGrupo = Convert.ToDateTime(row["fecha_inicio_grupo"]),
+                    fechaFinalizacionGrupo = Convert.ToDateTime(row["fecha_finalizacion_grupo"]),
+                    fechaInicioInscripcion = Convert.ToDateTime(row["fecha_inicio_inscripcion"]),
+                    fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
+                    cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
+                    temaAsociado = Convert.ToString(row[15]),
+                    nombreAsesorAsociado = Convert.ToString(row[16]),
+                    tipoActividadAsociado = Convert.ToString(row[17]),
+                    cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
+                    nombreArchivo = Convert.ToString(row["nombre_archivo"])
+                };
+
+                grupos.Add(grupo);
             }
 
-            // Si no se encontraron grupos, devuelve null; de lo contrario, devuelve la lista
-            if (listaGrupos.Count == 0)
+            // Si no se encontraron grupos, devuelve null; de lo contrario, devuelve la lista.
+            if (grupos.Count == 0)
             {
                 return null;
             }
 
-            return listaGrupos;
+            return grupos;
         }
 
-        // Método para obtener la información detallada de un grupo específico desde la base de datos
-        public GrupoModel ObtenerInfoGrupo(int idGrupo)
+        // Obtiene la información detallada de un solo un grupo en la base de datos según su id.
+        public GrupoModel ObtenerGrupo(int idGrupo)
         {
-            // Consulta SQL para obtener la información de un grupo específico y sus asociaciones mediante su ID
-            string consulta = "SELECT G.id_grupo_PK, G.id_tema_FK, G.modalidad, G.cupo, G.descripcion, G.es_visible, G.lugar, G.nombre, G.horario, G.fecha_inicio_grupo, G.fecha_finalizacion_grupo, G.fecha_inicio_inscripcion, G.fecha_finalizacion_inscripcion, G.cantidad_horas, G.nombre_archivo, T.nombre AS tema_asociado, A.nombre + ' ' + A.apellido_1 AS asesor, TA.nombre AS tipo_actividad FROM grupo G JOIN tema T ON T.id_tema_PK = G.id_tema_FK JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK WHERE G.id_grupo_PK = " + idGrupo;
-;
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
-            SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
+            GrupoModel grupo = null;
 
-            // Obtiene una tabla con los resultados de la consulta
-            DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
-
-            // Obtiene la primera fila de la tabla (la información del grupo) y la convierte en un objeto GrupoModel
-            DataRow info = tablaResultado.Rows[0];
-            GrupoModel infoGrupo = ObtenerGrupo(info);
-
-            // Retorna el objeto GrupoModel con la información del grupo específico
-            return infoGrupo;
-        }
-
-        // Método para convertir una fila de la tabla 'grupo' en un objeto GrupoModel
-        public GrupoModel ObtenerGrupo(DataRow filaGrupo)
-        {
-            // Crea un nuevo objeto GrupoModel y asigna los valores desde el DataRow
-            GrupoModel grupo = new GrupoModel
+            using (SqlCommand command = new SqlCommand("SelectGrupo", ConexionMetics))
             {
-                idGrupo = Convert.ToInt32(filaGrupo["id_grupo_PK"]),
-                modalidad = Convert.ToString(filaGrupo["modalidad"]),
-                cupo = Convert.ToInt32(filaGrupo["cupo"]),
-                descripcion = Convert.ToString(filaGrupo["descripcion"]),
-                esVisible = Convert.ToByte(filaGrupo["es_visible"]),
-                lugar = Convert.ToString(filaGrupo["lugar"]),
-                nombre = Convert.ToString(filaGrupo["nombre"]),
-                horario = Convert.ToString(filaGrupo["horario"]),
-                fechaInicioGrupo = Convert.ToDateTime(filaGrupo["fecha_inicio_grupo"]),
-                fechaFinalizacionGrupo = Convert.ToDateTime(filaGrupo["fecha_finalizacion_grupo"]),
-                fechaInicioInscripcion = Convert.ToDateTime(filaGrupo["fecha_inicio_inscripcion"]),
-                fechaFinalizacionInscripcion = Convert.ToDateTime(filaGrupo["fecha_finalizacion_inscripcion"]),
-                cantidadHoras = Convert.ToInt32(filaGrupo["cantidad_horas"]),
-                temaAsociado = Convert.ToString(filaGrupo[15]),
-                nombreAsesorAsociado = Convert.ToString(filaGrupo[16]),
-                tipoActividadAsociado = Convert.ToString(filaGrupo[17]),
-                cupoActual = ObtenerCupoActual(Convert.ToInt32(filaGrupo["id_grupo_PK"])),
-                nombreArchivo = Convert.ToString(filaGrupo["nombre_archivo"])
-            };
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idGrupo", idGrupo);
 
-            // Retorna el objeto GrupoModel creado
+                try
+                {
+                    ConexionMetics.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            grupo = new GrupoModel
+                            {
+                                idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_PK")),
+                                modalidad = reader.GetString(reader.GetOrdinal("modalidad")),
+                                cupo = reader.GetInt32(reader.GetOrdinal("cupo")),
+                                descripcion = reader.GetString(reader.GetOrdinal("descripcion")),
+                                esVisible = reader.GetBoolean(reader.GetOrdinal("es_visible")),
+                                lugar = reader.GetString(reader.GetOrdinal("lugar")),
+                                nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                                horario = reader.GetString(reader.GetOrdinal("horario")),
+                                fechaInicioGrupo = reader.GetDateTime(reader.GetOrdinal("fecha_inicio_grupo")),
+                                fechaFinalizacionGrupo = reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_grupo")),
+                                fechaInicioInscripcion = reader.GetDateTime(reader.GetOrdinal("fecha_inicio_inscripcion")),
+                                fechaFinalizacionInscripcion = reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_inscripcion")),
+                                cantidadHoras = reader.GetByte(reader.GetOrdinal("cantidad_horas")),
+                                nombreArchivo = reader.GetString(reader.GetOrdinal("nombre_archivo")),
+                                temaAsociado = reader.GetString(reader.GetOrdinal("tema_asociado")),
+                                nombreAsesorAsociado = reader.GetString(reader.GetOrdinal("asesor")),
+                                tipoActividadAsociado = reader.GetString(reader.GetOrdinal("tipo_actividad"))
+                            };
+                        }
+                    }
+
+                    ConexionMetics.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener el grupo: {ex.Message}");
+                }
+            }
+
             return grupo;
         }
 
@@ -189,7 +208,7 @@ namespace webMetics.Handlers
             foreach (DataRow filaGrupo in tablaResultado.Rows)
             {
                 int idGrupo = Convert.ToInt32(filaGrupo["id_grupo_PK"]);
-                listaGrupos.Add(ObtenerInfoGrupo(idGrupo));
+                listaGrupos.Add(ObtenerGrupo(idGrupo));
             }
 
             // Si no hay grupos en la lista, retornar nulo

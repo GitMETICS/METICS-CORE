@@ -686,6 +686,70 @@ BEGIN
         id_grupo_PK = @idGrupo;
 END
 
+GO
+-- Creación de procedimiento para seleccionar todos los grupos disponibles
+CREATE OR ALTER PROCEDURE SelectAllGrupos
+AS
+BEGIN
+    SELECT 
+        G.id_grupo_PK, 
+        G.id_tema_FK, 
+        G.modalidad, 
+        G.cupo, 
+        G.descripcion, 
+        G.es_visible, 
+        G.lugar, 
+        G.nombre, 
+        G.horario, 
+        G.fecha_inicio_grupo, 
+        G.fecha_finalizacion_grupo, 
+        G.fecha_inicio_inscripcion, 
+        G.fecha_finalizacion_inscripcion, 
+        G.cantidad_horas, 
+        G.nombre_archivo, 
+        T.nombre AS tema_asociado, 
+        A.nombre + ' ' + A.apellido_1 AS asesor, 
+        TA.nombre AS tipo_actividad
+    FROM grupo G
+    JOIN tema T ON T.id_tema_PK = G.id_tema_FK
+    JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK
+    JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK
+    JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK
+END
+
+GO
+-- Creación de procedimiento para seleccionar un grupo según su id
+CREATE OR ALTER PROCEDURE SelectGrupo
+    @idGrupo INT
+AS
+BEGIN
+    SELECT 
+        G.id_grupo_PK, 
+        G.id_tema_FK, 
+        G.modalidad, 
+        G.cupo, 
+        G.descripcion, 
+        G.es_visible, 
+        G.lugar, 
+        G.nombre, 
+        G.horario, 
+        G.fecha_inicio_grupo, 
+        G.fecha_finalizacion_grupo, 
+        G.fecha_inicio_inscripcion, 
+        G.fecha_finalizacion_inscripcion, 
+        G.cantidad_horas, 
+        G.nombre_archivo, 
+        T.nombre AS tema_asociado, 
+        A.nombre + ' ' + A.apellido_1 AS asesor, 
+        TA.nombre AS tipo_actividad
+    FROM grupo G
+    JOIN tema T ON T.id_tema_PK = G.id_tema_FK
+    JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK
+    JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK
+    JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK
+    WHERE G.id_grupo_PK = @idGrupo
+END
+
 
 /*
 	SCRIPT SET DE DATOS INICIAL

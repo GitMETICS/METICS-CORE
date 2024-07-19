@@ -234,7 +234,29 @@ namespace webMetics.Handlers
 
             foreach (DataRow filaGrupo in tablaResultado.Rows)
             {
-                listaGrupos.Add(accesoAGrupo.ObtenerGrupo(filaGrupo));
+                GrupoModel grupo = new GrupoModel
+                {
+                    idGrupo = Convert.ToInt32(filaGrupo["id_grupo_PK"]),
+                    modalidad = Convert.ToString(filaGrupo["modalidad"]),
+                    cupo = Convert.ToInt32(filaGrupo["cupo"]),
+                    descripcion = Convert.ToString(filaGrupo["descripcion"]),
+                    esVisible = Convert.ToBoolean(filaGrupo["es_visible"]),
+                    lugar = Convert.ToString(filaGrupo["lugar"]),
+                    nombre = Convert.ToString(filaGrupo["nombre"]),
+                    horario = Convert.ToString(filaGrupo["horario"]),
+                    fechaInicioGrupo = Convert.ToDateTime(filaGrupo["fecha_inicio_grupo"]),
+                    fechaFinalizacionGrupo = Convert.ToDateTime(filaGrupo["fecha_finalizacion_grupo"]),
+                    fechaInicioInscripcion = Convert.ToDateTime(filaGrupo["fecha_inicio_inscripcion"]),
+                    fechaFinalizacionInscripcion = Convert.ToDateTime(filaGrupo["fecha_finalizacion_inscripcion"]),
+                    cantidadHoras = Convert.ToInt32(filaGrupo["cantidad_horas"]),
+                    temaAsociado = Convert.ToString(filaGrupo[15]),
+                    nombreAsesorAsociado = Convert.ToString(filaGrupo[16]),
+                    tipoActividadAsociado = Convert.ToString(filaGrupo[17]),
+                    cupoActual = accesoAGrupo.ObtenerCupoActual(Convert.ToInt32(filaGrupo["id_grupo_PK"])),
+                    nombreArchivo = Convert.ToString(filaGrupo["nombre_archivo"])
+                };
+
+                listaGrupos.Add(grupo);
             }
 
             // Si no hay grupos en la lista, retornar nulo
@@ -297,7 +319,7 @@ namespace webMetics.Handlers
             try
             {
                 List<GrupoModel> gruposAsesor = ObtenerListaGruposAsesor(idAsesor);
-                if (gruposAsesor != null && gruposAsesor.Any(g => g.esVisible == 1))
+                if (gruposAsesor != null && gruposAsesor.Any(g => g.esVisible == true))
                 {
                     eliminar = false;
                 }

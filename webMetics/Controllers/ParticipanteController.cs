@@ -37,50 +37,26 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
         }
 
-        private int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        private string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
         /* Método para ver la lista de participantes de un grupo */
-        public ActionResult ListaParticipantes(int? idGrupo)
+        public ActionResult ListaParticipantes(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
                 ViewBag.IdGrupo = idGrupo;
-                ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo.Value);
+                ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 
                 ViewBag.Title = "Lista de participantes";
-                GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ViewBag.NombreGrupo = grupo.nombre;
                 return View();
             }
             catch
             {
                 // Si ocurre un error, redirigir a la lista de grupos disponibles
-                return RedirectToAction("ListaDeGruposDisponibles", "Grupo");
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
@@ -587,6 +563,30 @@ namespace webMetics.Controllers
                 .Select(s => s[random.Next(s.Length)]).ToArray());
 
             return password;
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }

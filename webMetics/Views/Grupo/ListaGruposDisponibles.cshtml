@@ -49,10 +49,10 @@
             <div class="row row-cols-1 row-cols-md-2">
                 @foreach (var grupo in ViewBag.GruposInscritos)
                 {
-                    if (grupo.esVisible == 1)
+                    if (grupo.esVisible == true)
                     {
                         var visible = "";
-                        if (grupo.esVisible == 0)
+                        if (grupo.esVisible == false)
                         {
                             visible = "opacity: 0.5";
                         }
@@ -155,10 +155,10 @@
                 }
                 @foreach (var grupo in ViewBag.ListaGrupos)
                 {
-                    if (grupo.esVisible == 1 || ViewBag.Role == 1)
+                    if (grupo.esVisible == true || ViewBag.Role == 1)
                     {
                         var visible = "";
-                        if (grupo.esVisible == 0)
+                        if (grupo.esVisible == false)
                         {
                             visible = "opacity: 0.5";
                         }
@@ -183,7 +183,7 @@
                                                 @if (ViewBag.Role == 1)
                                                 {
                                                     <i class="bi bi-trash3" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@grupo.idGrupo)"></i>
-                                                    if (grupo.esVisible == 1)
+                                                    if (grupo.esVisible == true)
                                                     {
                                                         <!--El grupo no esta visible -->
                                                         <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })" onclick="opacarGrupo(@grupo.idGrupo)"><i class="bi bi-eye"></i></a>
@@ -290,7 +290,7 @@
                     }
                     if (contadorGrupoOcultos == ViewBag.ListaGrupos.Count)
                     {
-                        <h2>No hay módulos disponibles en este momento</h2>
+                        <h2>No hay módulos disponibles en este momento.</h2>
                     }
                 }
             </div>

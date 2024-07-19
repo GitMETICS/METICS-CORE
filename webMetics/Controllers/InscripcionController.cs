@@ -75,7 +75,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
             if (participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
@@ -156,7 +156,7 @@ namespace webMetics.Controllers
                 // Si la eliminación fue exitosa, redirigir a la lista de participantes del grupo
                 if (ViewBag.ExitoAlCrear)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(Convert.ToInt32(idGrupo));
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
@@ -194,7 +194,7 @@ namespace webMetics.Controllers
                 // Si la desinscripción fue exitosa, redirigir a la lista de grupos disponibles
                 if (ViewBag.ExitoAlCrear)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(Convert.ToInt32(idGrupo));
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
@@ -345,7 +345,7 @@ namespace webMetics.Controllers
 
             // Obtener la lista de participantes del grupo y la información del grupo
             List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             // Construir una string HTML con los detalles de los participantes
             StringBuilder sb = new StringBuilder();
@@ -413,7 +413,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesPDF(int idGrupo)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
             PdfWriter writer = new PdfWriter(filePath);
@@ -464,7 +464,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesWord(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
             var fileName = "Lista_de_Participantes_" + grupo.nombre + ".docx";
@@ -520,7 +520,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
             // Creamos el archivo de Excel

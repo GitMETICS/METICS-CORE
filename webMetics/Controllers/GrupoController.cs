@@ -66,8 +66,6 @@ namespace webMetics.Controllers
             ViewBag.Role = rolUsuario;
             ViewBag.Id = idUsuario;
 
-            // Obtener y mostrar mensajes de alerta si es necesario
-            ViewBag.Message = "";
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -108,7 +106,6 @@ namespace webMetics.Controllers
             DateTime now = DateTime.Now;
             ViewBag.DateNow = now;
 
-            // Devolver la vista con la lista de grupos disponibles y participantes en grupos
             return View();
         }
 
@@ -279,7 +276,7 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
                 // Obtener información del grupo a editar
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
                 {
                     vista = Redirect("~/Grupo/ListaGruposDisponibles");
@@ -387,7 +384,7 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
                 // Obtener información del grupo para editar el adjunto
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
                 {
                     vista = Redirect("~/Grupo/ListaGruposDisponibles");
