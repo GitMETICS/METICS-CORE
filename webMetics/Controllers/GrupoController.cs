@@ -144,6 +144,7 @@ namespace webMetics.Controllers
             }
 
             ViewData["Temas"] = temas;
+            ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
             return View();
         }
 
@@ -164,6 +165,7 @@ namespace webMetics.Controllers
                     {
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -182,6 +184,7 @@ namespace webMetics.Controllers
 
                         ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -193,6 +196,7 @@ namespace webMetics.Controllers
 
                         ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -203,6 +207,7 @@ namespace webMetics.Controllers
                 else
                 {
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                     return View(grupo);
                 }
             }
@@ -297,7 +302,8 @@ namespace webMetics.Controllers
                     temas.Insert(0, temaSeleccionado);
 
                     // Pasar la lista de temas disponibles y el grupo a editar a la vista
-                    ViewData["Temas"] = temas;
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                     vista = View(modificarGrupo);
                 }
             }
@@ -325,6 +331,7 @@ namespace webMetics.Controllers
                     {
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -343,6 +350,7 @@ namespace webMetics.Controllers
 
                         ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -354,6 +362,7 @@ namespace webMetics.Controllers
 
                         ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                         return View(grupo);
                     }
 
@@ -364,6 +373,7 @@ namespace webMetics.Controllers
                 else
                 {
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
                     return View(grupo);
                 }
             }

@@ -43,7 +43,7 @@
                 <div class="col">
                     <div class="container">
                         <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" })
+                            @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "80", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
                         </div>
@@ -54,19 +54,19 @@
                         </div>
                         <div class="row mt-1">
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new List<SelectListItem> { new SelectListItem { Text = "Presencial", Value = "Presencial" }, new SelectListItem { Text = "Virtual", Value = "Virtual" }, new SelectListItem { Text = "AltoVirtual", Value = "Alto Virtual" } }, "Seleccione una modalidad...", new { @class = "form-select" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @value = "" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @value = "" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
                             </div>
@@ -83,16 +83,22 @@
                             @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.temaAsociado, new { Style = "font-size:22px" })
+                            @Html.LabelFor(grupoModel => grupoModel.temaAsociado, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.DropDownList("temaAsociado", ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema...", new { @class = "form-select" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.temaAsociado, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(grupoModel => grupoModel.nombreAsesorAsociado, new { Style = "font-size:22px" })
+                            @Html.DropDownList("asesorPrincipal", ViewData["Asesores"] as List<SelectListItem>, "Seleccione una opción...", new { @class = "form-select" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesorAsociado, "", new { @class = "text-danger" })
                         </div>
 
                         <br />
                         <div class="row mt-3">
                             <h4>Fechas de inscripción</h4>
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
+                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion) <a style="color:red;font-size:22px">*</a>
                                 <br />
                                 @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
@@ -109,13 +115,13 @@
                         <div class="row mt-3">
                             <h4>Fecha de inicio y fin del grupo</h4>
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
+                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo) <a style="color:red;font-size:22px">*</a>
                                 <br />
                                 @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
+                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo) <a style="color:red;font-size:22px">*</a>
                                 <br />
                                 @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })

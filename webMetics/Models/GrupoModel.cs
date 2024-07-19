@@ -76,6 +76,7 @@ namespace webMetics.Models
         // [Required(ErrorMessage = "Debe adjuntar el documento del programa del módulo.")]
         public IFormFile? archivoAdjunto { get; set; }
 
+        [Display(Name = "Asesor")]
         public string? nombreAsesorAsociado { get; set; }
 
         public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar según requerimientos
