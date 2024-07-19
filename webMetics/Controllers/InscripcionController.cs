@@ -54,7 +54,7 @@ namespace webMetics.Controllers
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-            if (participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+            if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
             {
                 if (MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
