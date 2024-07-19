@@ -116,7 +116,7 @@
                                 @if (ViewBag.Role == 1)
                                 {
                                     <td>
-                                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante', '@ViewBag.IdGrupo')">
+                                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@participante.idParticipante', '@ViewBag.IdGrupo')">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
@@ -162,7 +162,7 @@
 
 
 <script type="text/javascript">
-    function actualizarModal(idParticipante, idGrupo) {
+    function actualizarModalEliminarInscripcion(idParticipante, idGrupo) {
         document.getElementById("idParticipante").value = idParticipante;
         document.getElementById("idGrupo").value = idGrupo;
     }

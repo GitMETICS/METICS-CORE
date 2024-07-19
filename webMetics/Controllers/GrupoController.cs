@@ -66,8 +66,6 @@ namespace webMetics.Controllers
             ViewBag.Role = rolUsuario;
             ViewBag.Id = idUsuario;
 
-            // Obtener y mostrar mensajes de alerta si es necesario
-            ViewBag.Message = "";
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -108,7 +106,6 @@ namespace webMetics.Controllers
             DateTime now = DateTime.Now;
             ViewBag.DateNow = now;
 
-            // Devolver la vista con la lista de grupos disponibles y participantes en grupos
             return View();
         }
 
@@ -150,74 +147,69 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Vista del formulario para crear un grupo con los datos ingresados del modelo */
+        /* Vista del formulario para editar un grupo con los datos ingresados del modelo */
         [HttpPost]
-        public ActionResult AgregarGrupo(GrupoModel grupo)
+        [ValidateAntiForgeryToken]
+        public ActionResult CrearGrupo(GrupoModel grupo)
         {
-            if (ModelState.IsValid)
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-                
-                // Validar tamaño del archivo adjunto
-                if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
+                    // Validar tamaño del archivo adjunto
+                    if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
+                    {
+                        ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
+                    }
+
+                    // Validar fechas de inicio y finalización
+                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                    {
+                        if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
+                        {
+                            ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
+                        }
+
+                        if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                        {
+                            ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
+                        }
+
+                        ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
+                    }
+
+                    // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
+                    if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
+                    {
+                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
+                        ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
+
+                        ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
+                    }
+
+                    accesoAGrupo.CrearGrupo(grupo);
+                    TempData["successMessage"] = "Los datos del nuevo módulo fueron guardados.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+                else
+                {
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     return View(grupo);
                 }
-
-                // Validar fechas de inicio y finalización
-                if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
-                {
-                    ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de la fecha de inicio.";
-                    
-                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
-                    {
-                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
-                    }
-
-                    if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
-                    {
-                        ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
-                    }
-
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View("CrearGrupo", grupo);
-                }
-
-                // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
-                if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
-                {
-                    ViewBag.ErrorMessage = "La fecha final de la inscripción no puede ser después de la fecha de inicio del módulo.";
-
-                    ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
-                    ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
-                    
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View("CrearGrupo", grupo);
-                }
-
-                bool exito = accesoAGrupo.CrearGrupo(grupo);
-                if (exito)
-                {
-                    TempData["successMessage"] = "Se ha creado el módulo.";
-                } 
-                else
-                {
-                    TempData["errorMessage"] = "Ocurrió un error y no se pudo crear el módulo.";
-                }
-
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
-            else
+            catch
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-
-                // TODO: Debe retornar mensajes de error
-                return View("CrearGrupo", grupo);
+                TempData["errorMessage"] = "Ocurrió un error al subir los datos del módulo.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
@@ -284,7 +276,7 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
                 // Obtener información del grupo a editar
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
                 {
                     vista = Redirect("~/Grupo/ListaGruposDisponibles");
@@ -328,6 +320,14 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    // Validar tamaño del archivo adjunto
+                    if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
+                    {
+                        ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View(grupo);
+                    }
+
                     // Validar fechas de inicio y finalización
                     if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
                     {
@@ -384,7 +384,7 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
                 // Obtener información del grupo para editar el adjunto
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
                 if (modificarGrupo == null)
                 {
                     vista = Redirect("~/Grupo/ListaGruposDisponibles");

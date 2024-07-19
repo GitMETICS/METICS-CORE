@@ -309,7 +309,7 @@ namespace webMetics.Controllers
         }
 
         /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarCorreoRegistro(string id, string correo)
+        private void EnviarCorreoRegistro(string correo, string contrasena = "")
         {
             try
             {
@@ -320,7 +320,7 @@ namespace webMetics.Controllers
                 // Contenido base del mensaje en HTML y texto plano
                 const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
                 const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Registro en Proyecto Módulos"; // Asunto del correo
+                const string BASE_SUBJECT = "Registro en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
 
                 MimeMessage message = new MimeMessage();
 
@@ -335,7 +335,8 @@ namespace webMetics.Controllers
                 // Crear el cuerpo del mensaje con el contenido HTML y texto plano
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "Se ha registrado al usuario con identificación " + id + " en el Proyecto Módulos."; ;
+                    "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
+                    "<p>Su contraseña temporal es " + ". Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
 

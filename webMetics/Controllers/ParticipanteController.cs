@@ -37,50 +37,36 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
         }
 
-        private int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        private string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
         /* Método para ver la lista de participantes de un grupo */
-        public ActionResult ListaParticipantes(int? idGrupo)
+        public ActionResult ListaParticipantes(int idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
                 ViewBag.IdGrupo = idGrupo;
-                ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo.Value);
+                ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 
                 ViewBag.Title = "Lista de participantes";
-                GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo.Value);
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ViewBag.NombreGrupo = grupo.nombre;
+
+                if (TempData["errorMessage"] != null)
+                {
+                    ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                }
+                if (TempData["successMessage"] != null)
+                {
+                    ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                }
+
                 return View();
             }
             catch
             {
                 // Si ocurre un error, redirigir a la lista de grupos disponibles
-                return RedirectToAction("ListaDeGruposDisponibles", "Grupo");
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
@@ -92,13 +78,20 @@ namespace webMetics.Controllers
 
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
 
-            foreach (ParticipanteModel participante in participantes)
+            if (participantes != null)
             {
-                string idParticipante = participante.idParticipante;
-                participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-            }
+                foreach (ParticipanteModel participante in participantes)
+                {
+                    string idParticipante = participante.idParticipante;
+                    participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+                }
 
-            ViewBag.ListaParticipantes = participantes;
+                ViewBag.ListaParticipantes = participantes;
+            }
+            else
+            {
+                ViewBag.ListaParticipantes = null;
+            }
 
             if (TempData["errorMessage"] != null)
             {
@@ -163,6 +156,7 @@ namespace webMetics.Controllers
                         {
                             idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
                             tipoIdentificacion = "",
+                            numeroIdentificacion = "",
                             correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
                             nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
                             primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
@@ -173,7 +167,7 @@ namespace webMetics.Controllers
                             unidadAcademica = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad Académica")].Text,
                             departamento = "",
                             telefono = "",
-                            horasMatriculadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
+                            horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
                             horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
                             gruposInscritos = new List<GrupoModel>()
                         };
@@ -198,18 +192,6 @@ namespace webMetics.Controllers
             }
 
             return RedirectToAction("VerParticipantes");
-        }
-
-        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
-        {
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                if (worksheet.Cells[1, col].Text == columnName)
-                {
-                    return col;
-                }
-            }
-            return -1;
         }
 
         public ActionResult VerDatosParticipante(string idParticipante)
@@ -433,11 +415,11 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
                 bool eliminadoExitosamente = accesoAParticipante.EliminarParticipante(idParticipante);
 
                 if (eliminadoExitosamente)
@@ -579,6 +561,18 @@ namespace webMetics.Controllers
             }
         }
 
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                if (worksheet.Cells[1, col].Text == columnName)
+                {
+                    return col;
+                }
+            }
+            return -1;
+        }
+
         private string GenerateRandomPassword()
         {
             int length = 10;
@@ -588,6 +582,30 @@ namespace webMetics.Controllers
                 .Select(s => s[random.Next(s.Length)]).ToArray());
 
             return password;
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }

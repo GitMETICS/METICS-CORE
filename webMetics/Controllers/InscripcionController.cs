@@ -33,30 +33,6 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
         }
 
-        public int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        public string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
         /* Método para mostrar la lista de participantes inscritos en un grupo */
         public ActionResult ListaDeParticipantesInscritos(int idGrupo)
         {
@@ -75,7 +51,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
             if (participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
@@ -145,38 +121,37 @@ namespace webMetics.Controllers
         /* Método para que un administrador elimine una inscripción de un usuario */
         public ActionResult EliminarInscripcion(string idParticipante, string idGrupo)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            int idGrupoAux = Convert.ToInt32(idGrupo);
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
+                bool exito = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
 
-                // Intentar eliminar la inscripción del usuario con el idGenerado en el grupo especificado por idGrupo
-                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
-
-                // Si la eliminación fue exitosa, redirigir a la lista de participantes del grupo
-                if (ViewBag.ExitoAlCrear)
+                if (exito)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupoAux);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
 
-                    return Redirect("~/Participante/ListaParticipantes?idGrupo=" + idGrupo);
+                    TempData["successMessage"] = "Se eliminó la inscripción del participante.";
+                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
                 }
                 else
                 {
-                    // Si hubo un error al eliminar la inscripción, mostrar un mensaje y limpiar el modelo para la vista
-                    ViewBag.Message = "Hubo un error y no se pudo eliminar al asesor.";
-                    ModelState.Clear();
-                    return View();
+                    TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
+                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
                 }
             }
             catch (Exception)
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                ViewBag.Message = "Hubo un error y no se pudo enviar la petición de eliminar al asesor.";
-                return Redirect("~/Participante/ListaParticipantes?idGrupo=" + idGrupo);
+                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
+                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
             }
         }
 
@@ -194,7 +169,7 @@ namespace webMetics.Controllers
                 // Si la desinscripción fue exitosa, redirigir a la lista de grupos disponibles
                 if (ViewBag.ExitoAlCrear)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(Convert.ToInt32(idGrupo));
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(Convert.ToInt32(idGrupo));
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
@@ -345,7 +320,7 @@ namespace webMetics.Controllers
 
             // Obtener la lista de participantes del grupo y la información del grupo
             List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             // Construir una string HTML con los detalles de los participantes
             StringBuilder sb = new StringBuilder();
@@ -413,7 +388,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesPDF(int idGrupo)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
             PdfWriter writer = new PdfWriter(filePath);
@@ -464,7 +439,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesWord(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
             var fileName = "Lista_de_Participantes_" + grupo.nombre + ".docx";
@@ -520,7 +495,7 @@ namespace webMetics.Controllers
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            GrupoModel grupo = accesoAGrupo.ObtenerInfoGrupo(idGrupo);
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
 
             // Creamos el archivo de Excel
@@ -591,6 +566,30 @@ namespace webMetics.Controllers
             var file = stream.ToArray();
 
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }
