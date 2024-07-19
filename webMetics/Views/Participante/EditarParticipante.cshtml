@@ -93,12 +93,12 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
+                            @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), this.Model.departamento, new { @class = "form-control", id = "departamentoDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Selecciona una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), this.Model.unidadAcademica, new { @class = "form-control", id = "seccionDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -200,9 +200,30 @@ else
         });
 
         // Handle change event of departamento dropdown
-        $('#departamentoDropdown').change(function () {
+        $('#departamentoDropdown').click(function () {
             var departamentoName = $(this).val();
             var areaName = $('#areaDropdown').val();
+
+            $.ajax({
+                url: '/Participante/GetDepartamentosByArea',
+                type: 'GET',
+                data: { areaName: areaName },
+                dataType: 'json',
+                success: function (data) {
+                    // Update departamento dropdown with fetched data
+                    $.each(data, function (index, value) {
+                        $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while fetching departamentos: ' + error
+                    });
+                }
+            });
 
             // Clear unidadAcademica dropdown
             $('#seccionDropdown').empty().append('<option value="">Selecciona una unidad académica...</option>');
