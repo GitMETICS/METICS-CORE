@@ -411,6 +411,7 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    participante.idParticipante = participante.correo;
                     accesoAParticipante.EditarParticipante(participante);
                     TempData["successMessage"] = "Los datos fueron guardados.";
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
