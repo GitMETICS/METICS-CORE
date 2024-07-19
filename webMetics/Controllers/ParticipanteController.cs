@@ -78,13 +78,20 @@ namespace webMetics.Controllers
 
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
 
-            foreach (ParticipanteModel participante in participantes)
+            if (participantes != null)
             {
-                string idParticipante = participante.idParticipante;
-                participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-            }
+                foreach (ParticipanteModel participante in participantes)
+                {
+                    string idParticipante = participante.idParticipante;
+                    participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+                }
 
-            ViewBag.ListaParticipantes = participantes;
+                ViewBag.ListaParticipantes = participantes;
+            }
+            else
+            {
+                ViewBag.ListaParticipantes = null;
+            }
 
             if (TempData["errorMessage"] != null)
             {
@@ -149,6 +156,7 @@ namespace webMetics.Controllers
                         {
                             idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
                             tipoIdentificacion = "",
+                            numeroIdentificacion = "",
                             correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
                             nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
                             primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
@@ -159,7 +167,7 @@ namespace webMetics.Controllers
                             unidadAcademica = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad Académica")].Text,
                             departamento = "",
                             telefono = "",
-                            horasMatriculadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
+                            horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
                             horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
                             gruposInscritos = new List<GrupoModel>()
                         };
