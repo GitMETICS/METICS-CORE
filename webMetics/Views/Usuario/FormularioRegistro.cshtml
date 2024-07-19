@@ -120,18 +120,6 @@
                             @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Otro") @Html.Label("Otro")<br />
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.condicion, "", new { @class = "text-danger" })
                         </div>
-                        <div class="row mt-1 mb-4">
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(usuarioModel => usuarioModel.contrasena, new { @class = "form-control", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.contrasena, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(usuarioModel => usuarioModel.confirmarContrasena, new { @class = "form-control", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.confirmarContrasena, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">

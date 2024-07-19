@@ -85,29 +85,21 @@ namespace webMetics.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (usuario.contrasena == usuario.confirmarContrasena)
+                string contrasena = GenerateRandomPassword();
+                bool exito = CrearUsuario(usuario, contrasena);
+
+                if (exito)
                 {
-                    bool exito = CrearUsuario(usuario);
+                    ViewBag.Correo = usuario.correo;
+                    ViewBag.Titulo = "Registro realizado";
+                    ViewBag.Message = "Se registró éxitosamente. La contraseña temporal será enviada al correo";
+                    EnviarCorreoRegistro(usuario.correo, contrasena);
 
-                    if (exito)
-                    {
-                        ViewBag.Correo = usuario.correo;
-                        ViewBag.Titulo = "Registro realizado";
-                        ViewBag.Message = "Se registró en el Proyecto Módulos. La confirmación será enviada al correo";
-                        EnviarCorreoRegistro(usuario.id, usuario.correo);
-
-                        return View("ParticipanteRegistrado");
-                    }
-                    else 
-                    {
-                        return RedirectToAction("IniciarSesion");
-                    }
+                    return View("ParticipanteRegistrado");
                 }
                 else
                 {
-                    ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
-                    ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                    return View(usuario);
+                    return RedirectToAction("IniciarSesion");
                 }
             }
             else
@@ -118,7 +110,7 @@ namespace webMetics.Controllers
         }
 
         // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos
-        private bool CrearUsuario(UsuarioModel usuario)
+        private bool CrearUsuario(UsuarioModel usuario, string contrasena)
         {
             bool exito = false;
 
@@ -126,37 +118,57 @@ namespace webMetics.Controllers
             {
                 usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo.
 
-                if (!accesoAUsuario.ExisteUsuario(usuario.id))
+                // Si no existe el participante en la base de datos, debe crearse un usuario.
+                if (!accesoAParticipante.ExisteParticipante(usuario.id))
                 {
-                    accesoAUsuario.CrearUsuario(usuario.id, usuario.contrasena);
-
-                    if (!accesoAParticipante.ExisteParticipante(usuario.id))
+                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
                     {
-                        ParticipanteModel participante = new ParticipanteModel()
-                        {
-                            idParticipante = usuario.id,
-                            nombre = usuario.nombre,
-                            primerApellido = usuario.primerApellido,
-                            segundoApellido = usuario.segundoApellido,
-                            tipoIdentificacion = usuario.tipoIdentificacion,
-                            numeroIdentificacion = usuario.numeroIdentificacion,
-                            correo = usuario.correo,
-                            tipoParticipante = usuario.tipoParticipante,
-                            condicion = usuario.condicion,
-                            telefono = usuario.telefono,
-                            area = usuario.area,
-                            departamento = usuario.departamento,
-                            unidadAcademica = usuario.unidadAcademica,
-                            sede = usuario.sede,
-                            horasMatriculadas = 0,
-                            horasAprobadas = 0
-                        };
-
-                        accesoAParticipante.CrearParticipante(participante);
-                        exito = true;
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
                     }
-                    else 
+                    else
                     {
+                        TempData["errorMessage"] = "Ya existe un usuario con los mismos datos.";
+                        exito = false;
+                    }
+
+                    ParticipanteModel participante = new ParticipanteModel()
+                    {
+                        idParticipante = usuario.id,
+                        nombre = usuario.nombre,
+                        primerApellido = usuario.primerApellido,
+                        segundoApellido = usuario.segundoApellido,
+                        tipoIdentificacion = usuario.tipoIdentificacion,
+                        numeroIdentificacion = usuario.numeroIdentificacion,
+                        correo = usuario.correo,
+                        tipoParticipante = usuario.tipoParticipante,
+                        condicion = usuario.condicion,
+                        telefono = usuario.telefono,
+                        area = usuario.area,
+                        departamento = usuario.departamento,
+                        unidadAcademica = usuario.unidadAcademica,
+                        sede = usuario.sede,
+                        horasMatriculadas = 0,
+                        horasAprobadas = 0
+                    };
+
+                    accesoAParticipante.CrearParticipante(participante);
+                    exito = true;
+                } 
+                // Si sí existe el participante en la base de datos, significa que existe su usuario.
+                else
+                {
+                    // No puede existir un participante que no tenga también un usuario.
+                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
+                    {
+                        TempData["errorMessage"] = "Ocurrió un error al procesar los datos.";
+                        exito = false;
+                    }
+                    else
+                    {
+                        // Modificamos la contraseña temporal que estaba en la base de datos del usuario con la nueva contraseña.
+                        accesoAUsuario.EditarUsuario(usuario.id, contrasena);
+
+                        // Actualizamos el participante con los nuevos datos.
                         ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
 
                         ParticipanteModel participanteActualizado = new ParticipanteModel()
@@ -182,10 +194,6 @@ namespace webMetics.Controllers
                         accesoAParticipante.EditarParticipante(participanteActualizado);
                         exito = true;
                     }
-                }
-                else
-                {
-                    TempData["errorMessage"] = "Ya existe un usuario con los mismos datos.";
                 }
             }
             catch
@@ -309,11 +317,11 @@ namespace webMetics.Controllers
         }
 
         /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarCorreoRegistro(string correo, string contrasena = "")
+        private void EnviarCorreoRegistro(string correo, string contrasena)
         {
             try
             {
-                // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+                // Configurar el mensaje de correo electrónico de registro
                 // Se utiliza la librería MimeKit para construir el mensaje
                 // El mensaje incluye una versión en HTML y texto plano
 
@@ -336,7 +344,7 @@ namespace webMetics.Controllers
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
                     "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es " + ". Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
+                    "<p>Su contraseña temporal es " + contrasena + ". Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
 
@@ -358,6 +366,17 @@ namespace webMetics.Controllers
             {
                 TempData["errorMessage"] = ex.ToString();
             }
+        }
+
+        private string GenerateRandomPassword()
+        {
+            int length = 10;
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            var random = new Random();
+            string password = new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            return password;
         }
 
         private int GetRole()

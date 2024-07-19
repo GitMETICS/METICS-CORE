@@ -86,7 +86,7 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@id", id);
-                var existeParam = command.Parameters.Add("@existe", SqlDbType.Int);
+                var existeParam = command.Parameters.Add("@exists", SqlDbType.Int);
                 existeParam.Direction = ParameterDirection.Output;
 
                 try
@@ -117,14 +117,11 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
-                var exitoParam = command.Parameters.Add("@exito", SqlDbType.Int);
-                exitoParam.Direction = ParameterDirection.Output;
 
                 try
                 {
                     ConexionMetics.Open();
-                    command.ExecuteNonQuery();
-                    exito = Convert.ToInt32(exitoParam.Value) == 1;
+                    exito = command.ExecuteNonQuery() >= 1;
                 }
                 catch (Exception ex)
                 {
