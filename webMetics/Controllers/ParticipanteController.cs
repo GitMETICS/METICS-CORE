@@ -51,6 +51,16 @@ namespace webMetics.Controllers
                 ViewBag.Title = "Lista de participantes";
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ViewBag.NombreGrupo = grupo.nombre;
+
+                if (TempData["errorMessage"] != null)
+                {
+                    ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                }
+                if (TempData["successMessage"] != null)
+                {
+                    ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                }
+
                 return View();
             }
             catch
@@ -174,18 +184,6 @@ namespace webMetics.Controllers
             }
 
             return RedirectToAction("VerParticipantes");
-        }
-
-        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
-        {
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                if (worksheet.Cells[1, col].Text == columnName)
-                {
-                    return col;
-                }
-            }
-            return -1;
         }
 
         public ActionResult VerDatosParticipante(string idParticipante)
@@ -408,11 +406,11 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
                 bool eliminadoExitosamente = accesoAParticipante.EliminarParticipante(idParticipante);
 
                 if (eliminadoExitosamente)
@@ -552,6 +550,18 @@ namespace webMetics.Controllers
             {
                 TempData["errorMessage"] = ex.ToString();
             }
+        }
+
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                if (worksheet.Cells[1, col].Text == columnName)
+                {
+                    return col;
+                }
+            }
+            return -1;
         }
 
         private string GenerateRandomPassword()
