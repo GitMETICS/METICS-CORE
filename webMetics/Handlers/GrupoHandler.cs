@@ -16,72 +16,64 @@ namespace webMetics.Handlers
     {
         public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
+
         }
 
-        // Método para crear la consulta a la BD para crear un grupo
+        // Método para editar un grupo en la base de datos
         public bool CrearGrupo(GrupoModel grupo)
-        {
-            bool consultaExitosa;
-
-            // Consulta SQL para insertar un nuevo grupo en la tabla 'grupo'
-            string consulta = "INSERT INTO grupo (id_tema_FK, modalidad, cupo, descripcion, es_visible, lugar, nombre, horario, fecha_inicio_grupo, fecha_finalizacion_grupo, fecha_inicio_inscripcion, fecha_finalizacion_inscripcion, cantidad_horas, adjunto, nombre_archivo) VALUES (@idTema, @modalidad, @cupo, @descripcion, @es_visible, @lugar, @nombre, @horario, @fecha_inicio_grupo, @fecha_finalizacion_grupo, @fecha_inicio_inscripcion, @fecha_finalizacion_inscripcion, @cantidad_horas, Convert(varbinary(max),@adjunto), @nombre_archivo)";
-
-            // Llama al método AgregarGrupo para ejecutar la consulta
-            consultaExitosa = AgregarGrupo(consulta, grupo);
-
-            // Retorna el resultado de la ejecución de la consulta
-            return consultaExitosa;
-        }
-
-        // Método para crear un grupo en la base de datos
-        public bool AgregarGrupo(string consulta, GrupoModel grupo)
         {
             bool exito = false;
 
-            // Abre la conexión con la base de datos
-            ConexionMetics.Open();
-
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
-            comandoConsulta.Parameters.AddWithValue("@modalidad", grupo.modalidad);
-            comandoConsulta.Parameters.AddWithValue("@cupo", grupo.cupo);
-            comandoConsulta.Parameters.AddWithValue("@descripcion", grupo.descripcion);
-            comandoConsulta.Parameters.AddWithValue("@es_visible", 1);
-            comandoConsulta.Parameters.AddWithValue("@lugar", grupo.lugar);
-            comandoConsulta.Parameters.AddWithValue("@nombre", grupo.nombre);
-            comandoConsulta.Parameters.AddWithValue("@horario", grupo.horario);
-            comandoConsulta.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
-            comandoConsulta.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
-            comandoConsulta.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
-            comandoConsulta.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
-            comandoConsulta.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
-
-            // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
-            long fileLength = grupo.archivoAdjunto.Length;
-            byte[] buffer = new byte[fileLength];
-            using (var stream = grupo.archivoAdjunto.OpenReadStream())
+            using (var command = new SqlCommand("InsertGrupo", ConexionMetics))
             {
-                stream.Read(buffer, 0, (int)fileLength);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
+                command.Parameters.AddWithValue("@nombre", grupo.nombre);
+                command.Parameters.AddWithValue("@horario", grupo.horario);
+                command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
+                command.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
+                command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
+                command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
+                command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
+                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
+                command.Parameters.AddWithValue("@cupo", grupo.cupo);
+                command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
+                command.Parameters.AddWithValue("@lugar", grupo.lugar);
+                command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
+
+                // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos
+                byte[] buffer = new byte[0];
+
+                if (grupo.archivoAdjunto != null)
+                {
+                    long fileLength = grupo.archivoAdjunto.Length;
+                    buffer = new byte[fileLength];
+
+                    using (var stream = grupo.archivoAdjunto.OpenReadStream())
+                    {
+                        stream.Read(buffer, 0, (int)fileLength);
+                    }
+                }
+
+                command.Parameters.AddWithValue("@adjunto", buffer);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in CrearGrupo: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
             }
-
-            comandoConsulta.Parameters.AddWithValue("@adjunto", buffer);
-
-            // Obtiene el nombre y extensión del archivo adjunto para almacenarlos en la base de datos
-            string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
-            string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
-            string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
-
-            // Ejecuta la consulta y comprueba si al menos una fila fue afectada
-            exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
 
             return exito;
         }
-
 
         // Método para obtener la lista de grupos desde la base de datos con información detallada
         public List<GrupoModel> ObtenerListaGrupos()
@@ -379,58 +371,6 @@ namespace webMetics.Handlers
             }
 
             return exito;
-
-
-
-
-            /*bool consultaExitosa;
-
-            // Consulta SQL para actualizar los datos del grupo en la tabla 'grupo' mediante su ID
-            string consulta =
-                "UPDATE grupo SET " +
-                "id_tema_FK = @idTema, " +
-                "modalidad = @modalidad, " +
-                "cupo = @cupo, " +
-                "descripcion = @descripcion, " +
-                "es_visible = @es_visible, " +
-                "lugar = @lugar, " +
-                "nombre = @nombre, " +
-                "horario = @horario, " +
-                "fecha_inicio_grupo = @fecha_inicio_grupo, " +
-                "fecha_finalizacion_grupo = @fecha_finalizacion_grupo, " +
-                "fecha_inicio_inscripcion = @fecha_inicio_inscripcion, " +
-                "fecha_finalizacion_inscripcion = @fecha_finalizacion_inscripcion, " +
-                "cantidad_horas = @cantidad_horas " +
-                "WHERE id_grupo_PK = @idGrupo";
-
-            // Abre la conexión con la base de datos
-            ConexionMetics.Open();
-
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
-            comandoConsulta.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
-            comandoConsulta.Parameters.AddWithValue("@modalidad", grupo.modalidad);
-            comandoConsulta.Parameters.AddWithValue("@cupo", grupo.cupo);
-            comandoConsulta.Parameters.AddWithValue("@descripcion", grupo.descripcion);
-            comandoConsulta.Parameters.AddWithValue("@es_visible", 1); // ¿Por qué es_visible se establece siempre a 1?
-            comandoConsulta.Parameters.AddWithValue("@lugar", grupo.lugar);
-            comandoConsulta.Parameters.AddWithValue("@nombre", grupo.nombre);
-            comandoConsulta.Parameters.AddWithValue("@horario", grupo.horario);
-            comandoConsulta.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
-            comandoConsulta.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
-            comandoConsulta.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
-            comandoConsulta.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
-            comandoConsulta.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
-
-            // Ejecuta la consulta y comprueba si al menos una fila fue afectada
-            consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            // Cierra la conexión con la base de datos
-            ConexionMetics.Close();
-
-            // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
-            return consultaExitosa;*/
         }
 
         // Método para obtener el tema seleccionado del grupo mediante su ID

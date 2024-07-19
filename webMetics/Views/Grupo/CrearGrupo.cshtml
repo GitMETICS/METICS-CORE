@@ -18,7 +18,7 @@
             </div>
         }
 
-        @using (Html.BeginForm("AgregarGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("CrearGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <h1>@ViewBag.Title</h1>
