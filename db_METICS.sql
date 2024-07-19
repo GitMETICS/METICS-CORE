@@ -766,61 +766,99 @@ VALUES
 
 --Crear usuarios
 	-- admin
-EXEC InsertUsuario @id=N'0000', @rol=1, @contrasena=N'#Q+3n?OWk3i0:qG'
-
-EXEC InsertUsuario @id=N'1111', @rol=1, @contrasena=N'1234'
-
-EXEC InsertUsuario @id=N'2222', @rol=2, @contrasena=N'1234'
-
-EXEC InsertUsuario @id=N'3333', @rol=2, @contrasena=N'1234'
-
-EXEC InsertUsuario @id=N'4444', @rol=0, @contrasena=N'1234'
-
-EXEC InsertUsuario @id=N'5555', @rol=0, @contrasena=N'1234'
+EXEC InsertUsuario 
+	@id = N'admin.admin@ucr.ac.cr',
+	@rol = 1,
+	@contrasena = N'#Q+3n?OWk3i0:qG'
 
 --Crear asesores
-EXEC InsertAsesor
-    @idUsuario = N'2222',
-    @idAsesor = N'2222',
-    @nombre = N'Julio',
-    @apellido1 = N'Castro',
-    @apellido2 = N'Madriz',
-    @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'2222',
-    @correo = N'asesor1@ucr.ac.cr',
-    @telefono = N'800800800',
-    @descripcion = N'Soy asesor en el área de sistemas',
-    @area = N'Área de Ingeniería',
-    @departamento = N'Facultad de Ingeniería',
-    @unidadAcademica = N'ECCI',
-    @sede = N'Sede Rodrigo Facio',
-    @condicion = N'Activo'
+EXEC InsertUsuario
+	@id = N'MARIA.ENRIQUEZ@ucr.ac.cr',
+	@rol = 2,
+	@contrasena = N'4fG7hJ2kL9';
 
+EXEC InsertAsesor 
+    @idUsuario = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
+    @idAsesor = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', 
+    @numeroIdentificacion = N'', 
+    @correo = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
+    @nombre = N'María Ileana', 
+    @apellido1 = N'Enriquez', 
+    @apellido2 = N'Barrantes';
 
-EXEC InsertAsesor
-    @idUsuario = N'3333',
-    @idAsesor = N'3333',
-    @nombre = N'María',
-    @apellido1 = N'Gómez',
-    @apellido2 = N'Pérez',
-    @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'3333',
-    @correo = N'mariagomez@ejemplo.com',
-    @telefono = N'700700700',
-    @descripcion = N'Soy una asesora con amplia experiencia en el área de capacitación.',
-    @area = N'Área de Ciencias Sociales',
-    @departamento = N'Facultad de Ciencias Sociales',
-    @unidadAcademica = N'CICA',
-    @sede = N'Sede Rodrigo Facio',
-    @condicion = N'Activo'
+EXEC InsertUsuario
+	@id = N'jose.elizondosalas@ucr.ac.cr',
+	@rol = 2,
+	@contrasena = N'9dH3kL8pQz';
+
+EXEC InsertAsesor 
+    @idUsuario = N'jose.elizondosalas@ucr.ac.cr', 
+    @idAsesor = N'jose.elizondosalas@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', 
+    @numeroIdentificacion = N'', 
+    @correo = N'jose.elizondosalas@ucr.ac.cr', 
+    @nombre = N'Jose Antonio', 
+    @apellido1 = N'Elizondo', 
+    @apellido2 = N'Salas';
+
+EXEC InsertUsuario
+	@id = N'ORLANDO.GOMEZ@ucr.ac.cr',
+	@rol = 2,
+	@contrasena = N'2fJ8rK5tXq';
+
+EXEC InsertAsesor 
+    @idUsuario = N'ORLANDO.GOMEZ@ucr.ac.cr', 
+    @idAsesor = N'ORLANDO.GOMEZ@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', 
+    @numeroIdentificacion = N'', 
+    @correo = N'ORLANDO.GOMEZ@ucr.ac.cr', 
+    @nombre = N'Orlando Daniel', 
+    @apellido1 = N'Gómez', 
+    @apellido2 = N'Arias';
+
+EXEC InsertUsuario
+	@id = N'AARON.MENAARAYA@ucr.ac.cr',
+	@rol = 2,
+	@contrasena = N'6hP2jN9vWz';
+
+EXEC InsertAsesor 
+    @idUsuario = N'AARON.MENAARAYA@ucr.ac.cr', 
+    @idAsesor = N'AARON.MENAARAYA@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', 
+    @numeroIdentificacion = N'', 
+    @correo = N'AARON.MENAARAYA@ucr.ac.cr', 
+    @nombre = N'Aarón Elí', 
+    @apellido1 = N'Mena', 
+    @apellido2 = N'Araya';
+
+EXEC InsertUsuario
+	@id = N'brenda.alfaro@ucr.ac.cr',
+	@rol = 2,
+	@contrasena = N'3tX5kL8dVj';
+
+EXEC InsertAsesor 
+    @idUsuario = N'brenda.alfaro@ucr.ac.cr', 
+    @idAsesor = N'brenda.alfaro@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', 
+    @numeroIdentificacion = N'', 
+    @correo = N'brenda.alfaro@ucr.ac.cr', 
+    @nombre = N'Brenda Lidis', 
+    @apellido1 = N'Alfaro', 
+    @apellido2 = N'González';
 
 
 --Crear participantes
+EXEC InsertUsuario
+	@id = N'jhondoo@ucr.ac.cr',
+	@rol = 0,
+	@contrasena = N'1234';
+
 EXEC InsertParticipante
-    @idUsuario = N'4444',
-    @idParticipante = N'4444',
+    @idUsuario = N'jhondoo@ucr.ac.cr',
+    @idParticipante = N'jhondoo@ucr.ac.cr',
     @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'4444',
+    @numeroIdentificacion = N'123456789',
     @correo = N'jhondoo@ucr.ac.cr',
     @nombre = N'Jhon',
     @apellido1 = N'Doo',
@@ -834,12 +872,16 @@ EXEC InsertParticipante
     @horasMatriculadas = 0,
     @horasAprobadas = 0
 
+EXEC InsertUsuario
+	@id = N'armandotorres_rojas@ucr.ac.cr',
+	@rol = 0,
+	@contrasena = N'1234';
 
 EXEC InsertParticipante
-    @idUsuario = N'5555',
-    @idParticipante = N'5555',
+    @idUsuario = N'armandotorres_rojas@ucr.ac.cr',
+    @idParticipante = N'armandotorres_rojas@ucr.ac.cr',
     @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'5555',
+    @numeroIdentificacion = N'987654321',
     @correo = N'armandotorres_rojas@ucr.ac.cr',
     @nombre = N'Armando',
     @apellido1 = N'Torres',
@@ -908,15 +950,3 @@ INSERT INTO dbo.grupo(
 	N'Capacitaciones-Audiovisuales', N'L-M de 4pm a 7pm',
 	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
 	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf');
-
-
---Crear asesor da tema
-INSERT INTO asesor_da_tema
-(id_tema_FK,id_asesor_FK,asesores_asistentes)
-VALUES
-(1, N'2222', N'Julio Castro Madriz/Juan Quiros Ruiz/'),
-(2, N'3333', N'Juan Quiros Ruiz/Julio Castro Madriz/'),
-(3, N'2222', N'Julio Castro Madriz/Juan Quiros Ruiz/'),
-(4, N'3333', N'Juan Quiros Ruiz/Julio Castro Madriz/')
-
-GO
