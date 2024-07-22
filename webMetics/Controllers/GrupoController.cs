@@ -55,59 +55,75 @@ namespace webMetics.Controllers
             return id;
         }
 
-        /* Método de la vista ListaGruposDisponibles que muestra todos los grupos disponibles para inscribirse.
-         * Un grupo es disponible si la fecha de inscripción y el día de inicio aún no han pasado y si el estado es visible.
+        /*
+         * Método de la vista ListaGruposDisponibles que recupera y muestra todos los grupos disponibles para inscripción.
+         * Un grupo se considera disponible si:
+         * - La fecha de inscripción no ha expirado.
+         * - La fecha de inicio aún no ha pasado.
+         * - El estado del grupo es "visible".
+         *
+         * Este método también gestiona la lógica de roles de usuario, permitiendo que los participantes, inscriptores y asesores vean
+         * grupos según su rol. Además, se proporciona información sobre grupos a los que el usuario ya está inscrito.
          */
         public ActionResult ListaGruposDisponibles()
         {
+            const int RolUsuarioParticipante = 0;
+            const int RolUsuarioAdmin = 1;
+            const int RolUsuarioAsesor = 2;
+
             int rolUsuario = GetRole();
             string idUsuario = GetId();
 
-            ViewBag.Role = rolUsuario;
-            ViewBag.Id = idUsuario;
-
-            if (TempData["errorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
-
+            // Obtener la lista de grupos y participantes
             List<GrupoModel> listaGrupos = accesoAGrupo.ObtenerListaGrupos();
-            ViewBag.ListaGrupos = listaGrupos;
-            ViewBag.ParticipantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
-            ViewBag.IdParticipante = "";
+            var participantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
 
-            if (rolUsuario != 0 && idUsuario != "")
+            // Inicializar las propiedades de ViewBag
+            ViewBag.ListaGrupos = listaGrupos;
+            ViewBag.ParticipantesEnGrupos = participantesEnGrupos;
+            ViewBag.IdParticipante = string.Empty;
+
+            // Manejar los roles de usuario y las suscripciones a grupos
+            if (!string.IsNullOrEmpty(idUsuario))
             {
                 ViewBag.IdParticipante = idUsuario;
 
-                if (rolUsuario == 1)
+                switch (rolUsuario)
                 {
-                    List<GrupoModel> listaGruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                    case RolUsuarioParticipante:
+                        var gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                        ViewBag.GruposInscritos = gruposInscritos;
 
-                    if (listaGruposInscritos != null)
-                    {
-                        ViewBag.GruposInscritos = listaGruposInscritos;
-                        ViewBag.ListaGrupos = listaGrupos.Where(p => !listaGruposInscritos.Any(x => x.idGrupo == p.idGrupo)).ToList();
-                    }
-                }
-                else
-                {
-                    if (rolUsuario == 2)
-                    {
+                        if (gruposInscritos != null)
+                        {
+                            ViewBag.ListaGrupos = listaGrupos
+                                .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+                        break;
+
+                    case RolUsuarioAdmin:
+                        ViewBag.ListaGrupos = listaGrupos;
+                        break;
+
+                    case RolUsuarioAsesor:
                         ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
-                    }
+                        break;
                 }
             }
-            
-            DateTime now = DateTime.Now;
-            ViewBag.DateNow = now;
+
+            // Definir propiedades adicionales de ViewBag
+            ViewBag.DateNow = DateTime.Now;
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
+
+            // Gestionar mensajes de TempData
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
 
             return View();
         }
+
 
         /* Método para descargar el programa del grupo */
         public ActionResult DescargarArchivo(int idGrupo)
