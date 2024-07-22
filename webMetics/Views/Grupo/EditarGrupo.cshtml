@@ -61,7 +61,7 @@
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoModalidad))), "Seleccione un tipo de modalidad...", new { @class = "form-control" })
+                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoModalidad))), "Seleccione un tipo de modalidad...", new { @class = "form-control", @id = "modalidadSelect" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 
@@ -96,7 +96,7 @@
 
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.nombreAsesorAsociado, new { Style = "font-size:22px" })
-                            @Html.DropDownListFor(grupoModel => grupoModel.nombreAsesorAsociado, ViewData["Asesores"] as List<SelectListItem>, "Seleccione una opción...", new { @class = "form-select" })
+                            @Html.DropDownListFor(grupoModel => grupoModel.nombreAsesorAsociado, ViewData["Asesores"] as List<SelectListItem>, "Seleccione una opción...", new { @class = "form-select", @id = "asesorSelect" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesorAsociado, "", new { @class = "text-danger" })
                         </div>
 
@@ -159,3 +159,25 @@ else
 {
     await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
 }
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function verificarModalidad() {
+            var modalidadSeleccionada = $('#modalidadSelect').val();
+            if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
+                $('#asesorSelect').prop('disabled', true); // Deshabilitar el campo del asesor
+                $('#asesorSelect').val(''); // Limpiar la selección
+            } else {
+                $('#asesorSelect').prop('disabled', false); // Habilitar el campo del asesor
+            }
+        }
+
+        verificarModalidad();
+
+        // Llamar a la función cuando cambie la modalidad
+        $('#modalidadSelect').change(function () {
+            verificarModalidad();
+        });
+    });
+</script>
