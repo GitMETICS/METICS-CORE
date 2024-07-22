@@ -29,6 +29,7 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
+                command.Parameters.AddWithValue("@asesor", grupo.nombreAsesorAsociado);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
                 command.Parameters.AddWithValue("@horario", grupo.horario);
                 command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
@@ -96,6 +97,7 @@ namespace webMetics.Handlers
                     descripcion = Convert.ToString(row["descripcion"]),
                     esVisible = Convert.ToBoolean(row["es_visible"]),
                     lugar = Convert.ToString(row["lugar"]),
+                    nombreAsesorAsociado = Convert.ToString(row["asesor"]),
                     nombre = Convert.ToString(row["nombre"]),
                     horario = Convert.ToString(row["horario"]),
                     fechaInicioGrupo = Convert.ToDateTime(row["fecha_inicio_grupo"]),
@@ -103,9 +105,8 @@ namespace webMetics.Handlers
                     fechaInicioInscripcion = Convert.ToDateTime(row["fecha_inicio_inscripcion"]),
                     fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
-                    temaAsociado = Convert.ToString(row[15]),
-                    nombreAsesorAsociado = Convert.ToString(row[16]),
-                    tipoActividadAsociado = Convert.ToString(row[17]),
+                    temaAsociado = Convert.ToString(row[16]),
+                    tipoActividadAsociado = Convert.ToString(row[18]),
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(row["nombre_archivo"])
                 };
@@ -148,6 +149,7 @@ namespace webMetics.Handlers
                                 descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "Sin descripción" : reader.GetString(reader.GetOrdinal("descripcion")),
                                 esVisible = reader.IsDBNull(reader.GetOrdinal("es_visible")) ? false : reader.GetBoolean(reader.GetOrdinal("es_visible")),
                                 lugar = reader.IsDBNull(reader.GetOrdinal("lugar")) ? "Sin lugar" : reader.GetString(reader.GetOrdinal("lugar")),
+                                nombreAsesorAsociado = reader.IsDBNull(reader.GetOrdinal("asesor")) ? "Sin asesor" : reader.GetString(reader.GetOrdinal("asesor")),
                                 nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
                                 horario = reader.IsDBNull(reader.GetOrdinal("horario")) ? "Sin horario" : reader.GetString(reader.GetOrdinal("horario")),
                                 fechaInicioGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_grupo")),
@@ -157,7 +159,6 @@ namespace webMetics.Handlers
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
                                 nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("nombre_archivo")),
                                 temaAsociado = reader.IsDBNull(reader.GetOrdinal("tema_asociado")) ? "Sin tema" : reader.GetString(reader.GetOrdinal("tema_asociado")),
-                                nombreAsesorAsociado = reader.IsDBNull(reader.GetOrdinal("asesor")) ? "Sin asesor" : reader.GetString(reader.GetOrdinal("asesor")),
                                 tipoActividadAsociado = reader.IsDBNull(reader.GetOrdinal("tipo_actividad")) ? "Sin tipo de actividad" : reader.GetString(reader.GetOrdinal("tipo_actividad"))
                             };
                         }
@@ -359,6 +360,7 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
                 command.Parameters.AddWithValue("@idTema", int.Parse(grupo.temaAsociado));
+                command.Parameters.AddWithValue("@asesor", grupo.nombreAsesorAsociado);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
                 command.Parameters.AddWithValue("@horario", grupo.horario);
                 command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);

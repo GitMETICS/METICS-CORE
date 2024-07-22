@@ -117,6 +117,7 @@ CREATE TABLE asesor_da_tema (
 CREATE TABLE grupo (
     id_grupo_PK INT IDENTITY(1, 1) PRIMARY KEY,
     id_tema_FK INT NOT NULL,
+	asesor NVARCHAR(64) NULL,
 	nombre NVARCHAR(64) NOT NULL,
     horario NVARCHAR(128) NOT NULL,
     fecha_inicio_grupo DATE NOT NULL,
@@ -559,6 +560,8 @@ BEGIN
 END
 
 GO
+
+
 --Creación de procedimiento para obtener los datos de un participante
 CREATE OR ALTER PROCEDURE SelectParticipante
     @id NVARCHAR(64)
@@ -586,6 +589,7 @@ GO
 --Creación de procedimiento para insertar un grupo
 CREATE OR ALTER PROCEDURE InsertGrupo
     @idTema INT,
+	@asesor NVARCHAR(64),
 	@nombre NVARCHAR(64),
     @horario NVARCHAR(128),
     @fecha_inicio_grupo DATE,
@@ -607,6 +611,7 @@ BEGIN
     INSERT INTO grupo
     (
         id_tema_FK,
+		asesor,
         nombre,
         horario,
 		fecha_inicio_grupo,
@@ -625,6 +630,7 @@ BEGIN
     VALUES
     (
         @idTema,
+		@asesor,
 		@nombre,
 		@horario,
 		@fecha_inicio_grupo,
@@ -647,6 +653,7 @@ GO
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
     @idTema INT,
+	@asesor NVARCHAR(64) NULL,
     @nombre NVARCHAR(64),
     @horario NVARCHAR(128),
     @fecha_inicio_grupo DATE,
@@ -668,7 +675,8 @@ BEGIN
     UPDATE grupo
     SET
         id_tema_FK = @idTema,
-        nombre = @nombre,
+        asesor = @asesor,
+		nombre = @nombre,
         horario = @horario,
         fecha_inicio_grupo = @fecha_inicio_grupo,
         fecha_finalizacion_grupo = @fecha_finalizacion_grupo,
@@ -698,8 +706,9 @@ BEGIN
 		G.cupo, 
 		G.descripcion, 
 		G.es_visible, 
-		G.lugar, 
-		G.nombre, 
+		G.lugar,
+		G.asesor,
+		G.nombre,		
 		G.horario, 
 		G.fecha_inicio_grupo, 
 		G.fecha_finalizacion_grupo, 
@@ -730,8 +739,9 @@ BEGIN
 		G.cupo, 
 		G.descripcion, 
 		G.es_visible, 
-		G.lugar, 
-		G.nombre, 
+		G.lugar,
+		G.asesor,
+		G.nombre,
 		G.horario, 
 		G.fecha_inicio_grupo, 
 		G.fecha_finalizacion_grupo, 
