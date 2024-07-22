@@ -61,7 +61,7 @@
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new List<SelectListItem> { new SelectListItem { Text = "Presencial", Value = "Presencial" }, new SelectListItem { Text = "Virtual", Value = "Virtual" }, new SelectListItem { Text = "AltoVirtual", Value = "Alto Virtual" } }, "Seleccione una modalidad...", new { @class = "form-select" })
+                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoModalidad))), "Seleccione un tipo de modalidad...", new { @class = "form-control" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 

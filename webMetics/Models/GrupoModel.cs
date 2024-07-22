@@ -82,4 +82,13 @@ namespace webMetics.Models
         public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar según requerimientos
 
     }
+
+    public enum TipoModalidad
+    {
+        Autogestionado,
+        Presencial,
+        BajoVirtual,
+        Bimodal,
+        AltoVirtual
+    }
 }
