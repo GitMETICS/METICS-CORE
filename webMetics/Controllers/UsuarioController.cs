@@ -60,7 +60,7 @@ namespace webMetics.Controllers
                 }
                 else
                 {
-                    TempData["errorMessage"] = "Número de identificación o contraseña inválidos.";
+                    TempData["errorMessage"] = "Correo institucional o contraseña inválidos.";
                     return RedirectToAction("IniciarSesion", "Usuario");
                 }
             }
@@ -124,35 +124,35 @@ namespace webMetics.Controllers
                     if (!accesoAUsuario.ExisteUsuario(usuario.id))
                     {
                         accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+
+                        ParticipanteModel participante = new ParticipanteModel()
+                        {
+                            idParticipante = usuario.id,
+                            nombre = usuario.nombre,
+                            primerApellido = usuario.primerApellido,
+                            segundoApellido = usuario.segundoApellido,
+                            tipoIdentificacion = usuario.tipoIdentificacion,
+                            numeroIdentificacion = usuario.numeroIdentificacion,
+                            correo = usuario.correo,
+                            tipoParticipante = usuario.tipoParticipante,
+                            condicion = usuario.condicion,
+                            telefono = usuario.telefono,
+                            area = usuario.area,
+                            departamento = usuario.departamento,
+                            unidadAcademica = usuario.unidadAcademica,
+                            sede = usuario.sede,
+                            horasMatriculadas = 0,
+                            horasAprobadas = 0
+                        };
+
+                        accesoAParticipante.CrearParticipante(participante);
+                        exito = true;
                     }
                     else
                     {
                         TempData["errorMessage"] = "Ya existe un usuario con los mismos datos.";
                         exito = false;
                     }
-
-                    ParticipanteModel participante = new ParticipanteModel()
-                    {
-                        idParticipante = usuario.id,
-                        nombre = usuario.nombre,
-                        primerApellido = usuario.primerApellido,
-                        segundoApellido = usuario.segundoApellido,
-                        tipoIdentificacion = usuario.tipoIdentificacion,
-                        numeroIdentificacion = usuario.numeroIdentificacion,
-                        correo = usuario.correo,
-                        tipoParticipante = usuario.tipoParticipante,
-                        condicion = usuario.condicion,
-                        telefono = usuario.telefono,
-                        area = usuario.area,
-                        departamento = usuario.departamento,
-                        unidadAcademica = usuario.unidadAcademica,
-                        sede = usuario.sede,
-                        horasMatriculadas = 0,
-                        horasAprobadas = 0
-                    };
-
-                    accesoAParticipante.CrearParticipante(participante);
-                    exito = true;
                 } 
                 // Si sí existe el participante en la base de datos, significa que existe su usuario.
                 else
@@ -166,33 +166,42 @@ namespace webMetics.Controllers
                     else
                     {
                         // Modificamos la contraseña temporal que estaba en la base de datos del usuario con la nueva contraseña.
-                        accesoAUsuario.EditarUsuario(usuario.id, contrasena);
+                        accesoAUsuario.EditarUsuario(usuario.id, 0, contrasena); // TODO: Hacer bien esto con el rol por default.
 
                         // Actualizamos el participante con los nuevos datos.
                         ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
 
-                        ParticipanteModel participanteActualizado = new ParticipanteModel()
+                        if (string.IsNullOrEmpty(participante.numeroIdentificacion))
                         {
-                            idParticipante = participante.idParticipante,
-                            nombre = usuario.nombre,
-                            primerApellido = usuario.primerApellido,
-                            segundoApellido = usuario.segundoApellido,
-                            tipoIdentificacion = usuario.tipoIdentificacion,
-                            numeroIdentificacion = usuario.numeroIdentificacion,
-                            correo = participante.correo,
-                            tipoParticipante = usuario.tipoParticipante,
-                            condicion = usuario.condicion,
-                            telefono = usuario.telefono,
-                            area = usuario.area,
-                            departamento = usuario.departamento,
-                            unidadAcademica = usuario.unidadAcademica,
-                            sede = usuario.sede,
-                            horasMatriculadas = participante.horasMatriculadas,
-                            horasAprobadas = participante.horasAprobadas
-                        };
+                            ParticipanteModel participanteActualizado = new ParticipanteModel()
+                            {
+                                idParticipante = participante.idParticipante,
+                                nombre = usuario.nombre,
+                                primerApellido = usuario.primerApellido,
+                                segundoApellido = usuario.segundoApellido,
+                                tipoIdentificacion = usuario.tipoIdentificacion,
+                                numeroIdentificacion = usuario.numeroIdentificacion,
+                                correo = participante.correo,
+                                tipoParticipante = usuario.tipoParticipante,
+                                condicion = usuario.condicion,
+                                telefono = usuario.telefono,
+                                area = usuario.area,
+                                departamento = usuario.departamento,
+                                unidadAcademica = usuario.unidadAcademica,
+                                sede = usuario.sede,
+                                horasMatriculadas = participante.horasMatriculadas,
+                                horasAprobadas = participante.horasAprobadas
+                            };
 
-                        accesoAParticipante.EditarParticipante(participanteActualizado);
-                        exito = true;
+                            accesoAParticipante.EditarParticipante(participanteActualizado);
+                            exito = true;
+                        }
+                        else
+                        {
+                            // Si ya están los otros datos en la base de datos, significa que ya el usuario se había registrado.
+                            TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional y número de identificación.";
+                            exito = false;
+                        }
                     }
                 }
             }
@@ -277,40 +286,22 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult CambiarContrasena(NewLoginModel usuario)
         {
-            bool exito = false;
-            string errorMessage = "";
-
             if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
             {
                 if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
-                    exito = accesoAUsuario.EditarUsuario(usuario.id, usuario.nuevaContrasena);
+                    accesoAUsuario.EditarUsuario(usuario.id, GetRole(), usuario.nuevaContrasena);
+
+                    TempData["successMessage"] = "Se cambió la contraseña.";
                 }
                 else
                 {
-                    errorMessage = "Las nuevas contraseñas no coinciden. Por favor, asegúrese de que ambas contraseñas sean idénticas.";
+                    TempData["errorMessage"] = "Las nuevas contraseñas no coinciden. Por favor, asegúrese de que ambas contraseñas sean idénticas.";
                 }
             }
             else
             {
-                errorMessage = "Contraseña actual incorrecta. Por favor, inténtelo de nuevo.";
-            }
-
-
-            if (exito)
-            {
-                TempData["successMessage"] = "Su contraseña fue cambiada éxitosamente.";
-            }
-            else
-            {
-                if (errorMessage != "")
-                {
-                    TempData["errorMessage"] = errorMessage;
-                }
-                else
-                {
-                    TempData["errorMessage"] = "No se pudo cambiar su contraseña.";
-                }
+                TempData["errorMessage"] = "Contraseña actual incorrecta.";
             }
 
             return RedirectToAction("CambiarContrasena", new { idParticipante = usuario.id });

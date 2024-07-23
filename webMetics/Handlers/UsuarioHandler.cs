@@ -108,7 +108,7 @@ namespace webMetics.Handlers
             return existe;
         }
 
-        public bool EditarUsuario(string id, string contrasena)
+        public bool EditarUsuario(string id, int rol, string contrasena)
         {
             bool exito = false;
 
@@ -116,6 +116,7 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
 
                 try
