@@ -65,12 +65,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", asesor.correo);
                 command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
-                command.Parameters.AddWithValue("@condicion", asesor.condicion);
                 command.Parameters.AddWithValue("@telefono", asesor.telefono);
-                command.Parameters.AddWithValue("@area", asesor.area);
-                command.Parameters.AddWithValue("@departamento", asesor.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", asesor.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", asesor.sede);
 
                 try
                 {
@@ -106,12 +101,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
                 command.Parameters.AddWithValue("@correo", asesor.correo);
                 command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
-                command.Parameters.AddWithValue("@condicion", asesor.condicion);
                 command.Parameters.AddWithValue("@telefono", asesor.telefono);
-                command.Parameters.AddWithValue("@area", asesor.area);
-                command.Parameters.AddWithValue("@departamento", asesor.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", asesor.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", asesor.sede);
 
                 try
                 {
@@ -157,12 +147,7 @@ namespace webMetics.Handlers
                             numeroIdentificacion = reader["numero_identificacion"].ToString(),
                             correo = reader["correo"].ToString(),
                             descripcion = reader["descripcion"].ToString(),
-                            condicion = reader["condicion"].ToString(),
-                            telefono = reader["telefono"].ToString(),
-                            area = reader["area"].ToString(),
-                            departamento = reader["departamento"].ToString(),
-                            unidadAcademica = reader["unidad_academica"].ToString(),
-                            sede = reader["sede"].ToString()
+                            telefono = reader["telefono"].ToString()
                         };
                     }
                 }

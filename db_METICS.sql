@@ -31,12 +31,7 @@ CREATE TABLE asesor (
     numero_identificacion NVARCHAR(32),
     correo NVARCHAR(64) NOT NULL,
 	descripcion NVARCHAR(256),
-	condicion NVARCHAR(64),
     telefono NVARCHAR(15),
-    area NVARCHAR(64),
-    departamento NVARCHAR(64),
-    unidad_academica NVARCHAR(64),
-    sede NVARCHAR(64),
     
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
@@ -333,12 +328,7 @@ CREATE OR ALTER PROCEDURE InsertAsesor
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(64) = '',
-    @condicion NVARCHAR(64) = '',
-    @telefono NVARCHAR(64) = '',
-    @area NVARCHAR(64) = '',
-    @departamento NVARCHAR(64) = '',
-    @unidadAcademica NVARCHAR(64) = '',
-    @sede NVARCHAR(64) = ''
+    @telefono NVARCHAR(64) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -354,12 +344,7 @@ BEGIN
         numero_identificacion,
         correo,
         telefono,
-        descripcion,
-        area,
-        departamento,
-        unidad_academica,
-        sede,
-        condicion
+        descripcion
     )
     VALUES
     (
@@ -372,12 +357,7 @@ BEGIN
         @numeroIdentificacion,
         @correo,
         @telefono,
-        @descripcion,
-        @area,
-        @departamento,
-        @unidadAcademica,
-        @sede,
-        @condicion
+        @descripcion
     );
 END
 
@@ -393,12 +373,7 @@ CREATE OR ALTER PROCEDURE UpdateAsesor
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(64) = '',
-    @condicion NVARCHAR(64) = '',
-    @telefono NVARCHAR(64) = '',
-    @area NVARCHAR(64) = '',
-    @departamento NVARCHAR(64) = '',
-    @unidadAcademica NVARCHAR(64) = '',
-    @sede NVARCHAR(64) = ''
+    @telefono NVARCHAR(64) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -412,12 +387,7 @@ BEGIN
         apellido_1 = @apellido1,
         apellido_2 = @apellido2,
         descripcion = @descripcion,
-        condicion = @condicion,
-        telefono = @telefono,
-        area = @area,
-        departamento = @departamento,
-        unidad_academica = @unidadAcademica,
-        sede = @sede
+        telefono = @telefono
     WHERE
         id_usuario_FK = @idUsuario
         AND id_asesor_PK = @idAsesor;

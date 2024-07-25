@@ -28,33 +28,11 @@ namespace webMetics.Models
         [Display(Name = "Número de identificación")]
         public string? numeroIdentificacion { get; set; }
 
-        [Display(Name = "Área")]
-        public string? area { get; set; }
-
-        [Display(Name = "Departamento")]
-        public string? departamento { get; set; }
-
-        [Display(Name = "Unidad académica")]
-        public string? unidadAcademica { get; set; }
-
-        [Display(Name = "Sede")]
-        public string? sede { get; set; }
-
         [Display(Name = "Descripción")]
         public string? descripcion { get; set; }
-
-        [Display(Name = "Condición actual")]
-        public string? condicion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un número de teléfono.")]
         [Display(Name = "Número de teléfono")]
         public string? telefono { get; set; }
-
-        [Required(ErrorMessage = "Es necesario ingresar un tema asociado.")]
-        [Display(Name = "Tema asociado")]
-        public string? temaAsociado { get; set; }
-
-        [Display(Name = "Asistente(s)")]
-        public List<string>? asistentesAsociados { get; set; }
     }
 }
