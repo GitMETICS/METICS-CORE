@@ -33,13 +33,13 @@ namespace webMetics.Models
         [Display(Name = "Cupo actual")]
         public int cupoActual { get; set; }
 
-        [Required(ErrorMessage = "Agregue el lugar o enlace donde se imparte el curso.")]
+        // [Required(ErrorMessage = "Agregue el lugar o enlace donde se imparte el curso.")]
         [Display(Name = "Lugar")]
-        public string lugar { get; set; }
+        public string? lugar { get; set; }
 
-        [Required(ErrorMessage = "Es necesario que ingrese el horario del módulo.")]
+        // [Required(ErrorMessage = "Introduzca el horario del módulo.")]
         [Display(Name = "Horario")]
-        public string horario { get; set; }
+        public string? horario { get; set; }
 
         [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
         [Display(Name = "Tema asociado")]

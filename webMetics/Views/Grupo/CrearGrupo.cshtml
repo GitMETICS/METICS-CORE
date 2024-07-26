@@ -73,13 +73,13 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off", @id = "horarioText" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -159,10 +159,16 @@ else
         function verificarModalidad() {
             var modalidadSeleccionada = $('#modalidadSelect').val();
             if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
-                $('#asesorSelect').prop('disabled', true); // Deshabilitar el campo del asesor
-                $('#asesorSelect').val(''); // Limpiar la selección
+                $('#asesorSelect').prop('disabled', true);
+                $('#asesorSelect').val(' ');
+                $('#horarioText').prop('disabled', true);
+                $('#horarioText').val(' ');
+                $('#lugarText').prop('disabled', true);
+                $('#lugarText').val(' ');
             } else {
-                $('#asesorSelect').prop('disabled', false); // Habilitar el campo del asesor
+                $('#asesorSelect').prop('disabled', false);
+                $('#horarioText').prop('disabled', false);
+                $('#lugarText').prop('disabled', false);
             }
         }
 
