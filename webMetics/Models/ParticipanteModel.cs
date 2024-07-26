@@ -58,9 +58,11 @@ namespace webMetics.Models
         public string? telefono { get; set; }
 
         [Display(Name = "Horas matriculadas")]
+        [Range(0, int.MaxValue, ErrorMessage = "Las horas matriculadas deben ser al menos 0.")]
         public int horasMatriculadas { get; set; }
 
         [Display(Name = "Horas aprobadas")]
+        [Range(0, int.MaxValue, ErrorMessage = "Las horas aprobadas deben ser al menos 0.")]
         public int horasAprobadas { get; set; }
 
         public List<GrupoModel>? gruposInscritos { get; set; }
