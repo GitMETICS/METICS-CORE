@@ -59,11 +59,11 @@
                             visible = "0.5";
                         }
                         <div class="col mb-4">
-                            <div id="@grupo.idGrupo" class="card h-100 text-center border-success border-1 border-opacity-50" style="opacity:@visible">
-                                <div class="card-header bg-success bg-opacity-25 border-success border-1 border-opacity-25 text-muted">
+                            <div id="@grupo.idGrupo" class="card h-100 text-center border-info border-1 border-opacity-50" style="opacity:@visible">
+                                <div class="card-header bg-info bg-opacity-25 border-info border-1 border-opacity-25 text-muted">
                                     <div>
                                         <div style="float:left">
-                                            <span class="badge bg-success" style="float:right">Inscrito(a)</span>
+                                            <span class="badge bg-info" style="float:right">Inscrito(a)</span>
                                         </div>
                                     </div>
                                     <br />
@@ -71,7 +71,7 @@
                                             Duración del módulo: @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
                                     </div>
                                 </div>
-                                <div class="card-body align-content-center bg-success bg-opacity-10 border-success border-0 border-opacity-50">
+                                <div class="card-body align-content-center bg-info bg-opacity-10 border-info border-0 border-opacity-50">
                                     <h4 class="card-title">@grupo.nombre</h4>
                                     <div class="card-text mb-3">@grupo.descripcion</div>
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
@@ -124,7 +124,7 @@
                                         @Html.ActionLink("Ver el programa del módulo", "DescargarArchivo", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
                                     </div>
                                 </div>
-                                <div class="card-footer bg-success bg-opacity-25 border-success border-1 border-opacity-25 text-muted">
+                                <div class="card-footer bg-info bg-opacity-25 border-info border-1 border-opacity-25 text-muted">
                                     @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
                                     {
                                         @grupo.lugar
