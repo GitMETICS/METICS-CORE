@@ -623,21 +623,21 @@ GO
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
     @idTema INT,
-	@asesor NVARCHAR(64) NULL,
-    @nombre NVARCHAR(64),
-    @horario NVARCHAR(128),
+	@asesor NVARCHAR(64) = '',
+	@nombre NVARCHAR(64),
+	@modalidad NVARCHAR(16),
+	@cantidad_horas TINYINT,
+	@cupo INT,
     @fecha_inicio_grupo DATE,
     @fecha_finalizacion_grupo DATE,
     @fecha_inicio_inscripcion DATETIME,
     @fecha_finalizacion_inscripcion DATETIME,
-    @cantidad_horas TINYINT,
-    @modalidad NVARCHAR(16),
-    @cupo INT,
-    @descripcion NVARCHAR(256) = '',
-    @lugar NVARCHAR(512) = '',
-    @es_visible BIT = 1,
-    @nombre_archivo NVARCHAR(255) = '',
-    @adjunto VARBINARY(MAX) = NULL
+	@descripcion NVARCHAR(256) = '',
+	@horario NVARCHAR(128) = '',
+	@lugar NVARCHAR(512) = '',
+	@es_visible BIT = 1,
+	@nombre_archivo NVARCHAR(255) = '',
+	@adjunto VARBINARY(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -719,6 +719,7 @@ BEGIN
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
 		G.nombre_archivo, 
+		G.adjunto,
 		T.nombre AS tema_asociado, 
 		A.nombre + ' ' + A.apellido_1 AS asesor, 
 		TA.nombre AS tipo_actividad
