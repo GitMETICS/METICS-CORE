@@ -1,4 +1,4 @@
-﻿@using webMetics.Controllers
+﻿@model webMetics.Models.ParticipanteModel
 @{
     ViewBag.Title = "Módulos y Horas";
 
@@ -115,8 +115,11 @@
                         <div class="d-flex my-2 p-3 align-items-center flex-grow-1">
                             @Html.AntiForgeryToken()
                             <div class="navbar-text me-2"><strong>Aprobar</strong></div>
-                            <input type="number" class="form-control flex-grow-1" name="horasAprobadas" id="horasAprobadas">
+                            <input type="number" min="0" class="form-control flex-grow-1" name="horasAprobadas" id="horasAprobadas" asp-for="horasAprobadas">
                             <div class="navbar-text ms-2"><strong>horas.</strong></div>
+                            <small class="text-danger">
+                                @Html.ValidationMessageFor(model => model.horasAprobadas)
+                            </small>
                         </div>
                         <div class="mx-4 mb-4 align-self-center">
                             <button type="submit" class="btn btn-outline-primary">Aceptar</button>

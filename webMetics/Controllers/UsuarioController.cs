@@ -335,7 +335,8 @@ namespace webMetics.Controllers
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
                     "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es " + contrasena + ". Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
+                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
 
