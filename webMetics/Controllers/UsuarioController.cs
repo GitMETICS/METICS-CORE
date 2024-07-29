@@ -97,16 +97,19 @@ namespace webMetics.Controllers
 
                     return View("ParticipanteRegistrado");
                 }
-                else
-                {
-                    return RedirectToAction("IniciarSesion");
-                }
             }
-            else
+
+            if (TempData["errorMessage"] != null)
             {
-                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                return View(usuario);
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
             }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+            return View(usuario);
         }
 
         // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos

@@ -48,15 +48,16 @@ namespace webMetics.Controllers
         /* Método para inscribir a un usuario a un grupo */
         public ActionResult Inscribir(int idGrupo, string idParticipante)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
-            if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+            try
             {
-                if (MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+
+                
+                if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante) && MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
                     // Insertar la inscripción y enviar el comprobante por correo electrónico
                     InscripcionModel inscripcion = new InscripcionModel
@@ -86,15 +87,25 @@ namespace webMetics.Controllers
                         {
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
-                            ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el correo de inscripción.";
+                            ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el comprobante de inscripción a su correo institucional.";
                         }
                     }
+                    else
+                    {
+                        ViewBag.Titulo = "No se pudo realizar la inscripción";
+                        ViewBag.Message = "Ocurrió un error al procesar la solicitud de inscripción.";
+                    }
+                }
+                else
+                {
+                    ViewBag.Titulo = "No se pudo realizar la inscripción";
+                    ViewBag.Message = "No se puede inscribir en este grupo porque ya está inscrito o ha superado el límite máximo de horas.";
                 }
             }
-            else
+            catch
             {
                 ViewBag.Titulo = "No se pudo realizar la inscripción";
-                ViewBag.Message = "Hubo un error y no se pudo enviar la petición de inscripción.";
+                ViewBag.Message = "El módulo no se encuentra disponible.";
             }
 
             return View();
