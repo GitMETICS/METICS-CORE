@@ -297,16 +297,8 @@ namespace webMetics.Controllers
 
                 if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
                 {
-                    bool creado = accesoAParticipante.CrearParticipante(participante);
-                    
-                    if (creado) 
-                    {
-                        TempData["successMessage"] = "Se agregó el nuevo participante.";
-                    }
-                    else
-                    {
-                        TempData["errorMessage"] = "No se pudo agregar el participante.";
-                    }
+                    accesoAParticipante.CrearParticipante(participante);
+                    TempData["successMessage"] = "Se agregó el nuevo participante.";
                 }
                 else
                 {
