@@ -266,21 +266,28 @@ namespace webMetics.Controllers
 
         public ActionResult CambiarContrasena(string id)
         {
-            ViewBag.Id = GetId();
-            ViewBag.Role = GetRole();
-
-            NewLoginModel usuario = new NewLoginModel() { id = id };
-
-            if (TempData["errorMessage"] != null)
+            if (GetId() == id)
             {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
+                ViewBag.Id = GetId();
+                ViewBag.Role = GetRole();
 
-            return View(usuario);
+                NewLoginModel usuario = new NewLoginModel() { id = id };
+
+                if (TempData["errorMessage"] != null)
+                {
+                    ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                }
+                if (TempData["successMessage"] != null)
+                {
+                    ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                }
+
+                return View(usuario);
+            }
+            else
+            {
+                return RedirectToAction("CerrarSesion");
+            }
         }
 
         [HttpPost]

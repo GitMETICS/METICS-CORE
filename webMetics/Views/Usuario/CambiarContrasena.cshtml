@@ -42,12 +42,9 @@
             <div class="row mb-1">
                 <div class="col">
                     <div class="container">
-                        <div class="form-group mt-1 mb-3">
-                            <label style="font-size: 22px">Correo institucional</label>
-                            @Html.TextBoxFor(model => model.id, new { @class = "form-control", @readonly = "readonly" })
-                        </div>
                         <div class="row mt-1">
                             <div class="col">
+                                @Html.HiddenFor(model => model.id, new { })
                                 <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
                                 @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
                                 @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
