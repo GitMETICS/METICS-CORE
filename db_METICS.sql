@@ -645,6 +645,12 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
 AS
 BEGIN
     SET NOCOUNT ON;
+	IF (LEN(@adjunto) > 0)
+		begin
+			update grupo 
+			set nombre_archivo = @nombre_archivo, adjunto = @adjunto 
+			where id_grupo_PK = @idGrupo;
+		end
 
     UPDATE grupo
     SET
@@ -661,9 +667,8 @@ BEGIN
         cupo = @cupo,
         descripcion = @descripcion,
         lugar = @lugar,
-        es_visible = @es_visible,
-        nombre_archivo = @nombre_archivo,
-        adjunto = @adjunto
+        es_visible = @es_visible
+		
     WHERE
         id_grupo_PK = @idGrupo;
 END

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.RegularExpressions;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using System.Collections.Generic;
+using System;
 
 /*
  * Handler para los grupos
@@ -373,8 +374,17 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
                 command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
-                command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
-                command.Parameters.AddWithValue("@adjunto", grupo.archivoAdjunto);
+
+                if (grupo.archivoAdjunto != null)
+                {
+                    exito = EditarAdjunto(grupo);
+                }
+                else
+                {
+
+                    command.Parameters.AddWithValue("@nombre_archivo", "");
+                }
+
 
                 try
                 {
