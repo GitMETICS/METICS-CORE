@@ -109,14 +109,27 @@ namespace webMetics.Controllers
                     // Aquí se define que el correo es la identificación.
                     asesor.idAsesor = asesor.correo;
 
+                    if (!accesoAUsuario.ExisteUsuario(asesor.idAsesor))
+                    {
+                        if (!string.IsNullOrEmpty(asesor.contrasena) && asesor.contrasena == asesor.confirmarContrasena)
+                        {
+                            accesoAUsuario.CrearUsuario(asesor.idAsesor, asesor.contrasena);
+                        }
+                        else
+                        {
+                            ViewBag.ErrorMessage = "Las contraseñas deben coincidir.";
+                            ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                            return View("CrearAsesor", asesor);
+                        }
+                    }
+
                     if (!accesoAAsesor.ExisteAsesor(asesor.idAsesor))
                     {
-                        if (!accesoAUsuario.ExisteUsuario(asesor.idAsesor))
-                        {
-                            accesoAUsuario.CrearUsuario(asesor.idAsesor, "1234"); // Esta contraseña es provisional en la base de datos.
-                        }
-
                         accesoAAsesor.CrearAsesor(asesor);
+
+                        TempData["successMessage"] = "Se agregó éxitosamente el asesor.";
+                        return RedirectToAction("ListaAsesores");
+
                     }
                     else
                     {
@@ -124,8 +137,6 @@ namespace webMetics.Controllers
                         return RedirectToAction("ListaAsesores");
                     }
 
-                    TempData["successMessage"] = "El asesor fue agregado con éxito.";
-                    return RedirectToAction("ListaAsesores");
                 }
                 else
                 {
@@ -155,23 +166,19 @@ namespace webMetics.Controllers
                 bool exito = accesoAAsesor.EliminarAsesor(idAsesor);
                 if (exito)
                 {
-                    ViewBag.ExitoAlCrear = exito;
-                    TempData["Message"] = "Se eliminó al asesor.";
-                    return RedirectToAction("ListaAsesores");
+                    TempData["successMessage"] = "Se eliminó al asesor.";
                 }
                 else
                 {
-                    ViewBag.ExitoAlCrear = exito;
-                    ViewBag.Message = "Hubo un error y no se pudo eliminar al asesor.";
-                    ModelState.Clear();
-                    return View();
+                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar al asesor.";
                 }
             }
             else
             {
-                TempData["Message"] = "No se puede eliminar el asesor porque está asignado a un módulo.";
-                return RedirectToAction("ListaAsesores");
+                TempData["errorMessage"] = "No se puede eliminar el asesor porque está asignado a un módulo.";
             }
+
+            return RedirectToAction("ListaAsesores");
         }
 
         // Método de la vista del formulario para editar a un asesor

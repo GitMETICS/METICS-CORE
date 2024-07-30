@@ -29,24 +29,6 @@
             <h1>@ViewBag.Title</h1>
             <hr />
 
-            @if (ViewBag.Message != null)
-            {
-                if (ViewBag.ExitoAlCrear != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-                        @ViewBag.Message
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mt-4" role="alert">
-                        @ViewBag.Message
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-            }
-
             if (ViewBag.ErrorMessage != null)
             {
                 <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
@@ -111,6 +93,18 @@
                             @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" })
                             @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                            </div>
                         </div>
                     </div>
                     <div class="row justify-content-center m-4">

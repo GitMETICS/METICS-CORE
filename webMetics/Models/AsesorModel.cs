@@ -11,28 +11,36 @@ namespace webMetics.Models
         public required string nombre { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un apellido.")]
-        [Display(Name = "Primer apellido")]
+        [Display(Name = "Primer Apellido")]
         public required string primerApellido { get; set; }
 
-        [Display(Name = "Segundo apellido")]
+        [Display(Name = "Segundo Apellido")]
         public string? segundoApellido { get; set; }
 
         [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
-        [Display(Name = "Correo institucional")]
+        [Display(Name = "Correo Institucional")]
         public required string correo { get; set; }
 
-        [Display(Name = "Tipo de identificación")]
+        [Display(Name = "Tipo de Identificación")]
         public string? tipoIdentificacion { get; set; }
 
-        [Display(Name = "Número de identificación")]
+        [Display(Name = "Número de Identificación")]
         public string? numeroIdentificacion { get; set; }
 
         [Display(Name = "Descripción")]
         public string? descripcion { get; set; }
 
         [Required(ErrorMessage = "Es necesario ingresar un número de teléfono.")]
-        [Display(Name = "Número de teléfono")]
+        [Display(Name = "Número de Teléfono")]
         public string? telefono { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una contraseña temporal.")]
+        [Display(Name = "Contraseña Temporal")]
+        public string? contrasena { get; set; }
+
+        [Required(ErrorMessage = "Debe confirmar la contraseña temporal.")]
+        [Display(Name = "Confirmar Contraseña")]
+        public string? confirmarContrasena { get; set; }
     }
 }

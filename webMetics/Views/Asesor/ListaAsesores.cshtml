@@ -119,7 +119,7 @@
                     {
                         <div class="modal-footer">
                             <input type="hidden" id="idAsesor" name="idAsesor">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
+                            <input type="submit" class="btn btn-danger" value="Aceptar" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         </div>
                     }
@@ -134,8 +134,7 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModal(idGenerado) {
-        document.getElementById("idAsesor").value = idGenerado;
+    function actualizarModalEliminar(idAsesor) {
+        document.getElementById("idAsesor").value = idAsesor;
     }
-
 </script>
