@@ -72,10 +72,23 @@
                                     </div>
                                 </div>
                                 <div class="card-body align-content-center bg-info bg-opacity-10 border-info border-0 border-opacity-50">
-                                    <h4 class="card-title">@grupo.nombre</h4>
-                                    <div class="card-text mb-3">@grupo.descripcion</div>
+                                    <div class="mb-3"><h4>@grupo.nombre</h4></div>
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                    {
+                                        <div class="card-text mb-3">@grupo.descripcion</div>
+                                    }
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
-                                    <div class="card-text mb-3">Asesor: @grupo.nombreAsesorAsociado</div>
+                                    @if (!string.IsNullOrEmpty(grupo.nombreAsesorAsociado))
+                                    {
+                                        <div class="card-text mb-3">Asesor: @grupo.nombreAsesorAsociado</div>
+                                    }
+                                    else
+                                    {
+                                        @if (grupo.modalidad == "Autogestionado")
+                                        {
+                                            <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                        }
+                                    }
                                     <div class="card-text mb-3">Área de competencia: @grupo.temaAsociado</div>
                                     <div class="mt-3">
                                         @if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
@@ -200,10 +213,23 @@
                                     </div>
                                 </div>
                                 <div class="card-body align-content-center">
-                                    <h4 class="card-title">@grupo.nombre</h4>
-                                    <div class="card-text mb-3">@grupo.descripcion</div>
+                                    <div class="mb-3"><h4>@grupo.nombre</h4></div>
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                    {
+                                        <div class="card-text mb-3">@grupo.descripcion</div>
+                                    }
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
-                                    <div class="card-text mb-3">Asesor: @grupo.nombreAsesorAsociado</div>
+                                    @if (!string.IsNullOrEmpty(grupo.nombreAsesorAsociado))
+                                    {
+                                        <div class="card-text mb-3">Asesor: @grupo.nombreAsesorAsociado</div>
+                                    }
+                                    else
+                                    {
+                                        @if (grupo.modalidad == "Autogestionado")
+                                        {
+                                            <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                        }
+                                    }
                                     <div class="card-text mb-3">Área de competencia: @grupo.temaAsociado</div>
                                     <div class="mt-3">
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
