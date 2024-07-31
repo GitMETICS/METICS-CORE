@@ -15,7 +15,7 @@
                     {
                         <div class="text-center mb-1">
                             @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
-                            @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control" })
+                            @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
                             @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
                         </div>
                         <div class="text-center mb-1">

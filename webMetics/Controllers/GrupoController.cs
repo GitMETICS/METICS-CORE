@@ -128,15 +128,11 @@ namespace webMetics.Controllers
         /* Método para descargar el programa del grupo */
         public ActionResult DescargarArchivo(int idGrupo)
         {
-            // Crear el modelo de grupo con el ID proporcionado
-            GrupoModel grupo = new GrupoModel
-            {
-                idGrupo = idGrupo
-            };
-
             // Obtener el archivo y devolverlo para su descarga
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             byte[] archivo = accesoAGrupo.ObtenerArchivo(idGrupo);
-            return File(archivo, "application/octet-stream", accesoAGrupo.ObtenerNombreArchivo(grupo));
+
+            return File(archivo, "application/octet-stream", grupo.nombreArchivo);
         }
 
         /* Vista del formulario para crear un grupo */
@@ -401,30 +397,34 @@ namespace webMetics.Controllers
         }
 
         /* Método para añadir un archivo de programa del grupo */
-        [HttpGet]
-        public ActionResult EditarAdjunto(int? idGrupo)
+        public ActionResult EditarAdjunto(int idGrupo)
         {
-            ActionResult vista;
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
-                // Obtener información del grupo para editar el adjunto
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                if (modificarGrupo == null)
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                if (grupo != null)
                 {
-                    vista = Redirect("~/Grupo/ListaGruposDisponibles");
-                }
-                else
-                {
-                    vista = View(modificarGrupo);
+                    byte[] pdfBytes = accesoAGrupo.ObtenerArchivo(idGrupo);
+                    string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+                    ViewBag.Adjunto = pdfBase64;
+
+                    // Gestionar mensajes de TempData
+                    ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+                    ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+                    return View(grupo);
                 }
             }
             catch
             {
-                vista = RedirectToAction("ListaGruposDisponibles");
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del grupo.";
             }
-            return vista;
+
+            return RedirectToAction("ListaGruposDisponibles");
         }
 
         /* Método para añadir un archivo de programa del grupo */
@@ -440,27 +440,25 @@ namespace webMetics.Controllers
 
                 if (grupo.archivoAdjunto == null) // 5MB in bytes
                 {
-                    ModelState.AddModelError("archivoAdjunto", "Debe seleccionar un archivo adjunto válido.");
-                    return View(grupo);
+                    ModelState.AddModelError("archivoAdjunto", "Debe seleccionar un archivo adjunto válido. El tamaño máximo es de 5 MB.");
                 }
 
                 // Editar el adjunto del grupo y verificar el éxito de la operación
-                ViewBag.ExitoAlCrear = accesoAGrupo.EditarAdjunto(grupo);
-
-                if (ViewBag.ExitoAlCrear)
+                if (accesoAGrupo.EditarAdjunto(grupo))
                 {
-                    ViewBag.Message = "El archivo adjunto fue editado con éxito.";
-                    ModelState.Clear();
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
+                    TempData["successMessage"] = "Se editó el archivo adjunto.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "No se pudo editar el archivo.";
                 }
 
-                ViewBag.ExitoAlCrear = false;
-                TempData["msg"] = "No se pudo editar el archivo, intente de nuevo.";
-                return Redirect("/Grupo/ListaGruposDisponibles");
+                return RedirectToAction("EditarAdjunto", new { idGrupo = grupo.idGrupo });
             }
-            catch (Exception e)
+            catch
             {
-                return View(e);
+                TempData["errorMessage"] = "No se pudo editar el archivo.";
+                return RedirectToAction("ListaGruposDisponibles");
             }
         }
     }

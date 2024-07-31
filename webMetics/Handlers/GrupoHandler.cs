@@ -145,22 +145,22 @@ namespace webMetics.Handlers
                             grupo = new GrupoModel
                             {
                                 idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_PK")),
-                                modalidad = reader.IsDBNull(reader.GetOrdinal("modalidad")) ? "Default Modalidad" : reader.GetString(reader.GetOrdinal("modalidad")),
-                                cupo = reader.IsDBNull(reader.GetOrdinal("cupo")) ? 0 : reader.GetInt32(reader.GetOrdinal("cupo")),
+                                nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
                                 descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "Sin descripción" : reader.GetString(reader.GetOrdinal("descripcion")),
+                                modalidad = reader.IsDBNull(reader.GetOrdinal("modalidad")) ? "Sin modalidad" : reader.GetString(reader.GetOrdinal("modalidad")),
+                                cupo = reader.IsDBNull(reader.GetOrdinal("cupo")) ? 0 : reader.GetInt32(reader.GetOrdinal("cupo")),
                                 esVisible = reader.IsDBNull(reader.GetOrdinal("es_visible")) ? false : reader.GetBoolean(reader.GetOrdinal("es_visible")),
                                 lugar = reader.IsDBNull(reader.GetOrdinal("lugar")) ? "Sin lugar" : reader.GetString(reader.GetOrdinal("lugar")),
                                 nombreAsesorAsociado = reader.IsDBNull(reader.GetOrdinal("asesor")) ? "Sin asesor" : reader.GetString(reader.GetOrdinal("asesor")),
-                                nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
                                 horario = reader.IsDBNull(reader.GetOrdinal("horario")) ? "Sin horario" : reader.GetString(reader.GetOrdinal("horario")),
                                 fechaInicioGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_grupo")),
                                 fechaFinalizacionGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_grupo")),
                                 fechaInicioInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_inscripcion")),
                                 fechaFinalizacionInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_inscripcion")),
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
-                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("nombre_archivo")),
                                 temaAsociado = reader.IsDBNull(reader.GetOrdinal("tema_asociado")) ? "Sin tema" : reader.GetString(reader.GetOrdinal("tema_asociado")),
-                                tipoActividadAsociado = reader.IsDBNull(reader.GetOrdinal("tipo_actividad")) ? "Sin tipo de actividad" : reader.GetString(reader.GetOrdinal("tipo_actividad"))
+                                tipoActividadAsociado = reader.IsDBNull(reader.GetOrdinal("tipo_actividad")) ? "Sin tipo de actividad" : reader.GetString(reader.GetOrdinal("tipo_actividad")),
+                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("nombre_archivo")),
                             };
                         }
                     }

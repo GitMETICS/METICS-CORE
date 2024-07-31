@@ -73,7 +73,6 @@ namespace webMetics.Models
 
         public string? nombreArchivo { get; set; }
 
-        // [Required(ErrorMessage = "Debe adjuntar el documento del programa del módulo.")]
         public IFormFile? archivoAdjunto { get; set; }
 
         [Display(Name = "Asesor")]
