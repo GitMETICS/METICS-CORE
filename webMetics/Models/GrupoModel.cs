@@ -75,6 +75,8 @@ namespace webMetics.Models
 
         public IFormFile? archivoAdjunto { get; set; }
 
+        public string? idAsesor { get; set; }
+
         [Display(Name = "Asesor")]
         public string? nombreAsesorAsociado { get; set; }
 

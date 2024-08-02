@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.RegularExpressions;
 
 /*
  * Handler de los asesores
@@ -204,10 +205,9 @@ namespace webMetics.Handlers
             string consulta = "SELECT G.id_grupo_PK, G.id_tema_FK, G.modalidad, G.cupo, " +
                 "G.descripcion, G.es_visible, G.lugar, G.nombre, G.horario, G.fecha_inicio_grupo, " +
                 "G.fecha_finalizacion_grupo, G.fecha_inicio_inscripcion, G.fecha_finalizacion_inscripcion, " +
-                "G.cantidad_horas, G.nombre_archivo, T.nombre, A.nombre + ' ' + A.apellido_1, TA.nombre " +
-                "FROM grupo G JOIN tema T ON T.id_tema_PK = G.id_tema_FK " +
-                "JOIN asesor_da_tema ADT ON ADT.id_tema_FK = T.id_tema_PK " +
-                "JOIN asesor A ON A.id_asesor_PK = ADT.id_asesor_FK " +
+                "G.cantidad_horas, G.nombre_archivo, T.nombre, A.nombre + ' ' + A.apellido_1 as nombreAsesor, TA.nombre as tipo_actividad " +
+                "FROM grupo G JOIN tema T ON T.id_tema_PK = G.id_tema_FK "+
+                "JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK " +
                 "JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK " +
                 "WHERE A.id_asesor_PK = @id";
 
@@ -234,9 +234,9 @@ namespace webMetics.Handlers
                     fechaInicioInscripcion = Convert.ToDateTime(filaGrupo["fecha_inicio_inscripcion"]),
                     fechaFinalizacionInscripcion = Convert.ToDateTime(filaGrupo["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(filaGrupo["cantidad_horas"]),
-                    temaAsociado = Convert.ToString(filaGrupo[15]),
-                    nombreAsesorAsociado = Convert.ToString(filaGrupo[16]),
-                    tipoActividadAsociado = Convert.ToString(filaGrupo[17]),
+                    temaAsociado = Convert.ToString(filaGrupo["id_tema_FK"]),
+                    nombreAsesorAsociado = Convert.ToString(filaGrupo[17]), /// TODO: CAMBIAAAAAAAAR de numero a nombre de columna
+                    tipoActividadAsociado = Convert.ToString(filaGrupo["tipo_actividad"]),
                     cupoActual = accesoAGrupo.ObtenerCupoActual(Convert.ToInt32(filaGrupo["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(filaGrupo["nombre_archivo"])
                 };

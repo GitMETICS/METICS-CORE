@@ -59,18 +59,6 @@
                             @Html.DropDownList("tipoActividad", ViewData["TipoActividad"] as List<SelectListItem>, "---", new { @class = "form-select" })
                             @Html.ValidationMessageFor(temaModel => temaModel.tipoActividad, "", new { @class = "text-danger" })
                         </div>
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(temaModel => temaModel.asesorPrincipal, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownList("asesorPrincipal", ViewData["Asesores"] as List<SelectListItem>, "---", new { @class = "form-select" })
-                            @Html.ValidationMessageFor(temaModel => temaModel.asesorPrincipal, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(temaModel => temaModel.asesoresApoyo, new { Style = "font-size:22px" })
-                            @Html.DropDownListFor(temaModel => temaModel.asesoresApoyo, new MultiSelectList(ViewBag.Asesores, "Value", "Text"), new { @class = "form-select", id = "multiSelectAsesores", multiple = "multiple" })
-                            @Html.ValidationMessageFor(temaModel => temaModel.asesoresApoyo, "", new { @class = "text-danger" })
-                        </div>
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
@@ -89,13 +77,6 @@ else
 {
     await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
 }
-
-<script>
-    $(function () {
-        $('#multiSelectAsesores').chosen({ placeholder_text_multiple: "  ---" });
-        document.getElementById("multiSelectAsesores_chosen").style["width"] = "100%";
-    });
-</script>
 
 
 

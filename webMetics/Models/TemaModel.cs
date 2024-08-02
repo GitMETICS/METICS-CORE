@@ -19,20 +19,6 @@ namespace webMetics.Models
         [Display(Name = "Nombre")]
         public string nombre { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar un asesor principal.")]
-        [Display(Name = "Identificación de asesor principal")]
-        public string idAsesorPrincipal { get; set; }
-
-        [Required(ErrorMessage = "Es necesario ingresar un asesor principal.")]
-        [Display(Name = "Asesor principal")]
-        public string asesorPrincipal { get; set; }
-
-        [Display(Name = "Asesores de apoyo")]
-        [NotMapped]
-        public IEnumerable<string> asesoresApoyo { get; set; }
-
-        public string asesores;
-
         public int idTema { get; set; }
     }
 }

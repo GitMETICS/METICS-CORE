@@ -63,11 +63,8 @@ namespace webMetics.Controllers
             // Cargar los datos necesarios para llenar las opciones del formulario (categorias, tipos de actividad y asesores)
             ViewData["Categorias"] = null;
             ViewData["TipoActividad"] = null;
-            ViewData["Asesores"] = null;
             ViewData["Categorias"] = categoriaHandler.RecuperarCategoriasIndexadas();
             ViewData["TipoActividad"] = tipoActividadHandler.RecuperarTiposDeActividadesSeleccionables();
-            ViewData["Asesores"] = asesorHandler.ObtenerNombresDeAsesoresIndexados();
-            ViewBag.Asesores = asesorHandler.ObtenerNombresDeAsesoresIndexados();
             return View();
         }
 
@@ -76,7 +73,6 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult CrearTema(TemaModel tema)
         {
-            tema.idAsesorPrincipal = temaHandler.ObtenerIdAsesor(tema.asesorPrincipal);
             try
             {
                 
@@ -85,7 +81,6 @@ namespace webMetics.Controllers
 
                 // Intenta crear el tema y su relación con el asesor asociado
                 ViewBag.ExitoAlCrear = temaHandler.CrearTema(tema);
-                ViewBag.ExitoAlCrear2 = temaHandler.CrearRelacionTemaAsesor(tema);
                 if (ViewBag.ExitoAlCrear)
                 {
                     // Si se crea el tema exitosamente, muestra un mensaje de éxito y redirige a la lista de categorías
@@ -96,7 +91,6 @@ namespace webMetics.Controllers
                 // Si hay errores de validación, recarga los datos necesarios para llenar las opciones del formulario y muestra el formulario con los errores
                 ViewData["Categorias"] = categoriaHandler.RecuperarCategoriasIndexadas();
                 ViewData["TipoActividad"] = tipoActividadHandler.RecuperarTiposDeActividadesSeleccionables();
-                ViewData["Asesores"] = asesorHandler.ObtenerNombresDeAsesoresIndexados();
                 ViewBag.Asesores = asesorHandler.ObtenerNombresDeAsesoresIndexados();
                 return View(tema);
             }

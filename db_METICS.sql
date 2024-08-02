@@ -93,26 +93,12 @@ CREATE TABLE tema (
         ON UPDATE CASCADE
 );
 
---Creación de la tabla asesor da tema
-CREATE TABLE asesor_da_tema (
-    id_tema_FK INT NOT NULL,
-    id_asesor_FK NVARCHAR(64) NOT NULL,
-    asesores_asistentes NVARCHAR(MAX),
-
-    CONSTRAINT asesor_da_tema_PK PRIMARY KEY (id_tema_FK, id_asesor_FK),
-    CONSTRAINT id_tema_FK FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT id_asesor_FK FOREIGN KEY (id_asesor_FK) REFERENCES asesor(id_asesor_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
 --Creación de la tabla grupo
 CREATE TABLE grupo (
     id_grupo_PK INT IDENTITY(1, 1) PRIMARY KEY,
     id_tema_FK INT NOT NULL,
-	asesor NVARCHAR(64) NULL,
+	id_asesor_FK NVARCHAR(64),
+	nombreAsesor NVARCHAR(64),
 	nombre NVARCHAR(64) NOT NULL,
     horario NVARCHAR(128) NOT NULL,
     fecha_inicio_grupo DATE NOT NULL,
@@ -129,6 +115,9 @@ CREATE TABLE grupo (
 	adjunto VARBINARY(MAX),
 
     FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
+        ON DELETE NO ACTION,
+
+	FOREIGN KEY (id_asesor_FK) REFERENCES asesor(id_asesor_PK)
         ON DELETE NO ACTION
 );
 
@@ -563,7 +552,8 @@ GO
 --Creación de procedimiento para insertar un grupo
 CREATE OR ALTER PROCEDURE InsertGrupo
     @idTema INT,
-	@asesor NVARCHAR(64) = '',
+	@idAsesor NVARCHAR(64),
+	@nombreAsesor NVARCHAR(64) = '',
 	@nombre NVARCHAR(64),
 	@modalidad NVARCHAR(16),
 	@cantidad_horas TINYINT,
@@ -585,7 +575,8 @@ BEGIN
     INSERT INTO grupo
     (
         id_tema_FK,
-		asesor,
+		id_asesor_FK,
+		nombreAsesor,
         nombre,
         horario,
 		fecha_inicio_grupo,
@@ -604,7 +595,8 @@ BEGIN
     VALUES
     (
         @idTema,
-		@asesor,
+		@idAsesor,
+		@nombreAsesor,
 		@nombre,
 		@horario,
 		@fecha_inicio_grupo,
@@ -627,7 +619,8 @@ GO
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
     @idTema INT,
-	@asesor NVARCHAR(64) = '',
+	@idAsesor NVARCHAR(64),
+	@nombreAsesor NVARCHAR(64) = '',
 	@nombre NVARCHAR(64),
 	@modalidad NVARCHAR(16),
 	@cantidad_horas TINYINT,
@@ -655,7 +648,8 @@ BEGIN
     UPDATE grupo
     SET
         id_tema_FK = @idTema,
-        asesor = @asesor,
+		id_asesor_FK = @idAsesor,
+        nombreAsesor = @nombreAsesor,
 		nombre = @nombre,
         horario = @horario,
         fecha_inicio_grupo = @fecha_inicio_grupo,
@@ -680,13 +674,14 @@ AS
 BEGIN
     SELECT 
 		G.id_grupo_PK, 
-		G.id_tema_FK, 
+		G.id_tema_FK,
+		G.id_asesor_FK,
 		G.modalidad, 
 		G.cupo, 
 		G.descripcion, 
 		G.es_visible, 
 		G.lugar,
-		G.asesor,
+		G.nombreAsesor,
 		G.nombre,		
 		G.horario, 
 		G.fecha_inicio_grupo, 
@@ -695,13 +690,10 @@ BEGIN
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
 		G.nombre_archivo, 
-		T.nombre AS tema_asociado, 
-		A.nombre + ' ' + A.apellido_1 AS asesor, 
+		T.nombre AS tema_asociado,
 		TA.nombre AS tipo_actividad
 	FROM grupo G
 		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
-		LEFT JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK
-		LEFT JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK
 		JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK;
 END
 
@@ -713,13 +705,14 @@ AS
 BEGIN
     SELECT 
 		G.id_grupo_PK, 
-		G.id_tema_FK, 
+		G.id_tema_FK,
+		G.id_asesor_FK,
 		G.modalidad, 
 		G.cupo, 
 		G.descripcion, 
 		G.es_visible, 
 		G.lugar,
-		G.asesor,
+		G.nombreAsesor,
 		G.nombre,
 		G.horario, 
 		G.fecha_inicio_grupo, 
@@ -729,13 +722,10 @@ BEGIN
 		G.cantidad_horas, 
 		G.nombre_archivo, 
 		G.adjunto,
-		T.nombre AS tema_asociado, 
-		A.nombre + ' ' + A.apellido_1 AS asesor, 
+		T.nombre AS tema_asociado,
 		TA.nombre AS tipo_actividad
 	FROM grupo G
 		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
-		LEFT JOIN asesor_da_tema ADT ON T.id_tema_PK = ADT.id_tema_FK
-		LEFT JOIN asesor A ON ADT.id_asesor_FK = A.id_asesor_PK
 		JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK
     WHERE G.id_grupo_PK = @idGrupo;
 END
@@ -933,25 +923,15 @@ FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\Fi
 
 --Crear grupos
 INSERT INTO dbo.grupo(
-	id_tema_FK, modalidad, cupo, cantidad_horas,
+	id_tema_FK, id_asesor_FK, nombreAsesor, modalidad, cupo, cantidad_horas,
 	descripcion, es_visible, lugar,
 	nombre, horario,
 	fecha_inicio_grupo, fecha_finalizacion_grupo,
 	fecha_inicio_inscripcion, fecha_finalizacion_inscripcion,
 	nombre_archivo)
 	VALUES
-	(3, N'Presencial', 15, 3,
+	(1, N'AARON.MENAARAYA@ucr.ac.cr', N'Aarón Elí Mena Araya', N'Presencial', 15, 3,
 	N'Taller de videos interactivos', 1, N'Universidad de Costa Rica, Rodrigo Facio',
 	N'Capacitación-Plataforma', N'V-S de 4pm a 7pm',
-	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
-	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf'),
-	(2, N'Virtual', 10, 3,
-	N'Aprenda a realizar evaluaciones en la plataforma', 1, N'Mediación Virtual',
-	N'Capacitación-Profesores', N'L-V de 4pm a 7pm',
-	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
-	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf'),
-	(3, N'Virtual', 10, 3,
-	N'Aprenda a realizar videos llamativos e interesantes del temario del curso', 1, N'Mediación Virtual',
-	N'Capacitaciones-Audiovisuales', N'L-M de 4pm a 7pm',
-	'2023-06-01 00:00:00', '2026-12-02 00:00:00',
-	'2023-01-01 00:00:00', '2026-01-01 00:00:00', N'ArchivoPrueba.pdf');
+	'2026-06-01 00:00:00', '2027-12-02 00:00:00',
+	'2024-01-01 00:00:00', '2025-01-01 00:00:00', N'ArchivoPrueba.pdf')

@@ -27,7 +27,7 @@ namespace webMetics.Handlers
             // Se recorre la lista de temas obtenida para parsearlos a objetos SelectListItem.
             foreach (TemaModel tema in temas)
             {
-                temasParseados.Add(new SelectListItem { Text = tema.nombre, Value = tema.idTema.ToString() });
+                temasParseados.Add(new SelectListItem { Text = tema.nombre, Value = tema.nombre });
             }
 
             return temasParseados;
@@ -217,32 +217,13 @@ namespace webMetics.Handlers
             return id_asesor;
         }
 
-        public bool CrearRelacionTemaAsesor(TemaModel tema)
-        {
-            bool creacionExitosa;
-            // Obtiene el identificador del último tema agregado a la base de datos.
-            string id_tema = ObtenerUltimoTemaAgregado();
-            // Obtiene el identificador del asesor principal del tema.
-            string id_asesor = ObtenerIdAsesor(tema.asesorPrincipal);
-            // Parsea la lista de asesores de apoyo a una cadena separada por "/".
-            string asesoresParseados = ParsearListaAsesoresAsistentes(tema.asesoresApoyo);
-            // Define la consulta SQL para insertar la relación tema-asesor en la tabla "asesor_da_tema".
-            string consulta = "INSERT INTO asesor_da_tema (id_tema_FK, id_asesor_FK,asesores_asistentes) " +
-                " values(@id_tema, @id_asesor,@asesores_apoyo) ";
-            // Agrega la relación tema-asesor a la base de datos.
-            creacionExitosa = AgregarRelacionTemaAsesor(id_asesor, id_tema, asesoresParseados, consulta);
-
-            return creacionExitosa;
-        }
-
         public List<TemaModel> RecuperarTemasDeCategoria(string nombreCategoria)
         {
             // Obtiene el identificador de la categoría en base a su nombre.
             string idCategoria = categoriaHandler.ObtenerIDCategoria(nombreCategoria);
             // Define la consulta SQL para obtener la información de los temas relacionados con la categoría.
             string consulta = " SELECT T.id_tema_PK, T.nombre, A.nombre, A.apellido_1, A.apellido_2 , DT.asesores_asistentes, TA.nombre  " +
-                " FROM Tema T JOIN asesor_da_tema DT ON T.id_tema_PK = DT.id_tema_FK " +
-                " JOIN asesor A ON DT.id_asesor_FK = A.id_asesor_PK " +
+                " FROM Tema T JOIN" +
                 " JOIN tipos_actividad TA ON TA.id_tipos_actividad_PK = T.id_tipos_actividad_FK " +
                 " WHERE T.id_categoria_FK = @idCategoria ";
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
@@ -252,18 +233,10 @@ namespace webMetics.Handlers
             foreach (DataRow temas in tablaResultado.Rows)
             {
                 // Parsea los asesores de apoyo en una cadena separada por comas.
-                string asesores = "";
-                if (temas["asesores_asistentes"].ToString() != "")
-                {
-                    asesores = Convert.ToString(temas["asesores_asistentes"]).Replace("/", ", ");
-                    asesores = asesores.Substring(0, asesores.Length - 2);
-                }
                 // Crea un objeto TemaModel con la información del tema y sus asesores.
                 TemaModel tema = new TemaModel
                 {
                     nombre = Convert.ToString(temas["nombre"]),
-                    asesorPrincipal = Convert.ToString(temas[2]) + " " + Convert.ToString(temas["apellido_1"]) + " " + Convert.ToString(temas["apellido_2"]),
-                    asesores = asesores,
                     idTema = Convert.ToInt32(temas["id_tema_PK"]),
                     tipoActividad = Convert.ToString(temas["nombre2"])
                 };
