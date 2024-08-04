@@ -1,4 +1,3 @@
-// En este archivo se encuentran las sedes y recintos a las que pueden pertenecer los participantes de la aplicacion
 {
   "sedes": [
     {
@@ -55,7 +54,7 @@
               "name": "Recinto de Limón"
             },
             {
-              "name": "Recinto de Siquires"
+              "name": "Recinto de Siquírres"
             }
           ]
         },

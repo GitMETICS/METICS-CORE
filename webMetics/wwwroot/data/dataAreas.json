@@ -72,7 +72,7 @@
               "name": "Escuela de Geología"
             },
             {
-              "name": "Escuela de Matemáticas"
+              "name": "Escuela de Matemática"
             },
             {
               "name": "Escuela de Química"
@@ -214,7 +214,7 @@
               "name": "Escuela de Ingeniería Química"
             },
             {
-              "name": "Escuela Ingeniería Topográfica"
+              "name": "Escuela de Ingeniería Topográfica"
             }
           ]
         }
@@ -232,7 +232,7 @@
           ]
         },
         {
-          "name": "Facultad de medicina",
+          "name": "Facultad de Medicina",
           "secciones": [
             {
               "name": "Escuela de Enfermería"
