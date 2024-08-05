@@ -204,30 +204,26 @@ namespace webMetics.Controllers
             ViewBag.Participante = participante;
             ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
 
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            if (GetRole() == 2)
             {
-                int rolUsuario = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+                string idAsesor = GetId();
+                List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idAsesor);
+                List<GrupoModel> gruposParticipante = ViewBag.ListaGrupos;
 
-                if (rolUsuario == 2)
-                {
-                    string idAsesor = Convert.ToString(Request.Cookies["idUsuario"]);
-                    List<GrupoModel> gruposAsesor = accesoAAsesor.ObtenerListaGruposAsesor(idAsesor);
-                    List<GrupoModel> gruposParticipante = ViewBag.ListaGrupos;
+                List<GrupoModel> gruposEnComun = gruposAsesor.Join(
+                    gruposParticipante,
+                    grupoAsesor => grupoAsesor.idGrupo,
+                    grupoParticipante => grupoParticipante.idGrupo,
+                    (grupoAsesor, grupoParticipante) => new GrupoModel
+                    {
+                        idGrupo = grupoParticipante.idGrupo,
+                        nombre = grupoParticipante.nombre,
+                        cantidadHoras = grupoParticipante.cantidadHoras,
+                        modalidad = grupoParticipante.modalidad
+                    }
+                ).ToList();
 
-                    List<GrupoModel> gruposEnComun = gruposAsesor.Join(
-                        gruposParticipante,
-                        grupoAsesor => grupoAsesor.idGrupo,
-                        grupoParticipante => grupoParticipante.idGrupo,
-                        (grupoAsesor, grupoParticipante) => new GrupoModel
-                        {
-                            idGrupo = grupoParticipante.idGrupo,
-                            nombre = grupoParticipante.nombre,
-                            cantidadHoras = grupoParticipante.cantidadHoras
-                        }
-                    ).ToList();
-
-                    ViewBag.ListaGrupos = gruposEnComun;
-                }
+                ViewBag.ListaGrupos = gruposEnComun;
             }
 
             if (TempData["errorMessage"] != null)

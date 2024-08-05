@@ -9,7 +9,7 @@ namespace webMetics.Models
     {
         public string nombreGrupo { get; set; }
 
-        public string nombreAsesorAsociado { get; set; }
+        public string nombreAsesor { get; set; }
 
         public List<CalificacionModel> listaCalificaciones { get; set; }
     }
@@ -18,7 +18,7 @@ namespace webMetics.Models
     {
         public string nombreGrupo { get; set; }
 
-        public string nombreAsesorAsociado { get; set; }
+        public string nombreAsesor { get; set; }
 
         public List<ParticipanteModel> listaParticipantes { get; set; }
     }

@@ -159,7 +159,7 @@ namespace webMetics.Controllers
                 .SetFontSize(12);
             document.Add(header1);
 
-            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
+            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesor)
                 .SetFontSize(12);
             document.Add(header2);
 
@@ -210,7 +210,7 @@ namespace webMetics.Controllers
             headerRow0.GetCell(0).SetText("Nombre del Asesor");
             headerRow0.GetCell(1).SetText("Nombre del Módulo");
             var row0 = table.Rows[1];
-            row0.GetCell(0).SetText(grupo.nombreAsesorAsociado);
+            row0.GetCell(0).SetText(grupo.nombreAsesor);
             row0.GetCell(1).SetText(grupo.nombre);
 
             var headerRow = table.Rows[2];
@@ -227,7 +227,7 @@ namespace webMetics.Controllers
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.primerApellido + " " + calificaciones[i].participante.segundoApellido);
                 row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
                 row.GetCell(3).SetText(grupo.nombre);
-                row.GetCell(4).SetText(grupo.nombreAsesorAsociado);
+                row.GetCell(4).SetText(grupo.nombreAsesor);
             }
 
             var stream = new MemoryStream();
@@ -259,7 +259,7 @@ namespace webMetics.Controllers
             cell21.SetCellValue("Nombre del asesor asociado:");
 
             NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
-            cell22.SetCellValue(grupo.nombreAsesorAsociado);
+            cell22.SetCellValue(grupo.nombreAsesor);
 
             NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
@@ -362,7 +362,7 @@ namespace webMetics.Controllers
                 "<h4>Información adicional del grupo:</h4><ul>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li> " +
                 "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li> " +
-                "<li>Asesor: " + grupo.nombreAsesorAsociado + "</li> " +
+                "<li>Asesor: " + grupo.nombreAsesor + "</li> " +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li></ul>";
 

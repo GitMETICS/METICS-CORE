@@ -109,7 +109,7 @@ namespace webMetics.Controllers
                         break;
 
                     case RolUsuarioAsesor:
-                        ViewBag.ListaGrupos = accesoAAsesor.ObtenerListaGruposAsesor(idUsuario);
+                        ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
                         break;
                 }
             }
@@ -143,7 +143,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            List<AsesorModel> asesores = accesoAAsesor.ObtenerListaAsesores();
+            List<SelectListItem> asesores = accesoAAsesor.ObtenerListaSeleccionAsesores();
             if (asesores.Count == 0)
             {
                 TempData["errorMessage"] = "No hay asesores disponibles para crear un módulo.";
@@ -159,7 +159,7 @@ namespace webMetics.Controllers
 
             ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
             ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-            ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+            ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
             return View();
         }
 
@@ -181,7 +181,7 @@ namespace webMetics.Controllers
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -201,7 +201,7 @@ namespace webMetics.Controllers
                         ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -214,19 +214,19 @@ namespace webMetics.Controllers
                         ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
                     accesoAGrupo.CrearGrupo(grupo);
-                    TempData["successMessage"] = "Los datos del nuevo módulo fueron guardados.";
+                    TempData["successMessage"] = "Se guardó el nuevo módulo.";
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                     return View(grupo);
                 }
             }
@@ -276,62 +276,48 @@ namespace webMetics.Controllers
                 ViewBag.ExitoAlCrear = accesoAGrupo.CambiarEstadoVisible(idGrupo);
                 if (ViewBag.ExitoAlCrear)
                 {
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
+                    return RedirectToAction("ListaGruposDisponibles");
                 }
                 else
                 {
                     TempData["Message"] = "No se pudo cambiar el estado debido a un problema";
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
+                    return RedirectToAction("ListaGruposDisponibles");
                 }
             }
             catch (Exception)
             {
                 TempData["Message"] = "Hubo un error y no se pudo enviar la petición de cambiar el estado del módulo.";
-                return Redirect("~/Grupo/ListaGruposDisponibles");
+                return RedirectToAction("ListaGruposDisponibles");
             }
         }
 
         /* Vista del formulario para editar un grupo */
-        public ActionResult EditarGrupo(int? idGrupo)
+        public ActionResult EditarGrupo(int idGrupo)
         {
-            ActionResult vista;
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
-                // Obtener información del grupo a editar
-                GrupoModel modificarGrupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                if (modificarGrupo == null)
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                if (grupo == null)
                 {
-                    vista = Redirect("~/Grupo/ListaGruposDisponibles");
+                    TempData["errorMessage"] = "Ocurrió un error al obtener los datos del módulo.";
                 }
                 else
                 {
-                    // Obtener el tema seleccionado y la lista de temas disponibles
-                    ViewData["TemaSeleccionado"] = accesoAGrupo.ObtenerTemaSeleccionado(modificarGrupo);
-                    List<SelectListItem> temas = accesoATema.ObtenerListaSeleccionTemas();
-                    SelectListItem temaSeleccionado = ViewData["TemaSeleccionado"] as SelectListItem;
-
-                    // Quitar el tema seleccionado de la lista de temas disponibles y ponerlo al principio
-                    SelectListItem temaEncontrado = temas.FirstOrDefault(t => t.Value == temaSeleccionado.Value);
-                    if (temaEncontrado != null)
-                    {
-                        temas.Remove(temaEncontrado);
-                    }
-                    temas.Insert(0, temaSeleccionado);
-
-                    // Pasar la lista de temas disponibles y el grupo a editar a la vista
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
-                    vista = View(modificarGrupo);
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
+                    return View(grupo);
                 }
             }
             catch
             {
-                vista = RedirectToAction("ListaGruposDisponibles");
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del módulo.";
             }
-            return vista;
+
+            return RedirectToAction("ListaGruposDisponibles");
         }
 
         /* Vista del formulario para editar un grupo con los datos ingresados del modelo */
@@ -352,7 +338,7 @@ namespace webMetics.Controllers
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -372,7 +358,7 @@ namespace webMetics.Controllers
                         ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -385,19 +371,19 @@ namespace webMetics.Controllers
                         ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
                     accesoAGrupo.EditarGrupo(grupo);
-                    TempData["successMessage"] = "Los datos del módulo fueron guardados.";
+                    TempData["successMessage"] = "Se guardaron los datos del módulo.";
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                    ViewData["Asesores"] = accesoAAsesor.ObtenerNombresDeAsesoresIndexados();
+                    ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                     return View(grupo);
                 }
             }

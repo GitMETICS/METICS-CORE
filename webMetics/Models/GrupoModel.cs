@@ -8,36 +8,35 @@ namespace webMetics.Models
     {
         public int idGrupo { get; set; }
 
+        [Required(ErrorMessage = "Debe asociar un área de competencia al módulo.")]
         public int idTema { get; set; }
-
-        [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
-        [Display(Name = "Tema asociado")]
+        
+        [Display(Name = "Área de competencia")]
         public string? nombreTema { get; set; }
 
+        [Required(ErrorMessage = "Debe asociar una categoría al módulo.")]
         public int idCategoria { get; set; }
 
-        [Required(ErrorMessage = "Debe asociar una categoría al módulo.")]
         [Display(Name = "Categoría")]
         public string? nombreCategoria { get; set; }
 
         [Required(ErrorMessage = "Es necesario que ingrese el nombre del módulo.")]
         [Display(Name = "Nombre del módulo")]
-        public string nombre { get; set; }
+        public required string nombre { get; set; }
 
-        [Required(ErrorMessage = "Agregue la descripción del módulo.")]
         [Display(Name = "Descripción")]
-        public string descripcion { get; set; }
+        public string? descripcion { get; set; }
 
         [Required(ErrorMessage = "Es necesario seleccionar una modalidad.")]
         [Display(Name = "Modalidad")]
-        public string modalidad { get; set; }
+        public required string modalidad { get; set; }
 
-        [Required(ErrorMessage = "Ingrese la cantidad de horas.")]
+        [Required(ErrorMessage = "Es necesario ingresar la cantidad de horas del módulo.")]
         [Display(Name = "Cantidad de horas")]
         [Range(1, 100, ErrorMessage = "La cantidad de horas debe ser un número entre 1 y 100.")]
         public int cantidadHoras { get; set; }
 
-        [Required(ErrorMessage = "Ingrese el cupo.")]
+        [Required(ErrorMessage = "Es necesario ingresar el cupo del módulo.")]
         [Display(Name = "Cupo")]
         [Range(1, 50, ErrorMessage = "El cupo debe ser un número entre 1 y 50.")]
         public int cupo { get; set; }
@@ -83,13 +82,11 @@ namespace webMetics.Models
 
         public IFormFile? archivoAdjunto { get; set; }
 
+        // [Required(ErrorMessage = "Es necesario elegir un asesor del módulo.")]
         public string? idAsesor { get; set; }
 
         [Display(Name = "Asesor")]
-        public string? nombreAsesorAsociado { get; set; }
-
-        public string? tipoActividadAsociado { get; set; } // TODO: Estos nullable types se deben revisar según requerimientos
-
+        public string? nombreAsesor { get; set; }
     }
 
     public enum TipoModalidad

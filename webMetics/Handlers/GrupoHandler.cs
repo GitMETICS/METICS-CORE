@@ -2,12 +2,6 @@
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Text.RegularExpressions;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
-using System.Collections.Generic;
-using System;
-using NPOI.SS.Formula.Functions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 /*
  * Handler para los grupos
@@ -20,27 +14,14 @@ namespace webMetics.Handlers
     {
         private TemaHandler accesoATema;
         private CategoriaHandler accesoACategoria;
+        private AsesorHandler accesoAAsesor;
 
         public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
             accesoATema = new TemaHandler(environment, configuration);
             accesoACategoria = new CategoriaHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
         }
-
-        public string ObtenerIdTema(string nombreTema)
-        {
-            string consulta = "SELECT id_tema_PK FROM tema WHERE nombre = @nombre";
-
-            // crear el comando de consulta con la consulta sql y la conexión establecida
-            SqlCommand comandoparaconsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoparaconsulta.Parameters.AddWithValue("@nombre", nombreTema);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoparaconsulta);
-
-            return tablaResultado.Rows[0][0].ToString();
-        }
-
-
 
         // Crea un grupo en la base de datos.
         public bool CrearGrupo(GrupoModel grupo)
@@ -51,10 +32,11 @@ namespace webMetics.Handlers
             {
                 command.CommandType = CommandType.StoredProcedure;
 
-                string idAsesor = grupo.modalidad == "Autogestionado" ? "" : ObtenerIdAsesor(grupo.nombreAsesorAsociado);
+                string idAsesor = grupo.modalidad == "Autogestionado" ? null : grupo.idAsesor;
 
                 command.Parameters.AddWithValue("@idTema", grupo.idTema);
                 command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
+                command.Parameters.AddWithValue("@idAsesor", idAsesor);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
                 command.Parameters.AddWithValue("@horario", grupo.horario);
                 command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
@@ -63,28 +45,22 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
                 command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
                 command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
-                command.Parameters.AddWithValue("@idAsesor", idAsesor);
-                command.Parameters.AddWithValue("@nombreAsesor", grupo.nombreAsesorAsociado);
                 command.Parameters.AddWithValue("@cupo", grupo.cupo);
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
-                command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
-
-                // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos.
-                byte[] buffer = new byte[0];
 
                 if (grupo.archivoAdjunto != null)
                 {
-                    long fileLength = grupo.archivoAdjunto.Length;
-                    buffer = new byte[fileLength];
-
-                    using (var stream = grupo.archivoAdjunto.OpenReadStream())
-                    {
-                        stream.Read(buffer, 0, (int)fileLength);
-                    }
+                    byte[] adjunto = ObtenerAdjunto(grupo);
+                    string nombreArchivoAdjunto = ObtenerNombreAdjunto(grupo);
+                    command.Parameters.AddWithValue("@adjunto", adjunto);
+                    command.Parameters.AddWithValue("@nombre_archivo", nombreArchivoAdjunto);
                 }
-
-                command.Parameters.AddWithValue("@adjunto", buffer);
+                else
+                {
+                    command.Parameters.AddWithValue("@adjunto", grupo.archivoAdjunto);
+                    command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
+                }
 
                 try
                 {
@@ -104,6 +80,93 @@ namespace webMetics.Handlers
             return exito;
         }
 
+        // Método para editar un grupo en la base de datos
+        public bool EditarGrupo(GrupoModel grupo)
+        {
+            bool exito = false;
+
+            using (var command = new SqlCommand("UpdateGrupo", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                string idAsesor = grupo.modalidad == "Autogestionado" ? null : grupo.idAsesor;
+
+                command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
+                command.Parameters.AddWithValue("@idTema", grupo.idTema);
+                command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
+                command.Parameters.AddWithValue("@idAsesor", idAsesor);
+                command.Parameters.AddWithValue("@nombre", grupo.nombre);
+                command.Parameters.AddWithValue("@horario", grupo.horario);
+                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
+                command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
+                command.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
+                command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
+                command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
+                command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
+                command.Parameters.AddWithValue("@cupo", grupo.cupo);
+                command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
+                command.Parameters.AddWithValue("@lugar", grupo.lugar);
+                command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
+
+                if (grupo.archivoAdjunto != null)
+                {
+                    byte[] adjunto = ObtenerAdjunto(grupo);
+                    string nombreArchivoAdjunto = ObtenerNombreAdjunto(grupo);
+                    command.Parameters.AddWithValue("@adjunto", adjunto);
+                    command.Parameters.AddWithValue("@nombre_archivo", nombreArchivoAdjunto);
+                }
+                else
+                {
+                    command.Parameters.AddWithValue("@adjunto", grupo.archivoAdjunto);
+                    command.Parameters.AddWithValue("@nombre_archivo", grupo.nombreArchivo);
+                }
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in EditarGrupo: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return exito;
+        }
+
+        // Convierte el archivo adjunto en un arreglo de bytes para almacenarlo en la base de datos.
+        public byte[] ObtenerAdjunto(GrupoModel grupo)
+        {
+            byte[] buffer = new byte[0];
+
+            if (grupo.archivoAdjunto != null)
+            {
+                long fileLength = grupo.archivoAdjunto.Length;
+                buffer = new byte[fileLength];
+
+                using (var stream = grupo.archivoAdjunto.OpenReadStream())
+                {
+                    stream.Read(buffer, 0, (int)fileLength);
+                }
+            }
+
+            return buffer;
+        }
+
+        private string ObtenerNombreAdjunto(GrupoModel grupo)
+        {
+            string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName) == null ? "empty" : Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
+            string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName) == null ? ".pdf" : Path.GetExtension(grupo.archivoAdjunto.FileName);
+            string fileNombreExtension = fileNombre + fileExtension;
+
+            return fileNombreExtension;
+        }
+
         // Obtiene la información detallada de todos los grupos en la base de datos.
         public List<GrupoModel> ObtenerListaGrupos()
         {
@@ -116,26 +179,20 @@ namespace webMetics.Handlers
             // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
             foreach (DataRow row in result.Rows)
             {
-                int idTema = Convert.ToInt32(row["id_tema_FK"]);
-                string nombreTema = accesoATema.ObtenerTema(idTema).nombre;
-
-                int idCategoria = Convert.ToInt32(row["id_categoria_FK"]);
-                string nombreCategoria = accesoACategoria.ObtenerCategoria(idCategoria).nombre;
-
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
-                    idTema = idTema,
-                    nombreTema = nombreTema,
-                    idCategoria = idCategoria,
-                    nombreCategoria = nombreCategoria,
+                    idTema = Convert.ToInt32(row["id_tema_FK"]),
+                    nombreTema = Convert.ToString(row["nombre_tema"]),
+                    idCategoria = Convert.ToInt32(row["id_categoria_FK"]),
+                    nombreCategoria = Convert.ToString(row["nombre_categoria"]),
                     idAsesor = Convert.ToString(row["id_asesor_FK"]),
+                    nombreAsesor = Convert.ToString(row["nombre_asesor"]),
                     modalidad = Convert.ToString(row["modalidad"]),
                     cupo = Convert.ToInt32(row["cupo"]),
                     descripcion = Convert.ToString(row["descripcion"]),
                     esVisible = Convert.ToBoolean(row["es_visible"]),
                     lugar = Convert.ToString(row["lugar"]),
-                    nombreAsesorAsociado = Convert.ToString(row["nombreAsesor"]),
                     nombre = Convert.ToString(row["nombre"]),
                     horario = Convert.ToString(row["horario"]),
                     fechaInicioGrupo = Convert.ToDateTime(row["fecha_inicio_grupo"]),
@@ -177,27 +234,21 @@ namespace webMetics.Handlers
                     {
                         if (reader.Read())
                         {
-                            int idTema = reader.GetInt32(reader.GetOrdinal("id_tema_FK"));
-                            string nombreTema = accesoATema.ObtenerTema(idTema).nombre;
-
-                            int idCategoria = reader.GetInt32(reader.GetOrdinal("id_categoria_FK"));
-                            string nombreCategoria = accesoACategoria.ObtenerCategoria(idCategoria).nombre;
-
                             grupo = new GrupoModel
                             {
                                 idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_PK")),
-                                idTema = idTema,
-                                nombreTema = nombreTema,
-                                idCategoria = idCategoria,
-                                nombreCategoria = nombreCategoria,
-                                idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_FK")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("id_asesor_FK")),
+                                idTema = reader.GetInt32(reader.GetOrdinal("id_tema_FK")),
+                                nombreTema = reader.GetString(reader.GetOrdinal("nombre_tema")),
+                                idCategoria = reader.GetInt32(reader.GetOrdinal("id_categoria_FK")),
+                                nombreCategoria = reader.GetString(reader.GetOrdinal("nombre_categoria")),
+                                idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_FK")) ? null : reader.GetString(reader.GetOrdinal("id_asesor_FK")),
+                                nombreAsesor = reader.IsDBNull(reader.GetOrdinal("nombre_asesor")) ? null : reader.GetString(reader.GetOrdinal("nombre_asesor")),
                                 nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
                                 descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "Sin descripción" : reader.GetString(reader.GetOrdinal("descripcion")),
                                 modalidad = reader.IsDBNull(reader.GetOrdinal("modalidad")) ? "Sin modalidad" : reader.GetString(reader.GetOrdinal("modalidad")),
                                 cupo = reader.IsDBNull(reader.GetOrdinal("cupo")) ? 0 : reader.GetInt32(reader.GetOrdinal("cupo")),
                                 esVisible = reader.IsDBNull(reader.GetOrdinal("es_visible")) ? false : reader.GetBoolean(reader.GetOrdinal("es_visible")),
                                 lugar = reader.IsDBNull(reader.GetOrdinal("lugar")) ? "Sin lugar" : reader.GetString(reader.GetOrdinal("lugar")),
-                                nombreAsesorAsociado = reader.IsDBNull(reader.GetOrdinal("nombreAsesor")) ? "Sin asesor" : reader.GetString(reader.GetOrdinal("nombreAsesor")),
                                 horario = reader.IsDBNull(reader.GetOrdinal("horario")) ? "Sin horario" : reader.GetString(reader.GetOrdinal("horario")),
                                 fechaInicioGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_grupo")),
                                 fechaFinalizacionGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_grupo")),
@@ -267,6 +318,56 @@ namespace webMetics.Handlers
             return listaGrupos;
         }
 
+        public List<GrupoModel> ObtenerListaGruposAsesor(string idAsesor)
+        {
+            List<GrupoModel> grupos = new List<GrupoModel>();
+
+            SqlCommand command = new SqlCommand("SelectGruposAsesor", ConexionMetics);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@idAsesor", idAsesor);
+
+            DataTable result = CrearTablaConsulta(command);
+
+            // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
+            foreach (DataRow row in result.Rows)
+            {
+                GrupoModel grupo = new GrupoModel
+                {
+                    idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
+                    idTema = Convert.ToInt32(row["id_tema_FK"]),
+                    nombreTema = Convert.ToString(row["nombre_tema"]),
+                    idCategoria = Convert.ToInt32(row["id_categoria_FK"]),
+                    nombreCategoria = Convert.ToString(row["nombre_categoria"]),
+                    idAsesor = Convert.ToString(row["id_asesor_FK"]),
+                    nombreAsesor = Convert.ToString(row["nombre_asesor"]),
+                    modalidad = Convert.ToString(row["modalidad"]),
+                    cupo = Convert.ToInt32(row["cupo"]),
+                    descripcion = Convert.ToString(row["descripcion"]),
+                    esVisible = Convert.ToBoolean(row["es_visible"]),
+                    lugar = Convert.ToString(row["lugar"]),
+                    nombre = Convert.ToString(row["nombre"]),
+                    horario = Convert.ToString(row["horario"]),
+                    fechaInicioGrupo = Convert.ToDateTime(row["fecha_inicio_grupo"]),
+                    fechaFinalizacionGrupo = Convert.ToDateTime(row["fecha_finalizacion_grupo"]),
+                    fechaInicioInscripcion = Convert.ToDateTime(row["fecha_inicio_inscripcion"]),
+                    fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
+                    cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
+                    cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
+                    nombreArchivo = Convert.ToString(row["nombre_archivo"])
+                };
+
+                grupos.Add(grupo);
+            }
+
+            // Si no se encontraron grupos, devuelve null; de lo contrario, devuelve la lista.
+            if (grupos.Count == 0)
+            {
+                return null;
+            }
+
+            return grupos;
+        }
+
         // Método para eliminar un grupo de la base de datos mediante su ID
         public bool EliminarGrupo(int grupoId)
         {
@@ -291,6 +392,53 @@ namespace webMetics.Handlers
             // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
             return consultaExitosa;
         }
+
+        // Método para editar el archivo adjunto de un grupo en la base de datos
+        public bool EditarAdjunto(GrupoModel grupo)
+        {
+            bool consultaExitosa;
+
+            // Consulta SQL para actualizar el archivo adjunto y su nombre en la tabla 'grupo' mediante su ID
+            string consulta =
+                "UPDATE grupo SET " +
+                "adjunto = Convert(varbinary(max),@adjunto), " +
+                "nombre_archivo = @nombre_archivo " +
+                "WHERE id_grupo_PK = @idGrupo";
+
+            // Abre la conexión con la base de datos
+            ConexionMetics.Open();
+
+            // Crea un nuevo comando SQL con la consulta y la conexión establecida
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
+
+            // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
+            long fileLength = grupo.archivoAdjunto.Length;
+            byte[] buffer = new byte[fileLength];
+            using (var stream = grupo.archivoAdjunto.OpenReadStream())
+            {
+                stream.Read(buffer, 0, (int)fileLength);
+            }
+
+            comandoConsulta.Parameters.AddWithValue("@adjunto", buffer);
+
+            // Obtiene el nombre y la extensión del archivo adjunto y lo agrega como parámetro en el comando
+            string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
+            string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
+            string fileNombreExtension = fileNombre + fileExtension;
+            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
+
+            // Ejecuta la consulta y comprueba si al menos una fila fue afectada
+            consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            // Cierra la conexión con la base de datos
+            ConexionMetics.Close();
+
+            // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
+            return consultaExitosa;
+        }
+
+
 
         // Método para obtener el estado visible de un grupo mediante su ID
         public bool EsVisible(int grupoId)
@@ -395,91 +543,6 @@ namespace webMetics.Handlers
             }
         }
 
-
-        public string ObtenerIdAsesor(string nombreAsesor)
-        {
-            string consulta = "SELECT id_asesor_PK FROM asesor WHERE " +
-                "nombre = @nombre AND apellido_1 = @apellido_1 AND apellido_2 = @apellido_2 ";
-
-            // crear el comando de consulta con la consulta sql y la conexión establecida
-            SqlCommand comandoparaconsulta = new SqlCommand(consulta, ConexionMetics);
-
-            string[] temp = nombreAsesor.Split(' ');
-
-            if (temp.Length == 4)
-            {
-                comandoparaconsulta.Parameters.AddWithValue("@nombre", temp[0] + " " + temp[1]);
-            }
-            else {
-                comandoparaconsulta.Parameters.AddWithValue("@nombre", temp[0]);
-            }
-            
-            comandoparaconsulta.Parameters.AddWithValue("@apellido_1", temp[^2]);
-            comandoparaconsulta.Parameters.AddWithValue("@apellido_2", temp[^1]);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoparaconsulta);
-
-
-            return tablaResultado.Rows[0][0].ToString();
-        }
-
-        // Método para editar un grupo en la base de datos
-        public bool EditarGrupo(GrupoModel grupo)
-        {
-            bool exito = false;
-
-            using (var command = new SqlCommand("UpdateGrupo", ConexionMetics))
-            {
-                string idAsesor = ObtenerIdAsesor(grupo.nombreAsesorAsociado);
-
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
-                command.Parameters.AddWithValue("@idTema", grupo.idTema);
-                command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
-                command.Parameters.AddWithValue("@idAsesor", idAsesor);
-                command.Parameters.AddWithValue("@nombreAsesor", grupo.nombreAsesorAsociado);
-                command.Parameters.AddWithValue("@nombre", grupo.nombre);
-                command.Parameters.AddWithValue("@horario", grupo.horario);
-                command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
-                command.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
-                command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
-                command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
-                command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
-                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
-                command.Parameters.AddWithValue("@cupo", grupo.cupo);
-                command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
-                command.Parameters.AddWithValue("@lugar", grupo.lugar);
-                command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
-
-                if (grupo.archivoAdjunto != null)
-                {
-                    exito = EditarAdjunto(grupo);
-                }
-                else
-                {
-
-                    command.Parameters.AddWithValue("@nombre_archivo", "");
-                }
-
-
-                try
-                {
-                    ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error in EditarGrupo: {ex.Message}");
-                }
-                finally
-                {
-                    ConexionMetics.Close();
-                }
-            }
-
-            return exito;
-        }
-
         // Método para obtener el tema seleccionado del grupo mediante su ID
         public SelectListItem ObtenerTemaSeleccionado(GrupoModel grupo)
         {
@@ -499,51 +562,6 @@ namespace webMetics.Handlers
             // Crea y retorna un objeto SelectListItem con el texto y valor del tema seleccionado
             SelectListItem temaSeleccionado = new SelectListItem { Text = tema, Value = Convert.ToString(grupo.idTema)};
             return temaSeleccionado;
-        }
-
-        // Método para editar el archivo adjunto de un grupo en la base de datos
-        public bool EditarAdjunto(GrupoModel grupo)
-        {
-            bool consultaExitosa;
-
-            // Consulta SQL para actualizar el archivo adjunto y su nombre en la tabla 'grupo' mediante su ID
-            string consulta =
-                "UPDATE grupo SET " +
-                "adjunto = Convert(varbinary(max),@adjunto), " +
-                "nombre_archivo = @nombre_archivo " +
-                "WHERE id_grupo_PK = @idGrupo";
-
-            // Abre la conexión con la base de datos
-            ConexionMetics.Open();
-
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
-
-            // Convierte el archivo adjunto a un arreglo de bytes y lo agrega como parámetro en el comando
-            long fileLength = grupo.archivoAdjunto.Length;
-            byte[] buffer = new byte[fileLength];
-            using (var stream = grupo.archivoAdjunto.OpenReadStream())
-            {
-                stream.Read(buffer, 0, (int)fileLength);
-            }
-
-            comandoConsulta.Parameters.AddWithValue("@adjunto", buffer);
-
-            // Obtiene el nombre y la extensión del archivo adjunto y lo agrega como parámetro en el comando
-            string fileNombre = Path.GetFileNameWithoutExtension(grupo.archivoAdjunto.FileName);
-            string fileExtension = Path.GetExtension(grupo.archivoAdjunto.FileName);
-            string fileNombreExtension = fileNombre + fileExtension;
-            comandoConsulta.Parameters.AddWithValue("@nombre_archivo", fileNombreExtension);
-
-            // Ejecuta la consulta y comprueba si al menos una fila fue afectada
-            consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            // Cierra la conexión con la base de datos
-            ConexionMetics.Close();
-
-            // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
-            return consultaExitosa;
         }
 
         // Método para obtener una lista de grupos junto con sus temas y los IDs de los temas asociados

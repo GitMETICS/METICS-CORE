@@ -309,7 +309,7 @@ namespace webMetics.Controllers
                 "<ul><li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
                 "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
-                "<li>Asesor: " + grupo.nombreAsesorAsociado + "</li>" +
+                "<li>Asesor: " + grupo.nombreAsesor + "</li>" +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
             
@@ -340,7 +340,7 @@ namespace webMetics.Controllers
             // Agregar los encabezados y detalles de los participantes...
             sb.Append("<h2>Lista de participantes</h2>");
             sb.Append("<h4> Grupo: " + grupo.nombre + " </h4>");
-            sb.Append("<h4> Asesor: " + grupo.nombreAsesorAsociado + " </h4>");
+            sb.Append("<h4> Asesor: " + grupo.nombreAsesor + " </h4>");
             sb.Append("<tr>");
             sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Nombre completo</th>");
             sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Condición</th>");
@@ -411,7 +411,7 @@ namespace webMetics.Controllers
                 .SetFontSize(10);
             document.Add(header1);
 
-            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesorAsociado)
+            Paragraph header2 = new Paragraph("Nombre del asesor asociado: " + grupo.nombreAsesor)
                 .SetFontSize(10);
             document.Add(header2);
 
@@ -472,7 +472,7 @@ namespace webMetics.Controllers
             headerRow0.GetCell(0).SetText("Nombre del Asesor");
             headerRow0.GetCell(1).SetText("Nombre del Módulo");
             var row0 = table.Rows[1];
-            row0.GetCell(0).SetText(grupo.nombreAsesorAsociado);
+            row0.GetCell(0).SetText(grupo.nombreAsesor);
             row0.GetCell(1).SetText(grupo.nombre);
 
 
@@ -525,7 +525,7 @@ namespace webMetics.Controllers
             cell21.SetCellValue("Nombre del asesor asociado:");
 
             NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
-            cell22.SetCellValue(grupo.nombreAsesorAsociado);
+            cell22.SetCellValue(grupo.nombreAsesor);
 
             NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);

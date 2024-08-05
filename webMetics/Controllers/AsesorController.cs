@@ -15,6 +15,7 @@ namespace webMetics.Controllers
         private protected TemaHandler accesoATema;
         private protected AsesorHandler accesoAAsesor;
         private protected ParticipanteHandler accesoAParticipante;
+        private protected GrupoHandler accesoAGrupo;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -28,6 +29,7 @@ namespace webMetics.Controllers
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
         }
 
         public int GetRole()
@@ -70,7 +72,7 @@ namespace webMetics.Controllers
             }
 
             // Obtener la lista de asesores y enviarla a la vista a través de ViewBag
-            ViewBag.Asesores = accesoAAsesor.ObtenerListaAsesores();
+            ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
             return View();
         }
 
@@ -152,34 +154,6 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para eliminar un asesor */
-        public ActionResult EliminarAsesor(string idAsesor)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            // Verificar si se puede eliminar el asesor (no está asignado a ningún grupo)
-            bool eliminar = accesoAAsesor.PuedeEliminarAsesor(idAsesor);
-
-            if (eliminar)
-            {
-                bool exito = accesoAAsesor.EliminarAsesor(idAsesor);
-                if (exito)
-                {
-                    TempData["successMessage"] = "Se eliminó al asesor.";
-                }
-                else
-                {
-                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar al asesor.";
-                }
-            }
-            else
-            {
-                TempData["errorMessage"] = "No se puede eliminar el asesor porque está asignado a un módulo.";
-            }
-
-            return RedirectToAction("ListaAsesores");
-        }
 
         // Método de la vista del formulario para editar a un asesor
         public ActionResult EditarAsesor(string idAsesor)
@@ -200,9 +174,7 @@ namespace webMetics.Controllers
             }
         }
 
-        // Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult ActualizarAsesor(AsesorModel asesor)
         {
             ViewBag.Role = GetRole();
@@ -215,7 +187,7 @@ namespace webMetics.Controllers
                     asesor.idAsesor = asesor.correo; // Aquí se define que el correo es la identificación.
                     accesoAAsesor.EditarAsesor(asesor);
 
-                    TempData["SuccessMessage"] = "Los datos fueron guardados.";
+                    TempData["successMessage"] = "Los datos fueron guardados.";
                     return RedirectToAction("ListaAsesores");
                 }
                 else
@@ -226,9 +198,56 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["Message"] = "Ocurrió un error al editar los datos del asesor.";
+                TempData["errorMessage"] = "Ocurrió un error al editar los datos del asesor.";
                 return RedirectToAction("ListaAsesores");
             }
+        }
+
+        public ActionResult EliminarAsesor(string idAsesor)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            // Verificar si se puede eliminar el asesor (no está asignado a ningún grupo)
+            if (PuedeEliminarAsesor(idAsesor))
+            {
+                bool exito = accesoAAsesor.EliminarAsesor(idAsesor);
+                if (exito)
+                {
+                    TempData["successMessage"] = "Se eliminó al asesor.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar al asesor.";
+                }
+            }
+            else
+            {
+                TempData["errorMessage"] = "No se puede eliminar el asesor porque está asignado a un módulo.";
+            }
+
+            return RedirectToAction("ListaAsesores");
+        }
+
+        // Método para verificar si un asesor puede ser eliminado
+        public bool PuedeEliminarAsesor(string idAsesor)
+        {
+            bool eliminar = true;
+
+            try
+            {
+                List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idAsesor);
+                if (gruposAsesor != null && gruposAsesor.Any(g => g.esVisible == true))
+                {
+                    eliminar = false;
+                }
+            }
+            catch
+            {
+                eliminar = false;
+            }
+
+            return eliminar;
         }
     }
 }

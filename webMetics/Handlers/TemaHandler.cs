@@ -53,7 +53,7 @@ namespace webMetics.Handlers
             return tema;
         }
 
-        // Método para obtener una lista de objetos SelectListItem que representan los temas.
+        // Método para obtener una lista de objetos SelectListItem de los temas.
         public List<SelectListItem> ObtenerListaSeleccionTemas()
         {
             List<TemaModel> temas = ObtenerTemas();

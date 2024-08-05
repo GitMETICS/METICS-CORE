@@ -99,7 +99,6 @@ CREATE TABLE grupo (
     id_tema_FK INT NOT NULL,
 	id_categoria_FK INT NOT NULL,
 	id_asesor_FK NVARCHAR(64),
-	nombreAsesor NVARCHAR(64),
 	nombre NVARCHAR(64) NOT NULL,
     horario NVARCHAR(128) NOT NULL,
     fecha_inicio_grupo DATE NOT NULL,
@@ -557,8 +556,7 @@ GO
 CREATE OR ALTER PROCEDURE InsertGrupo
     @idTema INT,
 	@idCategoria INT,
-	@idAsesor NVARCHAR(64),
-	@nombreAsesor NVARCHAR(64) = '',
+	@idAsesor NVARCHAR(64) = NULL,
 	@nombre NVARCHAR(64),
 	@modalidad NVARCHAR(16),
 	@cantidad_horas TINYINT,
@@ -582,7 +580,6 @@ BEGIN
         id_tema_FK,
 		id_categoria_FK,
 		id_asesor_FK,
-		nombreAsesor,
         nombre,
         horario,
 		fecha_inicio_grupo,
@@ -603,7 +600,6 @@ BEGIN
         @idTema,
 		@idCategoria,
 		@idAsesor,
-		@nombreAsesor,
 		@nombre,
 		@horario,
 		@fecha_inicio_grupo,
@@ -627,8 +623,7 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
     @idTema INT,
 	@idCategoria INT,
-	@idAsesor NVARCHAR(64),
-	@nombreAsesor NVARCHAR(64) = '',
+	@idAsesor NVARCHAR(64) = NULL,
 	@nombre NVARCHAR(64),
 	@modalidad NVARCHAR(16),
 	@cantidad_horas TINYINT,
@@ -658,7 +653,6 @@ BEGIN
         id_tema_FK = @idTema,
 		id_categoria_FK = @idCategoria,
 		id_asesor_FK = @idAsesor,
-        nombreAsesor = @nombreAsesor,
 		nombre = @nombre,
         horario = @horario,
         fecha_inicio_grupo = @fecha_inicio_grupo,
@@ -690,16 +684,56 @@ BEGIN
 		G.descripcion, 
 		G.es_visible, 
 		G.lugar,
-		G.nombreAsesor,
-		G.nombre,		
+		G.nombre,
 		G.horario, 
 		G.fecha_inicio_grupo, 
 		G.fecha_finalizacion_grupo, 
 		G.fecha_inicio_inscripcion, 
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
-		G.nombre_archivo
+		G.nombre_archivo,
+		T.nombre as nombre_tema,
+		C.nombre as nombre_categoria,
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
 	FROM grupo G
+		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
+		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
+		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK;
+END
+
+GO
+-- Creación de procedimiento para seleccionar todos los grupos de un asesor
+CREATE OR ALTER PROCEDURE SelectGruposAsesor
+	@idAsesor NVARCHAR(64) = NULL
+AS
+BEGIN
+    SELECT 
+		G.id_grupo_PK, 
+		G.id_tema_FK,
+		G.id_categoria_FK,
+		G.id_asesor_FK,
+		G.modalidad, 
+		G.cupo, 
+		G.descripcion, 
+		G.es_visible, 
+		G.lugar,
+		G.nombre,
+		G.horario, 
+		G.fecha_inicio_grupo, 
+		G.fecha_finalizacion_grupo, 
+		G.fecha_inicio_inscripcion, 
+		G.fecha_finalizacion_inscripcion, 
+		G.cantidad_horas, 
+		G.nombre_archivo, 
+		G.adjunto,
+		T.nombre as nombre_tema,
+		C.nombre as nombre_categoria,
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
+	FROM grupo G
+		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
+		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
+		JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
+	WHERE G.id_asesor_FK = @idAsesor;
 END
 
 GO
@@ -718,7 +752,6 @@ BEGIN
 		G.descripcion, 
 		G.es_visible, 
 		G.lugar,
-		G.nombreAsesor,
 		G.nombre,
 		G.horario, 
 		G.fecha_inicio_grupo, 
@@ -727,8 +760,14 @@ BEGIN
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
 		G.nombre_archivo, 
-		G.adjunto
+		G.adjunto,
+		T.nombre as nombre_tema,
+		C.nombre as nombre_categoria,
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
 	FROM grupo G
+		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
+		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
+		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
     WHERE G.id_grupo_PK = @idGrupo;
 END
 
@@ -927,8 +966,7 @@ FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\Fi
 INSERT INTO dbo.grupo(
 	id_tema_FK,
 	id_categoria_FK,
-	id_asesor_FK, 
-	nombreAsesor, 
+	id_asesor_FK,
 	modalidad,
 	cupo, 
 	cantidad_horas,
@@ -943,7 +981,7 @@ INSERT INTO dbo.grupo(
 	fecha_finalizacion_inscripcion,
 	nombre_archivo)
 	VALUES
-	(1, 1, N'AARON.MENAARAYA@ucr.ac.cr', N'Aarón Elí Mena Araya', N'Presencial', 15, 3,
+	(1, 1, N'AARON.MENAARAYA@ucr.ac.cr', N'Presencial', 15, 3,
 	N'Taller de videos interactivos', 1, N'Universidad de Costa Rica, Rodrigo Facio',
 	N'Capacitación-Plataforma', N'V-S de 4pm a 7pm',
 	'2026-06-01 00:00:00', '2027-12-02 00:00:00',
