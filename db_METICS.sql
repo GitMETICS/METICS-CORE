@@ -65,11 +65,11 @@ CREATE TABLE participante (
 );
 
 --Creación de la tabla tipo_actividad
-CREATE TABLE tipos_actividad (
+/* CREATE TABLE tipos_actividad (
 	id_tipos_actividad_PK INT IDENTITY(1,1) PRIMARY KEY,
 	nombre NVARCHAR(64) NOT NULL UNIQUE,
 	descripcion NVARCHAR(256),
-);
+); */
 
 --Creación de la tabla categoria
 CREATE TABLE categoria (
@@ -82,7 +82,7 @@ CREATE TABLE categoria (
 CREATE TABLE tema (
     id_tema_PK INT IDENTITY(1, 1) PRIMARY KEY,
     nombre NVARCHAR(64) NOT NULL,
-    id_categoria_FK INT NOT NULL,
+    /* id_categoria_FK INT NOT NULL,
     id_tipos_actividad_FK INT NOT NULL,
 
     FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
@@ -90,13 +90,14 @@ CREATE TABLE tema (
         ON UPDATE CASCADE,
     FOREIGN KEY (id_tipos_actividad_FK) REFERENCES tipos_actividad(id_tipos_actividad_PK)
         ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE */
 );
 
 --Creación de la tabla grupo
 CREATE TABLE grupo (
     id_grupo_PK INT IDENTITY(1, 1) PRIMARY KEY,
     id_tema_FK INT NOT NULL,
+	id_categoria_FK INT NOT NULL,
 	id_asesor_FK NVARCHAR(64),
 	nombreAsesor NVARCHAR(64),
 	nombre NVARCHAR(64) NOT NULL,
@@ -115,6 +116,9 @@ CREATE TABLE grupo (
 	adjunto VARBINARY(MAX),
 
     FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
+        ON DELETE NO ACTION,
+
+	FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
         ON DELETE NO ACTION,
 
 	FOREIGN KEY (id_asesor_FK) REFERENCES asesor(id_asesor_PK)
@@ -288,11 +292,11 @@ BEGIN
     DECLARE @userID NVARCHAR(64)
     DECLARE @salt UNIQUEIDENTIFIER
 
-    SET @salt = (SELECT TOP 1 salt FROM usuario WHERE id_usuario_PK=@id)
+    SET @salt = (SELECT TOP 1 salt FROM usuario WHERE id_usuario_PK = @id)
 
-    IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK=@id)
+    IF EXISTS (SELECT TOP 1 id_usuario_PK FROM usuario WHERE id_usuario_PK = @id)
     BEGIN
-        SET @userID = (SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK=@id AND hash_contrasena=HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
+        SET @userID = (SELECT id_usuario_PK FROM usuario WHERE id_usuario_PK = @id AND hash_contrasena = HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))))
 
         IF(@userID IS NULL)
             SET @auth = 0
@@ -552,6 +556,7 @@ GO
 --Creación de procedimiento para insertar un grupo
 CREATE OR ALTER PROCEDURE InsertGrupo
     @idTema INT,
+	@idCategoria INT,
 	@idAsesor NVARCHAR(64),
 	@nombreAsesor NVARCHAR(64) = '',
 	@nombre NVARCHAR(64),
@@ -575,6 +580,7 @@ BEGIN
     INSERT INTO grupo
     (
         id_tema_FK,
+		id_categoria_FK,
 		id_asesor_FK,
 		nombreAsesor,
         nombre,
@@ -595,6 +601,7 @@ BEGIN
     VALUES
     (
         @idTema,
+		@idCategoria,
 		@idAsesor,
 		@nombreAsesor,
 		@nombre,
@@ -619,6 +626,7 @@ GO
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
     @idTema INT,
+	@idCategoria INT,
 	@idAsesor NVARCHAR(64),
 	@nombreAsesor NVARCHAR(64) = '',
 	@nombre NVARCHAR(64),
@@ -639,15 +647,16 @@ AS
 BEGIN
     SET NOCOUNT ON;
 	IF (LEN(@adjunto) > 0)
-		begin
-			update grupo 
-			set nombre_archivo = @nombre_archivo, adjunto = @adjunto 
-			where id_grupo_PK = @idGrupo;
-		end
+		BEGIN
+			UPDATE grupo 
+			SET nombre_archivo = @nombre_archivo, adjunto = @adjunto 
+			WHERE id_grupo_PK = @idGrupo;
+		END
 
     UPDATE grupo
     SET
         id_tema_FK = @idTema,
+		id_categoria_FK = @idCategoria,
 		id_asesor_FK = @idAsesor,
         nombreAsesor = @nombreAsesor,
 		nombre = @nombre,
@@ -662,7 +671,6 @@ BEGIN
         descripcion = @descripcion,
         lugar = @lugar,
         es_visible = @es_visible
-		
     WHERE
         id_grupo_PK = @idGrupo;
 END
@@ -675,6 +683,7 @@ BEGIN
     SELECT 
 		G.id_grupo_PK, 
 		G.id_tema_FK,
+		G.id_categoria_FK,
 		G.id_asesor_FK,
 		G.modalidad, 
 		G.cupo, 
@@ -689,12 +698,8 @@ BEGIN
 		G.fecha_inicio_inscripcion, 
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
-		G.nombre_archivo, 
-		T.nombre AS tema_asociado,
-		TA.nombre AS tipo_actividad
+		G.nombre_archivo
 	FROM grupo G
-		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
-		JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK;
 END
 
 GO
@@ -706,6 +711,7 @@ BEGIN
     SELECT 
 		G.id_grupo_PK, 
 		G.id_tema_FK,
+		G.id_categoria_FK,
 		G.id_asesor_FK,
 		G.modalidad, 
 		G.cupo, 
@@ -721,12 +727,8 @@ BEGIN
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
 		G.nombre_archivo, 
-		G.adjunto,
-		T.nombre AS tema_asociado,
-		TA.nombre AS tipo_actividad
+		G.adjunto
 	FROM grupo G
-		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
-		JOIN tipos_actividad TA ON T.id_tipos_actividad_FK = TA.id_tipos_actividad_PK
     WHERE G.id_grupo_PK = @idGrupo;
 END
 
@@ -892,29 +894,29 @@ EXEC InsertParticipante
 
 
 --Crear tipos de actividades
-INSERT INTO tipos_actividad
+/* INSERT INTO tipos_actividad
 (nombre, descripcion)
 VALUES
 (N'Curso', N'Los cursos cuentan con una duración de cinco a seis horas semanales, en la que se realizarán tareas, exámenes y quices para evaluar los conceptos aprendidos por los estudiantes'),
 (N'Taller', N'Un taller es una metodología de trabajo que se caracteriza por la investigación, el aprendizaje por descubrimiento y el trabajo en equipo'),
 (N'Taller corto', N'Un taller de menos duración de dos a tres horas semanales donde se trabajará con un tema en específico. No hay exámenes, el objetivo es que aprendan el concepto tratado'),
-(N'Charla', N'Se realizarán charlas con profesionales invitados')
+(N'Charla', N'Se realizarán charlas con profesionales invitados') */
 
 --Crear categorias
-INSERT INTO categoria
-(nombre, descripcion)
+INSERT INTO categoria(nombre, descripcion)
 VALUES
-(N'Primeros pasos en la plataforma', N'Aprenderá de manera básica las funciones del sitio de Mediación Virtual'),
-(N'Evaluaciones y calificaciones', N'Aprenderá a realizar el proceso de evaluacion y calificacion de los trabajos dentro de la plataforma'),
-(N'Material audio y visual', N'Utilice las herramientas audiovisuales que cuenta el sistema, suba y comparta material audiovisual a los estudiantes')
+	(N'Nivel 1', N'Aborda las etapas de Integrador (B1) y Experto (B2)'),
+	(N'Nivel 2', N'Incluye elementos de las etapas de Líder(C1) y Pionero (C2)')
 
 --Crear temas
-INSERT INTO tema
-(nombre, id_categoria_FK, id_tipos_actividad_FK)
-VALUES(N'¿Cómo utilizar la plataforma?', 1, 1),
-(N'Evaluaciones en la plataforma', 2, 2),
-(N'Subir material audiovisual a la plataforma', 3, 3),
-(N'Tema Adicional', 1, 2)
+INSERT INTO tema(nombre)
+VALUES
+	(N'Compromiso profesional'),
+	(N'Contenidos digitales'),
+	(N'Enseñanza y aprendizaje'),
+	(N'Evaluación y retroalimentación'),
+	(N'Empoderamiento de estudiantes'),
+	(N'Competencias de estudiantes')
 
 --Declarar archivo que se va a adjuntar (RUTA DEL ARCHIVO, Ejm: C:\Users\UserName\Documents\Folder\FileName.pdf) 
 /*DECLARE @adjunto varbinary(max)
@@ -923,14 +925,25 @@ FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\Fi
 
 --Crear grupos
 INSERT INTO dbo.grupo(
-	id_tema_FK, id_asesor_FK, nombreAsesor, modalidad, cupo, cantidad_horas,
-	descripcion, es_visible, lugar,
-	nombre, horario,
-	fecha_inicio_grupo, fecha_finalizacion_grupo,
-	fecha_inicio_inscripcion, fecha_finalizacion_inscripcion,
+	id_tema_FK,
+	id_categoria_FK,
+	id_asesor_FK, 
+	nombreAsesor, 
+	modalidad,
+	cupo, 
+	cantidad_horas,
+	descripcion, 
+	es_visible, 
+	lugar,
+	nombre, 
+	horario,
+	fecha_inicio_grupo, 
+	fecha_finalizacion_grupo,
+	fecha_inicio_inscripcion, 
+	fecha_finalizacion_inscripcion,
 	nombre_archivo)
 	VALUES
-	(1, N'AARON.MENAARAYA@ucr.ac.cr', N'Aarón Elí Mena Araya', N'Presencial', 15, 3,
+	(1, 1, N'AARON.MENAARAYA@ucr.ac.cr', N'Aarón Elí Mena Araya', N'Presencial', 15, 3,
 	N'Taller de videos interactivos', 1, N'Universidad de Costa Rica, Rodrigo Facio',
 	N'Capacitación-Plataforma', N'V-S de 4pm a 7pm',
 	'2026-06-01 00:00:00', '2027-12-02 00:00:00',
