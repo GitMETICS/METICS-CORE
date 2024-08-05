@@ -40,7 +40,7 @@
 
             <div class="d-flex justify-content-end">
                 <div class="mx-1">
-                    @Html.ActionLink("   Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
             {
                 <h5 class="text-center">No hay categorías.</h5>
                 <div class="justify-content-center m-3">
-                    @Html.ActionLink("   Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
                 </div>
             }
             else
@@ -91,11 +91,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar tema</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categoría</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar este tema?
+                    ¿Está seguro de que desea eliminar esta categoría?
                     <br />
                     @using (Html.BeginForm("EliminarCategoria", "Categoria"))
                     {
