@@ -1,6 +1,6 @@
 ﻿@using webMetics.Controllers
 @{
-    ViewBag.Title = "Categorías";
+    ViewBag.Title = "Áreas de Competencia";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -40,17 +40,17 @@
 
             <div class="d-flex justify-content-end">
                 <div class="mx-1">
-                    @Html.ActionLink("   Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                    @Html.ActionLink("   Crear", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
                 </div>
             </div>
         </div>
 
         <div class="table-responsive">
-            @if (ViewBag.Categorias == null)
+            @if (ViewBag.Temas == null)
             {
-                <h5 class="text-center">No hay categorías.</h5>
+                <h5 class="text-center">No hay temas.</h5>
                 <div class="justify-content-center m-3">
-                    @Html.ActionLink("   Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                    @Html.ActionLink("   Crear", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
                 </div>
             }
             else
@@ -59,23 +59,21 @@
                     <thead>
                         <tr>
                             <th scope="col">Nombre</th>
-                            <th scope="col">Descripción</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @foreach (var categoria in ViewBag.Categorias)
+                        @foreach (var tema in ViewBag.Temas)
                         {
                             <tr>
-                                <td>@categoria.nombre</td>
-                                <td>@categoria.descripcion</td>
+                                <td>@tema.nombre</td>
                                 <td>
-                                    @Html.ActionLink(" ", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "text-secondary bi bi-pencil-square" })
+                                    @Html.ActionLink(" ", "EditarTema", "Tema", new { idTema = tema.idTema }, new { @class = "text-secondary bi bi-pencil-square" })
                                 </td>
                                 <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@categoria.idCategoria')">
+                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@tema.idTema')">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -97,10 +95,10 @@
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar este tema?
                     <br />
-                    @using (Html.BeginForm("EliminarCategoria", "Categoria"))
+                    @using (Html.BeginForm("EliminarTema", "Tema"))
                     {
                         <div class="modal-footer">
-                            <input type="hidden" id="idCategoria" name="idCategoria">
+                            <input type="hidden" id="idTema" name="idTema">
                             <input type="submit" class="btn btn-danger" value="Aceptar" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         </div>
@@ -116,7 +114,7 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminar(idCategoria) {
-        document.getElementById("idCategoria").value = idCategoria;
+    function actualizarModalEliminar(idTema) {
+        document.getElementById("idTema").value = idTema;
     }
 </script>

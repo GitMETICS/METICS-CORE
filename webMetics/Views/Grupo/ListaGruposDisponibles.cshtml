@@ -89,7 +89,8 @@
                                             <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
                                         }
                                     }
-                                    <div class="card-text mb-3">Área de competencia: @grupo.temaAsociado</div>
+                                    <div class="card-text mb-3">Área de competencia: @grupo.nombreTema</div>
+                                    <div class="card-text mb-3">Categoría: @grupo.nombreCategoria</div>
                                     <div class="mt-3">
                                         @if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
                                         {
@@ -230,7 +231,8 @@
                                             <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
                                         }
                                     }
-                                    <div class="card-text mb-3">Área de competencia: @grupo.temaAsociado</div>
+                                    <div class="card-text mb-3">Área de competencia: @grupo.nombreTema</div>
+                                    <div class="card-text mb-3">Categoría: @grupo.nombreCategoria</div>
                                     <div class="mt-3">
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                                         {

@@ -18,15 +18,18 @@ namespace webMetics.Handlers
 {
     public class GrupoHandler : BaseDeDatosHandler
     {
+        private TemaHandler accesoATema;
+        private CategoriaHandler accesoACategoria;
 
         public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
+            accesoATema = new TemaHandler(environment, configuration);
+            accesoACategoria = new CategoriaHandler(environment, configuration);
         }
 
         public string ObtenerIdTema(string nombreTema)
         {
-            string consulta = "SELECT id_tema_PK FROM tema WHERE " +
-                "nombre = @nombre";
+            string consulta = "SELECT id_tema_PK FROM tema WHERE nombre = @nombre";
 
             // crear el comando de consulta con la consulta sql y la conexión establecida
             SqlCommand comandoparaconsulta = new SqlCommand(consulta, ConexionMetics);
@@ -44,32 +47,24 @@ namespace webMetics.Handlers
         {
             bool exito = false;
 
-
             using (var command = new SqlCommand("InsertGrupo", ConexionMetics))
             {
-                
                 command.CommandType = CommandType.StoredProcedure;
-                string temaId = ObtenerIdTema(grupo.temaAsociado);
-                command.Parameters.AddWithValue("@idTema", temaId);
 
-                if (!(grupo.modalidad == "Autogestionado"))
-                {
-                    string idAsesor = ObtenerIdAsesor(grupo.nombreAsesorAsociado);
-                    command.Parameters.AddWithValue("@idAsesor", idAsesor);
-                }
-                else {
-                    command.Parameters.AddWithValue("@idAsesor", "");
-                }
+                string idAsesor = grupo.modalidad == "Autogestionado" ? "" : ObtenerIdAsesor(grupo.nombreAsesorAsociado);
 
-                command.Parameters.AddWithValue("@nombreAsesor", grupo.nombreAsesorAsociado);
+                command.Parameters.AddWithValue("@idTema", grupo.idTema);
+                command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
                 command.Parameters.AddWithValue("@horario", grupo.horario);
+                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
                 command.Parameters.AddWithValue("@fecha_inicio_grupo", grupo.fechaInicioGrupo);
                 command.Parameters.AddWithValue("@fecha_finalizacion_grupo", grupo.fechaFinalizacionGrupo);
                 command.Parameters.AddWithValue("@fecha_inicio_inscripcion", grupo.fechaInicioInscripcion);
                 command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
                 command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
-                command.Parameters.AddWithValue("@modalidad", grupo.modalidad);
+                command.Parameters.AddWithValue("@idAsesor", idAsesor);
+                command.Parameters.AddWithValue("@nombreAsesor", grupo.nombreAsesorAsociado);
                 command.Parameters.AddWithValue("@cupo", grupo.cupo);
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
@@ -121,9 +116,19 @@ namespace webMetics.Handlers
             // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
             foreach (DataRow row in result.Rows)
             {
+                int idTema = Convert.ToInt32(row["id_tema_FK"]);
+                string nombreTema = accesoATema.ObtenerTema(idTema).nombre;
+
+                int idCategoria = Convert.ToInt32(row["id_categoria_FK"]);
+                string nombreCategoria = accesoACategoria.ObtenerCategoria(idCategoria).nombre;
+
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
+                    idTema = idTema,
+                    nombreTema = nombreTema,
+                    idCategoria = idCategoria,
+                    nombreCategoria = nombreCategoria,
                     idAsesor = Convert.ToString(row["id_asesor_FK"]),
                     modalidad = Convert.ToString(row["modalidad"]),
                     cupo = Convert.ToInt32(row["cupo"]),
@@ -138,8 +143,6 @@ namespace webMetics.Handlers
                     fechaInicioInscripcion = Convert.ToDateTime(row["fecha_inicio_inscripcion"]),
                     fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
-                    temaAsociado = Convert.ToString(row["tema_asociado"]),
-                    tipoActividadAsociado = Convert.ToString(row["tipo_actividad"]),
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(row["nombre_archivo"])
                 };
@@ -174,10 +177,19 @@ namespace webMetics.Handlers
                     {
                         if (reader.Read())
                         {
+                            int idTema = reader.GetInt32(reader.GetOrdinal("id_tema_FK"));
+                            string nombreTema = accesoATema.ObtenerTema(idTema).nombre;
+
+                            int idCategoria = reader.GetInt32(reader.GetOrdinal("id_categoria_FK"));
+                            string nombreCategoria = accesoACategoria.ObtenerCategoria(idCategoria).nombre;
+
                             grupo = new GrupoModel
                             {
                                 idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_PK")),
-                                temaAsociado = reader.GetString(reader.GetOrdinal("tema_asociado")),
+                                idTema = idTema,
+                                nombreTema = nombreTema,
+                                idCategoria = idCategoria,
+                                nombreCategoria = nombreCategoria,
                                 idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_FK")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("id_asesor_FK")),
                                 nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
                                 descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "Sin descripción" : reader.GetString(reader.GetOrdinal("descripcion")),
@@ -192,7 +204,6 @@ namespace webMetics.Handlers
                                 fechaInicioInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_inscripcion")),
                                 fechaFinalizacionInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_inscripcion")),
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
-                                tipoActividadAsociado = reader.IsDBNull(reader.GetOrdinal("tipo_actividad")) ? "Sin tipo de actividad" : reader.GetString(reader.GetOrdinal("tipo_actividad")),
                                 nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("nombre_archivo"))
                             };
                         }
@@ -411,6 +422,7 @@ namespace webMetics.Handlers
 
             return tablaResultado.Rows[0][0].ToString();
         }
+
         // Método para editar un grupo en la base de datos
         public bool EditarGrupo(GrupoModel grupo)
         {
@@ -418,13 +430,12 @@ namespace webMetics.Handlers
 
             using (var command = new SqlCommand("UpdateGrupo", ConexionMetics))
             {
-                string temaId = ObtenerIdTema(grupo.temaAsociado);
-                command.Parameters.AddWithValue("@idTema", temaId);
+                string idAsesor = ObtenerIdAsesor(grupo.nombreAsesorAsociado);
 
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
-                
-                string idAsesor = ObtenerIdAsesor(grupo.nombreAsesorAsociado);
+                command.Parameters.AddWithValue("@idTema", grupo.idTema);
+                command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
                 command.Parameters.AddWithValue("@idAsesor", idAsesor);
                 command.Parameters.AddWithValue("@nombreAsesor", grupo.nombreAsesorAsociado);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
@@ -473,7 +484,7 @@ namespace webMetics.Handlers
         public SelectListItem ObtenerTemaSeleccionado(GrupoModel grupo)
         {
             // Consulta SQL para obtener el ID del tema del grupo específico mediante su ID
-            string consulta = "SELECT nombre FROM tema WHERE id_tema_PK = " + ObtenerIdTema(grupo.temaAsociado);
+            string consulta = "SELECT nombre FROM tema WHERE id_tema_PK = " + Convert.ToString(grupo.idTema);
 
             // Crea un nuevo comando SQL con la consulta y la conexión establecida
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
@@ -486,7 +497,7 @@ namespace webMetics.Handlers
             string tema = Convert.ToString(TemaRow[0]);
 
             // Crea y retorna un objeto SelectListItem con el texto y valor del tema seleccionado
-            SelectListItem temaSeleccionado = new SelectListItem { Text = tema, Value = grupo.temaAsociado};
+            SelectListItem temaSeleccionado = new SelectListItem { Text = tema, Value = Convert.ToString(grupo.idTema)};
             return temaSeleccionado;
         }
 

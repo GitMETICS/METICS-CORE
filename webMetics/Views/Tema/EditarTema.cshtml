@@ -1,7 +1,7 @@
 ﻿@model webMetics.Models.TemaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Crear Área de Competencia";
+    ViewBag.Title = "Editar Área de Competencia";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -18,7 +18,7 @@
             </div>
         }
 
-        @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("EditarTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <h1>@ViewBag.Title</h1>

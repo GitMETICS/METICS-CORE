@@ -8,6 +8,18 @@ namespace webMetics.Models
     {
         public int idGrupo { get; set; }
 
+        public int idTema { get; set; }
+
+        [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
+        [Display(Name = "Tema asociado")]
+        public string? nombreTema { get; set; }
+
+        public int idCategoria { get; set; }
+
+        [Required(ErrorMessage = "Debe asociar una categoría al módulo.")]
+        [Display(Name = "Categoría")]
+        public string? nombreCategoria { get; set; }
+
         [Required(ErrorMessage = "Es necesario que ingrese el nombre del módulo.")]
         [Display(Name = "Nombre del módulo")]
         public string nombre { get; set; }
@@ -40,10 +52,6 @@ namespace webMetics.Models
         // [Required(ErrorMessage = "Introduzca el horario del módulo.")]
         [Display(Name = "Horario")]
         public string? horario { get; set; }
-
-        [Required(ErrorMessage = "Debe asociar un tema al módulo.")]
-        [Display(Name = "Tema asociado")]
-        public string? temaAsociado { get; set; }
 
         [Required(ErrorMessage = "Es necesario que seleccione la fecha de inicio de la actividad.")]
         [Display(Name = "Fecha de inicio")]

@@ -222,6 +222,8 @@ namespace webMetics.Handlers
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(filaGrupo["id_grupo_PK"]),
+                    idTema = Convert.ToInt32(filaGrupo["id_tema_FK"]),
+                    idCategoria = Convert.ToInt32(filaGrupo["categoria"]),
                     modalidad = Convert.ToString(filaGrupo["modalidad"]),
                     cupo = Convert.ToInt32(filaGrupo["cupo"]),
                     descripcion = Convert.ToString(filaGrupo["descripcion"]),
@@ -234,9 +236,8 @@ namespace webMetics.Handlers
                     fechaInicioInscripcion = Convert.ToDateTime(filaGrupo["fecha_inicio_inscripcion"]),
                     fechaFinalizacionInscripcion = Convert.ToDateTime(filaGrupo["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(filaGrupo["cantidad_horas"]),
-                    temaAsociado = Convert.ToString(filaGrupo["id_tema_FK"]),
-                    nombreAsesorAsociado = Convert.ToString(filaGrupo[17]), /// TODO: CAMBIAAAAAAAAR de numero a nombre de columna
-                    tipoActividadAsociado = Convert.ToString(filaGrupo["tipo_actividad"]),
+                    nombreAsesorAsociado = Convert.ToString(filaGrupo[17]),
+                    // tipoActividadAsociado = Convert.ToString(filaGrupo["tipo_actividad"]),
                     cupoActual = accesoAGrupo.ObtenerCupoActual(Convert.ToInt32(filaGrupo["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(filaGrupo["nombre_archivo"])
                 };
