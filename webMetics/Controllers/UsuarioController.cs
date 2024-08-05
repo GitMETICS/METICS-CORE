@@ -300,7 +300,7 @@ namespace webMetics.Controllers
             {
                 if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
-                    accesoAUsuario.EditarUsuario(usuario.id, GetRole(), usuario.nuevaContrasena);
+                    accesoAUsuario.EditarUsuario(GetId(), GetRole(), usuario.nuevaContrasena);
 
                     TempData["successMessage"] = "Se cambió la contraseña.";
                 }
@@ -314,7 +314,7 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Contraseña actual incorrecta.";
             }
 
-            return RedirectToAction("CambiarContrasena", new { idParticipante = usuario.id });
+            return RedirectToAction("CambiarContrasena", new { id = GetId() });
         }
 
         /* Método para enviar confirmación de registro al usuario*/

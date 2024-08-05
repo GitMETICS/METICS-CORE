@@ -317,6 +317,8 @@ namespace webMetics.Controllers
                 string contrasena = GenerateRandomPassword();
 
                 accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+
+                // EnviarCorreoConLaContrasena(participante.idParticipante, contrasena); // TODO: Se envía la contraseña por correo para que el usuario pueda ingresar.
             }
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))

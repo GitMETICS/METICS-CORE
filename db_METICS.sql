@@ -230,6 +230,18 @@ BEGIN
 	WHERE id_usuario_PK IN (SELECT id_usuario_FK FROM deleted)
 END
 
+GO
+--Creación de trigger al eliminar asesores
+CREATE OR ALTER TRIGGER TR_EliminarAsesor
+ON asesor
+AFTER DELETE
+AS
+BEGIN
+	DELETE FROM usuario
+	WHERE id_usuario_PK IN (SELECT id_usuario_FK FROM deleted)
+END
+
+
 
 /*
 	Script para crear los procedimientos almacenados de la base de datos

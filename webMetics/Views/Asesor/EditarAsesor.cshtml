@@ -93,7 +93,7 @@
                             @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
                         </div>
-                        <div class="row mt-1">
+                        @* <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
@@ -104,7 +104,7 @@
                                 @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
                             </div>
-                        </div>
+                        </div> *@
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">

@@ -169,7 +169,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["Message"] = "Ocurrió un error al obtener los datos del asesor.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del asesor.";
                 return RedirectToAction("ListaAsesores");
             }
         }
