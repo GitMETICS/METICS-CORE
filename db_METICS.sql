@@ -22,7 +22,7 @@ CREATE TABLE usuario (
 
 --Creación de la tabla asesor
 CREATE TABLE asesor (
-    id_usuario_FK NVARCHAR(64) NOT NULL,
+    id_usuario_FK NVARCHAR(64),
     id_asesor_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
     nombre NVARCHAR(64) NOT NULL,
     apellido_1 NVARCHAR(64) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE asesor (
 
 --Creación de la tabla participante
 CREATE TABLE participante (
-    id_usuario_FK NVARCHAR(64) NOT NULL,
+    id_usuario_FK NVARCHAR(64),
     id_participante_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
     nombre NVARCHAR(64) NOT NULL,
     apellido_1 NVARCHAR(64) NOT NULL,
@@ -217,6 +217,17 @@ BEGIN
 	DELETE FROM calificaciones
 	WHERE id_grupo_FK IN (SELECT id_grupo_FK FROM deleted)
 	AND id_participante_FK IN (SELECT id_participante_FK FROM deleted)
+END
+
+GO
+--Creación de trigger al eliminar participantes
+CREATE OR ALTER TRIGGER TR_EliminarParticipante
+ON participante
+AFTER DELETE
+AS
+BEGIN
+	DELETE FROM usuario
+	WHERE id_usuario_PK IN (SELECT id_usuario_FK FROM deleted)
 END
 
 
