@@ -66,6 +66,9 @@ namespace webMetics.Controllers
 
             ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
 
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
             return View();
         }
 

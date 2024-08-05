@@ -59,6 +59,9 @@ namespace webMetics.Controllers
 
             ViewBag.Temas = accesoATema.ObtenerTemas();
 
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
             return View();
         }
 
@@ -86,7 +89,7 @@ namespace webMetics.Controllers
                 bool exito = accesoATema.CrearTema(tema);
                 if (exito)
                 {
-                    TempData["successMessage"] = "El tema fue creado con éxito.";
+                    TempData["successMessage"] = "El área de competencia fue creado con éxito.";
                     return RedirectToAction("ListaTemas");
                 }
 
@@ -97,7 +100,7 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
-                TempData["errorMessage"] = "No se pudo crear el tema.";
+                TempData["errorMessage"] = "No se pudo crear el área de competencia.";
                 return RedirectToAction("ListaTemas");
             }
         }
@@ -125,16 +128,16 @@ namespace webMetics.Controllers
                 bool exito = accesoATema.EliminarTema(idTema);
                 if (exito)
                 {
-                    TempData["successMessage"] = "Se eliminó el tema.";
+                    TempData["successMessage"] = "Se eliminó el área de competencia.";
                 }
                 else
                 {
-                    TempData["errorMessage"] = "No se pudo eliminar el tema.";
+                    TempData["errorMessage"] = "No se pudo eliminar el área de competencia.";
                 }
             }
             catch
             {
-                TempData["errorMessage"] = "No se pudo eliminar el tema.";
+                TempData["errorMessage"] = "No se pudo eliminar el área de competencia.";
             }
 
             return RedirectToAction("ListaTemas");

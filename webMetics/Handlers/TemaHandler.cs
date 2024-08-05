@@ -69,8 +69,7 @@ namespace webMetics.Handlers
 
         public bool CrearTema(TemaModel tema)
         {
-            string consulta = 
-                "INSERT INTO tema (nombre, id_categoria_FK) VALUES (@nombre)";
+            string consulta = "INSERT INTO tema (nombre) VALUES (@nombre)";
 
             ConexionMetics.Open();
 
