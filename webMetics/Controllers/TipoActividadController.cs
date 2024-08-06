@@ -25,7 +25,7 @@ namespace webMetics.Controllers
             grupoHandler = new GrupoHandler(environment, configuration);
         }
 
-        public int GetRole()
+        private int GetRole()
         {
             int role = 0;
 
@@ -37,7 +37,7 @@ namespace webMetics.Controllers
             return role;
         }
 
-        public string GetId()
+        private string GetId()
         {
             string id = "";
 

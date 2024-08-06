@@ -9,9 +9,7 @@ namespace webMetics.Controllers
     public class TemaController : Controller
     {
         private CategoriaHandler accesoACategoria;
-        private AsesorHandler accesoAAsesor;
         private TemaHandler accesoATema;
-        private GrupoHandler accesoAGrupo;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -22,12 +20,10 @@ namespace webMetics.Controllers
             _configuration = configuration;
 
             accesoACategoria = new CategoriaHandler(environment, configuration);
-            accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoATema = new TemaHandler(environment, configuration);
-            accesoAGrupo = new GrupoHandler(environment, configuration);
         }
 
-        public int GetRole()
+        private int GetRole()
         {
             int role = 0;
 
@@ -39,7 +35,7 @@ namespace webMetics.Controllers
             return role;
         }
 
-        public string GetId()
+        private string GetId()
         {
             string id = "";
 
