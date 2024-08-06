@@ -56,9 +56,6 @@
     <None Include="Views\Shared\_Modal.cshtml" />
     <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
     <None Include="Views\Tema\CrearTema.cshtml" />
-    <None Include="Views\TipoActividad\CrearTipoActividad.cshtml" />
-    <None Include="Views\TipoActividad\EditarTipoActividad.cshtml" />
-    <None Include="Views\TipoActividad\ListaTiposActividad.cshtml" />
     <None Include="Views\Web.config" />
     <None Include="Views\_ViewImports.cshtml" />
     <None Include="Views\_ViewStart.cshtml" />

@@ -2,22 +2,11 @@
 using webMetics.Handlers;
 using webMetics.Models;
 
-/* 
- * Controlador de la entidad Categoria
- * Los grupos pertenecen a una categoría
- * En esta clase se puede retornar todos las categorías, editar, agregar y eliminar una categoría 
- */
-
 namespace webMetics.Controllers
 {
     public class CategoriaController : Controller
     {
-        // Declaración de los handlers necesarios
         public CategoriaHandler accesoACategoria;
-        public AsesorHandler asesorHandler;
-        public CategoriaHandler categoriaHandler;
-        public TipoActividadHandler tipoActividadHandler;
-        public GrupoHandler grupoHandler;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -28,10 +17,6 @@ namespace webMetics.Controllers
             _configuration = configuration;
 
             accesoACategoria = new CategoriaHandler(environment, configuration);
-            asesorHandler = new AsesorHandler(environment, configuration);
-            categoriaHandler = new CategoriaHandler(environment, configuration);
-            tipoActividadHandler = new TipoActividadHandler(environment, configuration);
-            grupoHandler = new GrupoHandler(environment, configuration);
         }
 
         private int GetRole()
@@ -58,7 +43,6 @@ namespace webMetics.Controllers
             return id;
         }
 
-        /* Vista de la lista de categorias */
         public ActionResult ListaCategorias()
         {
             ViewBag.Role = GetRole();
@@ -72,7 +56,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Vista del formulario para crear un categoria */
         public ActionResult CrearCategoria()
         {
             ViewBag.Role = GetRole();
@@ -83,7 +66,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Formulario para crear un categoria con los datos del modelo ingresados */
         [HttpPost]
         public ActionResult CrearCategoria(CategoriaModel categoria)
         {
@@ -110,7 +92,6 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Vista del formulario para crear un categoria */
         public ActionResult EditarCategoria()
         {
             ViewBag.Role = GetRole();
@@ -121,7 +102,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Método para eliminar un categoria */
         public ActionResult EliminarCategoria(int idCategoria)
         {
             try
