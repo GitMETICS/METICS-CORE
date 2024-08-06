@@ -2,12 +2,6 @@
 using webMetics.Models;
 using webMetics.Handlers;
 using MimeKit;
-using NPOI.XSSF.UserModel;
-using NPOI.XWPF.UserModel;
-using System.IO;
-using iText.Kernel.Pdf;
-using iText.Layout.Element;
-using NPOI.HPSF;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -261,15 +255,6 @@ namespace webMetics.Controllers
             return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
         }
 
-        // Vista para buscar y editar los datos de un participante
-        public ActionResult ObtenerParticipante()
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            return View(); // Muestra la vista para buscar al participante
-        }
-
         public ActionResult FormularioParticipante()
         {
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
@@ -316,9 +301,8 @@ namespace webMetics.Controllers
             {
                 string contrasena = GenerateRandomPassword();
 
-                accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
-
-                // EnviarCorreoConLaContrasena(participante.idParticipante, contrasena); // TODO: Se envía la contraseña por correo para que el usuario pueda ingresar.
+                accesoAUsuario.CrearUsuario(participante.idParticipante, "temporal"); // TODO: Esta es una contraseña temporal. Cambiar.
+                // EnviarContrasenaPorCorreo(participante.idParticipante, contrasena); // TODO: Se envía la contraseña por correo para que luego el usuario pueda ingresar.
             }
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
@@ -326,28 +310,7 @@ namespace webMetics.Controllers
                 accesoAParticipante.CrearParticipante(participante);
             }
         }
-
-        // Método para obtener los datos de un participante según el ID proporcionado
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult ObtenerParticipante(string idParticipante)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            // Busca al participante en la lista de participantes por su ID
-            ParticipanteModel getParticipante = accesoAParticipante.ObtenerListaParticipantes().Find(participanteModel => participanteModel.idParticipante == idParticipante);
-            if (getParticipante == null)
-            {
-                // Si no se encuentra el participante, redirige de nuevo a la vista para buscar
-                return RedirectToAction("ObtenerParticipante");
-            }
-            else
-            {
-                // Si se encuentra el participante, redirige a la vista para editar sus datos
-                return RedirectToAction("EditarParticipante", new { idParticipante = idParticipante });
-            }
-        }
+        
 
         // Método de la vista del formulario para editar a un participante
         public ActionResult EditarParticipante(string idParticipante)
@@ -505,6 +468,58 @@ namespace webMetics.Controllers
                 }
             }
             return -1;
+        }
+
+        /* Método para enviar confirmación de registro al usuario*/
+        private void EnviarContrasenaPorCorreo(string correo, string contrasena)
+        {
+            try
+            {
+                // Se utiliza la librería MimeKit para construir el mensaje
+                // El mensaje incluye una versión en HTML y texto plano
+
+                // Contenido base del mensaje en HTML y texto plano
+                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+                const string BASE_MESSAGE_TEXT = "";
+                const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
+
+                MimeMessage message = new MimeMessage();
+
+                // Configurar el remitente y el destinatario
+                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
+                message.From.Add(from);
+                MailboxAddress to = new MailboxAddress("Receiver", correo);
+                message.To.Add(to);
+
+                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+                BodyBuilder bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
+                    "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
+                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
+                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+                bodyBuilder.HtmlBody += "</p>";
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // Enviar el correo electrónico utilizando un cliente SMTP
+                using var client = new MailKit.Net.Smtp.SmtpClient();
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private string GenerateRandomPassword()

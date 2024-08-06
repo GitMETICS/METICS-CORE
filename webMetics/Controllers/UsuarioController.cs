@@ -112,7 +112,7 @@ namespace webMetics.Controllers
             return View(usuario);
         }
 
-        // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos
+        // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos.
         private bool CrearUsuario(UsuarioModel usuario, string contrasena)
         {
             bool exito = false;
@@ -121,91 +121,39 @@ namespace webMetics.Controllers
             {
                 usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo.
 
-                // Si no existe el participante en la base de datos, debe crearse un usuario.
-                if (!accesoAParticipante.ExisteParticipante(usuario.id))
+                // Si no existe el usuario, no existe el participante, por lo que es un registro completamente nuevo.
+                if (!accesoAUsuario.ExisteUsuario(usuario.id))
                 {
-                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
-                    {
-                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+                    accesoAUsuario.CrearUsuario(usuario.id, contrasena);
 
-                        ParticipanteModel participante = new ParticipanteModel()
-                        {
-                            idParticipante = usuario.id,
-                            nombre = usuario.nombre,
-                            primerApellido = usuario.primerApellido,
-                            segundoApellido = usuario.segundoApellido,
-                            tipoIdentificacion = usuario.tipoIdentificacion,
-                            numeroIdentificacion = usuario.numeroIdentificacion,
-                            correo = usuario.correo,
-                            tipoParticipante = usuario.tipoParticipante,
-                            condicion = usuario.condicion,
-                            telefono = usuario.telefono,
-                            area = usuario.area,
-                            departamento = usuario.departamento,
-                            unidadAcademica = usuario.unidadAcademica,
-                            sede = usuario.sede,
-                            horasMatriculadas = 0,
-                            horasAprobadas = 0
-                        };
-
-                        accesoAParticipante.CrearParticipante(participante);
-                        exito = true;
-                    }
-                    else
+                    ParticipanteModel participante = new ParticipanteModel()
                     {
-                        TempData["errorMessage"] = "Ya existe un usuario con los mismos datos.";
-                        exito = false;
-                    }
-                } 
-                // Si sí existe el participante en la base de datos, significa que existe su usuario.
+                        idParticipante = usuario.id,
+                        nombre = usuario.nombre,
+                        primerApellido = usuario.primerApellido,
+                        segundoApellido = usuario.segundoApellido,
+                        tipoIdentificacion = usuario.tipoIdentificacion,
+                        numeroIdentificacion = usuario.numeroIdentificacion,
+                        correo = usuario.correo,
+                        tipoParticipante = usuario.tipoParticipante,
+                        condicion = usuario.condicion,
+                        telefono = usuario.telefono,
+                        area = usuario.area,
+                        departamento = usuario.departamento,
+                        unidadAcademica = usuario.unidadAcademica,
+                        sede = usuario.sede,
+                        horasMatriculadas = 0,
+                        horasAprobadas = 0
+                    };
+
+                    accesoAParticipante.CrearParticipante(participante);
+                    exito = true;
+                }
+                // Si existe el usuario y existe el participante, significa que al usuario ya se le envió la contraseña por correo y existe en el sistema.
                 else
                 {
-                    // No puede existir un participante que no tenga también un usuario.
-                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
-                    {
-                        TempData["errorMessage"] = "Ocurrió un error al procesar los datos.";
-                        exito = false;
-                    }
-                    else
-                    {
-                        // Modificamos la contraseña temporal que estaba en la base de datos del usuario con la nueva contraseña.
-                        accesoAUsuario.EditarUsuario(usuario.id, 0, contrasena); // TODO: Hacer bien esto con el rol por default.
-
-                        // Actualizamos el participante con los nuevos datos.
-                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
-
-                        if (string.IsNullOrEmpty(participante.numeroIdentificacion))
-                        {
-                            ParticipanteModel participanteActualizado = new ParticipanteModel()
-                            {
-                                idParticipante = participante.idParticipante,
-                                nombre = usuario.nombre,
-                                primerApellido = usuario.primerApellido,
-                                segundoApellido = usuario.segundoApellido,
-                                tipoIdentificacion = usuario.tipoIdentificacion,
-                                numeroIdentificacion = usuario.numeroIdentificacion,
-                                correo = participante.correo,
-                                tipoParticipante = usuario.tipoParticipante,
-                                condicion = usuario.condicion,
-                                telefono = usuario.telefono,
-                                area = usuario.area,
-                                departamento = usuario.departamento,
-                                unidadAcademica = usuario.unidadAcademica,
-                                sede = usuario.sede,
-                                horasMatriculadas = participante.horasMatriculadas,
-                                horasAprobadas = participante.horasAprobadas
-                            };
-
-                            accesoAParticipante.EditarParticipante(participanteActualizado);
-                            exito = true;
-                        }
-                        else
-                        {
-                            // Si ya están los otros datos en la base de datos, significa que ya el usuario se había registrado.
-                            TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional y número de identificación.";
-                            exito = false;
-                        }
-                    }
+                    TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional.";
+                    exito = false;
                 }
             }
             catch
@@ -366,7 +314,7 @@ namespace webMetics.Controllers
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.ToString();
+                Console.WriteLine(ex.ToString());
             }
         }
 

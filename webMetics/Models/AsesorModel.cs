@@ -35,11 +35,11 @@ namespace webMetics.Models
         [Display(Name = "Número de Teléfono")]
         public string? telefono { get; set; }
 
-        // [Required(ErrorMessage = "Es necesario ingresar una contraseña temporal.")]
+        [Required(ErrorMessage = "Es necesario ingresar una contraseña temporal.")]
         [Display(Name = "Contraseña Temporal")]
         public string? contrasena { get; set; }
 
-        // [Required(ErrorMessage = "Debe confirmar la contraseña temporal.")]
+        [Required(ErrorMessage = "Debe confirmar la contraseña temporal.")]
         [Display(Name = "Confirmar Contraseña")]
         public string? confirmarContrasena { get; set; }
     }

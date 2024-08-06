@@ -187,6 +187,17 @@ namespace webMetics.Controllers
                     asesor.idAsesor = asesor.correo; // Aquí se define que el correo es la identificación.
                     accesoAAsesor.EditarAsesor(asesor);
 
+                    if (asesor.contrasena == asesor.confirmarContrasena)
+                    {
+                        accesoAUsuario.EditarUsuario(asesor.idAsesor, 2, asesor.contrasena);
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
+                        return View("EditarAsesor", asesor);
+                    }
+                    
+
                     TempData["successMessage"] = "Los datos fueron guardados.";
                     return RedirectToAction("ListaAsesores");
                 }
