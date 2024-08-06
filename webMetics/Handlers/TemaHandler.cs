@@ -69,7 +69,7 @@ namespace webMetics.Handlers
 
         public bool CrearTema(TemaModel tema)
         {
-            string consulta = "INSERT INTO tema (nombre) VALUES (@nombre)";
+            string consulta = "INSERT INTO tema nombre VALUES @nombre;";
 
             ConexionMetics.Open();
 
@@ -85,9 +85,7 @@ namespace webMetics.Handlers
 
         public bool EditarTema(TemaModel tema)
         {
-            string consulta =
-                "UPDATE tema SET nombre = @nombre " +
-                "WHERE id_tema_PK, @idTema";
+            string consulta = "UPDATE tema SET nombre = @nombre WHERE id_tema_PK = @idTema;";
 
             ConexionMetics.Open();
 
@@ -104,7 +102,7 @@ namespace webMetics.Handlers
 
         public bool EliminarTema(int idTema)
         {
-            string consulta = "DELETE FROM tema WHERE id_tema_PK = @idTema";
+            string consulta = "DELETE FROM tema WHERE id_tema_PK = @idTema;";
 
             ConexionMetics.Open();
 

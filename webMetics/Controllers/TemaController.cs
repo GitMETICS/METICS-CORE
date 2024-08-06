@@ -89,10 +89,11 @@ namespace webMetics.Controllers
                 bool exito = accesoATema.CrearTema(tema);
                 if (exito)
                 {
-                    TempData["successMessage"] = "El área de competencia fue creado con éxito.";
+                    TempData["successMessage"] = "Se creó el área de competencia.";
                     return RedirectToAction("ListaTemas");
                 }
 
+                ViewBag.ErrorMessage = "No se pudo crear el área de competencia.";
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
 
@@ -106,15 +107,45 @@ namespace webMetics.Controllers
         }
 
         /* Vista del formulario para crear un tema */
-        public ActionResult EditarTema()
+        public ActionResult EditarTema(int idTema)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
+            TemaModel tema = accesoATema.ObtenerTema(idTema);
+
             ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
             ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
 
-            return View();
+            return View(tema);
+        }
+
+        [HttpPost]
+        public ActionResult EditarTema(TemaModel tema)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                bool exito = accesoATema.EditarTema(tema);
+                if (exito)
+                {
+                    TempData["successMessage"] = "Se editó el área de competencia.";
+                    return RedirectToAction("ListaTemas");
+                }
+
+                ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
+                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+
+                return View(tema);
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "No se pudo editar el área de competencia.";
+                return RedirectToAction("ListaTemas");
+            }
         }
 
         /* Método para eliminar un tema */

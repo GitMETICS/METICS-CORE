@@ -22,7 +22,7 @@ CREATE TABLE usuario (
 
 --Creación de la tabla asesor
 CREATE TABLE asesor (
-    id_usuario_FK NVARCHAR(64),
+    id_usuario_FK NVARCHAR(64) NOT NULL,
     id_asesor_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
     nombre NVARCHAR(64) NOT NULL,
     apellido_1 NVARCHAR(64) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE asesor (
 
 --Creación de la tabla participante
 CREATE TABLE participante (
-    id_usuario_FK NVARCHAR(64),
+    id_usuario_FK NVARCHAR(64) NOT NULL,
     id_participante_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
     nombre NVARCHAR(64) NOT NULL,
     apellido_1 NVARCHAR(64) NOT NULL,

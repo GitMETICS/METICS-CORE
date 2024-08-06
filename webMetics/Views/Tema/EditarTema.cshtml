@@ -20,7 +20,6 @@
 
         @using (Html.BeginForm("EditarTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
-            @Html.AntiForgeryToken()
             <h1>@ViewBag.Title</h1>
             <hr />
 
@@ -43,6 +42,8 @@
                 <div class="col">
                     <div class="container">
                         <div class="form-group mt-1">
+                            @Html.HiddenFor(temaModel => temaModel.idTema)
+
                             @Html.LabelFor(temaModel => temaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64" })
                             @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
