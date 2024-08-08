@@ -3,6 +3,36 @@
     ViewBag.Title = "Iniciar sesión";
 }
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 45%;
+            right: 10px;
+            transform: translateY(10%);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+    </style>
+</head>
+
 <body style="background-image: url('/images/fondo_login.svg')">
     <div class="d-flex justify-content-center align-items-center" style="height: 75vh;">
         <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
@@ -18,9 +48,12 @@
                             @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
                             @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
                         </div>
-                        <div class="text-center mb-1">
+                        <div class="text-center mb-2 input-wrapper">
                             @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })
-                            @Html.PasswordFor(loginModel => loginModel.contrasena, new { @class = "form-control" })
+                            @Html.PasswordFor(loginModel => loginModel.contrasena, new { @id ="password", @class = "form-control" })
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                <i id="toggleIcon" class="fas fa-eye"></i>
+                            </button>
                             @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
                         </div>
                         @if (ViewBag.ErrorMessage != null)
@@ -52,4 +85,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
 </body>
+</html>
