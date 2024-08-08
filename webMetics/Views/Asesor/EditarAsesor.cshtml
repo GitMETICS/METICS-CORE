@@ -3,106 +3,147 @@
 <!--
     Vista del formulario para editar los datos de un asesor
 -->
-
 @{
     ViewBag.Title = "Editar Asesor";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Id != "" && ViewBag.Role == 1)
-{
-    <div class="contenedor-tipos-actividades container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
         }
 
-        @using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
-
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+            .input-wrapper input {
+                padding-right: 50px;
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group">
-                            @Html.LabelFor(asesorModel => asesorModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(10%);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (urlReferrer != null)
+            {
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            }
+
+            @using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <h1>@ViewBag.Title</h1>
+                <hr />
+
+                if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.ErrorMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.SuccessMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="row mb-1">
+                    <div class="col">
+                        <div class="container">
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { Style = "font-size:22px" })
-                                @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
+                            <div class="row mt-1">
+                                <div class="col">
+                                    @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                    @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col">
+                                    @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { Style = "font-size:22px" })
+                                    @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(asesorModel => asesorModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
-                                <small class="form-text text-muted">
-                                    Formato de cédula: 1-1100-1100 (con guiones)
-                                </small>
+                            <div class="row mt-1">
+                                <div class="col">
+                                    @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                    @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col">
+                                    @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                    @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                    <small class="form-text text-muted">
+                                        Formato de cédula: 1-1100-1100 (con guiones)
+                                    </small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(asesorModel => asesorModel.descripcion, new { Style = "font-size:22px" })
-                            @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(asesorModel => asesorModel.descripcion, new { Style = "font-size:22px" })
+                                @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col input-wrapper">
+                                    @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                        <i id="toggleIcon" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col input-wrapper">
+                                    @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
+                                        <i id="toggleIcon2" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -115,11 +156,43 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            }
+        </div>
+    }
+    else
+    {
+        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+    }
+
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
         }
-    </div>
-}
-else
-{
-    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-}
+    </script>
+    <script>
+        function togglePasswordVisibility2() {
+            var passwordInput = document.getElementById('passwordCheck');
+            var toggleIcon = document.getElementById('toggleIcon2');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -6,75 +6,167 @@
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Id != "")
-{
-    <div class="contenedor-tipos-actividades container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
         }
 
-        @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+        .input-wrapper input {
+            padding-right: 50px;
+        }
 
-            if (ViewBag.ErrorMessage != null)
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(10%);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    @if (ViewBag.Id != "")
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (urlReferrer != null)
             {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
                 </div>
             }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.HiddenFor(model => model.id, new { })
-                                <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(model => model.contrasena, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
+            @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <h1>@ViewBag.Title</h1>
+                <hr />
+
+                if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.ErrorMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.SuccessMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="row mb-1">
+                    <div class="col">
+                        <div class="container">
+                            <div class="row mt-1">
+                                <div class="col input-wrapper">
+                                    @Html.HiddenFor(model => model.id, new { })
+                                    <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.contrasena, new { @id = "passwordOld", @class = "form-control" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility3()">
+                                        <i id="toggleIcon3" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.nuevaContrasena, new { id="password", @class = "form-control" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                        <i id="toggleIcon" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
+                                        <i id="toggleIcon2" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
                             </div>
-                            <div class="col">
-                                <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(model => model.nuevaContrasena, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row justify-content-center m-4">
+                            <div class="col-auto">
+                                <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
                             </div>
-                            <div class="col">
-                                <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                @Html.PasswordFor(model => model.confirmarContrasena, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
                             </div>
                         </div>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
                 </div>
-            </div>
+            }
+        </div>
+    }
+    else
+    {
+        await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+    }
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
         }
-    </div>
-}
-else
-{
-    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
-}
+    </script>
+    <script>
+        function togglePasswordVisibility2() {
+            var passwordInput = document.getElementById('passwordCheck');
+            var toggleIcon = document.getElementById('toggleIcon2');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+    <script>
+        function togglePasswordVisibility3() {
+            var passwordInput = document.getElementById('passwordOld');
+            var toggleIcon = document.getElementById('toggleIcon3');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>
