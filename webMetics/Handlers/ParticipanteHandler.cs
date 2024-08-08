@@ -165,8 +165,8 @@ namespace webMetics.Handlers
                                 departamento = reader["departamento"].ToString(),
                                 unidadAcademica = reader["unidad_academica"].ToString(),
                                 sede = reader["sede"].ToString(),
-                                horasAprobadas = reader.GetInt32(reader.GetOrdinal("horas_aprobadas")),
-                                horasMatriculadas = reader.GetInt32(reader.GetOrdinal("horas_matriculadas")),
+                                horasAprobadas = reader.GetInt32(reader.GetOrdinal("total_horas_aprobadas")),
+                                horasMatriculadas = reader.GetInt32(reader.GetOrdinal("total_horas_matriculadas")),
                                 gruposInscritos = new List<GrupoModel>()
                             };
                         }
@@ -225,7 +225,7 @@ namespace webMetics.Handlers
         public bool ActualizarHorasMatriculadasParticipante(string idParticipante, int horasParticipante)
         {
             bool exito;
-            string consulta = "UPDATE participante SET horas_matriculadas = @horasMatriculadas " +
+            string consulta = "UPDATE participante SET total_horas_matriculadas = @horasMatriculadas " +
                               "WHERE id_participante_PK = @idParticipante";
 
             ConexionMetics.Open();
@@ -245,7 +245,7 @@ namespace webMetics.Handlers
         public bool ActualizarHorasAprobadasParticipante(string idParticipante, int horasParticipante)
         {
             bool exito;
-            string consulta = "UPDATE participante SET horas_aprobadas = @horasAprobadas " +
+            string consulta = "UPDATE participante SET total_horas_aprobadas = @horasAprobadas " +
                               "WHERE id_participante_PK = @idParticipante";
 
             ConexionMetics.Open();
@@ -281,8 +281,8 @@ namespace webMetics.Handlers
                 departamento = Convert.ToString(filaParticipante["departamento"]),
                 unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
                 sede = Convert.ToString(filaParticipante["sede"]),
-                horasMatriculadas = Convert.ToInt32(filaParticipante["horas_matriculadas"]),
-                horasAprobadas = Convert.ToInt32(filaParticipante["horas_aprobadas"]),
+                horasMatriculadas = Convert.ToInt32(filaParticipante["total_horas_matriculadas"]),
+                horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
                 gruposInscritos = new List<GrupoModel>()
             };
 

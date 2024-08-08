@@ -55,15 +55,19 @@ namespace webMetics.Controllers
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
                 
-                if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante) && MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
+                if (grupo != null && participante != null 
+                    && NoEstaInscritoEnGrupo(idGrupo, idParticipante) 
+                    && MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
                 {
                     // Insertar la inscripción y enviar el comprobante por correo electrónico
                     InscripcionModel inscripcion = new InscripcionModel
                     {
                         idGrupo = idGrupo,
-                        idParticipante = idParticipante
+                        idParticipante = idParticipante,
+                        horasMatriculadas = grupo.cantidadHoras,
+                        horasAprobadas = 0,
+                        estado = "Inscrito"
                     };
 
                     bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
@@ -76,9 +80,8 @@ namespace webMetics.Controllers
                         try
                         {
                             string mensaje = ConstructorDelMensaje(grupo, participante);
-                            SendEmail(grupo, mensaje, participante.correo);
+                            EnviarCorreoInscripcion(grupo, mensaje, participante.correo);
 
-                            // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
@@ -139,7 +142,7 @@ namespace webMetics.Controllers
 
             try
             {
-                bool exito = accesoAInscripcion.EliminarInscripcion(idParticipante, idGrupo);
+                bool exito = accesoAInscripcion.EliminarInscripcion(idGrupo, idParticipante);
 
                 if (exito)
                 {
@@ -226,7 +229,7 @@ namespace webMetics.Controllers
         }
 
         /* Método para enviar confirmación de inscripción al usuario*/
-        private void SendEmail(GrupoModel grupo, string mensaje, string correoParticipante)
+        private void EnviarCorreoInscripcion(GrupoModel grupo, string mensaje, string correoParticipante)
         {
             // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje

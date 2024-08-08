@@ -12,10 +12,11 @@ namespace webMetics.Controllers
 {
     public class ParticipanteController : Controller
     {
-        private UsuarioHandler accesoAUsuario;
-        private ParticipanteHandler accesoAParticipante;
-        private GrupoHandler accesoAGrupo;
-        private AsesorHandler accesoAAsesor;
+        private protected UsuarioHandler accesoAUsuario;
+        private protected ParticipanteHandler accesoAParticipante;
+        private protected GrupoHandler accesoAGrupo;
+        private protected AsesorHandler accesoAAsesor;
+        private protected InscripcionHandler accesoAInscripcion;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -29,6 +30,7 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
         /* Método para ver la lista de participantes de un grupo */
@@ -194,18 +196,20 @@ namespace webMetics.Controllers
             ViewBag.Id = GetId();
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-            
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
+            List<GrupoModel> grupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+
             ViewBag.Participante = participante;
-            ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+            ViewBag.Inscripciones = inscripciones;
+            ViewBag.ListaGrupos = grupos;
 
             if (GetRole() == 2)
             {
                 string idAsesor = GetId();
                 List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idAsesor);
-                List<GrupoModel> gruposParticipante = ViewBag.ListaGrupos;
 
                 List<GrupoModel> gruposEnComun = gruposAsesor.Join(
-                    gruposParticipante,
+                    grupos,
                     grupoAsesor => grupoAsesor.idGrupo,
                     grupoParticipante => grupoParticipante.idGrupo,
                     (grupoAsesor, grupoParticipante) => new GrupoModel
@@ -233,17 +237,27 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubirHorasAprobadas(string idParticipante, int horasAprobadas)
+        public ActionResult SubirHorasAprobadas(int idGrupo, string idParticipante, int horasAprobadas)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-            int nuevasHorasAprobadas = participante.horasAprobadas + horasAprobadas;
+            int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
 
-            if (nuevasHorasAprobadas <= participante.horasMatriculadas && nuevasHorasAprobadas >= 0)
+            InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo, idParticipante);
+            int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
+
+
+            if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas && nuevasHorasAprobadas >= 0)
             {
-                accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevasHorasAprobadas);
+                inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
+                {
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
+                }
 
                 TempData["successMessage"] = "Las horas fueron aprobadas.";
             }

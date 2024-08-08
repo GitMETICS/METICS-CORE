@@ -56,41 +56,25 @@ CREATE TABLE participante (
     departamento NVARCHAR(64) NOT NULL,
     unidad_academica NVARCHAR(64) NOT NULL,
     sede NVARCHAR(64),
-    horas_matriculadas INT DEFAULT 0,
-    horas_aprobadas INT DEFAULT 0,
+    total_horas_matriculadas INT DEFAULT 0,
+    total_horas_aprobadas INT DEFAULT 0,
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
---Creación de la tabla tipo_actividad
-/* CREATE TABLE tipos_actividad (
-	id_tipos_actividad_PK INT IDENTITY(1,1) PRIMARY KEY,
-	nombre NVARCHAR(64) NOT NULL UNIQUE,
-	descripcion NVARCHAR(256),
-); */
-
 --Creación de la tabla categoria
 CREATE TABLE categoria (
 	id_categoria_PK INT IDENTITY(1,1) PRIMARY KEY,
-	nombre NVARCHAR(64) NOT NULL UNIQUE,
-	descripcion NVARCHAR(256),
+	nombre NVARCHAR(256) NOT NULL UNIQUE,
+	descripcion NVARCHAR(512),
 );
 
 --Creación de la tabla tema
 CREATE TABLE tema (
     id_tema_PK INT IDENTITY(1, 1) PRIMARY KEY,
-    nombre NVARCHAR(64) NOT NULL,
-    /* id_categoria_FK INT NOT NULL,
-    id_tipos_actividad_FK INT NOT NULL,
-
-    FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (id_tipos_actividad_FK) REFERENCES tipos_actividad(id_tipos_actividad_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE */
+    nombre NVARCHAR(256) NOT NULL
 );
 
 --Creación de la tabla grupo
@@ -99,19 +83,19 @@ CREATE TABLE grupo (
     id_tema_FK INT NOT NULL,
 	id_categoria_FK INT NOT NULL,
 	id_asesor_FK NVARCHAR(64),
-	nombre NVARCHAR(64) NOT NULL,
-    horario NVARCHAR(128) NOT NULL,
+	nombre NVARCHAR(256) NOT NULL,
+    horario NVARCHAR(256) NOT NULL,
     fecha_inicio_grupo DATE NOT NULL,
     fecha_finalizacion_grupo DATE NOT NULL,
     fecha_inicio_inscripcion DATETIME NOT NULL,
     fecha_finalizacion_inscripcion DATETIME NOT NULL,
     cantidad_horas TINYINT NOT NULL,
-    modalidad NVARCHAR(16) NOT NULL,
+    modalidad NVARCHAR(64) NOT NULL,
     cupo INT NOT NULL,
-    descripcion NVARCHAR(256),
+    descripcion NVARCHAR(512),
     lugar NVARCHAR(512),
     es_visible BIT,
-    nombre_archivo NVARCHAR(255),
+    nombre_archivo NVARCHAR(256),
 	adjunto VARBINARY(MAX),
 
     FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
@@ -131,10 +115,13 @@ CREATE TABLE inscripcion (
     observaciones NVARCHAR(512),
     id_grupo_FK INT NOT NULL,
     id_participante_FK NVARCHAR(64) NOT NULL,
+	horas_aprobadas INT DEFAULT 0,
+	horas_matriculadas INT DEFAULT 0,
 
     FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
+
     FOREIGN KEY (id_grupo_FK) REFERENCES grupo(id_grupo_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -477,8 +464,8 @@ BEGIN
         departamento,
 		unidad_academica,
 		sede,
-		horas_matriculadas,
-		horas_aprobadas
+		total_horas_matriculadas,
+		total_horas_aprobadas
     )
     VALUES
     (
@@ -541,8 +528,8 @@ BEGIN
         departamento = @departamento,
         unidad_academica = @unidadAcademica,
         sede = @sede,
-        horas_matriculadas = @horasMatriculadas,
-        horas_aprobadas = @horasAprobadas
+        total_horas_matriculadas = @horasMatriculadas,
+        total_horas_aprobadas = @horasAprobadas
     WHERE
         id_usuario_FK = @idUsuario
         AND id_participante_PK = @idParticipante;
@@ -580,19 +567,19 @@ CREATE OR ALTER PROCEDURE InsertGrupo
     @idTema INT,
 	@idCategoria INT,
 	@idAsesor NVARCHAR(64) = NULL,
-	@nombre NVARCHAR(64),
-	@modalidad NVARCHAR(16),
-	@cantidad_horas TINYINT,
+	@nombre NVARCHAR(256),
+	@modalidad NVARCHAR(64),
+	@cantidad_horas INT,
 	@cupo INT,
     @fecha_inicio_grupo DATE,
     @fecha_finalizacion_grupo DATE,
     @fecha_inicio_inscripcion DATETIME,
     @fecha_finalizacion_inscripcion DATETIME,
-	@descripcion NVARCHAR(256) = '',
-	@horario NVARCHAR(128) = '',
+	@descripcion NVARCHAR(512) = '',
+	@horario NVARCHAR(512) = '',
 	@lugar NVARCHAR(512) = '',
 	@es_visible BIT = 1,
-	@nombre_archivo NVARCHAR(255) = '',
+	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL
 AS
 BEGIN
@@ -647,19 +634,19 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
     @idTema INT,
 	@idCategoria INT,
 	@idAsesor NVARCHAR(64) = NULL,
-	@nombre NVARCHAR(64),
-	@modalidad NVARCHAR(16),
-	@cantidad_horas TINYINT,
+	@nombre NVARCHAR(256),
+	@modalidad NVARCHAR(64),
+	@cantidad_horas INT,
 	@cupo INT,
     @fecha_inicio_grupo DATE,
     @fecha_finalizacion_grupo DATE,
     @fecha_inicio_inscripcion DATETIME,
     @fecha_finalizacion_inscripcion DATETIME,
-	@descripcion NVARCHAR(256) = '',
-	@horario NVARCHAR(128) = '',
+	@descripcion NVARCHAR(512) = '',
+	@horario NVARCHAR(512) = '',
 	@lugar NVARCHAR(512) = '',
 	@es_visible BIT = 1,
-	@nombre_archivo NVARCHAR(255) = '',
+	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL
 AS
 BEGIN

@@ -43,89 +43,122 @@
             }
             else
             {
-                var nombreCompleto = ViewBag.Participante.nombre;
-                nombreCompleto += " " + ViewBag.Participante.primerApellido;
+                @using (Html.BeginForm("SubirHorasAprobadas", "Participante", new { idGrupo = 1, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
+                {
+                    var nombreCompleto = ViewBag.Participante.nombre;
+                    nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre Completo</th>
-                            <th scope="col">Correo Institucional</th>
-                            <th scope="col">Módulos Matriculados</th>
-                            <th class="text-center" scope="col" style="width: 10%">Horas<br>por Módulo</th>
-                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
-                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
-                        </tr>
-                    </thead>
+                    <table class="table table-striped" id="tblCustomers">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre Completo</th>
+                                <th scope="col">Correo Institucional</th>
+                                <th scope="col">Módulos Matriculados</th>
+                                <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
+                                <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
+                                <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Matriculadas</th>
+                                <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
+                            </tr>
+                        </thead>
 
-                    <tbody class="align-middle">
-                        @if (ViewBag.Participante.segundoApellido != "-")
-                        {
-                            nombreCompleto += " " + ViewBag.Participante.segundoApellido;
-                        }
-                        <tr>
-                            <td class="">@nombreCompleto</td>
-                            <td class="">@ViewBag.Participante.idParticipante</td>
-                            <td class="">
+                        <tbody class="align-middle">
+                            @if (ViewBag.Participante.segundoApellido != "-")
+                            {
+                                nombreCompleto += " " + ViewBag.Participante.segundoApellido;
+                            }
+                            <tr>
+                                <td class="">@nombreCompleto</td>
+                                <td class="">@ViewBag.Participante.idParticipante</td>
+                                
                                 @if (ViewBag.ListaGrupos != null)
                                 {
-                                    foreach (var grupo in ViewBag.ListaGrupos)
-                                    {
-                                        <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-
-                                        <br>
-                                    }
+                                    <td class="">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            <div class="form-checkbox me-1" style="cursor: pointer;">
+                                                <input type="checkbox" class="form-check-input" id="grupo-@grupo.idGrupo" name="idGrupo" value="@grupo.idGrupo">
+                                                <label class="form-check-label" for="grupo-@grupo.idGrupo">
+                                                    @grupo.nombre (Grupo @grupo.idGrupo)
+                                                </label>
+                                            </div>
+                                            <br />
+                                        }
+                                    </td>
                                 }
                                 else
                                 {
-                                    <span>Sin grupos inscritos</span>
+                                    <td>Sin grupos inscritos</td>
                                 }
-                            </td>
-                            <td class="text-center">
+                                
                                 @if (ViewBag.ListaGrupos != null)
                                 {
-                                    foreach (var grupo in ViewBag.ListaGrupos)
-                                    {
-                                        <span>@grupo.cantidadHoras</span>
-
-                                        <br>
-                                    }
+                                    <td class="text-center">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            @if (ViewBag.Inscripciones != null)
+                                            {
+                                                foreach (var inscripcion in ViewBag.Inscripciones)
+                                                {
+                                                    if (inscripcion.idGrupo == grupo.idGrupo)
+                                                    {
+                                                        @inscripcion.horasMatriculadas
+                                                        <br />
+                                                    
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </td>
                                 }
-                                else
+                                
+                                @if (ViewBag.ListaGrupos != null)
                                 {
-                                    <span>0</span>
+                                    <td class="text-center">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            @if (ViewBag.Inscripciones != null)
+                                            {
+                                                foreach (var inscripcion in ViewBag.Inscripciones)
+                                                {
+                                                    if (inscripcion.idGrupo == grupo.idGrupo)
+                                                    {
+                                                    
+                                                        @inscripcion.horasAprobadas
+                                                        <br />
+                                                    
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </td>
                                 }
-                            </td>
-                            <td class="text-center">
-                                <span>@ViewBag.Participante.horasMatriculadas</span>
-                            </td>
-                            <td class="text-center">
-                                <span>@ViewBag.Participante.horasAprobadas</span>
-                            </td>
-                            <td class=""></td>
-                        </tr>
-                    </tbody>
-                </table>
-            }
-
-            @using (Html.BeginForm("SubirHorasAprobadas", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
-            {
-                <div class="d-flex justify-content-end">
-                    <div class="bg-light rounded-1 d-flex flex-column">
-                        <div class="d-flex my-2 p-3 align-items-center flex-grow-1">
-                            @Html.AntiForgeryToken()
-                            <div class="navbar-text me-2"><strong>Aprobar</strong></div>
-                            <input type="number" min="0" class="form-control flex-grow-1" name="horasAprobadas" id="horasAprobadas" asp-for="horasAprobadas">
-                            <div class="navbar-text ms-2"><strong>horas.</strong></div>
-                            <small class="text-danger">
-                                @Html.ValidationMessageFor(model => model.horasAprobadas)
-                            </small>
-                        </div>
-                        <div class="mx-4 mb-4 align-self-center">
-                            <button type="submit" class="btn btn-outline-primary">Aceptar</button>
+                                
+                                <td class="text-center">
+                                    <span>@ViewBag.Participante.horasMatriculadas</span>
+                                </td>
+                                <td class="text-center">
+                                    <span>@ViewBag.Participante.horasAprobadas</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            
+                    <div class="d-flex justify-content-end">
+                        <div class="bg-light rounded-1 d-flex flex-column">
+                            <div class="d-flex my-2 p-3 align-items-center flex-grow-1">
+                                <div class="navbar-text me-2"><strong>Aprobar</strong></div>
+                                <input type="number" min="0" class="form-control flex-grow-1" name="horasAprobadas">
+                                <div class="navbar-text ms-2"><strong>horas.</strong></div>
+                                <small class="text-danger">
+                                    @Html.ValidationMessageFor(model => model.horasAprobadas)
+                                </small>
+                            </div>
+                            <div class="mx-4 mb-4 align-self-center">
+                                <button type="submit" class="btn btn-outline-primary">Aceptar</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
             <div class="d-flex justify-content-center my-4">
                 <a href="#" class="btn btn-primary btn-block" onclick="history.go(-1); return false;">Regresar</a>

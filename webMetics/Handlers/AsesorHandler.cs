@@ -90,34 +90,6 @@ namespace webMetics.Handlers
             return asesoresParseados;
         }
 
-        /* public string ObtenerNombreAsesor(string nombreAsesor)
-        {
-            string consulta = "SELECT id_asesor_PK FROM asesor WHERE " +
-                "nombre = @nombre AND apellido_1 = @apellido_1 AND apellido_2 = @apellido_2 ";
-
-            // crear el comando de consulta con la consulta sql y la conexión establecida
-            SqlCommand comandoparaconsulta = new SqlCommand(consulta, ConexionMetics);
-
-            string[] temp = nombreAsesor.Split(' ');
-
-            if (temp.Length == 4)
-            {
-                comandoparaconsulta.Parameters.AddWithValue("@nombre", temp[0] + " " + temp[1]);
-            }
-            else
-            {
-                comandoparaconsulta.Parameters.AddWithValue("@nombre", temp[0]);
-            }
-
-            comandoparaconsulta.Parameters.AddWithValue("@apellido_1", temp[^2]);
-            comandoparaconsulta.Parameters.AddWithValue("@apellido_2", temp[^1]);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoparaconsulta);
-
-
-            return tablaResultado.Rows[0][0].ToString();
-        } */
-
         // Verificar la existencia de un asesor en la base de datos
         public bool ExisteAsesor(string idAsesor)
         {

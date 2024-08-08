@@ -13,10 +13,12 @@ namespace webMetics.Controllers
 {
     public class GrupoController : Controller
     {
-        private GrupoHandler accesoAGrupo;
-        private TemaHandler accesoATema;
-        private CategoriaHandler accesoACategoria;
-        private AsesorHandler accesoAAsesor;
+        private protected ParticipanteHandler accesoAParticipante;
+        private protected GrupoHandler accesoAGrupo;
+        private protected TemaHandler accesoATema;
+        private protected CategoriaHandler accesoACategoria;
+        private protected AsesorHandler accesoAAsesor;
+        private protected InscripcionHandler accesoAInscripcion;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -25,12 +27,13 @@ namespace webMetics.Controllers
         {
             _environment = environment;
             _configuration = configuration;
-
+            
+            accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoACategoria = new CategoriaHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoATema = new TemaHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
-
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
         private int GetRole()
@@ -78,7 +81,7 @@ namespace webMetics.Controllers
 
             // Obtener la lista de grupos y participantes
             List<GrupoModel> listaGrupos = accesoAGrupo.ObtenerListaGrupos();
-            var participantesEnGrupos = accesoAGrupo.ParticipantesEnGrupos();
+            List<InscripcionModel> participantesEnGrupos = accesoAInscripcion.ObtenerInscripciones();
 
             // Inicializar las propiedades de ViewBag
             ViewBag.ListaGrupos = listaGrupos;

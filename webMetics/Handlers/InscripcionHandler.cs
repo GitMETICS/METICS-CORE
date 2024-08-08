@@ -9,111 +9,175 @@ public class InscripcionHandler : BaseDeDatosHandler
     {
     }
 
-    // Método para insertar una nueva inscripción en un grupo
-    public bool InsertarInscripcion(InscripcionModel inscripcion)
+    public List<InscripcionModel> ObtenerInscripciones()
     {
-        // Consulta SQL para insertar una nueva inscripción
-        string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, estado, observaciones) " +
-                            "VALUES (@id_grupo_FK, @id_participante_FK, @estado, @observaciones)";
+        List<InscripcionModel> inscripciones = new List<InscripcionModel>();
 
-        // Llama al método AgregarInscripcion para realizar la inserción y devuelve el resultado
-        return AgregarInscripcion(consulta, inscripcion);
+        string consulta = "SELECT * FROM inscripcion;";
+
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        foreach (DataRow fila in tablaResultado.Rows)
+        {
+            InscripcionModel inscripcion = new InscripcionModel
+            {
+                idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+                idParticipante = Convert.ToString(fila["id_participante_FK"]),
+                idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+                estado = Convert.ToString(fila["estado"]),
+                observaciones = Convert.ToString(fila["observaciones"]),
+                horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+            };
+
+            inscripciones.Add(inscripcion);
+        }
+
+        return inscripciones;
     }
 
-    // Método para agregar una inscripción en la base de datos
-    public bool AgregarInscripcion(string consulta, InscripcionModel inscripcion)
+    public List<InscripcionModel> ObtenerInscripcionesDelGrupo(int idGrupo)
     {
-        // Variables para verificar si la consulta fue exitosa
-        bool exito;
+        List<InscripcionModel> inscripciones = new List<InscripcionModel>();
+
+        string consulta = "SELECT * FROM inscripcion WHERE id_grupo_FK = @idGrupo;";
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@idGrupo", idGrupo);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        foreach (DataRow fila in tablaResultado.Rows)
+        {
+            InscripcionModel inscripcion = new InscripcionModel
+            {
+                idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+                idParticipante = Convert.ToString(fila["id_participante_FK"]),
+                idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+                estado = Convert.ToString(fila["estado"]),
+                observaciones = Convert.ToString(fila["observaciones"]),
+                horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+            };
+
+            inscripciones.Add(inscripcion);
+        }
+        return inscripciones;
+    }
+
+    public List<InscripcionModel> ObtenerInscripcionesParticipante(string idParticipante)
+    {
+        List<InscripcionModel> inscripciones = new List<InscripcionModel>();
+
+        string consulta = "SELECT * FROM inscripcion WHERE id_participante_FK = @idParticipante;";
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        foreach (DataRow fila in tablaResultado.Rows)
+        {
+            InscripcionModel inscripcion = new InscripcionModel
+            {
+                idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+                idParticipante = Convert.ToString(fila["id_participante_FK"]),
+                idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+                estado = Convert.ToString(fila["estado"]),
+                observaciones = Convert.ToString(fila["observaciones"]),
+                horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+            };
+
+            inscripciones.Add(inscripcion);
+        }
+        return inscripciones;
+    }
+
+    public InscripcionModel ObtenerInscripcionParticipante(int idGrupo, string idParticipante)
+    {
+        string consulta = "SELECT * FROM inscripcion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@idGrupo", idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        DataRow fila = tablaResultado.Rows[0];
+
+        InscripcionModel inscripcion = new InscripcionModel
+        {
+            idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+            idParticipante = Convert.ToString(fila["id_participante_FK"]),
+            idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+            estado = Convert.ToString(fila["estado"]),
+            observaciones = Convert.ToString(fila["observaciones"]),
+            horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+            horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+        };
+
+        return inscripcion;
+    }
+
+    public bool InsertarInscripcion(InscripcionModel inscripcion)
+    {
+        string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, estado, observaciones, horas_aprobadas, horas_matriculadas)" +
+                          "VALUES (@idGrupo, @idParticipante, @estado, @observaciones, @horasAprobadas, @horasMatriculadas);";
+
         ConexionMetics.Open();
 
-        // Crea un nuevo comando SQL con la consulta y la conexión establecida
         SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-        comandoConsulta.Parameters.AddWithValue("@id_grupo_FK", inscripcion.idGrupo);
-        comandoConsulta.Parameters.AddWithValue("@id_participante_FK", inscripcion.idParticipante);
+        comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
+        comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
+        comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
         comandoConsulta.Parameters.AddWithValue("@estado", "Cursando");
         comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
-        // Ejecuta la consulta y verifica si se insertó al menos un registro
-        exito = comandoConsulta.ExecuteNonQuery() >= 1;
+        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 
-        // Cierra la conexión a la base de datos
         ConexionMetics.Close();
 
         return exito;
     }
 
-    // Método para obtener una lista de modelos de InscripcionModel con información de las inscripciones en un grupo específico
-    public List<InscripcionModel> ObtenerInscripcionesDelGrupo(int idGrupo)
+    public bool EditarInscripcion(InscripcionModel inscripcion)
     {
-        // Consulta SQL para obtener las inscripciones en un grupo específico
-        string consulta = "SELECT P.nombre+' '+P.apellido_1 AS " + @"""NombreCompleto""," +
-                            " I.* " +
-                            " FROM inscripcion I " +
-                            " JOIN participante P " +
-                            " ON P.id_participante_PK = I.id_participante_FK " +
-                            " WHERE I.id_grupo_FK = " + idGrupo;
+        string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, id_participante_FK = @idParticipante, " +
+                          "estado = @estado, observaciones = @observaciones, " +
+                          "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas " +
+                          "WHERE id_inscripcion_PK = @idInscripcion";
 
-        // Crea un nuevo comando SQL con la consulta y la conexión establecida
-        SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
+        ConexionMetics.Open();
 
-        // Crea una tabla con los resultados de la consulta
-        DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@idInscripcion", inscripcion.idInscripcion);
+        comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
+        comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
+        comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
+        comandoConsulta.Parameters.AddWithValue("@estado", "Cursando");
+        comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
-        // Crea una lista para almacenar la información de las inscripciones en el grupo
-        List<InscripcionModel> infoInscripcion = new List<InscripcionModel>();
+        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 
-        // Recorre cada fila de la tabla de resultados y agrega la información de cada inscripción al grupo a la lista
-        foreach (DataRow filaInscripcion in tablaResultado.Rows)
-        {
-            infoInscripcion.Add(ObtenerInfoInscripcion(filaInscripcion));
-        }
+        ConexionMetics.Close();
 
-        // Si no hay información de inscripciones en el grupo, retorna null, de lo contrario, retorna la lista de información
-        if (infoInscripcion.Count == 0)
-        {
-            return null;
-        }
-        return infoInscripcion;
+        return exito;
     }
 
-    // Método para obtener un modelo de InscripcionModel con la información de una inscripción en un grupo
-    public InscripcionModel ObtenerInfoInscripcion(DataRow filaInscripcion)
+    public bool EliminarInscripcion(string idGrupo, string idParticipante)
     {
-        // Crea un nuevo modelo de InscripcionModel y asigna los valores de la fila correspondiente
-        InscripcionModel info = new InscripcionModel
-        {
-            idInscripcion = Convert.ToInt32(filaInscripcion["id_inscripcion_PK"]),
-            idParticipante = Convert.ToString(filaInscripcion["id_participante_FK"]),
-            idGrupo = Convert.ToInt32(filaInscripcion["id_grupo_FK"]),
-            participanteAsociado = Convert.ToString(filaInscripcion["NombreCompleto"]),
-            estado = Convert.ToString(filaInscripcion["estado"]),
-            observaciones = Convert.ToString(filaInscripcion["observaciones"]),
-        };
-        return info;
+        string consulta = "DELETE FROM inscripcion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
+
+        ConexionMetics.Open();
+
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+        comandoConsulta.Parameters.AddWithValue("@idGrupo", idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+        ConexionMetics.Close();
+
+        return exito;
     }
-
-    // Se encarga de eliminar una inscripción de un grupo específico en la base de datos.
-    public bool EliminarInscripcion(string idGenerado, string idGrupo)
-    {
-        bool comprobacionConsultaExitosa;
-
-        string consulta = " DELETE FROM inscripcion  " + // Consulta SQL para eliminar la inscripción del grupo.
-                            " WHERE id_participante_FK = @idGenerado AND id_grupo_FK = @idGrupo"; // Condiciones para la eliminación basadas en los parámetros idGenerado e idGrupo.
-
-        ConexionMetics.Open(); // Abre la conexión con la base de datos.
-
-        SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics); 
-
-        comandoParaConsulta.Parameters.AddWithValue("@idGenerado", idGenerado); 
-        comandoParaConsulta.Parameters.AddWithValue("@idGrupo", idGrupo); 
-
-        comprobacionConsultaExitosa = comandoParaConsulta.ExecuteNonQuery() >= 1;
-
-        ConexionMetics.Close(); // Cierra la conexión con la base de datos.
-
-        return comprobacionConsultaExitosa;
-    }
-
 }
 
