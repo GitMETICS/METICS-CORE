@@ -5,7 +5,6 @@ using MimeKit;
 using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
-using NPOI.Util;
 using NPOI.XWPF.UserModel;
 
 /* 
@@ -326,79 +325,7 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
-        /*//Método original para exportar la lista de los participantes de un grupo a un archivo PDF
-        [HttpPost]
-        public FileResult Export(int idGrupo)
-        {
-            // Exportar la lista de participantes de un grupo a un archivo PDF
-
-            // Obtener la lista de participantes del grupo y la información del grupo
-            List<ParticipanteModel> lista = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-
-            // Construir una string HTML con los detalles de los participantes
-            StringBuilder sb = new StringBuilder();
-            //Inicio de la tabla
-            sb.Append("<table border='1' cellpadding='5' cellspacing='0' style='border: 1px solid #ccc;font-family: Arial; font-size: 10pt;'>");
-            // Agregar los encabezados y detalles de los participantes...
-            sb.Append("<h2>Lista de participantes</h2>");
-            sb.Append("<h4> Grupo: " + grupo.nombre + " </h4>");
-            sb.Append("<h4> Asesor: " + grupo.nombreAsesor + " </h4>");
-            sb.Append("<tr>");
-            sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Nombre completo</th>");
-            sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Condición</th>");
-            sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Unidad académica</th>");
-            sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Correo</th>");
-            sb.Append("<th style='background-color: #B8DBFD;border: 1px solid #ccc'>Teléfono</th>");
-            sb.Append("</tr>");
-            //Contenido de la tabla
-            foreach (var participante in lista)
-            {
-                sb.Append("<tr>");
-                //Append data.
-                sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
-                sb.Append("</td>");
-
-                sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.condicion);
-                sb.Append("</td>");
-
-
-                sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.unidadAcademica);
-                sb.Append("</td>");
-
-
-                sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.correo);
-                sb.Append("</td>");
-
-                sb.Append("<td style='border: 1px solid #ccc'>");
-                sb.Append(participante.telefono);
-                sb.Append("</td>");
-
-                sb.Append("</tr>");
-            }
-
-            //Final de la tabla
-            sb.Append("</table>");
-
-            // Crear el archivo PDF utilizando la librería iTextSharp
-            using (MemoryStream stream = new MemoryStream())
-            {
-                StringReader sr = new StringReader(sb.ToString());
-                Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 100f, 0f);
-                PdfWriter writer = PdfWriter.GetInstance(pdfDoc, stream);
-                pdfDoc.Open();
-                XMLWorkerHelper.GetInstance().ParseXHtml(writer, pdfDoc, sr);
-                //pdfDoc.Close();
-                return File(stream.ToArray(), "application/pdf", "Lista de Participantes.pdf");
-            }
-        }*/
-
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
-        [HttpPost]
         public ActionResult ExportarParticipantesPDF(int idGrupo)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
@@ -409,7 +336,6 @@ namespace webMetics.Controllers
             PdfDocument pdf = new PdfDocument(writer);
             iText.Layout.Document document = new iText.Layout.Document(pdf);
 
-            // Add content to the PDF
             Paragraph header1 = new Paragraph("Nombre del módulo: " + grupo.nombre)
                 .SetFontSize(10);
             document.Add(header1);
@@ -432,11 +358,11 @@ namespace webMetics.Controllers
 
             foreach (var participante in participantes)
             {
-                table.AddCell(participante.idParticipante);
+                table.AddCell(participante.numeroIdentificacion);
                 table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                 table.AddCell(participante.condicion);
                 table.AddCell(participante.unidadAcademica);
-                table.AddCell(participante.correo);
+                table.AddCell(participante.idParticipante);
                 table.AddCell(participante.telefono);
             }
 
@@ -449,7 +375,6 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
-        [HttpPost]
         public ActionResult ExportarParticipantesWord(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -491,11 +416,11 @@ namespace webMetics.Controllers
             for (int i = 0; i < participantes.Count; i++)
             {
                 var row = table.Rows[i + 3];
-                row.GetCell(0).SetText(participantes[i].idParticipante.ToString());
+                row.GetCell(0).SetText(participantes[i].numeroIdentificacion.ToString());
                 row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
                 row.GetCell(2).SetText(participantes[i].condicion.ToString());
                 row.GetCell(3).SetText(participantes[i].unidadAcademica);
-                row.GetCell(4).SetText(participantes[i].correo.ToString());
+                row.GetCell(4).SetText(participantes[i].idParticipante.ToString());
                 row.GetCell(5).SetText(participantes[i].telefono.ToString());
             }
 
@@ -505,7 +430,6 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
-        [HttpPost]
         public ActionResult ExportarParticipantesExcel(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -554,7 +478,7 @@ namespace webMetics.Controllers
             {
                 NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
                 NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
-                cell1.SetCellValue(participante.idParticipante);
+                cell1.SetCellValue(participante.numeroIdentificacion);
 
                 NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
                 cell2.SetCellValue(participante.nombre + ' ' + participante.primerApellido + ' ' + participante.segundoApellido);
@@ -566,7 +490,7 @@ namespace webMetics.Controllers
                 cell4.SetCellValue(participante.unidadAcademica);
 
                 NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
-                cell5.SetCellValue(participante.correo);
+                cell5.SetCellValue(participante.idParticipante);
 
                 NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
                 cell6.SetCellValue(participante.telefono);

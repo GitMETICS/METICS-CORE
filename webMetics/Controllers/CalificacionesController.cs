@@ -143,7 +143,6 @@ namespace webMetics.Controllers
         }
 
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
-        [HttpPost]
         public ActionResult ExportarCalificacionesPDF(int idGrupo)
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
@@ -199,35 +198,30 @@ namespace webMetics.Controllers
             XWPFDocument wordDoc = new XWPFDocument();
 
             // Create a table
-            XWPFTable table = wordDoc.CreateTable(calificaciones.Count+1, 5);
-            table.SetColumnWidth(0, 2000);
-            table.SetColumnWidth(1, 2000);
+            XWPFTable table = wordDoc.CreateTable(calificaciones.Count + 4, 3);
+            table.SetColumnWidth(0, 3750);
+            table.SetColumnWidth(1, 3750);
             table.SetColumnWidth(2, 1500);
-            table.SetColumnWidth(3, 1500);
-            table.SetColumnWidth(4, 1500);
 
             var headerRow0 = table.Rows[0];
             headerRow0.GetCell(0).SetText("Nombre del Asesor");
             headerRow0.GetCell(1).SetText("Nombre del Módulo");
+
             var row0 = table.Rows[1];
             row0.GetCell(0).SetText(grupo.nombreAsesor);
             row0.GetCell(1).SetText(grupo.nombre);
 
-            var headerRow = table.Rows[2];
+            var headerRow = table.Rows[3];
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre");
             headerRow.GetCell(2).SetText("Calificación");
-            headerRow.GetCell(3).SetText("Nombre del módulo:");
-            headerRow.GetCell(4).SetText("Nombre del asesor asociado:");
 
             for (int i = 0; i < calificaciones.Count; i++)
             {
-                var row = table.Rows[i + 3];
+                var row = table.Rows[i + 4];
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.primerApellido + " " + calificaciones[i].participante.segundoApellido);
                 row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
-                row.GetCell(3).SetText(grupo.nombre);
-                row.GetCell(4).SetText(grupo.nombreAsesor);
             }
 
             var stream = new MemoryStream();
@@ -236,7 +230,6 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
-        [HttpPost]
         public ActionResult ExportarCalificacionesExcel(int idGrupo)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
