@@ -75,13 +75,12 @@
                                     <td class="">
                                         @foreach (var grupo in ViewBag.ListaGrupos)
                                         {
-                                            <div class="form-checkbox me-1" style="cursor: pointer;">
-                                                <input type="checkbox" class="form-check-input" id="grupo-@grupo.idGrupo" name="idGrupo" value="@grupo.idGrupo">
+                                            <div class="form-check me-1">
+                                                <input type="radio" class="form-check-input" id="grupo-@grupo.idGrupo" name="idGrupo" value="@grupo.idGrupo">
                                                 <label class="form-check-label" for="grupo-@grupo.idGrupo">
                                                     @grupo.nombre (Grupo @grupo.idGrupo)
                                                 </label>
                                             </div>
-                                            <br />
                                         }
                                     </td>
                                 }
