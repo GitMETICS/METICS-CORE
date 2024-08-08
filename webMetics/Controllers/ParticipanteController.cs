@@ -107,10 +107,12 @@ namespace webMetics.Controllers
             ViewBag.Id = GetId();
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(id);
+            List<GrupoModel> grupos = accesoAGrupo.ObtenerListaGruposParticipante(id);
 
             ViewBag.Participante = participante;
-
-            ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposParticipante(id);
+            ViewBag.Inscripciones = inscripciones;
+            ViewBag.ListaGrupos = grupos;
 
             if (TempData["errorMessage"] != null)
             {

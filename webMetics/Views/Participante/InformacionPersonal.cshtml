@@ -87,49 +87,78 @@
                     <table class="table table-striped" id="tblCustomers">
                         <thead>
                             <tr>
-                                <th scope="col">Módulos inscritos</th>
-                                <th class="text-center" scope="col">Horas por módulo</th>
-                                <th class="text-center" scope="col">Total de horas inscritas</th>
-                                <th class="text-center" scope="col">Horas aprobadas</th>
+                                <th scope="col">Módulos Matriculados</th>
+                                <th class="text-center" scope="col" style="width: 15%">Horas<br>Matriculadas</th>
+                                <th class="text-center" scope="col" style="width: 15%">Horas<br>Aprobadas</th>
+                                <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Matriculadas</th>
+                                <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Aprobadas</th>
                             </tr>
                         </thead>
 
                         <tbody class="align-middle">
                             <tr>
-                                <td class=" ">
-                                    @if (ViewBag.ListaGrupos != null)
-                                    {
-                                        foreach (var grupo in ViewBag.ListaGrupos)
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    <td class="">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
                                         {
                                             <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-
-                                            <br>
+                                            <br />
                                         }
-                                    }
-                                    else
-                                    {
-                                        <span>Sin grupos inscritos</span>
-                                    }
-                                </td>
-                                <td class="  text-center">
-                                    @if (ViewBag.ListaGrupos != null)
-                                    {
-                                        foreach (var grupo in ViewBag.ListaGrupos)
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>Sin grupos inscritos</td>
+                                }
+
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    <td class="text-center">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
                                         {
-                                            <span>@grupo.cantidadHoras</span>
+                                            @if (ViewBag.Inscripciones != null)
+                                            {
+                                                foreach (var inscripcion in ViewBag.Inscripciones)
+                                                {
+                                                    if (inscripcion.idGrupo == grupo.idGrupo)
+                                                    {
+                                                        @inscripcion.horasMatriculadas
+                                                        <br />
 
-                                            <br>
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        <span>0</span>
-                                    }
-                                </td>
-                                <td class="  text-center">
+                                    </td>
+                                }
+
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    <td class="text-center">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            @if (ViewBag.Inscripciones != null)
+                                            {
+                                                foreach (var inscripcion in ViewBag.Inscripciones)
+                                                {
+                                                    if (inscripcion.idGrupo == grupo.idGrupo)
+                                                    {
+
+                                                        @inscripcion.horasAprobadas
+                                                        <br />
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                }
+
+                                <td class="text-center">
                                     <span>@ViewBag.Participante.horasMatriculadas</span>
                                 </td>
-                                <td class="  text-center">
+                                <td class="text-center">
                                     <span>@ViewBag.Participante.horasAprobadas</span>
                                 </td>
                             </tr>
