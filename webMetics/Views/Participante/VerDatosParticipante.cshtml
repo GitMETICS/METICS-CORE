@@ -100,16 +100,19 @@
                                                 {
                                                     if (inscripcion.idGrupo == grupo.idGrupo)
                                                     {
-                                                        @inscripcion.horasMatriculadas
+                                                        @((inscripcion.horasMatriculadas ?? 0))
                                                         <br />
-                                                    
                                                     }
                                                 }
                                             }
                                         }
                                     </td>
                                 }
-                                
+                                else
+                                {
+                                    <td class="text-center">0</td>
+                                }
+
                                 @if (ViewBag.ListaGrupos != null)
                                 {
                                     <td class="text-center">
@@ -121,22 +124,24 @@
                                                 {
                                                     if (inscripcion.idGrupo == grupo.idGrupo)
                                                     {
-                                                    
-                                                        @inscripcion.horasAprobadas
+                                                        @((inscripcion.horasAprobadas ?? 0))
                                                         <br />
-                                                    
                                                     }
                                                 }
                                             }
                                         }
                                     </td>
                                 }
-                                
+                                else
+                                {
+                                    <td class="text-center">0</td>
+                                }
+
                                 <td class="text-center">
-                                    <span>@ViewBag.Participante.horasMatriculadas</span>
+                                    <span>@((ViewBag.Participante.horasMatriculadas ?? 0))</span>
                                 </td>
                                 <td class="text-center">
-                                    <span>@ViewBag.Participante.horasAprobadas</span>
+                                    <span>@((ViewBag.Participante.horasAprobadas ?? 0))</span>
                                 </td>
                             </tr>
                         </tbody>
