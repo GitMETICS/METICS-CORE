@@ -8,6 +8,8 @@ using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.XWPF.UserModel;
+using NPOI.SS.Formula.Functions;
+using System.Text.RegularExpressions;
 
 /* 
  * Controlador de la entidad Participante
@@ -47,7 +49,7 @@ namespace webMetics.Controllers
             {
                 ViewBag.IdGrupo = idGrupo;
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
-                
+
                 ViewBag.Title = "Lista de participantes";
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ViewBag.NombreGrupo = grupo.nombre;
@@ -259,7 +261,7 @@ namespace webMetics.Controllers
             headerRow.GetCell(3).SetText("Unidad académica");
             headerRow.GetCell(4).SetText("Correo institucional");
             headerRow.GetCell(5).SetText("Teléfono");
-            
+
 
             for (int i = 1; i < participantes.Count; i++)
             {
@@ -472,7 +474,7 @@ namespace webMetics.Controllers
                 accesoAParticipante.CrearParticipante(participante);
             }
         }
-        
+
 
         // Método de la vista del formulario para editar a un participante
         public ActionResult EditarParticipante(string idParticipante)
@@ -592,131 +594,364 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        public static List<SelectListItem> GetSedes()
+        public static List<SelectListItem> GetAreas()
         {
-            var sedes = new List<SelectListItem>();
+            var areas = new List<SelectListItem>();
+            areas.Add(new SelectListItem() { Text = "Área de Artes y Letras" });
+            areas.Add(new SelectListItem() { Text = "Área de Ciencias Agroalimentarias" });
+            areas.Add(new SelectListItem() { Text = "Área de Ciencias Básicas" });
+            areas.Add(new SelectListItem() { Text = "Área de Ciencias Sociales" });
+            areas.Add(new SelectListItem() { Text = "Área de Ingeniería" });
+            areas.Add(new SelectListItem() { Text = "Área de Salud" });
+            areas.Add(new SelectListItem() { Text = "Sistema de Estudios de Posgrado" });
 
-            var group1 = new SelectListGroup() { Name = "Sede Central" };
-            var group2 = new SelectListGroup() { Name = "Sede del Sur"};
-            var group3 = new SelectListGroup() { Name = "Sede del Caribe" };
-            var group4 = new SelectListGroup() { Name = "Sede de Guanacaste" };
-            var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
-            var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
-            var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
-
-            sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Turrialba", Group = group5 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Paraíso", Group = group5 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
-            sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
-
-            return sedes;
+            return areas;
         }
 
-        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
-        {
-            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
-            {
-                if (worksheet.Cells[1, col].Text == columnName)
-                {
-                    return col;
-                }
-            }
-            return -1;
+
+
+        [HttpGet]
+        public JsonResult GetDepartamentoJSON(string areaName) { 
+            return Json(GetDepartamento(areaName));
         }
 
-        /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarContrasenaPorCorreo(string correo, string contrasena)
+        [HttpGet]
+        public static List<SelectListItem> GetDepartamento(string value)
         {
-            try
+            var departamentos = new List<SelectListItem>();
+
+            switch (value)
             {
-                // Se utiliza la librería MimeKit para construir el mensaje
-                // El mensaje incluye una versión en HTML y texto plano
+                case "Área de Artes y Letras":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Artes" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Letras" });
+                    break;
 
-                // Contenido base del mensaje en HTML y texto plano
-                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-                const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
+                case "Área de Ciencias Agroalimentarias":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Ciencias Agroalimentarias" });
+                    break;
 
-                MimeMessage message = new MimeMessage();
-
-                // Configurar el remitente y el destinatario
-                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
-                message.From.Add(from);
-                MailboxAddress to = new MailboxAddress("Receiver", correo);
-                message.To.Add(to);
-
-                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-                BodyBuilder bodyBuilder = new BodyBuilder();
-                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
-                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
-                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-                bodyBuilder.HtmlBody += "</p>";
-
-                message.Body = bodyBuilder.ToMessageBody();
-
-                // Enviar el correo electrónico utilizando un cliente SMTP
-                using var client = new MailKit.Net.Smtp.SmtpClient();
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
+                case "Área de Ciencias Básicas":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Ciencias" });
+                    break;
+                case "Área de Ciencias Sociales":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Ciencias Económicas" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Ciencias Sociales" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Derecho" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Educación" });
+                    break;
+                case "Área de Ingeniería":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Ingeniería" });
+                    break;
+                case "Área de Salud":
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Farmacia" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Medicina" });
+                    break;
+                case "Sistema de Estudios de Posgrado":
+                    departamentos.Add(new SelectListItem() { Text = "Especialidad de Posgrado" });
+                    departamentos.Add(new SelectListItem() { Text = "Programa de Doctorado" });
+                    departamentos.Add(new SelectListItem() { Text = "Programa de Estudios de Posgrado" });
+                    break;
             }
-            catch (Exception ex)
+            return departamentos;
+        }
+        [HttpGet]
+        public static List<SelectListItem> GetUnidades(string value)
+        {
+            var unidades = new List<SelectListItem>();
+
+            switch (value)
             {
-                Console.WriteLine(ex.ToString());
+                case "Facultad de Artes":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Artes Dramáticas" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Artes Musicales" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Artes Plásticas" });
+                    break;
+
+                case "Facultad de Letras":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Filología, Lingüistica y Literatura" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Filosofía" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Lenguas Modernas" });
+                    break;
+
+                case "Facultad de Ciencias Agroalimentarias":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Agronomía" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Economía Agrícola y Agronegocios" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Tecnología de Alimentos" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Zootecnia" });
+                    break;
+                case "Facultad de Ciencias":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Biología" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Física" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Geología" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Matemática" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Química" });
+                    break;
+                case "Facultad de Ciencias Económicas":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Administración de Negocios" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Administración Pública" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Economía" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Estadística" });
+                    break;
+                case "Facultad de Ciencias Sociales":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ciencias de la Comunicación Colectiva" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Psicología" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ciencias Políticas" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Historia y Geografía" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Trabajo Social" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Historia" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Geografía" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Antropología" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Sociología" });
+                    break;
+                case "Facultad de Derecho":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Derecho" });
+                    break;
+
+                case "Facultad de Educación":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Administración Educativa" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Formación Docente" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Orientación y Educación Especial" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Bibliotecología" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Educación Física y Deportes" });
+                    break;
+                case "Facultad de Ingeniería":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Arquitectura" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ciencias de la Computación e Informática" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería de Biosistemas" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Civil" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Eléctrica" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Social" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Industrial" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Mecánica" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Química" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Ingeniería Topográfica" });
+                    break;
+                case "Facultad de Farmacia":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Farmacia" });
+                    break;
+                case "Facultad de Medicina":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Enfermería" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Medicina" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Nutrición" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Salud Pública" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Tecnologías en Salud" });
+                    break;
+                case "Especialidad de Posgrado":
+                    unidades.Add(new SelectListItem() { Text = "Especialidades de Posgrado en Microbiología" });
+                    unidades.Add(new SelectListItem() { Text = "Especialidades de Posgrado en Odontología General Avanzada" });
+                    break;
+                case "Programa de Doctorado":
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Ciencias" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Ciencias Sociales sobre América Central" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Educación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Estudios de la Sociedad y la Cultura" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Filología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Ingeniería" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Doctorado en Sistemas de Producción Agrícola Tropical Sostenible" });
+                    break;
+                case "Programa de Estudios de Posgrado":
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Administración Pública" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Administración Universitaria" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Administración y Dirección de Empresas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Antropología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Arquitectura" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Artes" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Astrofísica" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Bibliotecología y Estudios de la Información" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Biología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencia de Alimentos" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias Agrícolas y Recursos Naturales" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias Biomédicas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias Cognoscitivas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias de la Atmósfera" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias de la Educación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias de la Enfermería" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias del Movimiento Humano y Recreación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias Médicas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ciencias Políticas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Computación e Informática" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Comunicación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Derecho" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Desarrollo Integrado en Regiones de Bajo Riego" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Desarrollo Sostenible" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Economía" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Educación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Enseñanza del Castellano y Literatura" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Enseñanza del Inglés como Lengua Extranjera" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Español como Segunda Lengua" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Especialidades Médicas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Estadística" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Estudios de la Mujer" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Estudios Interdisciplinarios" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Estudios Interdisciplinarios sobre Discapacidad" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Evaluación de Programas y Proyectos" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Evaluación Educativa" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Farmacia" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Filosofía" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Física" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Geografía" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Geología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gerencia Agroempresarial" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gerontología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gestión Ambiental y Ecoturismo" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gestión Hotelera" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gestión Integrada Áreas Costeras Tropicales" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Gobierno y Políticas Públicas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Historia" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería Civil" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería Eléctrica" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería en Biosistemas" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería Industrial" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería Mecánica" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Ingeniería Química" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Lingüistica" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Literatura" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Matemática" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Medicina Legal y Patología Forense" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Microbiología, Parasitología, Química Clínica e Inmunología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Nutrición Humana" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Odontología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Orientación" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Planificación Curricular" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Psicología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Química" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Salud Pública" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Sociología" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Tecnologías de Información y Comunicación para la Gestión Organizacional" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Telemática" });
+                    unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Trabajo Social" });
+                    break;
             }
+            return unidades;
         }
 
-        private string GenerateRandomPassword()
+    [HttpGet]
+    public static List<SelectListItem> GetSedes()
+    {
+        var sedes = new List<SelectListItem>();
+
+        var group1 = new SelectListGroup() { Name = "Sede Central" };
+        var group2 = new SelectListGroup() { Name = "Sede del Sur" };
+        var group3 = new SelectListGroup() { Name = "Sede del Caribe" };
+        var group4 = new SelectListGroup() { Name = "Sede de Guanacaste" };
+        var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
+        var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
+        var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
+
+        sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
+        sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Turrialba", Group = group5 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Paraíso", Group = group5 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
+        sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
+        sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+
+        return sedes;
+    }
+
+    private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+    {
+        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
         {
-            int length = 10;
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-            var random = new Random();
-            string password = new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-
-            return password;
-        }
-
-        private int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            if (worksheet.Cells[1, col].Text == columnName)
             {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+                return col;
             }
-
-            return role;
         }
+        return -1;
+    }
 
-        private string GetId()
+    /* Método para enviar confirmación de registro al usuario*/
+    private void EnviarContrasenaPorCorreo(string correo, string contrasena)
+    {
+        try
         {
-            string id = "";
+            // Se utiliza la librería MimeKit para construir el mensaje
+            // El mensaje incluye una versión en HTML y texto plano
 
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
+            // Contenido base del mensaje en HTML y texto plano
+            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+            const string BASE_MESSAGE_TEXT = "";
+            const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
 
-            return id;
+            MimeMessage message = new MimeMessage();
+
+            // Configurar el remitente y el destinatario
+            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
+            message.From.Add(from);
+            MailboxAddress to = new MailboxAddress("Receiver", correo);
+            message.To.Add(to);
+
+            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
+                "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
+                "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
+            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+            bodyBuilder.HtmlBody += "</p>";
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            // Enviar el correo electrónico utilizando un cliente SMTP
+            using var client = new MailKit.Net.Smtp.SmtpClient();
+            // Configurar el cliente SMTP para el servidor de correo de la UCR
+            client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+            client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
+
+            // Enviar el mensaje
+            client.Send(message);
+
+            // Desconectar el cliente SMTP
+            client.Disconnect(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
         }
     }
+
+    private string GenerateRandomPassword()
+    {
+        int length = 10;
+        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+        var random = new Random();
+        string password = new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+
+        return password;
+    }
+
+    private int GetRole()
+    {
+        int role = 0;
+
+        if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+        {
+            role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+        }
+
+        return role;
+    }
+
+    private string GetId()
+    {
+        string id = "";
+
+        if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+        {
+            id = Convert.ToString(Request.Cookies["idUsuario"]);
+        }
+
+        return id;
+    }
+}
 }
