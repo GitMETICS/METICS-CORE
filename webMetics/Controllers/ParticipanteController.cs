@@ -8,12 +8,8 @@ using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.XWPF.UserModel;
-using NPOI.SS.Formula.Functions;
-using System.Text.RegularExpressions;
 
-/* 
- * Controlador de la entidad Participante
- */
+
 namespace webMetics.Controllers
 {
     public class ParticipanteController : Controller
@@ -39,7 +35,6 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
-        /* Método para ver la lista de participantes de un grupo */
         public ActionResult ListaParticipantes(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -67,7 +62,6 @@ namespace webMetics.Controllers
             }
             catch
             {
-                // Si ocurre un error, redirigir a la lista de grupos disponibles
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
@@ -465,8 +459,8 @@ namespace webMetics.Controllers
             {
                 string contrasena = GenerateRandomPassword();
 
-                accesoAUsuario.CrearUsuario(participante.idParticipante, "temporal"); // TODO: Esta es una contraseña temporal. Cambiar.
-                // EnviarContrasenaPorCorreo(participante.idParticipante, contrasena); // TODO: Se envía la contraseña por correo para que luego el usuario pueda ingresar.
+                accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                EnviarContrasenaPorCorreo(participante.idParticipante, contrasena);
             }
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
