@@ -41,7 +41,6 @@
                 <div>
                     @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
-                        @Html.AntiForgeryToken()
                         <form>
                             <div class="mb-3 d-flex align-items-center">
                                 <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
