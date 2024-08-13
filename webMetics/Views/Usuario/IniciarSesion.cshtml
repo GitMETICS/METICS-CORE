@@ -34,47 +34,52 @@
 </head>
 
 <body style="background-image: url('/images/fondo_login.svg')">
-    <div class="d-flex justify-content-center align-items-center" style="height: 75vh;">
-        <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+        <div class="container d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
+            
+
             <div class="card shadow" style="width: 450px;">
                 <div class="card-header text-center pt-4 pb-3">
-                    <h2>@ViewBag.Title</h2>
+                    <h4 class="text-center"><strong>Sistema de Inscripciones<br />METICS</strong></h4>
                 </div>
                 <div class="card-body p-4">
-                    @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        <div class="text-center mb-1">
-                            @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
-                            @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
-                            @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="text-center mb-2 input-wrapper">
-                            @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })
-                            @Html.PasswordFor(loginModel => loginModel.contrasena, new { @id ="password", @class = "form-control" })
-                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                                <i id="toggleIcon" class="fas fa-eye"></i>
-                            </button>
-                            @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
-                        </div>
-                        @if (ViewBag.ErrorMessage != null)
+                    <div class="text-center text-uppercase text-secondary"><strong>Iniciar sesión</strong></div>
+                    <div class="mt-4">
+                        @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
                         {
-                            <div class="text-danger text-center">
-                                @ViewBag.ErrorMessage
+                            <div class="text-center mb-1">
+                                @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
+                                @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
+                                @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
                             </div>
-                        }
-                        else
-                        {
-                            @if (ViewBag.SuccessMessage != null)
+                            <div class="text-center mb-2 input-wrapper">
+                                @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })
+                                @Html.PasswordFor(loginModel => loginModel.contrasena, new { @id = "password", @class = "form-control" })
+                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                    <i id="toggleIcon" class="fas fa-eye"></i>
+                                </button>
+                                @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
+                            </div>
+                            @if (ViewBag.ErrorMessage != null)
                             {
-                                <div class="text-success text-center">
-                                    @ViewBag.SuccessMessage
+                                <div class="text-danger text-center">
+                                    @ViewBag.ErrorMessage
                                 </div>
                             }
+                            else
+                            {
+                                @if (ViewBag.SuccessMessage != null)
+                                {
+                                    <div class="text-success text-center">
+                                        @ViewBag.SuccessMessage
+                                    </div>
+                                }
+                            }
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary btn-block">Acceder</button>
+                            </div>
                         }
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary btn-block">Acceder</button>
-                        </div>
-                    }
+                    </div>
                 </div>
                 <div class="card-footer text-center pt-2 pb-3">
                     <small>
