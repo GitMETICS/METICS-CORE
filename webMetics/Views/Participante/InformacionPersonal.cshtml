@@ -174,5 +174,7 @@
 }
 else
 {
-    await Html.RenderPartialAsync("~/Views/Usuario/IniciarSesion.cshtml");
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
 }

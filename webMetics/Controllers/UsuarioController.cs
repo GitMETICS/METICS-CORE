@@ -182,17 +182,17 @@ namespace webMetics.Controllers
 
                     Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddHours(2)
+                        Expires = DateTime.Now.AddMinutes(20)
                     });
 
                     Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
                     {
-                        Expires = DateTime.Now.AddHours(2)
+                        Expires = DateTime.Now.AddMinutes(20)
                     });
 
                     Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddHours(2)
+                        Expires = DateTime.Now.AddMinutes(20)
                     });
                 }
             }

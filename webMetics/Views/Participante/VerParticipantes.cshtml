@@ -136,32 +136,39 @@
             }
         </div>
     </div>
-}
 
-<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Está seguro de que desea eliminar este participante?
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar este participante?
 
-                @using (Html.BeginForm("EliminarParticipante", "Participante"))
-                {
-                    @Html.AntiForgeryToken()
+                    @using (Html.BeginForm("EliminarParticipante", "Participante"))
+                    {
+                        @Html.AntiForgeryToken()
 
-                    <div class="modal-footer">
-                        <input type="hidden" id="idParticipante" name="idParticipante">
-                        <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                }
+                        <div class="modal-footer">
+                            <input type="hidden" id="idParticipante" name="idParticipante">
+                            <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}
+
 
 <script type="text/javascript">
     function actualizarModalEliminar(idParticipante) {
