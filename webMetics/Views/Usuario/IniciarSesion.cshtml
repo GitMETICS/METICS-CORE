@@ -36,14 +36,12 @@
 <body style="background-image: url('/images/fondo_login.svg')">
     <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
         <div class="container d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
-            
-
             <div class="card shadow" style="width: 450px;">
                 <div class="card-header text-center pt-4 pb-3">
-                    <h4 class="text-center text-secondary"><strong>Sistema de Inscripciones<br />METICS</strong></h4>
+                    <h3 class="text-center text-secondary"><strong>Sistema de Inscripciones</strong><br />METICS</h3>
                 </div>
                 <div class="card-body p-4">
-                    <div class="text-center text-uppercase text-dark"><strong>Iniciar sesión</strong></div>
+                    <h4 class="text-center">Iniciar sesión</h4>
                     <div class="mt-4">
                         @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
                         {

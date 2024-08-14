@@ -15,11 +15,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="logos_wrapper" style="background-color: #44beef ">
-        <a href="https://www.ucr.ac.cr/"> <img src="~/images/logoUCR.png" style="width: 10%; margin-right: 1%;" alt="Logo Universidad de Costa Rica" /> </a>
-        <a href="https://metics.ucr.ac.cr/"> <img src="~/images/logoMETICS.png" style="width: 15%; margin-right: 1%;" alt="Logo METICS" /> </a>
-        <a href="https://vd.ucr.ac.cr/"> <img src="~/images/logosVC.png" style="width: 8%; margin-right: 1%;" alt="Logo Vicerrectoria de Docencia" /> </a>
+    <div class="" style="background-color: #16c1f3; margin: 0; padding: 0;">
+        <div class="logo d-flex justify-content-start align-items-center">
+            <div class="logo-link mx-4">
+                <a href="https://www.ucr.ac.cr/" style="display: block;">
+                    <img src="@Url.Content("~/images/UCR_logo.png")" style="max-width: 185px; height: auto;" alt="Logo Universidad de Costa Rica" />
+                </a>
+            </div>
+
+            <div class="logo-link me-3">
+                <a href="https://metics.ucr.ac.cr/es/" style="display: block;">
+                    <img src="@Url.Content("~/images/METICS_logo.png")" style="max-width: 285px; height: auto;" alt="Logo METICS" />
+                </a>
+            </div>
+
+            <div class="logo-link h-100">
+                <a href="https://vd.ucr.ac.cr/" style="display: block;">
+                    <img src="@Url.Content("~/images/VD_logo.png")" style="max-width: 200px; height: auto;" alt="Logo Vicerrectoria de Docencia" />
+                </a>
+            </div>
+        </div>
     </div>
+
+
 
     @if (ViewBag.Id != "" && ViewBag.Title != "Formulario de Registro" && ViewBag.Title != "Iniciar sesión")
     {

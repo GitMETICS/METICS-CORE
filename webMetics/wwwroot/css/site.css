@@ -1,14 +1,4 @@
-﻿#body-login container {
-    height: 200px;
-    position: relative;
-    margin: 0;
-}
-
-#body-login {
-    margin: 0;
-}
-
-.navbar-custom {
+﻿.navbar-custom {
     background: #f4f4f4;
 }
 
@@ -26,15 +16,6 @@
     border-radius: 15px;
 }
 
-.formulario-login {
-    width: 75%;
-    padding: 90px 30px 50px 30px;
-}
-
-.datos-login {
-    margin-top: 20px;
-}
-
 .footer {
     position: absolute;
     bottom: 0;
@@ -49,24 +30,6 @@
     text-align: justify;
 }
 
-.boton-formularios {
-    float: right;
-    margin-right: 20px;
-    width: 20%;
-    height: 105%
-}
-
 .hiddenRow {
     padding: 0 !important;
-}
-
-.alertaCrearAsesor {
-    color: red;
-    font-size: 16px;
-}
-
-.alertaFechas {
-    color: red;
-    padding-bottom: 10px;
-    font-size: 16px;
 }

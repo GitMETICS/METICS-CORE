@@ -60,14 +60,6 @@
     <None Include="Views\_ViewImports.cshtml" />
     <None Include="Views\_ViewStart.cshtml" />
     <None Include="wwwroot\css\site.css" />
-    <None Include="wwwroot\images\fondo_login.jpg" />
-    <None Include="wwwroot\images\logoMETICS.png" />
-    <None Include="wwwroot\images\logos.png" />
-    <None Include="wwwroot\images\logosVC.png" />
-    <None Include="wwwroot\images\logoUCR.png" />
-    <None Include="wwwroot\images\logo_metics.png" />
-    <None Include="wwwroot\images\logo_UCR.webp" />
-    <None Include="wwwroot\images\vc_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
