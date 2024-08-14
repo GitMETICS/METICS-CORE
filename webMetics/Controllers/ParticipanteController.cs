@@ -334,6 +334,39 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
+        public ActionResult DescargarPlantillaSubirParticipantes()
+        {
+            // Creamos el archivo de Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Plantilla_Lista_Participantes");
+
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
+            cell31.SetCellValue("Unidad Académica");
+
+            NPOI.SS.UserModel.ICell cell32 = row.CreateCell(1);
+            cell32.SetCellValue("Nombre");
+
+            NPOI.SS.UserModel.ICell cell33 = row.CreateCell(2);
+            cell33.SetCellValue("Primer Apellido");
+
+            NPOI.SS.UserModel.ICell cell34 = row.CreateCell(3);
+            cell34.SetCellValue("Segundo Apellido");
+
+            NPOI.SS.UserModel.ICell cell35 = row.CreateCell(4);
+            cell35.SetCellValue("Correo Institucional");
+
+            NPOI.SS.UserModel.ICell cell36 = row.CreateCell(5);
+            cell36.SetCellValue("Horas aprobadas");
+
+            string fileName = "Plantilla_Lista_Participantes.xlsx";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
         public ActionResult VerDatosParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();

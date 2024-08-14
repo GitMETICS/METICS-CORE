@@ -38,25 +38,27 @@
 
         <div class="table-responsive">
             <div class="d-flex justify-content-between mb-4">
-                <div>
-                    @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        <form>
-                            <div class="mb-3 d-flex align-items-center">
-                                <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
-                                <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-                            </div>
+                @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <form>
+                        <div class="mx-1">
+                        </div>
 
-                            <div class="mb-4 bg-light p-3 rounded">
-                                <small class="text-muted">
-                                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
-                                    <br />
-                                    Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas aprobadas
-                                </small>
-                            </div>
-                        </form>
-                    }
-                </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
+                            @Html.ActionLink("   Plantilla", "DescargarPlantillaSubirParticipantes", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download ms-2 w-25" })
+                            <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
+                        </div>
+
+                        <div class="mb-4 bg-light p-3 rounded">
+                            <small class="text-muted">
+                                Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
+                                <br />
+                                Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas aprobadas
+                            </small>
+                        </div>
+                    </form>
+                }
 
                 <div class="d-flex justify-content-end">
                     <div class="mx-1">
