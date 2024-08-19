@@ -27,25 +27,8 @@
     margin-top: 60px;
     margin-bottom: 150px;
     align-content: center;
-    text-align: justify;
 }
 
 .hiddenRow {
     padding: 0 !important;
-}
-
-.image-container {
-    position: relative;
-    display: inline-block;
-}
-
-.overlay {
-    position: absolute;
-    margin-top: 25px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
 }
