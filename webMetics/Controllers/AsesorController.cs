@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 /* 
  * Controlador de la entidad Asesor
  * Los asesores son los profesores a cargo de impartir el grupo
@@ -177,42 +178,57 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ActualizarAsesor(AsesorModel asesor)
         {
-            ViewBag.Role = GetRole();
+            int role = GetRole();
+
             ViewBag.Id = GetId();
+            ViewBag.Role = role;
+
+            if (!ModelState.IsValid)
+            {
+                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                return View("EditarAsesor", asesor);
+            }
 
             try
             {
-                if (ModelState.IsValid)
-                {
-                    asesor.idAsesor = asesor.correo; // Aquí se define que el correo es la identificación.
-                    accesoAAsesor.EditarAsesor(asesor);
+                asesor.idAsesor = asesor.correo;
+                accesoAAsesor.EditarAsesor(asesor);
 
+                if (role == 1)
+                {
                     if (asesor.contrasena == asesor.confirmarContrasena)
                     {
                         accesoAUsuario.EditarUsuario(asesor.idAsesor, 2, asesor.contrasena);
+                        TempData["successMessage"] = "Los datos fueron guardados.";
                     }
                     else
                     {
                         ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         return View("EditarAsesor", asesor);
                     }
-                    
-
+                }
+                else
+                {
                     TempData["successMessage"] = "Los datos fueron guardados.";
+                }
+
+                if (role == 1)
+                {
                     return RedirectToAction("ListaAsesores");
                 }
                 else
                 {
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    return View("EditarAsesor", asesor);
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
             }
             catch
             {
                 TempData["errorMessage"] = "Ocurrió un error al editar los datos del asesor.";
-                return RedirectToAction("ListaAsesores");
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
+
 
         public ActionResult EliminarAsesor(string idAsesor)
         {

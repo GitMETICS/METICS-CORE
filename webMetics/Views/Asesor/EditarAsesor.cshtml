@@ -44,7 +44,7 @@
     </style>
 </head>
 <body>
-    @if (ViewBag.Id != "" && ViewBag.Role == 1)
+    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
     {
         <div class="contenedor-tipos-actividades container-fluid">
             @if (urlReferrer != null)
@@ -127,24 +127,27 @@
                                 @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
                             </div>
-                            <div class="row mt-2">
-                                <div class="col input-wrapper">
-                                    @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                                        <i id="toggleIcon" class="fas fa-eye"></i>
-                                    </button>
-                                    @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                            @if (ViewBag.Role == 1) 
+                            {
+                                <div class="row mt-2">
+                                    <div class="col input-wrapper">
+                                        @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                        @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                            <i id="toggleIcon" class="fas fa-eye"></i>
+                                        </button>
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col input-wrapper">
+                                        @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                        @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
+                                            <i id="toggleIcon2" class="fas fa-eye"></i>
+                                        </button>
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                                    </div>
                                 </div>
-                                <div class="col input-wrapper">
-                                    @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
-                                        <i id="toggleIcon2" class="fas fa-eye"></i>
-                                    </button>
-                                    @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
                     <div class="row justify-content-center m-4">

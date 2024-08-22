@@ -15,6 +15,10 @@ namespace webMetics.Controllers
         private protected CookiesController cookiesController;
         private protected UsuarioHandler accesoAUsuario;
         private protected ParticipanteHandler accesoAParticipante;
+        private protected AsesorHandler accesoAAsesor;
+        private protected GrupoHandler accesoAGrupo;
+        private protected InscripcionHandler accesoAInscripcion;
+
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -29,6 +33,9 @@ namespace webMetics.Controllers
             cookiesController = new CookiesController(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
+            accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
         // Método para mostrar la vista de inicio de sesión
@@ -202,6 +209,87 @@ namespace webMetics.Controllers
             }
 
             return usuarioAutorizado;
+        }
+
+        public ActionResult InformacionPersonal(string id)
+        {
+            const int RolUsuarioParticipante = 0;
+            const int RolUsuarioAdmin = 1;
+            const int RolUsuarioAsesor = 2;
+
+            int rol = GetRole();
+
+            switch (rol)
+            {
+                case RolUsuarioParticipante:
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);
+                    List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(id);
+                    List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(id);
+
+                    UsuarioModel usuarioParticipante = new UsuarioModel()
+                    {
+                        id = id,
+                        nombre = participante.nombre,
+                        primerApellido = participante.primerApellido,
+                        segundoApellido = participante.segundoApellido,
+                        tipoIdentificacion = participante.tipoIdentificacion,
+                        numeroIdentificacion = participante.numeroIdentificacion,
+                        correo = participante.correo,
+                        tipoParticipante = participante.tipoParticipante,
+                        condicion = participante.condicion,
+                        telefono = participante.telefono,
+                        area = participante.area,
+                        departamento = participante.departamento,
+                        unidadAcademica = participante.unidadAcademica,
+                        sede = participante.sede,
+                    };
+
+                    ViewBag.Usuario = usuarioParticipante;
+                    ViewBag.Participante = participante;
+                    ViewBag.Inscripciones = inscripciones;
+                    ViewBag.ListaGrupos = gruposParticipante;
+
+                    break;
+
+                case RolUsuarioAdmin:
+                    break;
+
+                case RolUsuarioAsesor:
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(id);
+                    List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(id);
+
+                    UsuarioModel usuarioAsesor = new UsuarioModel()
+                    {
+                        id = id,
+                        nombre = asesor.nombre,
+                        primerApellido = asesor.primerApellido,
+                        segundoApellido = asesor.segundoApellido,
+                        tipoIdentificacion = asesor.tipoIdentificacion,
+                        numeroIdentificacion = asesor.numeroIdentificacion,
+                        correo = asesor.correo,
+                        telefono = asesor.telefono,
+                    };
+
+                    ViewBag.Usuario = usuarioAsesor;
+                    ViewBag.Asesor = asesor;
+                    ViewBag.ListaGrupos = gruposAsesor;
+
+                    break;
+
+                default:
+                    break;
+            }
+
+
+
+
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View();
         }
 
         // Método para cerrar la sesión del usuario

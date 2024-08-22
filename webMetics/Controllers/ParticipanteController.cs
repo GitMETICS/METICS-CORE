@@ -101,30 +101,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        public ActionResult InformacionPersonal(string id)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(id);
-            List<GrupoModel> grupos = accesoAGrupo.ObtenerListaGruposParticipante(id);
-
-            ViewBag.Participante = participante;
-            ViewBag.Inscripciones = inscripciones;
-            ViewBag.ListaGrupos = grupos;
-
-            if (TempData["errorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
-
-            return View();
-        }
 
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcel(IFormFile file)
