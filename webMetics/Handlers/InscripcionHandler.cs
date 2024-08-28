@@ -168,7 +168,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         return exito;
     }
 
-    public bool EliminarInscripcion(string idGrupo, string idParticipante)
+    public bool EliminarInscripcion(int idGrupo, string idParticipante)
     {
         string consulta = "DELETE FROM inscripcion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
 

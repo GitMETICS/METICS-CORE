@@ -133,12 +133,10 @@ namespace webMetics.Controllers
         }
 
         /* Método para que un administrador elimine una inscripción de un usuario */
-        public ActionResult EliminarInscripcion(string idParticipante, string idGrupo)
+        public ActionResult EliminarInscripcion(string idParticipante, int idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
-
-            int idGrupoAux = Convert.ToInt32(idGrupo);
 
             try
             {
@@ -146,70 +144,65 @@ namespace webMetics.Controllers
 
                 if (exito)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupoAux);
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
-                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
+                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
                 }
                 else
                 {
                     TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
-                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
+                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
                 }
             }
             catch (Exception)
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
                 TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
-                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupoAux });
+                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
             }
         }
 
         /* Método para que un usuario se desinscriba de un grupo*/
-        public ActionResult DesinscribirParticipante(string idParticipante, string idGrupo)
+        public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
-                // Intentar eliminar la inscripción del participante con el idParticipante en el grupo especificado por idGrupo
-                ViewBag.ExitoAlCrear = accesoAInscripcion.EliminarInscripcion(ViewBag.Id, idGrupo);
+                bool exito = accesoAInscripcion.EliminarInscripcion(idGrupo, idParticipante);
 
-                // Si la desinscripción fue exitosa, redirigir a la lista de grupos disponibles
-                if (ViewBag.ExitoAlCrear)
+                if (exito)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(Convert.ToInt32(idGrupo));
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(ViewBag.Id);
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
-
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
                 }
                 else
                 {
-                    // Si hubo un error al eliminar la inscripción, mostrar un mensaje y limpiar el modelo para la vista
-                    ViewBag.Message = "Hubo un error y no se pudo eliminar al participante.";
-                    ModelState.Clear();
-                    return Redirect("~/Grupo/ListaGruposDisponibles");
+                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar la inscripción.";
                 }
+
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
             catch (Exception)
             {
-                // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de grupos disponibles
-                ViewBag.Message = "Hubo un error y no se pudo enviar la petición de eliminar al participante.";
-                return Redirect("~/Grupo/ListaGruposDisponibles");
+                TempData["errorMessage"] = "Hubo un error y no se pudo enviar la solicitud de eliminar la inscripción.";
+
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
         private bool MenorALimiteMaximoHoras(int horasGrupo, int horasParticipante)
         {
-            return horasParticipante + horasGrupo <= 30;
+            return horasParticipante + horasGrupo <= 50; // TODO: Refactor.
         }
 
         private int CalcularNumeroHorasAlInscribirse(int horasGrupo, int horasParticipante)
