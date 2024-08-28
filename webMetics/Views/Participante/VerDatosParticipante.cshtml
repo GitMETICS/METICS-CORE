@@ -70,15 +70,15 @@
                                 <td class="">@nombreCompleto</td>
                                 <td class="">@ViewBag.Participante.idParticipante</td>
                                 
-                                @if (ViewBag.ListaGrupos != null)
+                                @if (ViewBag.Inscripciones != null)
                                 {
                                     <td class="">
-                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
                                         {
                                             <div class="form-check me-1">
-                                                <input type="radio" class="form-check-input" id="grupo-@grupo.idGrupo" name="idGrupo" value="@grupo.idGrupo">
-                                                <label class="form-check-label" for="grupo-@grupo.idGrupo">
-                                                    @grupo.nombre (Grupo @grupo.idGrupo)
+                                                <input type="radio" class="form-check-input" id="grupo-@inscripcion.idGrupo" name="idGrupo" value="@inscripcion.idGrupo">
+                                                <label class="form-check-label" for="grupo-@inscripcion.idGrupo">
+                                                    @inscripcion.nombreGrupo (Grupo @inscripcion.idGrupo)
                                                 </label>
                                             </div>
                                         }
@@ -89,52 +89,23 @@
                                     <td>Sin grupos inscritos</td>
                                 }
                                 
-                                @if (ViewBag.ListaGrupos != null)
+                                @if (ViewBag.Inscripciones != null)
                                 {
                                     <td class="text-center">
-                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
                                         {
-                                            @if (ViewBag.Inscripciones != null)
-                                            {
-                                                foreach (var inscripcion in ViewBag.Inscripciones)
-                                                {
-                                                    if (inscripcion.idGrupo == grupo.idGrupo)
-                                                    {
-                                                        @((inscripcion.horasMatriculadas ?? 0))
-                                                        <br />
-                                                    }
-                                                }
-                                            }
+                                            @((inscripcion.horasMatriculadas ?? 0))
+                                            <br />
                                         }
                                     </td>
-                                }
-                                else
-                                {
-                                    <td class="text-center">0</td>
-                                }
 
-                                @if (ViewBag.ListaGrupos != null)
-                                {
                                     <td class="text-center">
-                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
                                         {
-                                            @if (ViewBag.Inscripciones != null)
-                                            {
-                                                foreach (var inscripcion in ViewBag.Inscripciones)
-                                                {
-                                                    if (inscripcion.idGrupo == grupo.idGrupo)
-                                                    {
-                                                        @((inscripcion.horasAprobadas ?? 0))
-                                                        <br />
-                                                    }
-                                                }
-                                            }
+                                            @((inscripcion.horasAprobadas ?? 0))
+                                            <br />
                                         }
                                     </td>
-                                }
-                                else
-                                {
-                                    <td class="text-center">0</td>
                                 }
 
                                 <td class="text-center">
