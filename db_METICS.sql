@@ -113,16 +113,13 @@ CREATE TABLE inscripcion (
     id_inscripcion_PK INT IDENTITY(1, 1) PRIMARY KEY,
     estado NVARCHAR(16) NOT NULL,
     observaciones NVARCHAR(512),
-    id_grupo_FK INT NOT NULL,
+    id_grupo_FK INT,
+	grupo_nombre NVARCHAR(256),
     id_participante_FK NVARCHAR(64) NOT NULL,
 	horas_aprobadas INT DEFAULT 0,
 	horas_matriculadas INT DEFAULT 0,
 
     FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY (id_grupo_FK) REFERENCES grupo(id_grupo_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
