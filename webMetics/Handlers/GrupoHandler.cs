@@ -2,6 +2,8 @@
 using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using webMetics.Helpers;
+
 
 /*
  * Handler para los grupos
@@ -33,7 +35,6 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
 
                 string idAsesor = grupo.modalidad == "Autogestionado" ? null : grupo.idAsesor;
-
                 command.Parameters.AddWithValue("@idTema", grupo.idTema);
                 command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
                 command.Parameters.AddWithValue("@idAsesor", idAsesor);

@@ -1,4 +1,6 @@
 ﻿@using webMetics.Models
+@using webMetics.Helpers
+
 
 <!--
     Vista para mostrar la lista de todos los grupos disponibles
@@ -145,7 +147,7 @@
                                     }
                                     else
                                     {
-                                        @grupo.modalidad
+                                            @EnumHelper.GetDisplayName(grupo.modalidad)
                                     }
                                     <br />
                                     @grupo.horario
@@ -305,7 +307,7 @@
                                     }
                                     else
                                     {
-                                        @grupo.modalidad
+                                         @EnumHelper.GetDisplayName(grupo.modalidad)
                                     }
                                     <br />
                                     @grupo.horario

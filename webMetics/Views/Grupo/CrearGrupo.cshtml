@@ -1,5 +1,6 @@
 ﻿@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
+@using webMetics.Helpers
 @{
     ViewBag.Title = "Crear Módulo";
 
@@ -49,16 +50,25 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
-                            @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300", @autocomplete = "off" })
+                            @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "3000", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
                         </div>
                         <div class="row mt-1">
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoModalidad))), "Seleccione un tipo de modalidad...", new { @class = "form-control", @id = "modalidadSelect" })
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
+                                <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(
+                                         grupoModel => grupoModel.modalidad,
+                                         new SelectList(
+                                         Enum.GetValues(typeof(webMetics.Models.TipoModalidad))
+                                         .Cast<webMetics.Models.TipoModalidad>()
+                                         .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
+                                         "Value",
+                                         "Text"),
+                                         "Seleccione un tipo de modalidad...",
+                                         new { @class = "form-control", @id = "modalidadSelect" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
-
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @value = "" })
