@@ -1,5 +1,6 @@
 @model webMetics.Models.GrupoModel
 @using webMetics.Controllers
+@using webMetics.Helpers
 @{
     ViewBag.Title = "Editar Módulo";
 
@@ -58,8 +59,18 @@
                         </div>
                         <div class="row mt-1">
                             <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(grupoModel => grupoModel.modalidad, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoModalidad))), "Seleccione un tipo de modalidad...", new { @class = "form-control", @id = "modalidadSelect" })
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
+                                <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(
+                                         grupoModel => grupoModel.modalidad,
+                                         new SelectList(
+                                         Enum.GetValues(typeof(webMetics.Models.TipoModalidad))
+                                         .Cast<webMetics.Models.TipoModalidad>()
+                                         .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
+                                         "Value",
+                                         "Text"),
+                                         "Seleccione un tipo de modalidad...",
+                                         new { @class = "form-control", @id = "modalidadSelect" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 

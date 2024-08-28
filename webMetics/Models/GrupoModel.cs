@@ -91,10 +91,22 @@ namespace webMetics.Models
 
     public enum TipoModalidad
     {
+        [Display(Name = "Autogestionado")]
         Autogestionado,
+
+        [Display(Name = "Presencial")]
         Presencial,
+
+        [Display(Name = "Bajo Virtual")]
         BajoVirtual,
+
+        [Display(Name = "Bimodal")]
         Bimodal,
-        AltoVirtual
+
+        [Display(Name = "Alto Virtual")]
+        AltoVirtual,
+
+        [Display(Name = "Virtual")]
+        Virtual
     }
 }
