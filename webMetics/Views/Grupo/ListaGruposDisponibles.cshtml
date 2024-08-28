@@ -77,7 +77,7 @@
                                     <div class="mb-3"><h4>@grupo.nombre</h4></div>
                                     @if (!string.IsNullOrEmpty(grupo.descripcion))
                                     {
-                                        <div class="card-text mb-3">@grupo.descripcion</div>
+                                            <div class="card-text mb-3 overflow-scroll align-content-center" style="max-height: 100px;">@grupo.descripcion</div>
                                     }
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
                                     @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
@@ -219,7 +219,7 @@
                                     <div class="mb-3"><h4>@grupo.nombre</h4></div>
                                     @if (!string.IsNullOrEmpty(grupo.descripcion))
                                     {
-                                        <div class="card-text mb-3">@grupo.descripcion</div>
+                                            <div class="card-text mb-3 overflow-scroll align-content-center" style="max-height: 100px;">@grupo.descripcion</div>
                                     }
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
                                     @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
