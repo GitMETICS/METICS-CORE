@@ -6,7 +6,7 @@
 -->
 
 @{
-    ViewBag.Title = "Asesores";
+    ViewBag.Title = "Facilitadores(as)";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -54,7 +54,7 @@
         <div class="table-responsive">
             @if (ViewBag.Asesores == null)
             {
-                <h5 class="text-center">No hay asesores.</h5>
+                <h5 class="text-center">No hay facilitadores(as).</h5>
             }
             else
             {
@@ -109,11 +109,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar asesor</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar facilitador(a)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar a este asesor?
+                    ¿Está seguro de que desea eliminar a este(a) facilitador(a)?
                     <br />
                     @using (Html.BeginForm("EliminarAsesor", "Asesor"))
                     {

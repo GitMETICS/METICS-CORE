@@ -82,17 +82,17 @@
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
                                     @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                     {
-                                        <div class="card-text mb-3">Asesor: @grupo.nombreAsesor</div>
+                                        <div class="card-text mb-3">Facilitador(a): @grupo.nombreAsesor</div>
                                     }
                                     else
                                     {
                                         @if (grupo.modalidad == "Autogestionado")
                                         {
-                                            <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                                <div class="card-text mb-3">Facilitador: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
                                         }
                                     }
                                     <div class="card-text mb-3">Área de competencia: @grupo.nombreTema</div>
-                                    <div class="card-text mb-3">Categoría: @grupo.nombreCategoria</div>
+                                    <div class="card-text mb-3">@grupo.nombreCategoria</div>
                                     <div class="mt-3">
                                         @if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
                                         {
@@ -224,17 +224,17 @@
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
                                     @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                     {
-                                        <div class="card-text mb-3">Asesor: @grupo.nombreAsesor</div>
+                                            <div class="card-text mb-3">Facilitador(a): @grupo.nombreAsesor</div>
                                     }
                                     else
                                     {
                                         @if (grupo.modalidad == "Autogestionado")
                                         {
-                                            <div class="card-text mb-3">Asesor: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                                <div class="card-text mb-3">Facilitador: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
                                         }
                                     }
                                     <div class="card-text mb-3">Área de competencia: @grupo.nombreTema</div>
-                                    <div class="card-text mb-3">Categoría: @grupo.nombreCategoria</div>
+                                    <div class="card-text mb-3">@grupo.nombreCategoria</div>
                                     <div class="mt-3">
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                                         {
