@@ -14,10 +14,10 @@ namespace webMetics.Models
         [Display(Name = "Área de competencia")]
         public string? nombreTema { get; set; }
 
-        [Required(ErrorMessage = "Debe asociar una categoría al módulo.")]
+        [Required(ErrorMessage = "Debe asociar un nivel al módulo.")]
         public int idCategoria { get; set; }
 
-        [Display(Name = "Categoría")]
+        [Display(Name = "Nivel")]
         public string? nombreCategoria { get; set; }
 
         [Required(ErrorMessage = "Es necesario que ingrese el nombre del módulo.")]
@@ -85,7 +85,7 @@ namespace webMetics.Models
         // [Required(ErrorMessage = "Es necesario elegir un asesor del módulo.")]
         public string? idAsesor { get; set; }
 
-        [Display(Name = "Asesor")]
+        [Display(Name = "Facilitador(a)")]
         public string? nombreAsesor { get; set; }
     }
 

@@ -130,13 +130,13 @@ namespace webMetics.Controllers
                     {
                         accesoAAsesor.CrearAsesor(asesor);
 
-                        TempData["successMessage"] = "Se agregó éxitosamente el asesor.";
+                        TempData["successMessage"] = "El/la facilitador(a) se agregó con éxito.";
                         return RedirectToAction("ListaAsesores");
 
                     }
                     else
                     {
-                        TempData["errorMessage"] = "Ya existe un asesor con los mismos datos.";
+                        TempData["errorMessage"] = "Ya existe un(a) facilitador(a) con los mismos datos.";
                         return RedirectToAction("ListaAsesores");
                     }
 
@@ -150,7 +150,7 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
-                TempData["errorMessage"] = "Hubo un error y no se pudo crear el asesor.";
+                TempData["errorMessage"] = "Hubo un error y no se pudo crear el/la facilitador(a).";
                 return RedirectToAction("ListaAsesores");
             }
         }
@@ -170,7 +170,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del asesor.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del/la facilitador(a).";
                 return RedirectToAction("ListaAsesores");
             }
         }
@@ -224,7 +224,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error al editar los datos del asesor.";
+                TempData["errorMessage"] = "Ocurrió un error al editar los datos del/la facilitador(a).";
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
@@ -241,16 +241,16 @@ namespace webMetics.Controllers
                 bool exito = accesoAAsesor.EliminarAsesor(idAsesor);
                 if (exito)
                 {
-                    TempData["successMessage"] = "Se eliminó al asesor.";
+                    TempData["successMessage"] = "El/la facilitador(a) se eliminó.";
                 }
                 else
                 {
-                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar al asesor.";
+                    TempData["errorMessage"] = "Hubo un error y no se pudo eliminar el/la facilitador(a).";
                 }
             }
             else
             {
-                TempData["errorMessage"] = "No se puede eliminar el asesor porque está asignado a un módulo.";
+                TempData["errorMessage"] = "No se puede eliminar el/la facilitador(a) porque está asignado(a) a un módulo.";
             }
 
             return RedirectToAction("ListaAsesores");

@@ -149,7 +149,7 @@ namespace webMetics.Controllers
             List<SelectListItem> asesores = accesoAAsesor.ObtenerListaSeleccionAsesores();
             if (asesores.Count == 0)
             {
-                TempData["errorMessage"] = "No hay asesores disponibles para crear un módulo.";
+                TempData["errorMessage"] = "No hay facilitadores(as) disponibles para crear un módulo.";
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
 

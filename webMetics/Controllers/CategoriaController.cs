@@ -77,7 +77,7 @@ namespace webMetics.Controllers
                 bool exito = accesoACategoria.CrearCategoria(categoria);
                 if (exito)
                 {
-                    TempData["successMessage"] = "La categoría fue creada con éxito.";
+                    TempData["successMessage"] = "El nivel fue creado con éxito.";
                     return RedirectToAction("ListaCategorias");
                 }
 
@@ -87,7 +87,7 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
-                TempData["errorMessage"] = "No se pudo crear la categoría.";
+                TempData["errorMessage"] = "No se pudo crear el nivel.";
                 return RedirectToAction("ListaCategorias");
             }
         }
