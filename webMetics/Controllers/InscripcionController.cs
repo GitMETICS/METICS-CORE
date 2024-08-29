@@ -334,7 +334,7 @@ namespace webMetics.Controllers
                 .SetFontSize(10);
             document.Add(header1);
 
-            Paragraph header2 = new Paragraph("Nombre del facilitador(a) asociado: " + grupo.nombreAsesor)
+            Paragraph header2 = new Paragraph("Nombre del/la facilitador(a) asociado(a): " + grupo.nombreAsesor)
                 .SetFontSize(10);
             document.Add(header2);
 
@@ -391,7 +391,7 @@ namespace webMetics.Controllers
 
 
             var headerRow0 = table.Rows[0];
-            headerRow0.GetCell(0).SetText("Nombre del Facilitador(a)");
+            headerRow0.GetCell(0).SetText("Nombre del/la Facilitador(a)");
             headerRow0.GetCell(1).SetText("Nombre del Módulo");
             var row0 = table.Rows[1];
             row0.GetCell(0).SetText(grupo.nombreAsesor);
@@ -443,7 +443,7 @@ namespace webMetics.Controllers
 
             NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(1);
             NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
-            cell21.SetCellValue("Nombre del facilitador(a) asociado:");
+            cell21.SetCellValue("Nombre del/la facilitador(a) asociado(a):");
 
             NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
             cell22.SetCellValue(grupo.nombreAsesor);
