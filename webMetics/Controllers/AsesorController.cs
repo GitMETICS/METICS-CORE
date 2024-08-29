@@ -130,7 +130,7 @@ namespace webMetics.Controllers
                     {
                         accesoAAsesor.CrearAsesor(asesor);
 
-                        TempData["successMessage"] = "Se agregó éxitosamente el/la facilitador(a).";
+                        TempData["successMessage"] = "El/la facilitador(a) se agregó con éxito.";
                         return RedirectToAction("ListaAsesores");
 
                     }
@@ -241,7 +241,7 @@ namespace webMetics.Controllers
                 bool exito = accesoAAsesor.EliminarAsesor(idAsesor);
                 if (exito)
                 {
-                    TempData["successMessage"] = "Se eliminó el/la facilitador(a).";
+                    TempData["successMessage"] = "El/la facilitador(a) se eliminó.";
                 }
                 else
                 {
