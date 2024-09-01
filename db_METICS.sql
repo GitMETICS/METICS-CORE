@@ -892,28 +892,49 @@ EXEC InsertAsesor
 
 
 --Crear participantes
-EXEC InsertUsuario
-	@id = N'jhondoo@ucr.ac.cr',
-	@rol = 0,
-	@contrasena = N'1234';
 
-EXEC InsertParticipante
-    @idUsuario = N'jhondoo@ucr.ac.cr',
-    @idParticipante = N'jhondoo@ucr.ac.cr',
-    @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'123456789',
-    @correo = N'jhondoo@ucr.ac.cr',
-    @nombre = N'Jhon',
-    @apellido1 = N'Doo',
-    @apellido2 = NULL,
-    @area = N'Área de Artes y Letras',
-    @departamento = N'Facultad de Artes',
-    @unidadAcademica = N'Escuela de Artes Dramáticas',
-    @telefono = N'800800800',
-    @tipoParticipante = N'Interino',
-    @condicion = N'Activo',
-    @horasMatriculadas = 0,
-    @horasAprobadas = 0
+
+EXEC InsertUsuario @id = N'docencia.metics2@ucr.ac.cr', @rol = 0, @contrasena = N'12345';
+EXEC InsertParticipante @idUsuario = N'docencia.metics2@ucr.ac.cr', @idParticipante = N'docencia.metics2@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', @numeroIdentificacion = N'222222222', @correo = N'docencia.metics2@ucr.ac.cr',
+    @nombre = N'Nombre.metics2', @apellido1 = N'Apellido.metics2', @apellido2 = NULL, 
+    @area = N'Área de Artes y Letras', @departamento = N'Facultad de Artes', 
+    @unidadAcademica = N'Escuela de Artes Dramáticas', @telefono = N'200200200',
+    @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
+
+EXEC InsertUsuario @id = N'docencia.metics3@ucr.ac.cr', @rol = 0, @contrasena = N'12345';
+EXEC InsertParticipante @idUsuario = N'docencia.metics3@ucr.ac.cr', @idParticipante = N'docencia.metics3@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', @numeroIdentificacion = N'333333333', @correo = N'docencia.metics3@ucr.ac.cr',
+    @nombre = N'Nombre.metics3', @apellido1 = N'Apellido.metics3', @apellido2 = NULL, 
+    @area = N'Área de Artes y Letras', @departamento = N'Facultad de Artes', 
+    @unidadAcademica = N'Escuela de Artes Dramáticas', @telefono = N'300300300',
+    @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
+
+EXEC InsertUsuario @id = N'docencia.metics4@ucr.ac.cr', @rol = 0, @contrasena = N'12345';
+EXEC InsertParticipante @idUsuario = N'docencia.metics4@ucr.ac.cr', @idParticipante = N'docencia.metics4@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', @numeroIdentificacion = N'444444444', @correo = N'docencia.metics4@ucr.ac.cr',
+    @nombre = N'Nombre.metics4', @apellido1 = N'Apellido.metics4', @apellido2 = NULL, 
+    @area = N'Área de Artes y Letras', @departamento = N'Facultad de Artes', 
+    @unidadAcademica = N'Escuela de Artes Dramáticas', @telefono = N'400400400',
+    @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
+
+EXEC InsertUsuario @id = N'docencia.metics5@ucr.ac.cr', @rol = 0, @contrasena = N'12345';
+EXEC InsertParticipante @idUsuario = N'docencia.metics5@ucr.ac.cr', @idParticipante = N'docencia.metics5@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', @numeroIdentificacion = N'555555555', @correo = N'docencia.metics5@ucr.ac.cr',
+    @nombre = N'Nombre.metics5', @apellido1 = N'Apellido.metics5', @apellido2 = NULL, 
+    @area = N'Área de Artes y Letras', @departamento = N'Facultad de Artes', 
+    @unidadAcademica = N'Escuela de Artes Dramáticas', @telefono = N'500500500',
+    @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
+
+EXEC InsertUsuario @id = N'docencia.metics6@ucr.ac.cr', @rol = 0, @contrasena = N'12345';
+EXEC InsertParticipante @idUsuario = N'docencia.metics6@ucr.ac.cr', @idParticipante = N'docencia.metics6@ucr.ac.cr', 
+    @tipoIdentificacion = N'Cédula', @numeroIdentificacion = N'666666666', @correo = N'docencia.metics6@ucr.ac.cr',
+    @nombre = N'Nombre.metics6', @apellido1 = N'Apellido.metics6', @apellido2 = NULL, 
+    @area = N'Área de Artes y Letras', @departamento = N'Facultad de Artes', 
+    @unidadAcademica = N'Escuela de Artes Dramáticas', @telefono = N'600600600',
+    @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
+
+
 
 EXEC InsertUsuario
 	@id = N'armandotorres_rojas@ucr.ac.cr',
@@ -970,26 +991,39 @@ SELECT @adjunto = CAST(bulkcolumn AS varbinary(max))
 FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\FileName.pdf', SINGLE_BLOB) AS x*/
 
 --Crear grupos
+
 INSERT INTO dbo.grupo(
-	id_tema_FK,
-	id_categoria_FK,
-	id_asesor_FK,
-	modalidad,
-	cupo, 
-	cantidad_horas,
-	descripcion, 
-	es_visible, 
-	lugar,
-	nombre, 
-	horario,
-	fecha_inicio_grupo, 
-	fecha_finalizacion_grupo,
-	fecha_inicio_inscripcion, 
-	fecha_finalizacion_inscripcion,
-	nombre_archivo)
-	VALUES
-	(1, 1, N'AARON.MENAARAYA@ucr.ac.cr', N'Presencial', 15, 3,
-	N'Taller de videos interactivos', 1, N'Universidad de Costa Rica, Rodrigo Facio',
-	N'Capacitación-Plataforma', N'V-S de 4pm a 7pm',
-	'2026-06-01 00:00:00', '2027-12-02 00:00:00',
-	'2024-01-01 00:00:00', '2025-01-01 00:00:00', N'ArchivoPrueba.pdf')
+    id_tema_FK,
+    id_categoria_FK,
+    id_asesor_FK,
+    modalidad,
+    cupo, 
+    cantidad_horas,
+    descripcion, 
+    es_visible, 
+    lugar,
+    nombre, 
+    horario,
+    fecha_inicio_grupo, 
+    fecha_finalizacion_grupo,
+    fecha_inicio_inscripcion, 
+    fecha_finalizacion_inscripcion,
+    nombre_archivo)
+    VALUES
+    (6, 
+    1, 
+    N'AARON.MENAARAYA@ucr.ac.cr', 
+    N'Virtual', 
+    15, 
+    10, 
+    N'Incluye actividades de aprendizaje que involucran el uso de entornos virtuales, herramientas de visualización de pensamiento y otros recursos digitales para mediar actividades de aprendizaje diseñadas para apoyar el desarrollo del pensamiento crítico.'
+    + CHAR(10) + CHAR(10) + 'Para participar en este módulo, las personas docentes deben tener acceso a una computadora durante las sesiones sincrónicas y contar con al menos con un entorno virtual en la plataforma Mediación Virtual (Pasado, En Progreso o Futuro).',
+    1, 
+    N'Universidad de Costa Rica, Rodrigo Facio',
+    N'Diseño Didáctico para el Desarrollo del Pensamiento Crítico', 
+    N'Viernes de 09:30-12:00',
+    '2024-09-13 00:00:00', 
+    '2024-09-27 00:00:00', 
+    '2024-01-01 00:00:00', 
+    '2024-12-09 00:00:00', 
+    N'ArchivoPrueba.pdf');
