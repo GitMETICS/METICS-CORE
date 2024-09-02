@@ -309,6 +309,11 @@ namespace webMetics.Controllers
                 }
                 else
                 {
+                    byte[] pdfBytes = accesoAGrupo.ObtenerArchivo(idGrupo);
+                    string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+                    ViewBag.Adjunto = pdfBase64;
+
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
                     ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
@@ -333,15 +338,21 @@ namespace webMetics.Controllers
 
             try
             {
+                byte[] pdfBytes = accesoAGrupo.ObtenerArchivo(grupo.idGrupo);
+                string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+                ViewBag.Adjunto = pdfBase64;
+                ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
+                ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
+
                 if (ModelState.IsValid)
                 {
                     // Validar tamaño del archivo adjunto
                     if (grupo.archivoAdjunto != null && grupo.archivoAdjunto.Length > 5242880) // 5MB en bytes
                     {
                         ModelState.AddModelError("archivoAdjunto", "El archivo no puede ser mayor a 5MB.");
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -359,9 +370,6 @@ namespace webMetics.Controllers
                         }
 
                         ViewBag.ErrorMessage = "La fecha de finalización no puede ser antes de las fechas de inicio.";
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
@@ -370,23 +378,16 @@ namespace webMetics.Controllers
                     {
                         ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
                         ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
-
-                        ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
                     accesoAGrupo.EditarGrupo(grupo);
                     TempData["successMessage"] = "Se guardaron los datos del módulo.";
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
-                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-                    ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                     return View(grupo);
                 }
             }
