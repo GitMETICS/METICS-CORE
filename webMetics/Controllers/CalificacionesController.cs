@@ -4,10 +4,8 @@ using webMetics.Handlers;
 using MimeKit;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
-using System.IO;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
-using NPOI.HPSF;
 using OfficeOpenXml;
 
 namespace webMetics.Controllers
@@ -289,7 +287,7 @@ namespace webMetics.Controllers
         }
 
         /* Método para enviar calificación y estado de un grupo */
-        private void SendEmail(string grupo, string mensaje, string correoParticipante)
+        private void EnviarCalificaciones(string grupo, string mensaje, string correoParticipante)
         {
             // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
             // Se utiliza la librería MimeKit para construir el mensaje
@@ -362,7 +360,6 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
-        [HttpPost]
         public ActionResult EnviarCalificaciones(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -371,24 +368,22 @@ namespace webMetics.Controllers
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
-            string mensaje;
             try
             {
                 foreach (CalificacionModel calificacion in calificaciones)
                 {
-                    mensaje = ConstructorDelMensaje(grupo, calificacion);
-                    SendEmail(grupo.nombre, mensaje, calificacion.participante.correo);
+                    string mensaje = ConstructorDelMensaje(grupo, calificacion);
+                    EnviarCalificaciones(grupo.nombre, mensaje, calificacion.participante.correo);
                 }
 
                 TempData["successMessage"] = "Las calificaciones fueron enviadas éxitosamente al correo de cada participante.";
             }
-            catch (Exception ex)
+            catch
             {
-                TempData["errorMessage"] = "Error al enviar las calificaciones: " + ex.Message;
+                TempData["errorMessage"] = "Ocurrió un error al enviar las calificaciones.";
             }
 
-            // Redirige a la vista adecuada.
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+            return RedirectToAction("VerCalificaciones", new { idGrupo });
         }
 
         private int GetRole()
