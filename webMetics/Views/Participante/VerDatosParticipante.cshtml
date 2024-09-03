@@ -70,15 +70,15 @@
                                 <td class="">@nombreCompleto</td>
                                 <td class="">@ViewBag.Participante.idParticipante</td>
                                 
-                                @if (ViewBag.Inscripciones != null)
+                                @if (ViewBag.ListaGrupos != null)
                                 {
                                     <td class="">
-                                        @foreach (var inscripcion in ViewBag.Inscripciones)
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
                                         {
                                             <div class="form-check me-1">
-                                                <input type="radio" class="form-check-input" id="grupo-@inscripcion.idGrupo" name="idGrupo" value="@inscripcion.idGrupo">
-                                                <label class="form-check-label" for="grupo-@inscripcion.idGrupo">
-                                                    @inscripcion.nombreGrupo (Grupo @inscripcion.idGrupo)
+                                                <input type="radio" class="form-check-input" id="grupo-@grupo.idGrupo" name="idGrupo" value="@grupo.idGrupo">
+                                                <label class="form-check-label" for="grupo-@grupo.idGrupo">
+                                                    @grupo.nombre (Grupo @grupo.numeroGrupo)
                                                 </label>
                                             </div>
                                         }
