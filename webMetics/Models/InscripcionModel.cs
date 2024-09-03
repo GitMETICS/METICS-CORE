@@ -8,6 +8,8 @@
 
         public required string idParticipante { get; set; }
 
+        public int numeroGrupo { get; set; }
+
         public string? nombreGrupo { get; set; }
 
         public string? estado { get; set; }

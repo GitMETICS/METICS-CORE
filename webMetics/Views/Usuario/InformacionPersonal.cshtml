@@ -180,75 +180,57 @@
                 }
                 else
                 {
-                    @if (ViewBag.ListaGrupos == null)
-                    {
-                        <h5 class="text-center">No tiene grupos inscritos.</h5>
-                    }
-                    else
-                    {
-                        <div class="mt-4">
-                            <h3 class="">Inscripciones</h3>
-                            <table class="table table-striped" id="tblCustomers">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Módulos Matriculados</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Horas<br>Matriculadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Horas<br>Aprobadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Matriculadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Aprobadas</th>
-                                    </tr>
-                                </thead>
+                    <div class="mt-4">
+                        <h3 class="">Inscripciones</h3>
+                        <table class="table table-striped" id="tblCustomers">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Módulos Inscritos</th>
+                                    <th class="text-center" scope="col" style="width: 15%">Horas<br>Matriculadas</th>
+                                    <th class="text-center" scope="col" style="width: 15%">Horas<br>Aprobadas</th>
+                                    <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Matriculadas</th>
+                                    <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Aprobadas</th>
+                                </tr>
+                            </thead>
 
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <td>
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-                                                <br />
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                foreach (var inscripcion in ViewBag.Inscripciones)
-                                                {
-                                                    if (inscripcion.idGrupo == grupo.idGrupo)
-                                                    {
-                                                        @inscripcion.horasMatriculadas
-                                                        <br />
+                            <tbody class="align-middle">
+                                <tr>
 
-                                                    }
-                                                }
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                foreach (var inscripcion in ViewBag.Inscripciones)
-                                                {
-                                                    if (inscripcion.idGrupo == grupo.idGrupo)
-                                                    {
+                                    <td class="">
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
+                                        {
+                                            <span>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</span>
+                                            <br />
+                                        }
+                                    </td>
 
-                                                        @inscripcion.horasAprobadas
-                                                        <br />
+                                    <td class="text-center">
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
+                                        {
+                                            @inscripcion.horasMatriculadas
+                                            <br />
+                                        }
+                                    </td>
 
-                                                    }
-                                                }
-                                            }
-                                        </td>
+                                    <td class="text-center">
+                                        @foreach (var inscripcion in ViewBag.Inscripciones)
+                                        {
+                                            @inscripcion.horasAprobadas
+                                            <br />
+                                        }
+                                    </td>
 
-                                        <td class="text-center">
-                                            <span>@ViewBag.Participante.horasMatriculadas</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span>@ViewBag.Participante.horasAprobadas</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    }
+                                    <td class="text-center">
+                                        <span>@ViewBag.Participante.horasMatriculadas</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span>@ViewBag.Participante.horasAprobadas</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 }
             }
             <div class="d-flex justify-content-center my-4">

@@ -25,7 +25,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
                 idParticipante = Convert.ToString(fila["id_participante_FK"]),
                 idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
-                nombreGrupo = Convert.ToString(fila["grupo_nombre"]),
+                numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+                nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
@@ -54,7 +55,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
                 idParticipante = Convert.ToString(fila["id_participante_FK"]),
                 idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
-                nombreGrupo = Convert.ToString(fila["grupo_nombre"]),
+                numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+                nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
@@ -82,7 +84,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
                 idParticipante = Convert.ToString(fila["id_participante_FK"]),
                 idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
-                nombreGrupo = Convert.ToString(fila["grupo_nombre"]),
+                numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+                nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
@@ -109,7 +112,8 @@ public class InscripcionHandler : BaseDeDatosHandler
             idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
             idParticipante = Convert.ToString(fila["id_participante_FK"]),
             idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
-            nombreGrupo = Convert.ToString(fila["grupo_nombre"]),
+            numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+            nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
             estado = Convert.ToString(fila["estado"]),
             observaciones = Convert.ToString(fila["observaciones"]),
             horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
@@ -121,18 +125,19 @@ public class InscripcionHandler : BaseDeDatosHandler
 
     public bool InsertarInscripcion(InscripcionModel inscripcion)
     {
-        string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, grupo_nombre, estado, observaciones, horas_aprobadas, horas_matriculadas)" +
-                          "VALUES (@idGrupo, @idParticipante, @nombreGrupo, @estado, @observaciones, @horasAprobadas, @horasMatriculadas);";
+        string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, numero_grupo, nombre_grupo, estado, observaciones, horas_aprobadas, horas_matriculadas)" +
+                          "VALUES (@idGrupo, @idParticipante, @numeroGrupo, @nombreGrupo, @estado, @observaciones, @horasAprobadas, @horasMatriculadas);";
 
         ConexionMetics.Open();
 
         SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
         comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
         comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
+        comandoConsulta.Parameters.AddWithValue("@numeroGrupo", inscripcion.numeroGrupo);
         comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
         comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
         comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
-        comandoConsulta.Parameters.AddWithValue("@estado", "Cursando");
+        comandoConsulta.Parameters.AddWithValue("@estado", "Inscrito");
         comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
@@ -144,21 +149,22 @@ public class InscripcionHandler : BaseDeDatosHandler
 
     public bool EditarInscripcion(InscripcionModel inscripcion)
     {
-        string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, grupo_nombre = @nombreGrupo, id_participante_FK = @idParticipante, " +
-                          "estado = @estado, observaciones = @observaciones, " +
-                          "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas " +
-                          "WHERE id_inscripcion_PK = @idInscripcion";
+        string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, numero_grupo = @numeroGrupo, nombre_grupo = @nombreGrupo, " +
+            "id_participante_FK = @idParticipante, estado = @estado, observaciones = @observaciones, " +
+            "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas " +
+            "WHERE id_inscripcion_PK = @idInscripcion";
 
         ConexionMetics.Open();
 
         SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
         comandoConsulta.Parameters.AddWithValue("@idInscripcion", inscripcion.idInscripcion);
         comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@numeroGrupo", inscripcion.numeroGrupo);
         comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
         comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
         comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
         comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
-        comandoConsulta.Parameters.AddWithValue("@estado", "Cursando");
+        comandoConsulta.Parameters.AddWithValue("@estado", "Inscrito");
         comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;

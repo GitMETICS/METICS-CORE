@@ -115,7 +115,8 @@ CREATE TABLE inscripcion (
     estado NVARCHAR(16) NOT NULL,
     observaciones NVARCHAR(512),
     id_grupo_FK INT,
-	grupo_nombre NVARCHAR(256),
+	numero_grupo INT,
+	nombre_grupo NVARCHAR(256),
     id_participante_FK NVARCHAR(64) NOT NULL,
 	horas_aprobadas INT DEFAULT 0,
 	horas_matriculadas INT DEFAULT 0,
@@ -127,14 +128,11 @@ CREATE TABLE inscripcion (
 
 --Creación de la tabla calificaciones
 CREATE TABLE calificaciones (
-    id_grupo_FK INT NOT NULL,
+    id_grupo_FK INT,
     id_participante_FK NVARCHAR(64) NOT NULL,
     calificacion FLOAT DEFAULT 0.0,
 
     CONSTRAINT id_participante_calificacion_FK FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT id_grupo_calificacion_FK FOREIGN KEY (id_grupo_FK) REFERENCES grupo(id_grupo_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );

@@ -64,6 +64,7 @@ namespace webMetics.Controllers
                     {
                         idGrupo = idGrupo,
                         idParticipante = idParticipante,
+                        numeroGrupo = grupo.numeroGrupo,
                         nombreGrupo = grupo.nombre,
                         horasMatriculadas = grupo.cantidadHoras,
                         horasAprobadas = 0,
