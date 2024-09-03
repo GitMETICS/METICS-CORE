@@ -1,0 +1,110 @@
+﻿@model webMetics.Models.GrupoModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Programa del Módulo";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Id != "")
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+        <h1>@Model.nombre</h1>
+        <h2>@ViewBag.Title</h2>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="form-horizontal">
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="container">
+                        @if (ViewBag.Adjunto != null && ViewBag.Adjunto.Length > 0)
+                        {
+                            <div class="m-3">
+                                <h5 class="mt-4">Archivo Actual</h5>
+                                <div class="d-flex align-items-center">
+                                    @Html.ActionLink(" ", "DescargarArchivo", "Grupo", new { idGrupo = Model.idGrupo }, new { @class = "text-muted bi bi-download me-2" })
+                                    <span class="text-muted">@Model.nombreArchivo</span>
+                                </div>
+                                <iframe class="my-2 rounded" id="pdfPreview" src="data:application/pdf;base64,@(ViewBag.Adjunto)" width="100%" height="500" style="border: none;"></iframe>
+                            </div>
+                        }
+
+                    </div>
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}
+
+<script>
+    async function previewPDF(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const fileURL = URL.createObjectURL(file);
+
+            const loadingTask = pdfjsLib.getDocument(fileURL);
+            loadingTask.promise.then(pdf => {
+                // Fetch the first page
+                pdf.getPage(1).then(page => {
+                    const scale = 1.5;
+                    const viewport = page.getViewport({ scale: scale });
+
+                    // Prepare canvas using PDF page dimensions
+                    const canvas = document.getElementById('pdfCanvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+
+                    // Show the canvas
+                    canvas.style.display = 'block';
+                });
+            }).catch(error => {
+                console.error('Error loading PDF: ', error);
+            });
+        }
+    }
+</script>

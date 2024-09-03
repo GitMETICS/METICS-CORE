@@ -398,7 +398,35 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para añadir un archivo de programa del grupo */
+        public ActionResult VerAdjunto(int idGrupo)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                if (grupo != null)
+                {
+                    byte[] pdfBytes = accesoAGrupo.ObtenerArchivo(idGrupo);
+                    string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+                    ViewBag.Adjunto = pdfBase64;
+
+                    ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+                    ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+                    return View(grupo);
+                }
+            }
+            catch
+            {
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del grupo.";
+            }
+
+            return RedirectToAction("ListaGruposDisponibles");
+        }
+
         public ActionResult EditarAdjunto(int idGrupo)
         {
             try
