@@ -120,7 +120,6 @@
                     </table>
                 </div>
 
-                <hr />
 
                 @if (ViewBag.Inscripciones == null)
                 {
@@ -180,12 +179,14 @@
                 }
                 else
                 {
+                    <br />
                     <div class="mt-4">
                         <h3 class="">Inscripciones</h3>
-                        <table class="table table-striped" id="tblCustomers">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th scope="col">Módulos Inscritos</th>
+                                    <th scope="col" style="width: 25%">Módulos Inscritos</th>
+                                    <th class="text-center" scope="col" style="width: 15%">Calificación</th>
                                     <th class="text-center" scope="col" style="width: 15%">Horas<br>Matriculadas</th>
                                     <th class="text-center" scope="col" style="width: 15%">Horas<br>Aprobadas</th>
                                     <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Matriculadas</th>
@@ -195,36 +196,33 @@
 
                             <tbody class="align-middle">
                                 <tr>
-
-                                    <td class="">
+                                    <td class="my-3" colspan="4">
                                         @foreach (var inscripcion in ViewBag.Inscripciones)
                                         {
-                                            <span>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</span>
-                                            <br />
+                                            <table class="w-100">
+                                                <tr>
+                                                    <td class="my-2" style="width: 25%">
+                                                        <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
+                                                    </td>
+                                                    <td class="my-2 text-center" style="width: 15%">
+                                                        Calificación @* <span>@inscripcion.calificacion</span> *@
+                                                    </td>
+                                                    <td class="my-2 text-center" style="width: 15%">
+                                                        @inscripcion.horasMatriculadas
+                                                    </td>
+                                                    <td class="my-2 text-center" style="width: 15%">
+                                                        @inscripcion.horasAprobadas
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         }
                                     </td>
 
-                                    <td class="text-center">
-                                        @foreach (var inscripcion in ViewBag.Inscripciones)
-                                        {
-                                            @inscripcion.horasMatriculadas
-                                            <br />
-                                        }
-                                    </td>
-
-                                    <td class="text-center">
-                                        @foreach (var inscripcion in ViewBag.Inscripciones)
-                                        {
-                                            @inscripcion.horasAprobadas
-                                            <br />
-                                        }
-                                    </td>
-
-                                    <td class="text-center">
+                                    <td class="my-3 text-center" style="width: 15%">
                                         <span>@ViewBag.Participante.horasMatriculadas</span>
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="my-3 text-center" scope="col" style="width: 15%">
                                         <span>@ViewBag.Participante.horasAprobadas</span>
                                     </td>
                                 </tr>

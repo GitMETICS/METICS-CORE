@@ -19,5 +19,7 @@
         public int horasAprobadas { get; set; }
 
         public int horasMatriculadas { get; set; }
+
+        public float? calificacion {  get; set; }
     }
 }
