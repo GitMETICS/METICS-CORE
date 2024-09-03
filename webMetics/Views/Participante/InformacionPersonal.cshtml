@@ -105,13 +105,20 @@
 
                         <tbody class="align-middle">
                             <tr>
-                                <td class="">
-                                    @foreach (var inscripcion in ViewBag.Inscripciones)
-                                    {
-                                        <span>@inscripcion.nombreGrupo (Grupo @inscripcion.idGrupo)</span>
-                                        <br />
-                                    }
-                                </td>
+                                @if (ViewBag.ListaGrupos != null)
+                                {
+                                    <td class="">
+                                        @foreach (var grupo in ViewBag.ListaGrupos)
+                                        {
+                                            <span>@grupo.nombre (Grupo @grupo.numeroGrupo)</span>
+                                            <br />
+                                        }
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>Grupos no disponibles</td>
+                                }
 
                                 <td class="text-center">
                                     @foreach (var inscripcion in ViewBag.Inscripciones)
