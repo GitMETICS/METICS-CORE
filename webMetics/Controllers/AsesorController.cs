@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+
 /* 
  * Controlador de la entidad Asesor
  * Los asesores son los profesores a cargo de impartir el grupo
@@ -33,30 +33,7 @@ namespace webMetics.Controllers
             accesoAGrupo = new GrupoHandler(environment, configuration);
         }
 
-        private int GetRole()
-        {
-            int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-            {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
-
-            return role;
-        }
-
-        private string GetId()
-        {
-            string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
-            {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
-            }
-
-            return id;
-        }
-
+        
         /* Método de la vista ListaAsesores que muestra todos los asesores */
         public ActionResult ListaAsesores()
         {
@@ -99,7 +76,6 @@ namespace webMetics.Controllers
 
         // Método para procesar el formulario con los datos necesarios para crear un asesor
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult AgregarAsesor(AsesorModel asesor)
         {
             ViewBag.Role = GetRole();
@@ -120,7 +96,7 @@ namespace webMetics.Controllers
                         }
                         else
                         {
-                            ViewBag.ErrorMessage = "Las contraseñas deben coincidir.";
+                            ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
                             ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                             return View("CrearAsesor", asesor);
                         }
@@ -150,7 +126,7 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
-                TempData["errorMessage"] = "Hubo un error y no se pudo crear el/la facilitador(a).";
+                TempData["errorMessage"] = "Ocurrió un error crear el/la facilitador(a).";
                 return RedirectToAction("ListaAsesores");
             }
         }
@@ -275,6 +251,30 @@ namespace webMetics.Controllers
             }
 
             return eliminar;
+        }
+
+        private int GetRole()
+        {
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
+        }
+
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
         }
     }
 }

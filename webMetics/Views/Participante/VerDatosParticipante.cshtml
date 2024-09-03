@@ -114,7 +114,7 @@
                                                         <th class="text-center" scope="col">Calificación</th>
                                                         <th class="text-center" scope="col" style="width: 10%;">Horas<br>Matriculadas</th>
                                                         <th class="text-center" scope="col" style="width: 10%;">Horas<br>Aprobadas</th>
-                                                        <th class="text-center" scope="col" style="width: 20%;">Aprobar<br>Horas</th>
+                                                        <th class="" scope="col" style="width: 20%;">Aprobar Horas</th>
                                                     </tr>
                                                 </thead>
 
@@ -128,7 +128,7 @@
                                                         <td class="text-center">
                                                             @using (Html.BeginForm("SubirHorasAprobadas", "Participante", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
                                                             {
-                                                                <div class="my-2 align-items-center justify-content-center d-lg-flex">
+                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
                                                                     <input type="number" min="0" class="form-control" style="max-width: 125px;" name="horasAprobadas">
                                                                     <button type="submit" class="m-1 btn btn-outline-secondary">Aceptar</button>
                                                                 </div>

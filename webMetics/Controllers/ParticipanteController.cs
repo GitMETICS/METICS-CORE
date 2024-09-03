@@ -350,32 +350,18 @@ namespace webMetics.Controllers
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
-            List<GrupoModel> grupos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
 
             ViewBag.Participante = participante;
             ViewBag.Inscripciones = inscripciones;
-            ViewBag.ListaGrupos = grupos;
-
+          
             if (GetRole() == 2)
             {
                 string idAsesor = GetId();
                 List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idAsesor);
 
-                List<GrupoModel> gruposEnComun = gruposAsesor.Join(
-                    grupos,
-                    grupoAsesor => grupoAsesor.idGrupo,
-                    grupoParticipante => grupoParticipante.idGrupo,
-                    (grupoAsesor, grupoParticipante) => new GrupoModel
-                    {
-                        idGrupo = grupoParticipante.idGrupo,
-                        nombre = grupoParticipante.nombre,
-                        numeroGrupo = grupoParticipante.numeroGrupo,
-                        cantidadHoras = grupoParticipante.cantidadHoras,
-                        modalidad = grupoParticipante.modalidad
-                    }
-                ).ToList();
+                List<InscripcionModel> inscripcionesEnComun = inscripciones.Where(i => gruposAsesor.Any(g => g.idGrupo == i.idGrupo)).ToList();
 
-                ViewBag.ListaGrupos = gruposEnComun;
+                ViewBag.Inscripciones = inscripcionesEnComun;
             }
 
             if (TempData["errorMessage"] != null)
@@ -622,7 +608,8 @@ namespace webMetics.Controllers
 
 
         [HttpGet]
-        public JsonResult GetDepartamentoJSON(string areaName) { 
+        public JsonResult GetDepartamentoJSON(string areaName)
+        {
             return Json(GetDepartamento(areaName));
         }
 
@@ -837,132 +824,132 @@ namespace webMetics.Controllers
             return unidades;
         }
 
-    [HttpGet]
-    public static List<SelectListItem> GetSedes()
-    {
-        var sedes = new List<SelectListItem>();
-
-        var group1 = new SelectListGroup() { Name = "Sede Central" };
-        var group2 = new SelectListGroup() { Name = "Sede del Sur" };
-        var group3 = new SelectListGroup() { Name = "Sede del Caribe" };
-        var group4 = new SelectListGroup() { Name = "Sede de Guanacaste" };
-        var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
-        var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
-        var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
-
-        sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
-        sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Turrialba", Group = group5 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Paraíso", Group = group5 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
-        sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
-        sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
-
-        return sedes;
-    }
-
-    private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
-    {
-        for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+        [HttpGet]
+        public static List<SelectListItem> GetSedes()
         {
-            if (worksheet.Cells[1, col].Text == columnName)
+            var sedes = new List<SelectListItem>();
+
+            var group1 = new SelectListGroup() { Name = "Sede Central" };
+            var group2 = new SelectListGroup() { Name = "Sede del Sur" };
+            var group3 = new SelectListGroup() { Name = "Sede del Caribe" };
+            var group4 = new SelectListGroup() { Name = "Sede de Guanacaste" };
+            var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
+            var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
+            var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
+
+            sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
+            sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Turrialba", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Paraíso", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
+            sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+
+            return sedes;
+        }
+
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
             {
-                return col;
+                if (worksheet.Cells[1, col].Text == columnName)
+                {
+                    return col;
+                }
+            }
+            return -1;
+        }
+
+        /* Método para enviar confirmación de registro al usuario*/
+        private void EnviarContrasenaPorCorreo(string correo, string contrasena)
+        {
+            try
+            {
+                // Se utiliza la librería MimeKit para construir el mensaje
+                // El mensaje incluye una versión en HTML y texto plano
+
+                // Contenido base del mensaje en HTML y texto plano
+                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
+                const string BASE_MESSAGE_TEXT = "";
+                const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
+
+                MimeMessage message = new MimeMessage();
+
+                // Configurar el remitente y el destinatario
+                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
+                message.From.Add(from);
+                MailboxAddress to = new MailboxAddress("Receiver", correo);
+                message.To.Add(to);
+
+                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+                BodyBuilder bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
+                    "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
+                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
+                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
+                bodyBuilder.HtmlBody += "</p>";
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // Enviar el correo electrónico utilizando un cliente SMTP
+                using var client = new MailKit.Net.Smtp.SmtpClient();
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
         }
-        return -1;
-    }
 
-    /* Método para enviar confirmación de registro al usuario*/
-    private void EnviarContrasenaPorCorreo(string correo, string contrasena)
-    {
-        try
+        private string GenerateRandomPassword()
         {
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
+            int length = 10;
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            var random = new Random();
+            string password = new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
 
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correo);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                "<p>Su contraseña temporal es " + contrasena + "</p>" +
-                "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
-            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using var client = new MailKit.Net.Smtp.SmtpClient();
-            // Configurar el cliente SMTP para el servidor de correo de la UCR
-            client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-            client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-            // Enviar el mensaje
-            client.Send(message);
-
-            // Desconectar el cliente SMTP
-            client.Disconnect(true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-        }
-    }
-
-    private string GenerateRandomPassword()
-    {
-        int length = 10;
-        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-        var random = new Random();
-        string password = new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        return password;
-    }
-
-    private int GetRole()
-    {
-        int role = 0;
-
-        if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
-        {
-            role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            return password;
         }
 
-        return role;
-    }
-
-    private string GetId()
-    {
-        string id = "";
-
-        if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+        private int GetRole()
         {
-            id = Convert.ToString(Request.Cookies["idUsuario"]);
+            int role = 0;
+
+            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            {
+                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+            }
+
+            return role;
         }
 
-        return id;
+        private string GetId()
+        {
+            string id = "";
+
+            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            {
+                id = Convert.ToString(Request.Cookies["idUsuario"]);
+            }
+
+            return id;
+        }
     }
-}
 }

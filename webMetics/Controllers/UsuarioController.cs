@@ -217,9 +217,12 @@ namespace webMetics.Controllers
             const int RolUsuarioAdmin = 1;
             const int RolUsuarioAsesor = 2;
 
-            int rol = GetRole();
+            int role = GetRole();
 
-            switch (rol)
+            ViewBag.Id = GetId();
+            ViewBag.Role = role;
+
+            switch (role)
             {
                 case RolUsuarioParticipante:
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);

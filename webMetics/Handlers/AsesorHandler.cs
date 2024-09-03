@@ -37,7 +37,6 @@ namespace webMetics.Handlers
             }
             return asesores;
         }
-
         public AsesorModel ObtenerAsesor(string idAsesor)
         {
             AsesorModel asesor = null;
@@ -55,15 +54,15 @@ namespace webMetics.Handlers
                     {
                         asesor = new AsesorModel
                         {
-                            idAsesor = reader.GetString(reader.GetOrdinal("id_asesor_PK")),
-                            nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                            primerApellido = reader.GetString(reader.GetOrdinal("apellido_1")),
-                            segundoApellido = reader.GetString(reader.GetOrdinal("apellido_2")),
-                            tipoIdentificacion = reader.GetString(reader.GetOrdinal("tipo_identificacion")),
-                            numeroIdentificacion = reader.GetString(reader.GetOrdinal("numero_identificacion")),
-                            correo = reader.GetString(reader.GetOrdinal("correo")),
-                            descripcion = reader.GetString(reader.GetOrdinal("descripcion")),
-                            telefono = reader.GetString(reader.GetOrdinal("telefono"))
+                            idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_PK")) ? "" : reader.GetString(reader.GetOrdinal("id_asesor_PK")),
+                            nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "" : reader.GetString(reader.GetOrdinal("nombre")),
+                            primerApellido = reader.IsDBNull(reader.GetOrdinal("apellido_1")) ? "" : reader.GetString(reader.GetOrdinal("apellido_1")),
+                            segundoApellido = reader.IsDBNull(reader.GetOrdinal("apellido_2")) ? "" : reader.GetString(reader.GetOrdinal("apellido_2")),
+                            tipoIdentificacion = reader.IsDBNull(reader.GetOrdinal("tipo_identificacion")) ? "" : reader.GetString(reader.GetOrdinal("tipo_identificacion")),
+                            numeroIdentificacion = reader.IsDBNull(reader.GetOrdinal("numero_identificacion")) ? "" : reader.GetString(reader.GetOrdinal("numero_identificacion")),
+                            correo = reader.IsDBNull(reader.GetOrdinal("correo")) ? "" : reader.GetString(reader.GetOrdinal("correo")),
+                            descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "" : reader.GetString(reader.GetOrdinal("descripcion")),
+                            telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? "" : reader.GetString(reader.GetOrdinal("telefono"))
                         };
                     }
                 }
