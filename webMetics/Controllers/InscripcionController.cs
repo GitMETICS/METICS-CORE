@@ -342,25 +342,25 @@ namespace webMetics.Controllers
                 .SetFontSize(10);
             document.Add(header3);
 
-            Table table = new Table(6, true);
-            table.AddHeaderCell("Identificación").SetFontSize(8);
+            Table table = new Table(5, true);
             table.AddHeaderCell("Nombre del participante").SetFontSize(8);
+            table.AddHeaderCell("Correo institucional").SetFontSize(8);
             table.AddHeaderCell("Condición").SetFontSize(8);
             table.AddHeaderCell("Unidad académica").SetFontSize(8);
-            table.AddHeaderCell("Correo institucional").SetFontSize(8);
             table.AddHeaderCell("Teléfono").SetFontSize(8);
 
             foreach (var participante in participantes)
             {
-                table.AddCell(participante.numeroIdentificacion);
                 table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
+                table.AddCell(participante.idParticipante);
                 table.AddCell(participante.condicion);
                 table.AddCell(participante.unidadAcademica);
-                table.AddCell(participante.idParticipante);
                 table.AddCell(participante.telefono);
             }
 
             document.Add(table);
+
+            table.Complete();
 
             document.Close();
 
@@ -399,23 +399,21 @@ namespace webMetics.Controllers
 
 
             var headerRow = table.Rows[2];
-            headerRow.GetCell(0).SetText("Identificación");
-            headerRow.GetCell(1).SetText("Nombre del participante");
+            headerRow.GetCell(0).SetText("Nombre del participante");
+            headerRow.GetCell(1).SetText("Correo institucional");
             headerRow.GetCell(2).SetText("Condición");
             headerRow.GetCell(3).SetText("Unidad académica");
-            headerRow.GetCell(4).SetText("Correo institucional");
-            headerRow.GetCell(5).SetText("Teléfono");
+            headerRow.GetCell(4).SetText("Teléfono");
 
 
             for (int i = 0; i < participantes.Count; i++)
             {
                 var row = table.Rows[i + 3];
-                row.GetCell(0).SetText(participantes[i].numeroIdentificacion.ToString());
-                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
+                row.GetCell(0).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
+                row.GetCell(1).SetText(participantes[i].idParticipante.ToString());
                 row.GetCell(2).SetText(participantes[i].condicion.ToString());
                 row.GetCell(3).SetText(participantes[i].unidadAcademica);
-                row.GetCell(4).SetText(participantes[i].idParticipante.ToString());
-                row.GetCell(5).SetText(participantes[i].telefono.ToString());
+                row.GetCell(4).SetText(participantes[i].telefono.ToString());
             }
 
             var stream = new MemoryStream();
@@ -432,7 +430,10 @@ namespace webMetics.Controllers
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet(grupo.nombre);
+
+            string sheetName = grupo.nombre.Length > 31 ? grupo.nombre.Substring(0, 31) : grupo.nombre;
+
+            var sheet = workbook.CreateSheet(sheetName);
 
             NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
             NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
@@ -449,11 +450,13 @@ namespace webMetics.Controllers
             cell22.SetCellValue(grupo.nombreAsesor);
 
             NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
-            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
-            cell31.SetCellValue("Identificación");
 
-            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
+
+            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(0);
             cell32.SetCellValue("Nombre del participante");
+
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(1);
+            cell35.SetCellValue("Correo institucional");
 
             NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
             cell33.SetCellValue("Condición");
@@ -461,21 +464,20 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
             cell34.SetCellValue("Unidad académica");
 
-            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
-            cell35.SetCellValue("Correo institucional");
-
-            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
+            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(4);
             cell36.SetCellValue("Teléfono");
 
             int rowN = 4;
             foreach (var participante in participantes)
             {
                 NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
-                NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
-                cell1.SetCellValue(participante.numeroIdentificacion);
 
-                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
+
+                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(0);
                 cell2.SetCellValue(participante.nombre + ' ' + participante.primerApellido + ' ' + participante.segundoApellido);
+
+                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(1);
+                cell5.SetCellValue(participante.idParticipante);
 
                 NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
                 cell3.SetCellValue(participante.condicion);
@@ -483,10 +485,7 @@ namespace webMetics.Controllers
                 NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
                 cell4.SetCellValue(participante.unidadAcademica);
 
-                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
-                cell5.SetCellValue(participante.idParticipante);
-
-                NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
+                NPOI.SS.UserModel.ICell cell6 = row.CreateCell(4);
                 cell6.SetCellValue(participante.telefono);
 
                 rowN++;
