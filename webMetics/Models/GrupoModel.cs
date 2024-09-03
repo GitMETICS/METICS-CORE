@@ -24,6 +24,10 @@ namespace webMetics.Models
         [Display(Name = "Nombre del módulo")]
         public required string nombre { get; set; }
 
+        [Required(ErrorMessage = "Es necesario que ingrese un número de grupo.")]
+        [Display(Name = "Número de grupo")]
+        public required int numeroGrupo { get; set; }
+
         [Display(Name = "Descripción")]
         public string? descripcion { get; set; }
 
