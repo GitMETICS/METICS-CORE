@@ -47,6 +47,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
                 command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
                 command.Parameters.AddWithValue("@cupo", grupo.cupo);
+                command.Parameters.AddWithValue("@numeroGrupo", grupo.numeroGrupo);
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
 
@@ -105,6 +106,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@fecha_finalizacion_inscripcion", grupo.fechaFinalizacionInscripcion);
                 command.Parameters.AddWithValue("@cantidad_horas", grupo.cantidadHoras);
                 command.Parameters.AddWithValue("@cupo", grupo.cupo);
+                command.Parameters.AddWithValue("@numeroGrupo", grupo.numeroGrupo);
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
                 command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
@@ -191,6 +193,7 @@ namespace webMetics.Handlers
                     nombreAsesor = Convert.ToString(row["nombre_asesor"]),
                     modalidad = Convert.ToString(row["modalidad"]),
                     cupo = Convert.ToInt32(row["cupo"]),
+                    numeroGrupo = Convert.ToInt32(row["numero_grupo"]),
                     descripcion = Convert.ToString(row["descripcion"]),
                     esVisible = Convert.ToBoolean(row["es_visible"]),
                     lugar = Convert.ToString(row["lugar"]),
@@ -245,18 +248,19 @@ namespace webMetics.Handlers
                                 idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_FK")) ? null : reader.GetString(reader.GetOrdinal("id_asesor_FK")),
                                 nombreAsesor = reader.IsDBNull(reader.GetOrdinal("nombre_asesor")) ? null : reader.GetString(reader.GetOrdinal("nombre_asesor")),
                                 nombre = reader.IsDBNull(reader.GetOrdinal("nombre")) ? "Sin nombre" : reader.GetString(reader.GetOrdinal("nombre")),
+                                numeroGrupo = reader.IsDBNull(reader.GetOrdinal("numero_grupo")) ? 0 : reader.GetInt32(reader.GetOrdinal("numero_grupo")),
                                 descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "Sin descripción" : reader.GetString(reader.GetOrdinal("descripcion")),
                                 modalidad = reader.IsDBNull(reader.GetOrdinal("modalidad")) ? "Sin modalidad" : reader.GetString(reader.GetOrdinal("modalidad")),
                                 cupo = reader.IsDBNull(reader.GetOrdinal("cupo")) ? 0 : reader.GetInt32(reader.GetOrdinal("cupo")),
                                 esVisible = reader.IsDBNull(reader.GetOrdinal("es_visible")) ? false : reader.GetBoolean(reader.GetOrdinal("es_visible")),
                                 lugar = reader.IsDBNull(reader.GetOrdinal("lugar")) ? "Sin lugar" : reader.GetString(reader.GetOrdinal("lugar")),
-                                horario = reader.IsDBNull(reader.GetOrdinal("horario")) ? "Sin horario" : reader.GetString(reader.GetOrdinal("horario")),
+                                horario = reader.IsDBNull(reader.GetOrdinal("horario")) ? "Sin horario definido" : reader.GetString(reader.GetOrdinal("horario")),
                                 fechaInicioGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_grupo")),
                                 fechaFinalizacionGrupo = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_grupo")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_grupo")),
                                 fechaInicioInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_inscripcion")),
                                 fechaFinalizacionInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_inscripcion")),
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
-                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo" : reader.GetString(reader.GetOrdinal("nombre_archivo"))
+                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo adjunto" : reader.GetString(reader.GetOrdinal("nombre_archivo"))
                             };
                         }
                     }
@@ -309,13 +313,11 @@ namespace webMetics.Handlers
                 listaGrupos.Add(ObtenerGrupo(idGrupo));
             }
 
-            // Si no hay grupos en la lista, retornar nulo
             if (listaGrupos.Count == 0)
             {
                 return null;
             }
 
-            // Retornar la lista de grupos obtenida de la base de datos
             return listaGrupos;
         }
 
@@ -329,7 +331,6 @@ namespace webMetics.Handlers
 
             DataTable result = CrearTablaConsulta(command);
 
-            // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
             foreach (DataRow row in result.Rows)
             {
                 GrupoModel grupo = new GrupoModel
@@ -343,6 +344,7 @@ namespace webMetics.Handlers
                     nombreAsesor = Convert.ToString(row["nombre_asesor"]),
                     modalidad = Convert.ToString(row["modalidad"]),
                     cupo = Convert.ToInt32(row["cupo"]),
+                    numeroGrupo = Convert.ToInt32(row["numero_grupo"]),
                     descripcion = Convert.ToString(row["descripcion"]),
                     esVisible = Convert.ToBoolean(row["es_visible"]),
                     lugar = Convert.ToString(row["lugar"]),
@@ -360,7 +362,6 @@ namespace webMetics.Handlers
                 grupos.Add(grupo);
             }
 
-            // Si no se encontraron grupos, devuelve null; de lo contrario, devuelve la lista.
             if (grupos.Count == 0)
             {
                 return null;
@@ -374,23 +375,16 @@ namespace webMetics.Handlers
         {
             bool consultaExitosa;
 
-            // Consulta SQL para eliminar un grupo de la tabla 'grupo' utilizando su ID
             string consulta = "DELETE FROM grupo WHERE id_grupo_PK = @grupoId";
 
-            // Abre la conexión con la base de datos
             ConexionMetics.Open();
 
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoConsulta.Parameters.AddWithValue("@grupoId", grupoId);
-
-            // Ejecuta la consulta y comprueba si al menos una fila fue afectada
             consultaExitosa = comandoConsulta.ExecuteNonQuery() >= 1;
 
-            // Cierra la conexión con la base de datos
             ConexionMetics.Close();
 
-            // Retorna true si la consulta se ejecutó correctamente, de lo contrario, retorna false
             return consultaExitosa;
         }
 
@@ -444,20 +438,15 @@ namespace webMetics.Handlers
         // Método para obtener el estado visible de un grupo mediante su ID
         public bool EsVisible(int grupoId)
         {
-            // Consulta SQL para obtener el estado 'es_visible' de un grupo específico mediante su ID
             string consulta = "SELECT es_visible FROM grupo WHERE id_grupo_PK = " + grupoId;
 
-            // Crea un nuevo comando SQL con la consulta y la conexión establecida
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
 
-            // Obtiene una tabla con los resultados de la consulta
             DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
 
-            // Obtiene el valor del estado 'es_visible' desde la primera fila de la tabla
             DataRow esVisible = tablaResultado.Rows[0];
             int estadoActual = Convert.ToInt32(esVisible[0]);
 
-            // Retorna true si el estado es 1 (visible), de lo contrario, retorna false (no visible)
             return estadoActual == 1;
         }
 

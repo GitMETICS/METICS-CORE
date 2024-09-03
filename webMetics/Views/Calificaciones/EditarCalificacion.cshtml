@@ -11,7 +11,7 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                <a class="text-dark fs-4" onclick="history.go(-2); return false;" href=#>
                     <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
@@ -70,7 +70,7 @@
                             {
                                 @Html.AntiForgeryToken()
                                 <td>
-                                    <input type="number" class="form-control" name="calificacion" id="calificacion">
+                                    <input type="number" min="0", max="100" class="form-control" name="calificacion" id="calificacion">
                                 </td>
                                 <td>
                                     <button type="submit" class="btn btn-outline-primary">Aceptar</button>
