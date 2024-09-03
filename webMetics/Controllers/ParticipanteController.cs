@@ -184,23 +184,23 @@ namespace webMetics.Controllers
             Table table = new Table(6, true);
             table.AddHeaderCell("Identificación").SetFontSize(8);
             table.AddHeaderCell("Nombre del participante").SetFontSize(8);
+            table.AddHeaderCell("Correo institucional").SetFontSize(8);
             table.AddHeaderCell("Condición").SetFontSize(8);
             table.AddHeaderCell("Unidad académica").SetFontSize(8);
-            table.AddHeaderCell("Correo institucional").SetFontSize(8);
             table.AddHeaderCell("Teléfono").SetFontSize(8);
 
             foreach (var participante in participantes)
             {
                 table.AddCell(participante.numeroIdentificacion);
                 table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
+                table.AddCell(participante.idParticipante);
                 table.AddCell(participante.condicion);
                 table.AddCell(participante.unidadAcademica);
-                table.AddCell(participante.idParticipante);
                 table.AddCell(participante.telefono);
             }
 
             document.Add(table);
-
+            table.Complete();
             document.Close();
 
             string fileName = "Lista_de_Participantes_Módulos.pdf";
@@ -227,9 +227,9 @@ namespace webMetics.Controllers
             var headerRow = table.Rows[0];
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre del participante");
-            headerRow.GetCell(2).SetText("Condición");
-            headerRow.GetCell(3).SetText("Unidad académica");
-            headerRow.GetCell(4).SetText("Correo institucional");
+            headerRow.GetCell(2).SetText("Correo institucional");
+            headerRow.GetCell(3).SetText("Condición");
+            headerRow.GetCell(4).SetText("Unidad académica");
             headerRow.GetCell(5).SetText("Teléfono");
 
 
@@ -238,9 +238,9 @@ namespace webMetics.Controllers
                 var row = table.Rows[i];
                 row.GetCell(0).SetText(participantes[i].numeroIdentificacion.ToString());
                 row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
-                row.GetCell(2).SetText(participantes[i].condicion.ToString());
-                row.GetCell(3).SetText(participantes[i].unidadAcademica);
-                row.GetCell(4).SetText(participantes[i].idParticipante.ToString());
+                row.GetCell(2).SetText(participantes[i].idParticipante.ToString());
+                row.GetCell(3).SetText(participantes[i].condicion.ToString());
+                row.GetCell(4).SetText(participantes[i].unidadAcademica);
                 row.GetCell(5).SetText(participantes[i].telefono.ToString());
             }
 
@@ -265,14 +265,14 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
             cell32.SetCellValue("Nombre del participante");
 
-            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(2);
+            cell35.SetCellValue("Correo institucional");
+
+            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(3);
             cell33.SetCellValue("Condición");
 
-            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
+            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(4);
             cell34.SetCellValue("Unidad académica");
-
-            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
-            cell35.SetCellValue("Correo institucional");
 
             NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
             cell36.SetCellValue("Teléfono");
@@ -287,14 +287,14 @@ namespace webMetics.Controllers
                 NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
                 cell2.SetCellValue(participante.nombre + ' ' + participante.primerApellido + ' ' + participante.segundoApellido);
 
-                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
+                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(2);
+                cell5.SetCellValue(participante.idParticipante);
+
+                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(3);
                 cell3.SetCellValue(participante.condicion);
 
-                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
+                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(4);
                 cell4.SetCellValue(participante.unidadAcademica);
-
-                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
-                cell5.SetCellValue(participante.idParticipante);
 
                 NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
                 cell6.SetCellValue(participante.telefono);
@@ -391,36 +391,43 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubirHorasAprobadas(int idGrupo, string idParticipante, int horasAprobadas)
+        public ActionResult SubirHorasAprobadas(int? idGrupo, string idParticipante, int horasAprobadas)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-            int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
-
-            InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo, idParticipante);
-            int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
-
-
-            if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas && nuevasHorasAprobadas >= 0)
+            if (!idGrupo.HasValue)
             {
-                inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                accesoAInscripcion.EditarInscripcion(inscripcion);
-
-                if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
-                {
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
-                }
-
-                TempData["successMessage"] = "Las horas fueron aprobadas.";
+                TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
+                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
             }
             else
             {
-                TempData["errorMessage"] = "No se pudo aprobar las horas.";
-            }
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
 
-            return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
+
+                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
+
+                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas && nuevasHorasAprobadas >= 0)
+                {
+                    inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
+                    {
+                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
+                    }
+
+                    TempData["successMessage"] = "Las horas fueron aprobadas.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "No se pudo aprobar las horas.";
+                }
+
+                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+            }
         }
 
         public ActionResult FormularioParticipante()

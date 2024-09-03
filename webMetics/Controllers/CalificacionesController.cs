@@ -164,19 +164,22 @@ namespace webMetics.Controllers
                 .SetFontSize(12);
             document.Add(header3);
 
+
+
             Table table = new Table(3, true);
-            table.AddHeaderCell("Identificación").SetFontSize(10);
             table.AddHeaderCell("Nombre del participante").SetFontSize(10);
+            table.AddHeaderCell("Correo Institucional").SetFontSize(10);          
             table.AddHeaderCell("Calificación").SetFontSize(10);
 
             foreach (var calificacion in calificaciones)
             {
-                table.AddCell(calificacion.participante.idParticipante);
                 table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
+                table.AddCell(calificacion.participante.idParticipante);
                 table.AddCell(calificacion.calificacion.ToString());
             }
 
             document.Add(table);
+            table.Complete();
 
             document.Close();
 
@@ -210,7 +213,7 @@ namespace webMetics.Controllers
             row0.GetCell(1).SetText(grupo.nombre);
 
             var headerRow = table.Rows[3];
-            headerRow.GetCell(0).SetText("Identificación");
+            headerRow.GetCell(0).SetText("Correo Institucional");
             headerRow.GetCell(1).SetText("Nombre");
             headerRow.GetCell(2).SetText("Calificación");
 
@@ -236,7 +239,10 @@ namespace webMetics.Controllers
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet(grupo.nombre);
+
+            string sheetName = grupo.nombre.Length > 31 ? grupo.nombre.Substring(0, 31) : grupo.nombre;
+
+            var sheet = workbook.CreateSheet(sheetName);
 
             NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(0);
             NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
@@ -254,7 +260,7 @@ namespace webMetics.Controllers
 
             NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
-            cell31.SetCellValue("Identificación");
+            cell31.SetCellValue("Correo Institucional");
 
             NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
             cell32.SetCellValue("Nombre del participante");
