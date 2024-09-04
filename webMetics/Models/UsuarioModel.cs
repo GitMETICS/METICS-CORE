@@ -151,7 +151,6 @@ public class EmailDomainAttribute : ValidationAttribute
             return new ValidationResult("El correo electrónico es obligatorio.");
         }
 
-        // Ensure email ends with the domain
         if (!email.Contains("@"))
         {
             email = $"{email}@{_domain}";
@@ -161,7 +160,6 @@ public class EmailDomainAttribute : ValidationAttribute
             return new ValidationResult($"El correo electrónico debe terminar con '{_domain}'.");
         }
 
-        // Validate with regular expression
         var regex = new Regex(@"^[\w\.]+@ucr\.ac\.cr$");
         if (!regex.IsMatch(email))
         {
