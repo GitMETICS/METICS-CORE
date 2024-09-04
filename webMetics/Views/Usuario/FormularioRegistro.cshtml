@@ -59,9 +59,14 @@
                             </div>
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    <span class="input-group-text"><b>@@ucr.ac.cr</span>
+                                </div>
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            </div>
                         </div>
                         <div class="row mt-1">
                             <div class="col">

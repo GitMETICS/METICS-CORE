@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace webMetics.Models
 {
@@ -17,10 +18,16 @@ namespace webMetics.Models
         [Display(Name = "Segundo Apellido")]
         public string? segundoApellido { get; set; }
 
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [EmailDomain("ucr.ac.cr")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo Institucional")]
-        public required string correo { get; set; }
+        public string correo
+        {
+            get => _correo;
+            set => _correo = EnsureEmailDomain(value);
+        }
+        private string _correo = string.Empty;
+
 
         [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
         [Display(Name = "Tipo de Identificación")]
@@ -58,14 +65,30 @@ namespace webMetics.Models
         public string? telefono { get; set; }
 
         public ParticipanteModel? participante { get; set; }
+
+
+        private string EnsureEmailDomain(string email)
+        {
+            if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+            {
+                email = $"{email}@ucr.ac.cr";
+            }
+            return email;
+        }
     }
 
     public class LoginModel
     {
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+
+        [EmailDomain("ucr.ac.cr")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
-        [Display(Name = "Correo institucional")]
-        public string id { get; set; }
+        [Display(Name = "Correo Institucional")]
+        public string id
+        {
+            get => _id;
+            set => _id = EnsureEmailDomain(value);
+        }
+        private string _id = string.Empty;
 
         [Display(Name = "Rol")]
         public int rol { get; set; }
@@ -73,6 +96,20 @@ namespace webMetics.Models
         [Required(ErrorMessage = "Es necesario ingresar una contraseña.")]
         [Display(Name = "Contraseña")]
         public string contrasena { get; set; }
+
+        private string EnsureEmailDomain(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return email;
+            }
+
+            if (!email.Contains("@"))
+            {
+                email = $"{email}@ucr.ac.cr";
+            }
+            return email;
+        }
     }
 
     public class NewLoginModel
@@ -93,5 +130,44 @@ namespace webMetics.Models
         [Required(ErrorMessage = "Es necesario confirmar la nueva contraseña.")]
         [Display(Name = "Confirmar nueva contraseña")]
         public string confirmarContrasena { get; set; }
+    }
+}
+
+public class EmailDomainAttribute : ValidationAttribute
+{
+    private readonly string _domain;
+
+    public EmailDomainAttribute(string domain)
+    {
+        _domain = domain;
+    }
+
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        var email = value as string;
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return new ValidationResult("El correo electrónico es obligatorio.");
+        }
+
+        // Ensure email ends with the domain
+        if (!email.Contains("@"))
+        {
+            email = $"{email}@{_domain}";
+        }
+        else if (!email.EndsWith(_domain))
+        {
+            return new ValidationResult($"El correo electrónico debe terminar con '{_domain}'.");
+        }
+
+        // Validate with regular expression
+        var regex = new Regex(@"^[\w\.]+@ucr\.ac\.cr$");
+        if (!regex.IsMatch(email))
+        {
+            return new ValidationResult($"El correo electrónico debe seguir el formato requerido y terminar con '{_domain}'.");
+        }
+
+        return ValidationResult.Success;
     }
 }
