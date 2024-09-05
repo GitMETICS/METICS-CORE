@@ -299,23 +299,25 @@ namespace webMetics.Controllers
 
             // Crear el mensaje con información relevante de la inscripción en formato HTML
             string mensaje = "" +
-                "<h2>Comprobante de inscripción</h2> " +
+                "<h2>Comprobante de inscripción a módulo - SISTEMA DE INSCRIPCIONES METICS</h2>" +
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
-                "<p>Cédula: " + participante.idParticipante + "</p>" +
-                "<p>Se ha inscrito al módulo: <strong>" + grupo.idGrupo + " " + grupo.nombre + "</strong></p>" +
-                "<ul><li>Horario: " + grupo.horario + "</li>" +
+                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " Grupo (" + grupo.numeroGrupo + ")</strong></p>" +
+                
+                "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
+                "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
                 "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
             
-            if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+            if (!(string.Equals(grupo.modalidad, "Autogestionado", StringComparison.OrdinalIgnoreCase) || string.Equals(grupo.modalidad, "Virtual", StringComparison.OrdinalIgnoreCase)))
             {
                 mensaje += "<li>Lugar: " + grupo.lugar + "</li>";
             }
             
-            mensaje += "</ul>";
+            mensaje += "</ul>" +
+                "<p>En caso de ser necesario, para proceder con la desinscripción de este módulo, por favor ingrese al sistema y complete el proceso correspondiente.</p>"; ;
 
             return mensaje;
         }

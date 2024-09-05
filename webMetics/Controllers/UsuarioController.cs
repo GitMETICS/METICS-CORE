@@ -368,7 +368,7 @@ namespace webMetics.Controllers
                 // Contenido base del mensaje en HTML y texto plano
                 const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
                 const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Registro en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
+                const string BASE_SUBJECT = "Registro en el SISTEMA DE INSCRIPCIONES METICS"; // Asunto del correo
 
                 MimeMessage message = new MimeMessage();
 
@@ -383,8 +383,8 @@ namespace webMetics.Controllers
                 // Crear el cuerpo del mensaje con el contenido HTML y texto plano
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                    "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                    "<p>Su contraseña temporal es <strong>" + contrasena + "</strong></p>" +
                     "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";
