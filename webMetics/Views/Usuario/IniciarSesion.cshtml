@@ -47,7 +47,12 @@
                         {
                             <div class="text-center mb-1">
                                 @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
-                                @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
+
+                                <div class="input-group">
+                                    @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
+                                    <span class="input-group-text"><b>@@ucr.ac.cr</span>
+                                </div>
+
                                 @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
                             </div>
                             <div class="text-center mb-2 input-wrapper">
