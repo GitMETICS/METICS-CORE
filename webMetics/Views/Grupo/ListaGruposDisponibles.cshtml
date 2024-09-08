@@ -218,18 +218,10 @@
                                 </div>
                                 <div class="card-body align-content-center">
                                     <div class="mb-3"><h4>@grupo.nombre</h4></div>
-                                        @if (!string.IsNullOrEmpty(grupo.descripcion))
-                                        {
-                                            <div class="card-text mb-3" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
-                                                @grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))@* Mostrar los primeros 250 caracteres *@
-                                                @if (grupo.descripcion.Length > 250)
-                                                {
-                                                    <span class="dots">...</span>
-                                                    <span class="more" style="display:none;">@grupo.descripcion.Substring(250)</span>
-                                                    <button class="btn btn-link p-0 see-more-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMore(this)">Ver más</button>
-                                                }
-                                            </div>
-                                        }
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                    {
+                                            <div class="card-text mb-3 overflow-scroll align-content-center" style="max-height: 100px;">@grupo.descripcion</div>
+                                    }
                                     <div class="card-text mb-3">Número de grupo: @grupo.numeroGrupo</div>
                                     <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
                                     @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
@@ -449,32 +441,3 @@ else
         document.getElementById("valueGrupoDesinscribir").value = idGrupo;
     }
 </script>
-
-<script>
-    function toggleSeeMore(btn) {
-        var dots = btn.previousElementSibling.previousElementSibling; // The dots element
-        var moreText = btn.previousElementSibling; // The hidden text element
-
-        if (dots.style.display === "none") {
-            dots.style.display = "inline";
-            btn.innerHTML = "Ver más";
-            moreText.style.display = "none";
-        } else {
-            dots.style.display = "none";
-            btn.innerHTML = "Ver menos";
-            moreText.style.display = "inline";
-        }
-    }
-</script>
-<style>
-    .more {
-        display: none;
-        transition: all 1s ease-in-out;
-    }
-
-    .see-more-btn {
-        border: none;
-        background: none;
-        cursor: pointer;
-    }
-</style>
