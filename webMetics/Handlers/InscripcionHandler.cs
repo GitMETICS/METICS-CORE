@@ -210,7 +210,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         return correo;
     }
 
-    public string EditarCorreoLimiteHoras(string correo)
+    public bool ActualizarCorreoLimiteHoras(string correo)
     {
         string consulta = "UPDATE inscripcion SET correo_limite_horas = @correo;";
 
@@ -223,7 +223,7 @@ public class InscripcionHandler : BaseDeDatosHandler
 
         ConexionMetics.Close();
 
-        return correo;
+        return exito;
     }
 }
 

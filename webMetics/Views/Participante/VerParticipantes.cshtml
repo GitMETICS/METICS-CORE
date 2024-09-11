@@ -38,27 +38,42 @@
 
         <div class="table-responsive">
             <div class="d-flex justify-content-between mb-4">
-                @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                {
-                    <form>
-                        <div class="mx-1">
+                <div>
+                    @using (Html.BeginForm("SubirArchivoExcel", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <form>
+                            <div class="mb-3 d-flex align-items-center">
+                                <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
+                                @Html.ActionLink("   Plantilla", "DescargarPlantillaSubirParticipantes", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download ms-2 w-25" })
+                                <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
+                            </div>
+                        </form>
+                    }
+                    <div class="mb-4 bg-light p-3 rounded">
+                        <small class="text-muted">
+                            Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
+                            <br />
+                            Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas aprobadas
+                        </small>
+                    </div>
+                    <hr />
+                    <div class="mb-3 d-flex justify-content-between">
+                        <div class="p-2 rounded bg-light w-100">
+                            @using (Html.BeginForm("ActualizarCorreoLimiteHoras", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                            {
+                                <form>
+                                    <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
+                                    <div class="d-flex">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras">
+                                        </div>
+                                        <input class="btn btn-secondary ms-2" type="submit" value="Guardar">
+                                    </div>
+                                </form>
+                            }
                         </div>
-
-                        <div class="mb-3 d-flex align-items-center">
-                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
-                            @Html.ActionLink("   Plantilla", "DescargarPlantillaSubirParticipantes", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download ms-2 w-25" })
-                            <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-                        </div>
-
-                        <div class="mb-4 bg-light p-3 rounded">
-                            <small class="text-muted">
-                                Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
-                                <br />
-                                Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas aprobadas
-                            </small>
-                        </div>
-                    </form>
-                }
+                    </div>
+                </div>
 
                 <div class="d-flex justify-content-end">
                     <div class="mx-1">
@@ -85,6 +100,7 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th scope="col">Unidad Académica</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Primer<br>Apellido</th>
@@ -109,6 +125,16 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
+                                @if (participante.horasMatriculadas > 30)
+                                {
+                                    <td class="text-success">
+                                        <i class="bi bi-bell"></i>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
                                 <td>@participante.unidadAcademica</td>
                                 <td>@participante.nombre</td>
                                 <td>@participante.primerApellido</td>

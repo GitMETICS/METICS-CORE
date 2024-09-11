@@ -1,4 +1,6 @@
-﻿namespace webMetics.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace webMetics.Models
 {
     public class InscripcionModel
     {
@@ -21,5 +23,10 @@
         public int horasMatriculadas { get; set; }
 
         public double? calificacion {  get; set; }
+
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+        [Display(Name = "Correo de Notificación sobre Horas Inscritas")]
+        public string? correoLimiteHoras { get; set; }
     }
 }
