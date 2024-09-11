@@ -6,6 +6,7 @@ using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.XWPF.UserModel;
+using System.Text.RegularExpressions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -55,9 +56,7 @@ namespace webMetics.Controllers
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                 
-                if (grupo != null && participante != null 
-                    && NoEstaInscritoEnGrupo(idGrupo, idParticipante) 
-                    && MenorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
+                if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
                 {
                     // Insertar la inscripción y enviar el comprobante por correo electrónico
                     InscripcionModel inscripcion = new InscripcionModel
@@ -86,6 +85,16 @@ namespace webMetics.Controllers
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+
+                            if (MayorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
+                            {
+                                string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
+                                if (!string.IsNullOrEmpty(correo))
+                                {
+                                    // Enviar correo "ha superado las 30 horas"
+                                    EnviarCorreoLimiteHoras(idGrupo, idParticipante, correo);
+                                }
+                            }
                         }
                         catch
                         {
@@ -113,6 +122,50 @@ namespace webMetics.Controllers
             }
 
             return View();
+        }
+
+        private void EnviarCorreoLimiteHoras(int idGrupo, string idParticipante, string correo)
+        {
+            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
+            // Se utiliza la librería MimeKit para construir el mensaje
+            // El mensaje incluye una versión en HTML y texto plano
+
+            // Contenido base del mensaje en HTML y texto plano
+            const string BASE_MESSAGE_HTML = "<p>"; // Contenido HTML adicional puede ser agregado aquí
+            const string BASE_MESSAGE_TEXT = "";
+            const string BASE_SUBJECT = "Notificación sobre límite de horas"; // Asunto del correo
+
+            MimeMessage message = new MimeMessage();
+
+            // Configurar el remitente y el destinatario
+            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
+            message.From.Add(from);
+            MailboxAddress to = new MailboxAddress("Receiver", correo);
+            message.To.Add(to);
+
+            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
+
+            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
+            bodyBuilder.TextBody = $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
+            bodyBuilder.HtmlBody += "</p>";
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            // Enviar el correo electrónico utilizando un cliente SMTP
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                // Configurar el cliente SMTP para el servidor de correo de la UCR
+                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
+
+                // Enviar el mensaje
+                client.Send(message);
+
+                // Desconectar el cliente SMTP
+                client.Disconnect(true);
+            }
         }
 
         private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
@@ -168,6 +221,26 @@ namespace webMetics.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult ActualizarCorreoLimiteHoras(string correoLimiteHoras)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            bool exito = accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
+
+            if (exito)
+            {
+                TempData["successMessage"] = "Se actualizó el correo de notificación.";
+            }
+            else
+            {
+                TempData["errorMessage"] = "Ocurrió un error al actualizar el correo de notificación.";
+            }
+
+            return RedirectToAction("VerParticipantes", "Participante");
+        }
+
         /* Método para que un usuario se desinscriba de un grupo*/
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
@@ -201,9 +274,9 @@ namespace webMetics.Controllers
             }
         }
 
-        private bool MenorALimiteMaximoHoras(int horasGrupo, int horasParticipante)
+        private bool MayorALimiteMaximoHoras(int horasGrupo, int horasParticipante)
         {
-            return horasParticipante + horasGrupo <= 50; // TODO: Refactor.
+            return horasParticipante + horasGrupo > 30;
         }
 
         private int CalcularNumeroHorasAlInscribirse(int horasGrupo, int horasParticipante)
@@ -299,23 +372,25 @@ namespace webMetics.Controllers
 
             // Crear el mensaje con información relevante de la inscripción en formato HTML
             string mensaje = "" +
-                "<h2>Comprobante de inscripción</h2> " +
+                "<h2>Comprobante de inscripción a módulo - SISTEMA DE INSCRIPCIONES METICS</h2>" +
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
-                "<p>Cédula: " + participante.idParticipante + "</p>" +
-                "<p>Se ha inscrito al módulo: <strong>" + grupo.idGrupo + " " + grupo.nombre + "</strong></p>" +
-                "<ul><li>Horario: " + grupo.horario + "</li>" +
+                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " Grupo (" + grupo.numeroGrupo + ")</strong></p>" +
+                
+                "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
+                "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
-                "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
+                // "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
             
-            if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+            if (!(string.Equals(grupo.modalidad, "Autogestionado", StringComparison.OrdinalIgnoreCase) || string.Equals(grupo.modalidad, "Virtual", StringComparison.OrdinalIgnoreCase)))
             {
                 mensaje += "<li>Lugar: " + grupo.lugar + "</li>";
             }
             
-            mensaje += "</ul>";
+            mensaje += "</ul>" +
+                "<p>Si necesita desinscribirse de este módulo, puede ingresar al sistema y realizarlo desde la plataforma.</p>";
 
             return mensaje;
         }

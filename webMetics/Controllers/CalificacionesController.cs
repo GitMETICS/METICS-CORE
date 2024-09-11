@@ -111,7 +111,7 @@ namespace webMetics.Controllers
                             {
                                 for (int col = 1; col <= worksheet.Dimension.End.Column && seguir; col++)
                                 {
-                                    if (worksheet.Cells[row, col].Text == "Identificación") { rowBegin = row; colId = col; }
+                                    if (worksheet.Cells[row, col].Text == "Correo Institucional") { rowBegin = row; colId = col; }
                                     if (worksheet.Cells[row, col].Text == "Calificación") { rowBegin = row; colCalificacion = col; seguir = false; }
                                 }
                             }

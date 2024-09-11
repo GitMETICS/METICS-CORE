@@ -120,23 +120,13 @@ CREATE TABLE inscripcion (
     id_participante_FK NVARCHAR(64) NOT NULL,
 	horas_aprobadas INT DEFAULT 0,
 	horas_matriculadas INT DEFAULT 0,
+	calificacion FLOAT DEFAULT 0.0,
+	correo_limite_horas NVARCHAR(64) DEFAULT '',
 
     FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
---Creación de la tabla calificaciones
-CREATE TABLE calificaciones (
-    id_grupo_FK INT,
-    id_participante_FK NVARCHAR(64) NOT NULL,
-    calificacion FLOAT DEFAULT 0.0,
-
-    CONSTRAINT id_participante_calificacion_FK FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
 
 /*
 	Script para crear los triggers de la base de datos
@@ -176,30 +166,6 @@ BEGIN
 	DECLARE @id NVARCHAR(64) = (SELECT id_usuario_PK FROM inserted)
 
 	UPDATE asesor SET id_asesor_PK =  @id WHERE id_usuario_FK = @id
-END
-
-GO
---Creación de trigger al insertar inscripciones
-CREATE OR ALTER TRIGGER TR_InsertarCalificacion
-ON inscripcion
-AFTER INSERT
-AS
-BEGIN
-	INSERT INTO calificaciones(id_grupo_FK, id_participante_FK)
-		SELECT id_grupo_FK, id_participante_FK
-		FROM inserted
-END
-
-GO
---Creación de trigger al eliminar inscripciones
-CREATE OR ALTER TRIGGER TR_EliminarCalificacion
-ON inscripcion
-AFTER DELETE
-AS
-BEGIN
-	DELETE FROM calificaciones
-	WHERE id_grupo_FK IN (SELECT id_grupo_FK FROM deleted)
-	AND id_participante_FK IN (SELECT id_participante_FK FROM deleted)
 END
 
 GO

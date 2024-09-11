@@ -50,7 +50,7 @@
 
                                 <div class="input-group">
                                     @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
-                                    <span class="input-group-text"><b>@@ucr.ac.cr</span>
+                                    <span class="input-group-text text-secondary"><b>@@ucr.ac.cr</b></span>
                                 </div>
 
                                 @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
