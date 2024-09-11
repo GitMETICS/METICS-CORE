@@ -316,8 +316,8 @@ namespace webMetics.Controllers
                 mensaje += "<li>Lugar: " + grupo.lugar + "</li>";
             }
             
-            mensaje += "</ul><br />" +
-                "<p>En caso de ser necesario, para proceder con la desinscripción de este módulo, por favor ingrese al sistema y complete el proceso correspondiente.</p>";
+            mensaje += "</ul>" +
+                "<p>Si necesita desinscribirse de este módulo, puede ingresar al sistema y realizarlo desde la plataforma.</p>";
 
             return mensaje;
         }

@@ -63,7 +63,7 @@
                                 @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 <div class="input-group">
                                     @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    <span class="input-group-text"><b>@@ucr.ac.cr</span>
+                                    <span class="input-group-text"><b>@@ucr.ac.cr</b></span>
                                 </div>
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
                             </div>
