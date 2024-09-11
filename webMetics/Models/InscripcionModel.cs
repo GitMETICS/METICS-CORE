@@ -20,6 +20,6 @@
 
         public int horasMatriculadas { get; set; }
 
-        public float? calificacion {  get; set; }
+        public double? calificacion {  get; set; }
     }
 }

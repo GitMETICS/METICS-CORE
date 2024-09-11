@@ -33,7 +33,7 @@ namespace webMetics.Handlers
         // Método para obtener una lista de todas las calificaciones de un grupo
         public List<CalificacionModel> ObtenerListaCalificaciones(int idGrupo)
         {
-            string consulta = "SELECT * FROM calificaciones WHERE id_grupo_FK = " + idGrupo;
+            string consulta = "SELECT * FROM inscripcion WHERE id_grupo_FK = " + idGrupo;
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
             DataTable tablaResultado = CrearTablaConsulta(comandoParaConsulta);
             List<CalificacionModel> listaCalificaciones = new List<CalificacionModel>();
@@ -57,7 +57,7 @@ namespace webMetics.Handlers
         public bool IngresarNota(int idGrupo, string idParticipante, int calificacion)
         {
             bool comprobacionConsultaExitosa;
-            string consulta = "UPDATE calificaciones SET calificacion = @calificacion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante";
+            string consulta = "UPDATE inscripcion SET calificacion = @calificacion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
 
             ConexionMetics.Open();
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
