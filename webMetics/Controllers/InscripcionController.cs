@@ -379,7 +379,7 @@ namespace webMetics.Controllers
                 "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
                 "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
-                "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
+                // "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
