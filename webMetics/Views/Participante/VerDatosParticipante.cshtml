@@ -122,7 +122,7 @@
                                                     <tr>
                                                         <td class="">@nombreCompleto</td>
                                                         <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                                        <td class="text-center">@* <span>@inscripcion.calificacion</span> *@</td>
+                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
                                                         <td class="text-center">

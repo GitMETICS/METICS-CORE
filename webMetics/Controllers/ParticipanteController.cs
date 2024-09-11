@@ -8,6 +8,13 @@ using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.XWPF.UserModel;
+using NPOI.SS.UserModel;
+using iText.Kernel.Font;
+using iText.Layout.Properties;
+using iText.Kernel.Geom;
+using NPOI.OpenXmlFormats.Wordprocessing;
+using NPOI.XWPF.Model;
+using NPOI.OpenXmlFormats.Spreadsheet;
 
 
 namespace webMetics.Controllers
@@ -170,80 +177,190 @@ namespace webMetics.Controllers
 
         public ActionResult ExportarParticipantesPDF()
         {
+            // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
 
-            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes_Módulos.docx");
+            // Crear el archivo PDF
+            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes_Módulos.pdf");
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
-            iText.Layout.Document document = new iText.Layout.Document(pdf);
 
-            Paragraph header3 = new Paragraph("Lista de Participantes")
-                .SetFontSize(10);
-            document.Add(header3);
+            // Definir tamaño de página más grande (A2 o A3)
+            PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
+            iText.Layout.Document document = new iText.Layout.Document(pdf, pageSize);
 
-            Table table = new Table(6, true);
-            table.AddHeaderCell("Identificación").SetFontSize(8);
-            table.AddHeaderCell("Nombre del participante").SetFontSize(8);
-            table.AddHeaderCell("Correo institucional").SetFontSize(8);
-            table.AddHeaderCell("Condición").SetFontSize(8);
-            table.AddHeaderCell("Unidad académica").SetFontSize(8);
-            table.AddHeaderCell("Teléfono").SetFontSize(8);
+            // Establecer fuente en negrita para encabezado
+            PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
+            PdfFont regularFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
 
-            foreach (var participante in participantes)
+            // Crear encabezado del documento
+            Paragraph header = new Paragraph("Lista de Participantes y Módulos")
+                .SetFont(boldFont)
+                .SetFontSize(14)
+                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                .SetMarginBottom(20);
+            document.Add(header);
+
+            // Crear la tabla (9 columnas)
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
+            table.SetWidth(UnitValue.CreatePercentValue(100));
+
+            // Agregar encabezados de la tabla con estilo
+            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            foreach (var headerText in headers)
             {
-                table.AddCell(participante.numeroIdentificacion);
-                table.AddCell(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
-                table.AddCell(participante.idParticipante);
-                table.AddCell(participante.condicion);
-                table.AddCell(participante.unidadAcademica);
-                table.AddCell(participante.telefono);
+                table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY));
             }
 
+            // Rellenar la tabla con los datos
+            foreach (var participante in participantes)
+            {
+                // Obtener las inscripciones del participante
+                var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
+
+                if (inscripcionesParticipante.Any())
+                {
+                    foreach (var inscripcion in inscripcionesParticipante)
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+
+                        // Datos del módulo
+                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.horasAprobadas.ToString()).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.calificacion.ToString()).SetFont(regularFont).SetFontSize(9)));
+                    }
+                }
+                else
+                {
+                    // Si no tiene inscripciones, rellenar con "N/A"
+                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+
+                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                }
+            }
+
+            // Añadir la tabla al documento
             document.Add(table);
-            table.Complete();
+
+            // Cerrar el documento
             document.Close();
 
+            // Devolver el archivo PDF
             string fileName = "Lista_de_Participantes_Módulos.pdf";
-
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
         public ActionResult ExportarParticipantesWord()
         {
+            // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
 
             var fileName = "Lista_de_Participantes_Módulos.docx";
 
+            // Crear el documento Word
             XWPFDocument wordDoc = new XWPFDocument();
 
-            XWPFTable table = wordDoc.CreateTable(participantes.Count, 6);
-            table.SetColumnWidth(0, 1500);
-            table.SetColumnWidth(1, 2500);
-            table.SetColumnWidth(2, 1000);
-            table.SetColumnWidth(3, 2000);
-            table.SetColumnWidth(4, 2500);
-            table.SetColumnWidth(5, 1000);
+            // Crear un título
+            XWPFParagraph titleParagraph = wordDoc.CreateParagraph();
+            titleParagraph.Alignment = ParagraphAlignment.CENTER;
+            XWPFRun titleRun = titleParagraph.CreateRun();
+            titleRun.SetText("Lista de Participantes y Módulos");
+            titleRun.IsBold = true;
+            titleRun.FontSize = 16;
+            titleRun.AddBreak(); // Salto de línea después del título
 
-            var headerRow = table.Rows[0];
+            // Crear tabla con el número de participantes y columnas para los módulos
+            XWPFTable table = wordDoc.CreateTable(participantes.Count + 1, 9); // +1 para la fila de encabezado
+
+            // Ajustar los anchos de columna (simulando margen)
+            table.SetColumnWidth(0, 750);  // Ajustar más ancho para la columna de identificación
+            table.SetColumnWidth(1, 1000);  // Ancho de columna de nombre
+            table.SetColumnWidth(2, 1500);  // Columna de correo
+            table.SetColumnWidth(3, 750);  // Columna de condición
+            table.SetColumnWidth(4, 1500);  // Columna de unidad académica
+            table.SetColumnWidth(5, 750);  // Columna de teléfono
+            table.SetColumnWidth(6, 1500);  // Nombre del módulo
+            table.SetColumnWidth(7, 750);  // Horas aprobadas
+            table.SetColumnWidth(8, 750);  // Nota del módulo
+
+            // Estilo para el encabezado
+            var headerRow = table.GetRow(0);
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre del participante");
             headerRow.GetCell(2).SetText("Correo institucional");
             headerRow.GetCell(3).SetText("Condición");
             headerRow.GetCell(4).SetText("Unidad académica");
             headerRow.GetCell(5).SetText("Teléfono");
+            headerRow.GetCell(6).SetText("Módulo");
+            headerRow.GetCell(7).SetText("Horas aprobadas");
+            headerRow.GetCell(8).SetText("Calificación del módulo");
 
+            // Rellenar la tabla con los datos de los participantes e inscripciones
+            int rowIndex = 1; // Comenzar después del encabezado
 
-            for (int i = 1; i < participantes.Count; i++)
+            foreach (var participante in participantes)
             {
-                var row = table.Rows[i];
-                row.GetCell(0).SetText(participantes[i].numeroIdentificacion.ToString());
-                row.GetCell(1).SetText(participantes[i].nombre + " " + participantes[i].primerApellido + " " + participantes[i].segundoApellido);
-                row.GetCell(2).SetText(participantes[i].idParticipante.ToString());
-                row.GetCell(3).SetText(participantes[i].condicion.ToString());
-                row.GetCell(4).SetText(participantes[i].unidadAcademica);
-                row.GetCell(5).SetText(participantes[i].telefono.ToString());
+                // Obtener las inscripciones del participante
+                var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
+
+                if (inscripcionesParticipante.Any())
+                {
+                    foreach (var inscripcion in inscripcionesParticipante)
+                    {
+                        var row = table.CreateRow(); // Crear una nueva fila para cada inscripción
+
+                        row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
+                        row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
+                        row.GetCell(2).SetText(participante.idParticipante.ToString());
+                        row.GetCell(3).SetText(participante.condicion.ToString());
+                        row.GetCell(4).SetText(participante.unidadAcademica);
+                        row.GetCell(5).SetText(participante.telefono.ToString());
+
+                        // Información del módulo
+                        row.GetCell(6).SetText(inscripcion.nombreGrupo);
+                        row.GetCell(7).SetText(inscripcion.horasAprobadas.ToString());
+                        row.GetCell(8).SetText(inscripcion.calificacion.ToString());
+
+                        rowIndex++;
+                    }
+                }
+                else
+                {
+                    // Si el participante no tiene inscripciones, crear una fila con "N/A"
+                    var row = table.CreateRow();
+
+                    row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
+                    row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
+                    row.GetCell(2).SetText(participante.idParticipante.ToString());
+                    row.GetCell(3).SetText(participante.condicion.ToString());
+                    row.GetCell(4).SetText(participante.unidadAcademica);
+                    row.GetCell(5).SetText(participante.telefono.ToString());
+
+                    row.GetCell(6).SetText("N/A");
+                    row.GetCell(7).SetText("N/A");
+                    row.GetCell(8).SetText("N/A");
+
+                    rowIndex++;
+                }
             }
 
+            // Guardar el archivo y devolver el documento Word como respuesta
             var stream = new MemoryStream();
             wordDoc.Write(stream);
             var file = stream.ToArray();
@@ -252,63 +369,123 @@ namespace webMetics.Controllers
 
         public ActionResult ExportarParticipantesExcel()
         {
+            // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Lista_de_Participantes_Módulos");
 
-            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
-            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
-            cell31.SetCellValue("Identificación");
+            // Crear estilos para el encabezado
+            ICellStyle headerStyle = workbook.CreateCellStyle();
+            headerStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            headerStyle.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
 
-            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
-            cell32.SetCellValue("Nombre del participante");
+            // Añadir borde y fondo al encabezado
+            headerStyle.BorderBottom = BorderStyle.Thin;
+            headerStyle.BorderTop = BorderStyle.Thin;
+            headerStyle.BorderLeft = BorderStyle.Thin;
+            headerStyle.BorderRight = BorderStyle.Thin;
 
-            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(2);
-            cell35.SetCellValue("Correo institucional");
+            // Crear fuente en negrita para el encabezado
+            IFont font = workbook.CreateFont();
+            headerStyle.SetFont(font);
 
-            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(3);
-            cell33.SetCellValue("Condición");
+            // Crear estilos para las celdas del cuerpo
+            ICellStyle bodyStyle = workbook.CreateCellStyle();
+            bodyStyle.BorderBottom = BorderStyle.Thin;
+            bodyStyle.BorderTop = BorderStyle.Thin;
+            bodyStyle.BorderLeft = BorderStyle.Thin;
+            bodyStyle.BorderRight = BorderStyle.Thin;
 
-            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(4);
-            cell34.SetCellValue("Unidad académica");
+            // Crear el encabezado de la tabla
+            IRow row3 = sheet.CreateRow(3);
+            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
 
-            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
-            cell36.SetCellValue("Teléfono");
+            for (int i = 0; i < headers.Length; i++)
+            {
+                NPOI.SS.UserModel.ICell cell = row3.CreateCell(i);
+                cell.SetCellValue(headers[i]);
+                cell.CellStyle = headerStyle;  // Aplicar estilo de encabezado
+            }
 
             int rowN = 4;
             foreach (var participante in participantes)
             {
-                NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
-                NPOI.SS.UserModel.ICell cell1 = row.CreateCell(0);
-                cell1.SetCellValue(participante.numeroIdentificacion);
+                // Obtener las inscripciones del participante
+                var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
 
-                NPOI.SS.UserModel.ICell cell2 = row.CreateCell(1);
-                cell2.SetCellValue(participante.nombre + ' ' + participante.primerApellido + ' ' + participante.segundoApellido);
+                // Si el participante tiene inscripciones, crear una fila por cada módulo inscrito
+                if (inscripcionesParticipante.Any())
+                {
+                    foreach (var inscripcion in inscripcionesParticipante)
+                    {
+                        IRow row = sheet.CreateRow(rowN);
 
-                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(2);
-                cell5.SetCellValue(participante.idParticipante);
+                        // Completar los datos del participante en cada fila
+                        row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
+                        row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
+                        row.CreateCell(2).SetCellValue(participante.idParticipante);
+                        row.CreateCell(3).SetCellValue(participante.condicion);
+                        row.CreateCell(4).SetCellValue(participante.unidadAcademica);
+                        row.CreateCell(5).SetCellValue(participante.telefono);
 
-                NPOI.SS.UserModel.ICell cell3 = row.CreateCell(3);
-                cell3.SetCellValue(participante.condicion);
+                        // Completar los datos del módulo
+                        row.CreateCell(6).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
+                        row.CreateCell(7).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
+                        row.CreateCell(8).SetCellValue(inscripcion.calificacion); // Nota del módulo
 
-                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(4);
-                cell4.SetCellValue(participante.unidadAcademica);
+                        // Aplicar estilo al cuerpo
+                        for (int i = 0; i < 9; i++)
+                        {
+                            row.GetCell(i).CellStyle = bodyStyle;
+                        }
 
-                NPOI.SS.UserModel.ICell cell6 = row.CreateCell(5);
-                cell6.SetCellValue(participante.telefono);
+                        rowN++; // Incrementar para la siguiente fila
+                    }
+                }
+                else
+                {
+                    // Si no tiene inscripciones, dejar una sola fila para el participante con "N/A"
+                    IRow row = sheet.CreateRow(rowN);
 
-                rowN++;
+                    row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
+                    row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
+                    row.CreateCell(2).SetCellValue(participante.idParticipante);
+                    row.CreateCell(3).SetCellValue(participante.condicion);
+                    row.CreateCell(4).SetCellValue(participante.unidadAcademica);
+                    row.CreateCell(5).SetCellValue(participante.telefono);
+                    row.CreateCell(6).SetCellValue("N/A");
+                    row.CreateCell(7).SetCellValue("N/A");
+                    row.CreateCell(8).SetCellValue("N/A");
+
+                    // Aplicar estilo al cuerpo
+                    for (int i = 0; i < 9; i++)
+                    {
+                        row.GetCell(i).CellStyle = bodyStyle;
+                    }
+
+                    rowN++; // Incrementar para la siguiente fila
+                }
             }
 
-            string fileName = "Lista_de_Participantes_Módulos.xlsx";
-            var stream = new MemoryStream();
-            workbook.Write(stream);
-            var file = stream.ToArray();
+            // Ajustar automáticamente el ancho de las columnas
+            for (int i = 0; i < headers.Length; i++)
+            {
+                sheet.AutoSizeColumn(i);
+            }
 
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            // Crear el archivo de Excel y devolverlo como respuesta
+            string fileName = "Lista_de_Participantes_Módulos.xlsx";
+            using (var stream = new MemoryStream())
+            {
+                workbook.Write(stream);
+                var file = stream.ToArray();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
         }
+
 
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
@@ -333,7 +510,7 @@ namespace webMetics.Controllers
             cell35.SetCellValue("Correo Institucional");
 
             NPOI.SS.UserModel.ICell cell36 = row.CreateCell(5);
-            cell36.SetCellValue("Horas aprobadas");
+            cell36.SetCellValue("Horas Aprobadas");
 
             string fileName = "Plantilla_Lista_Participantes.xlsx";
             var stream = new MemoryStream();

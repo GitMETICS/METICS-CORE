@@ -30,7 +30,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
-                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+                calificacion = Convert.ToDouble(fila["calificacion"])
             };
 
             inscripciones.Add(inscripcion);
@@ -60,7 +61,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
-                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+                calificacion = Convert.ToDouble(fila["calificacion"])
             };
 
             inscripciones.Add(inscripcion);
@@ -89,7 +91,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 estado = Convert.ToString(fila["estado"]),
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
-                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+                horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+                calificacion = Convert.ToDouble(fila["calificacion"])
             };
 
             inscripciones.Add(inscripcion);
@@ -117,7 +120,8 @@ public class InscripcionHandler : BaseDeDatosHandler
             estado = Convert.ToString(fila["estado"]),
             observaciones = Convert.ToString(fila["observaciones"]),
             horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
-            horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"])
+            horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+            calificacion = Convert.ToDouble(fila["calificacion"])
         };
 
         return inscripcion;
@@ -184,6 +188,36 @@ public class InscripcionHandler : BaseDeDatosHandler
 
         comandoConsulta.Parameters.AddWithValue("@idGrupo", idGrupo);
         comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+        ConexionMetics.Close();
+
+        return exito;
+    }
+
+    public string ObtenerCorreoLimiteHoras()
+    {
+        string consulta = "SELECT correo_limite_horas FROM inscripcion;";
+
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        DataRow fila = tablaResultado.Rows[0];
+
+        string correo = Convert.ToString(fila["correo_limite_horas"]);
+
+        return correo;
+    }
+
+    public bool ActualizarCorreoLimiteHoras(string correo)
+    {
+        string consulta = "UPDATE inscripcion SET correo_limite_horas = @correo;";
+
+        ConexionMetics.Open();
+
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@correo", correo);
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 
