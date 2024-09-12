@@ -51,6 +51,7 @@ namespace webMetics.Controllers
             {
                 ViewBag.IdGrupo = idGrupo;
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+                ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
 
                 ViewBag.Title = "Lista de participantes";
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
@@ -149,7 +150,7 @@ namespace webMetics.Controllers
                             departamento = "",
                             telefono = "",
                             horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
-                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
+                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0,
                             gruposInscritos = new List<GrupoModel>()
                         };
 
@@ -400,12 +401,12 @@ namespace webMetics.Controllers
             bodyStyle.BorderRight = BorderStyle.Thin;
 
             // Crear el encabezado de la tabla
-            IRow row3 = sheet.CreateRow(3);
+            IRow rowHeaders = sheet.CreateRow(3);
             string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
 
             for (int i = 0; i < headers.Length; i++)
             {
-                NPOI.SS.UserModel.ICell cell = row3.CreateCell(i);
+                NPOI.SS.UserModel.ICell cell = rowHeaders.CreateCell(i);
                 cell.SetCellValue(headers[i]);
                 cell.CellStyle = headerStyle;  // Aplicar estilo de encabezado
             }

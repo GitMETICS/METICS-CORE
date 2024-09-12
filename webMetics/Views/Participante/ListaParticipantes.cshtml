@@ -78,6 +78,8 @@
                             <th scope="col">Primer<br>Apellido</th>
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
+                            <th scope="col" style="width:10%" class="text-center">Horas<br />Aprobadas</th>
+                            <th scope="col" style="width:10%">Calificación</th>
                             <th scope="col" style="width:3.33%"></th>
                             @if (ViewBag.Role == 1)
                             {
@@ -101,6 +103,34 @@
                                 <td>@participante.primerApellido</td>
                                 <td>@participante.segundoApellido</td>
                                 <td>@participante.correo</td>
+                                @{
+                                    int horasAprobadas = 0;
+
+                                    List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
+
+                                    if (inscripciones != null)
+                                    {
+                                        horasAprobadas = inscripciones
+                                        .Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+                                        .Select(i => i.horasAprobadas)
+                                        .FirstOrDefault(); // Devuelve el primer resultado o un valor por defecto (0 para int)
+                                    }
+                                
+                                    <td class="text-center">@horasAprobadas</td>
+                                }
+                                @{
+                                    double calificacion = 0;
+
+                                    if (inscripciones != null)
+                                    {
+                                        calificacion = inscripciones
+                                        .Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+                                        .Select(i => i.calificacion)
+                                        .FirstOrDefault(); // Devuelve el primer resultado o un valor por defecto (0 para int)
+                                    }
+
+                                    <td class="text-center">@calificacion</td>
+                                }
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
                                 </td>
