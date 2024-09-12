@@ -80,6 +80,9 @@ namespace webMetics.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime fechaFinalizacionInscripcion { get; set; }
 
+        public List<int>? TemasSeleccionados { get; set; }
+
+
         public bool esVisible { get; set; }
 
         public string? nombreArchivo { get; set; }
