@@ -70,8 +70,7 @@
                                     </div>
                                     <br />
                                     <div class="justify-content-center">
-                                            <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                            <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
+                                            Duración del módulo: @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
                                     </div>
                                 </div>
                                 <div class="card-body align-content-center bg-info bg-opacity-10 border-info border-0 border-opacity-50">
@@ -192,15 +191,11 @@
                                         <div style="float:left">
                                             @if (grupo.cupoActual < grupo.cupo)
                                             {
-                                                <span class="badge bg-info" style="float:left; margin-right: 10px;">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
+                                                <span class="badge bg-info" style="float:right">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
-                                            }
-                                            @if (ViewBag.Role == 1 || ViewBag.Role == 2)
-                                            {
-                                                <span class="badge bg-info" style="float:left; margin-right: 10px;">Inscripciones: @(grupo.cupoActual)</span>
+                                                <span class="badge bg-danger" style="float:right">Sin cupo</span>
                                             }
                                         </div>
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
@@ -226,8 +221,7 @@
                                     </div>
                                     <br />
                                     <div class="justify-content-center">
-                                        <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                        <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
+                                        Duración del módulo: @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
                                     </div>
                                 </div>
                                 <div class="card-body align-content-center">
