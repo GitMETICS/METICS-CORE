@@ -177,7 +177,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            bool exito = accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
+            bool exito = correoLimiteHoras != null ? accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras) : false;
 
             if (exito)
             {
@@ -185,7 +185,7 @@ namespace webMetics.Controllers
             }
             else
             {
-                TempData["errorMessage"] = "Ocurrió un error al actualizar el correo de notificación.";
+                TempData["errorMessage"] = "Debe introducir un correo de notificación válido.";
             }
 
             return RedirectToAction("VerParticipantes", "Participante");

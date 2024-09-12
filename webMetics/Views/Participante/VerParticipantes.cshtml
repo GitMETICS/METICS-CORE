@@ -47,7 +47,12 @@
                                     <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
                                     <div class="d-flex">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@(ViewBag.CorreoNotificacion ?? string.Empty)">
+                                            @{
+                                                string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
+                                                correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
+                                                
+                                                <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                            }
                                         </div>
                                         <input class="btn btn-secondary ms-2" type="submit" value="Guardar">
                                     </div>
