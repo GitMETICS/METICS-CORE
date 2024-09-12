@@ -89,16 +89,6 @@ namespace webMetics.Controllers
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
-                            if (MayorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
-                            {
-                                string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
-                                if (!string.IsNullOrEmpty(correo))
-                                {
-                                    // Enviar correo "ha superado las 30 horas"
-                                    EnviarCorreoLimiteHoras(idGrupo, idParticipante, correo);
-                                }
-                            }
                         }
                         catch
                         {
@@ -126,50 +116,6 @@ namespace webMetics.Controllers
             }
 
             return View();
-        }
-
-        private void EnviarCorreoLimiteHoras(int idGrupo, string idParticipante, string correo)
-        {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
-
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = "<p>"; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Notificación sobre límite de horas"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correo);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.TextBody = $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
         }
 
         private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)

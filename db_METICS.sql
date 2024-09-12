@@ -58,6 +58,7 @@ CREATE TABLE participante (
     sede NVARCHAR(64),
     total_horas_matriculadas INT DEFAULT 0,
     total_horas_aprobadas INT DEFAULT 0,
+	correo_notificacion_enviado INT DEFAULT 0,
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
         ON DELETE CASCADE

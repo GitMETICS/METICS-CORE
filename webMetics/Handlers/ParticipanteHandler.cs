@@ -167,6 +167,7 @@ namespace webMetics.Handlers
                                 sede = reader["sede"].ToString(),
                                 horasAprobadas = reader.GetInt32(reader.GetOrdinal("total_horas_aprobadas")),
                                 horasMatriculadas = reader.GetInt32(reader.GetOrdinal("total_horas_matriculadas")),
+                                correoNotificacionEnviado = reader.GetInt32(reader.GetOrdinal("correo_notificacion_enviado")),
                                 gruposInscritos = new List<GrupoModel>()
                             };
                         }
@@ -283,6 +284,7 @@ namespace webMetics.Handlers
                 sede = Convert.ToString(filaParticipante["sede"]),
                 horasMatriculadas = Convert.ToInt32(filaParticipante["total_horas_matriculadas"]),
                 horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
+                correoNotificacionEnviado = Convert.ToInt32(filaParticipante["correo_notificacion_enviado"]),
                 gruposInscritos = new List<GrupoModel>()
             };
 
@@ -364,6 +366,41 @@ namespace webMetics.Handlers
                 // El usuario está registrado en la base de datos
                 return true;
             }
+        }
+
+        public bool ObtenerCorreoNotificacionEnviadoParticipante(string idParticipante)
+        {
+            string consulta = "SELECT correo_notificacion_enviado FROM participante WHERE id_participante_PK = @idParticipante;";
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+            DataRow fila = tablaResultado.Rows[0];
+
+            int enviado = Convert.ToInt32(fila["correo_notificacion_enviado"]);
+
+            return enviado != 0;
+        }
+
+        public bool ActualizarCorreoNotificacionEnviadoParticipante(string idParticipante)
+        {
+            string consulta = "UPDATE participante SET correo_notificacion_enviado = @valor" +
+                "WHERE id_participante_PK = @idParticipante;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@valor", 1);
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
         }
 
         // Método para leer un archivo JSON y devolver su contenido como una cadena
