@@ -1,183 +1,179 @@
 is_global = true
 build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = webMetics
 build_property.RootNamespace = webMetics
-build_property.ProjectDir = C:\Users\zmont\Source\Repos\METICS-CORE\webMetics\
+build_property.ProjectDir = C:\Users\XPC\Source\Repos\METICS-CORE\webMetics\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\zmont\Source\Repos\METICS-CORE\webMetics
+build_property.MSBuildProjectDirectory = C:\Users\XPC\Source\Repos\METICS-CORE\webMetics
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Areas/Identity/Pages/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Asesor/CrearAsesor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXNlc29yXENyZWFyQXNlc29yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Asesor/AgregarAsesor.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXNlc29yXEFncmVnYXJBc2Vzb3IuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Asesor/EditarAsesor.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Asesor/EditarAsesor.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXNlc29yXEVkaXRhckFzZXNvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Asesor/ListaAsesores.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Asesor/ListaAsesores.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXNlc29yXExpc3RhQXNlc29yZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/EditarCalificacion.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/EditarCalificacion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FsaWZpY2FjaW9uZXNcRWRpdGFyQ2FsaWZpY2FjaW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/ExportarCalificaciones.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/ExportarCalificaciones.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FsaWZpY2FjaW9uZXNcRXhwb3J0YXJDYWxpZmljYWNpb25lcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/VerCalificaciones.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Calificaciones/VerCalificaciones.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FsaWZpY2FjaW9uZXNcVmVyQ2FsaWZpY2FjaW9uZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Categoria/CrearCategoria.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Categoria/CrearCategoria.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmlhXENyZWFyQ2F0ZWdvcmlhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Categoria/EditarCategoria.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Categoria/EditarCategoria.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmlhXEVkaXRhckNhdGVnb3JpYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Categoria/ListaCategorias.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Categoria/ListaCategorias.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcmlhXExpc3RhQ2F0ZWdvcmlhcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Grupo/AgregarGrupo.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cQWdyZWdhckdydXBvLmNzaHRtbA==
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Grupo/CrearGrupo.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cQ3JlYXJHcnVwby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Grupo/EditarAdjunto.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Grupo/EditarAdjunto.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cRWRpdGFyQWRqdW50by5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Grupo/EditarGrupo.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Grupo/EditarGrupo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cRWRpdGFyR3J1cG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Grupo/ListaGruposDisponibles.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Grupo/ListaGruposDisponibles.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cTGlzdGFHcnVwb3NEaXNwb25pYmxlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Home/Index.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Grupo/VerAdjunto.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3J1cG9cVmVyQWRqdW50by5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Inscripcion/ExportarParticipantes.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Inscripcion/ExportarParticipantes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zY3JpcGNpb25cRXhwb3J0YXJQYXJ0aWNpcGFudGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Inscripcion/Inscribir.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Inscripcion/Inscribir.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zY3JpcGNpb25cSW5zY3JpYmlyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Login/FormularioDeUsuario.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cRm9ybXVsYXJpb0RlVXN1YXJpby5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Login/GestionarContrasena.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cR2VzdGlvbmFyQ29udHJhc2VuYS5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Login/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cTG9naW4uY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Login/ParticipanteRegistrado.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cUGFydGljaXBhbnRlUmVnaXN0cmFkby5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/EditarParticipante.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/EditarParticipante.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXEVkaXRhclBhcnRpY2lwYW50ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/FormularioDeUsuario.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXEZvcm11bGFyaW9EZVVzdWFyaW8uY3NodG1s
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/FormularioParticipante.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXEZvcm11bGFyaW9QYXJ0aWNpcGFudGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/ListaParticipantes.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/ListaParticipantes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXExpc3RhUGFydGljaXBhbnRlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/MiUsuario.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXE1pVXN1YXJpby5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/ObtenerParticipante.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/ObtenerParticipante.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXE9idGVuZXJQYXJ0aWNpcGFudGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/VerDatosParticipante.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/VerDatosParticipante.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXFZlckRhdG9zUGFydGljaXBhbnRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Participante/VerParticipantes.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Participante/VerParticipantes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGljaXBhbnRlXFZlclBhcnRpY2lwYW50ZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/Error.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/Info.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Shared/Info.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEluZm8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/_LoginPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/_Modal.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Shared/_Modal.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Nb2RhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Tema/CrearTema.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Tema/CrearTema.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVtYVxDcmVhclRlbWEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Tema/MostrarTemas.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVtYVxNb3N0cmFyVGVtYXMuY3NodG1s
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Tema/EditarTema.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVtYVxFZGl0YXJUZW1hLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/TipoActividad/CrearTipoActividad.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlwb0FjdGl2aWRhZFxDcmVhclRpcG9BY3RpdmlkYWQuY3NodG1s
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Tema/ListaTemas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVtYVxMaXN0YVRlbWFzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/TipoActividad/EditarTipoActividad.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlwb0FjdGl2aWRhZFxFZGl0YXJUaXBvQWN0aXZpZGFkLmNzaHRtbA==
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Usuario/CambiarContrasena.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb1xDYW1iaWFyQ29udHJhc2VuYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/TipoActividad/ListaTiposActividad.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlwb0FjdGl2aWRhZFxMaXN0YVRpcG9zQWN0aXZpZGFkLmNzaHRtbA==
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Usuario/FormularioRegistro.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb1xGb3JtdWxhcmlvUmVnaXN0cm8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/_ViewImports.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Usuario/InformacionPersonal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb1xJbmZvcm1hY2lvblBlcnNvbmFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Usuario/IniciarSesion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb1xJbmljaWFyU2VzaW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Usuario/ParticipanteRegistrado.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXN1YXJpb1xQYXJ0aWNpcGFudGVSZWdpc3RyYWRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/_ViewStart.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/zmont/Source/Repos/METICS-CORE/webMetics/Views/Shared/_Layout.cshtml]
+[C:/Users/XPC/Source/Repos/METICS-CORE/webMetics/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-bgx26y6tet
