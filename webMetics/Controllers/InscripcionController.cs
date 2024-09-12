@@ -380,7 +380,7 @@ namespace webMetics.Controllers
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
                 "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " (Grupo " + grupo.numeroGrupo + ")</strong></p>" +
                 
-                "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
+                "<ul><li>Descripción: " + grupo.descripcion + "</li>" +
                 "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
                 "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
