@@ -378,15 +378,15 @@ namespace webMetics.Controllers
             string mensaje = "" +
                 "<h2>Comprobante de inscripción a módulo - SISTEMA DE INSCRIPCIONES METICS</h2>" +
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
-                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " Grupo (" + grupo.numeroGrupo + ")</strong></p>" +
+                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " (Grupo " + grupo.numeroGrupo + ")</strong></p>" +
                 
                 "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
                 "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
-                // "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
+                "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
-                "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
-                "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
+                "<li>Fecha de inicio: " + grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") + "</li>" +
+                "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy") + "</li>";
             
             if (!(string.Equals(grupo.modalidad, "Autogestionado", StringComparison.OrdinalIgnoreCase) || string.Equals(grupo.modalidad, "Virtual", StringComparison.OrdinalIgnoreCase)))
             {
