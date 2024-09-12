@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using NPOI.SS.UserModel;
 using iText.Layout.Properties;
 using iText.Kernel.Font;
+using iText.Kernel.Geom;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -405,10 +406,12 @@ namespace webMetics.Controllers
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
 
-            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
+            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
-            iText.Layout.Document document = new iText.Layout.Document(pdf);
+
+            PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
+            iText.Layout.Document document = new iText.Layout.Document(pdf, pageSize);
 
             // Establecer fuente en negrita para encabezado
             PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
@@ -427,11 +430,11 @@ namespace webMetics.Controllers
             document.Add(header3);
 
             // Crear la tabla (9 columnas)
-            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 3, 2, 2, 3, 2, 3, 2, 2 });
             table.SetWidth(UnitValue.CreatePercentValue(100));
 
             // Agregar encabezados de la tabla con estilo
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
             foreach (var headerText in headers)
             {
                 table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
@@ -449,7 +452,6 @@ namespace webMetics.Controllers
                 {
                     foreach (var inscripcion in inscripcionesParticipante)
                     {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
@@ -465,7 +467,6 @@ namespace webMetics.Controllers
                 else
                 {
                     // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
