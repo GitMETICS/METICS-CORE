@@ -370,23 +370,32 @@ namespace webMetics.Handlers
 
         public bool ObtenerCorreoNotificacionEnviadoParticipante(string idParticipante)
         {
+            int enviado = 0;
             string consulta = "SELECT correo_notificacion_enviado FROM participante WHERE id_participante_PK = @idParticipante;";
 
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+            {
+                comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
 
-            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
 
-            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
-            DataRow fila = tablaResultado.Rows[0];
+                if (tablaResultado.Rows.Count > 0)
+                {
+                    DataRow fila = tablaResultado.Rows[0];
 
-            int enviado = Convert.ToInt32(fila["correo_notificacion_enviado"]);
+                    if (fila["correo_notificacion_enviado"] != DBNull.Value)
+                    {
+                        enviado = Convert.ToInt32(fila["correo_notificacion_enviado"]);
+                    }
+                }
 
-            return enviado != 0;
+                return enviado != 0;
+            }
         }
 
         public bool ActualizarCorreoNotificacionEnviadoParticipante(string idParticipante)
         {
-            string consulta = "UPDATE participante SET correo_notificacion_enviado = @valor" +
+            string consulta = "UPDATE participante SET correo_notificacion_enviado = @valor " +
                 "WHERE id_participante_PK = @idParticipante;";
 
             ConexionMetics.Open();

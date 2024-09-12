@@ -187,9 +187,17 @@ namespace webMetics.Controllers
                 try
                 {
                     EnviarCorreoNotificacion(idParticipante);
-                    accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante);
+                    bool exito = accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante);
 
-                    TempData["successMessage"] = "Se envió el correo de notificación.";
+                    if (exito)
+                    {
+                        TempData["successMessage"] = "Se envió el correo de notificación.";
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
+                    }
+                    
                 }
                 catch 
                 {
@@ -227,8 +235,8 @@ namespace webMetics.Controllers
 
             // Crear el cuerpo del mensaje con el contenido HTML y texto plano
             BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.TextBody = $"El usuario {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
+            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
+            bodyBuilder.TextBody = $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
             bodyBuilder.HtmlBody += "</p>";
 
             message.Body = bodyBuilder.ToMessageBody();
