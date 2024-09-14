@@ -1,8 +1,8 @@
-@model webMetics.Models.GrupoModel
+ï»¿@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Editar Módulo";
+    ViewBag.Title = "Editar MÃ³dulo";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -124,7 +124,7 @@
 
                         <br />
                         <div class="row mt-3">
-                            <h4>Fechas de inscripción</h4>
+                            <h4>Fechas de inscripciÃ³n</h4>
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
                                 <br />
@@ -216,7 +216,7 @@ else
 
         verificarModalidad();
 
-        // Llamar a la función cuando cambie la modalidad
+        // Llamar a la funciÃ³n cuando cambie la modalidad
         $('#modalidadSelect').change(function () {
             verificarModalidad();
         });
