@@ -17,7 +17,8 @@ CREATE TABLE usuario (
 	id_usuario_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
 	rol_FK INT FOREIGN KEY REFERENCES rol(rol_PK) ON DELETE NO ACTION DEFAULT 0,
 	hash_contrasena BINARY(64) NOT NULL,
-	salt UNIQUEIDENTIFIER
+	salt UNIQUEIDENTIFIER,
+	registrado_por_usuario INT DEFAULT 0,
 );
 
 --Creación de la tabla asesor

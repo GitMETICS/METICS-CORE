@@ -126,44 +126,49 @@ namespace webMetics.Controllers
 
             try
             {
-                usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo.
+                usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo
+                ParticipanteModel participante = new ParticipanteModel()
+                {
+                    idParticipante = usuario.id,
+                    nombre = usuario.nombre,
+                    primerApellido = usuario.primerApellido,
+                    segundoApellido = usuario.segundoApellido,
+                    tipoIdentificacion = usuario.tipoIdentificacion,
+                    numeroIdentificacion = usuario.numeroIdentificacion,
+                    correo = usuario.correo,
+                    tipoParticipante = usuario.tipoParticipante,
+                    condicion = usuario.condicion,
+                    telefono = usuario.telefono,
+                    area = usuario.area,
+                    departamento = usuario.departamento,
+                    unidadAcademica = usuario.unidadAcademica,
+                    sede = usuario.sede,
+                    horasMatriculadas = 0,
+                    horasAprobadas = 0
+                };
 
-                // Si no existe el usuario, no existe el participante, por lo que es un registro completamente nuevo.
-                if (!accesoAUsuario.ExisteUsuario(usuario.id))
+                // Verificar si el usuario ya existe
+                bool usuarioExiste = accesoAUsuario.ExisteUsuario(usuario.id);
+
+                // Si el usuario no existe, crear un nuevo registro
+                if (!usuarioExiste)
                 {
                     accesoAUsuario.CrearUsuario(usuario.id, contrasena);
-
-                    ParticipanteModel participante = new ParticipanteModel()
-                    {
-                        idParticipante = usuario.id,
-                        nombre = usuario.nombre,
-                        primerApellido = usuario.primerApellido,
-                        segundoApellido = usuario.segundoApellido,
-                        tipoIdentificacion = usuario.tipoIdentificacion,
-                        numeroIdentificacion = usuario.numeroIdentificacion,
-                        correo = usuario.correo,
-                        tipoParticipante = usuario.tipoParticipante,
-                        condicion = usuario.condicion,
-                        telefono = usuario.telefono,
-                        area = usuario.area,
-                        departamento = usuario.departamento,
-                        unidadAcademica = usuario.unidadAcademica,
-                        sede = usuario.sede,
-                        horasMatriculadas = 0,
-                        horasAprobadas = 0
-                    };
-
                     accesoAParticipante.CrearParticipante(participante);
                     exito = true;
                 }
-                // Si existe el usuario y existe el participante, significa que al usuario ya se le envió la contraseña por correo y existe en el sistema.
+                // Si el usuario existe, verificar si fue registrado por el propio usuario
+                else if (!accesoAUsuario.ObtenerRegistradoPorUsuario(usuario.id)) // Si no fue registrado por el propio usuario, actualizar los datos del participante
+                {
+                    accesoAParticipante.EditarParticipante(participante);
+                    exito = true;
+                }
                 else
                 {
                     TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional.";
-                    exito = false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 TempData["errorMessage"] = "No se pudo crear el usuario. Inténtelo de nuevo.";
             }

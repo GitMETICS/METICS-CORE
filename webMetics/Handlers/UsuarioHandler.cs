@@ -167,5 +167,42 @@ namespace webMetics.Handlers
 
             return autenticado;
         }
+
+        public bool ObtenerRegistradoPorUsuario(string idUsuario)
+        {
+            string consulta = "SELECT registrado_por_usuario FROM usuario WHERE id_usuario_PK = @idUsuario;";
+            int registradoPorUsuario = 1;
+
+            using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+            {
+                comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+                DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+
+                if (tablaResultado.Rows.Count > 0)
+                {
+                    DataRow fila = tablaResultado.Rows[0];
+                    registradoPorUsuario = Convert.ToInt32(fila["registrado_por_usuario"]);
+                }
+            }
+
+            return registradoPorUsuario == 1;
+        }
+
+        public bool ActualizarRegistradoPorUsuario(string idUsuario)
+        {
+            string consulta = "UPDATE usuario SET registrado_por_usuario = 1 WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
     }
 }
