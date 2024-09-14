@@ -160,7 +160,10 @@ namespace webMetics.Controllers
                 // Si el usuario existe, verificar si fue registrado por el propio usuario
                 else if (!accesoAUsuario.ObtenerRegistradoPorUsuario(usuario.id)) // Si no fue registrado por el propio usuario, actualizar los datos del participante
                 {
+                    accesoAUsuario.EditarUsuario(usuario.id, 0, contrasena); // Rol de participante = 0
                     accesoAParticipante.EditarParticipante(participante);
+                    accesoAUsuario.ActualizarRegistradoPorUsuario(usuario.id);
+
                     exito = true;
                 }
                 else
