@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using webMetics.Handlers;
 using webMetics.Models;
@@ -43,11 +45,36 @@ public class GrupoTemaHandler : BaseDeDatosHandler
         }).ToList();
     }
 
+    public List<SelectListItem> ObtenerGruposTemasSelectList()
+    {
+        var consulta = "SELECT * FROM grupo_tema;";
+        var tablaResultado = EjecutarConsulta(consulta);
+
+        return tablaResultado.AsEnumerable().Select(fila => new SelectListItem
+        {
+            Value = fila.Field<int>("id_grupo_FK").ToString(), // The value sent when the item is selected
+            Text = $"Grupo: {fila.Field<int>("id_grupo_FK")}, Tema: {fila.Field<int>("id_tema_FK")}", // The display text
+            Selected = false // Can be dynamically set if needed
+        }).ToList();
+    }
+
     // Obtener todas las relaciones para un grupo específico
     public List<TemaModel> ObtenerTemasDelGrupo(int idGrupo)
     {
         var gruposTemas = ObtenerGruposTemasPorGrupo(idGrupo);
         return gruposTemas.Select(gt => accesoATema.ObtenerTema(gt.idTema)).ToList();
+    }
+    public List<SelectListItem> ObtenerTemasDelGrupoSelectList(int idGrupo)
+    {
+        var gruposTemas = ObtenerGruposTemasPorGrupo(idGrupo); // Obtiene relaciones grupo-tema
+        var temas = gruposTemas.Select(gt => accesoATema.ObtenerTema(gt.idTema)).ToList(); // Obtiene los temas del grupo
+
+        // Transformar los temas en una lista de SelectListItem
+        return temas.Select(t => new SelectListItem
+        {
+            Value = t.idTema.ToString(),  // El valor del SelectListItem será el ID del tema
+            Text = t.nombre               // El texto del SelectListItem será el nombre del tema
+        }).ToList();
     }
 
     // Método auxiliar para obtener las relaciones grupo-tema por grupo
@@ -107,28 +134,32 @@ public class GrupoTemaHandler : BaseDeDatosHandler
     // Actualizar las relaciones de temas por grupo
     public bool ActualizarTemasPorGrupo(int idGrupo, int[] temasSeleccionados)
     {
-        using (var transaccion = ConexionMetics.BeginTransaction())
+        Debug.WriteLine("eliminacion afuera");
+
+
+        try
         {
-            try
-            {
-                // 1. Eliminar todos los temas asociados al grupo
-                EliminarTemasPorGrupo(idGrupo);
+            // 1. Eliminar todos los temas asociados al grupo
+            EliminarTemasPorGrupo(idGrupo);
+            Debug.WriteLine("eliminacion.");
 
-                // 2. Insertar los temas seleccionados
-                foreach (var idTema in temasSeleccionados)
-                {
-                    InsertarGrupoTema(idGrupo, idTema);
-                }
 
-                transaccion.Commit();
-                return true;
-            }
-            catch (Exception)
+            // 2. Insertar los temas seleccionados
+            foreach (var idTema in temasSeleccionados)
             {
-                transaccion.Rollback();
-                return false;
+                InsertarGrupoTema(idGrupo, idTema);
             }
+            Debug.WriteLine("insercion.");
+
+
+            return true;
         }
+        catch (Exception)
+        {
+
+            return false;
+        }
+        
     }
 
     // Método para eliminar todos los temas de un grupo específico
