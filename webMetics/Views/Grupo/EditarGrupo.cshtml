@@ -103,14 +103,34 @@
                             @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                         </div>
 
-                        <!-- Nuevo Dropdown para seleccionar temas -->
                         <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" })
-                            @Html.ListBoxFor(grupoModel => grupoModel.TemasSeleccionados,
-                                     ViewData["Temas"] as IEnumerable<SelectListItem>,
-                                     new { @class = "form-select", size = "10" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.TemasSeleccionados, "", new { @class = "text-danger" })
+                            @Html.LabelFor(grupoModel => grupoModel.nombreTema, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(grupoModel => grupoModel.idTema, ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema...", new { @class = "form-select" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreTema, "", new { @class = "text-danger" })
                         </div>
+
+                        @{
+                            var temas = ViewData["Temas"] as List<SelectListItem>; // Todos los temas
+                            var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem>; // Temas pre-seleccionados
+                        }
+
+                        <div class="form-group mt-1">
+                            <!-- Etiqueta para TemasSeleccionados -->
+                            <label style="font-size: 22px;">Temas Seleccionados</label>
+
+                            <!-- Lista de checkboxes para TemasSeleccionados -->
+                            @foreach (var item in temas)
+                            {
+                                // Verificar si el item está pre-seleccionado
+                                bool isChecked = temasSeleccionados.Any(t => t.Value == item.Value);
+
+                                <div class="form-check">
+                                    <!-- Checkbox para cada item -->
+                                    <input type="checkbox" name="TemasSeleccionados" value="@item.Value" class="form-check-input" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@item.Text</label>
+                                </div>
+                            }
+                         </div>   
 
                         <!-- Dropdown para categorías -->
                         <div class="form-group mt-1">
