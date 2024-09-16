@@ -359,6 +359,8 @@ namespace webMetics.Controllers
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
+            List<TemaModel> temasSeleccionadosList = accesoAGrupoTema.ObtenerTemasDelGrupo(grupo.idGrupo);
+            List<TemaModel> temasDisponiblesList = accesoATema.ObtenerTemas();
 
             try
             {
@@ -371,6 +373,12 @@ namespace webMetics.Controllers
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
                 ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
+                grupo.TemasSeleccionados = temasSeleccionadosList.Select(t => t.idTema).ToList();
+                ViewData["TemasSeleccionadosCheckList"] = accesoAGrupoTema.ObtenerTemasDelGrupoSelectList(grupo.idGrupo);
+                ViewData["TemasDisponiblesCheckList"] = temasDisponiblesList.Select(t => t.idTema).ToList();
+
+                ViewData["TemasId"] = temasSeleccionadosList.Select(t => t.idTema).ToList();
+
 
                 if (ModelState.IsValid)
                 {
