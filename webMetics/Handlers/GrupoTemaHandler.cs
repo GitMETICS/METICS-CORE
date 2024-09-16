@@ -57,6 +57,25 @@ public class GrupoTemaHandler : BaseDeDatosHandler
             Selected = false // Can be dynamically set if needed
         }).ToList();
     }
+    public List<int> ObtenerIdsTemasDelGrupo(int idGrupo)
+    {
+        var gruposTemas = ObtenerGruposTemasPorGrupo(idGrupo);
+
+        // Devolver solo los ID de los temas asociados al grupo
+        return gruposTemas.Select(gt => gt.idTema).ToList();
+    }
+
+    public List<string> ObtenerNombresTemasDelGrupo(int idGrupo)
+    {
+        // Obtener relaciones grupo-tema por grupo
+        var gruposTemas = ObtenerGruposTemasPorGrupo(idGrupo);
+
+        // Obtener los temas relacionados con el grupo
+        var temas = gruposTemas.Select(gt => accesoATema.ObtenerTema(gt.idTema)).ToList();
+
+        // Devolver una lista de nombres de los temas
+        return temas.Select(t => t.nombre).ToList();
+    }
 
     // Obtener todas las relaciones para un grupo específico
     public List<TemaModel> ObtenerTemasDelGrupo(int idGrupo)

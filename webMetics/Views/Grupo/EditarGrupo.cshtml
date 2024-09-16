@@ -110,13 +110,13 @@
                         </div>
 
                         @{
-                            var temas = ViewData["Temas"] as List<SelectListItem>; // Todos los temas
-                            var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem>; // Temas pre-seleccionados
+                            var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
+                            var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
                         }
 
                         <div class="form-group mt-1">
                             <!-- Etiqueta para TemasSeleccionados -->
-                            <label style="font-size: 22px;">Temas Seleccionados</label>
+                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
 
                             <!-- Lista de checkboxes para TemasSeleccionados -->
                             @foreach (var item in temas)
@@ -130,7 +130,11 @@
                                     <label class="form-check-label">@item.Text</label>
                                 </div>
                             }
-                         </div>   
+
+                            @Html.ValidationMessageFor(model => model.TemasSeleccionados, "", new { @class = "text-danger" })
+
+                        </div>
+
 
                         <!-- Dropdown para categorías -->
                         <div class="form-group mt-1">

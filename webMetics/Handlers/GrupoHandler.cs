@@ -17,12 +17,14 @@ namespace webMetics.Handlers
         private TemaHandler accesoATema;
         private CategoriaHandler accesoACategoria;
         private AsesorHandler accesoAAsesor;
+        private GrupoTemaHandler accesoAGrupoTema;
 
         public GrupoHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
             accesoATema = new TemaHandler(environment, configuration);
             accesoACategoria = new CategoriaHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
+            accesoAGrupoTema = new GrupoTemaHandler(environment, configuration, accesoATema);
         }
 
         // Crea un grupo en la base de datos.
@@ -179,9 +181,13 @@ namespace webMetics.Handlers
 
             DataTable result = CrearTablaConsulta(command);
 
+            List<int> idsGrupos = result.AsEnumerable().Select(row => Convert.ToInt32(row["id_grupo_PK"])).ToList();
+
             // Recorre cada fila de la tabla y agrega una instancia de GrupoModel a la lista.
             foreach (DataRow row in result.Rows)
             {
+                int idGrupo = Convert.ToInt32(row["id_grupo_PK"]);
+
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
@@ -205,7 +211,9 @@ namespace webMetics.Handlers
                     fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
-                    nombreArchivo = Convert.ToString(row["nombre_archivo"])
+                    nombreArchivo = Convert.ToString(row["nombre_archivo"]),
+                    TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
+
                 };
 
                 grupos.Add(grupo);
@@ -224,6 +232,7 @@ namespace webMetics.Handlers
         public GrupoModel ObtenerGrupo(int idGrupo)
         {
             GrupoModel grupo = null;
+
 
             using (SqlCommand command = new SqlCommand("SelectGrupo", ConexionMetics))
             {
@@ -260,7 +269,8 @@ namespace webMetics.Handlers
                                 fechaInicioInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_inicio_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_inicio_inscripcion")),
                                 fechaFinalizacionInscripcion = reader.IsDBNull(reader.GetOrdinal("fecha_finalizacion_inscripcion")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_finalizacion_inscripcion")),
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
-                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo adjunto" : reader.GetString(reader.GetOrdinal("nombre_archivo"))
+                                nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo adjunto" : reader.GetString(reader.GetOrdinal("nombre_archivo")),
+                                TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
                             };
                         }
                     }
@@ -331,8 +341,11 @@ namespace webMetics.Handlers
 
             DataTable result = CrearTablaConsulta(command);
 
+            List<int> idsGrupos = result.AsEnumerable().Select(row => Convert.ToInt32(row["id_grupo_PK"])).ToList();
+
             foreach (DataRow row in result.Rows)
             {
+                int idGrupo = Convert.ToInt32(row["id_grupo_PK"]);
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
@@ -356,7 +369,9 @@ namespace webMetics.Handlers
                     fechaFinalizacionInscripcion = Convert.ToDateTime(row["fecha_finalizacion_inscripcion"]),
                     cantidadHoras = Convert.ToInt32(row["cantidad_horas"]),
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
-                    nombreArchivo = Convert.ToString(row["nombre_archivo"])
+                    nombreArchivo = Convert.ToString(row["nombre_archivo"]),
+                    TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
+
                 };
 
                 grupos.Add(grupo);

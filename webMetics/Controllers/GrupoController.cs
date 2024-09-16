@@ -308,7 +308,7 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-                List<TemaModel> temasSeleccionadosList = accesoAGrupoTema.ObtenerTemasDelGrupo(1);
+                List<TemaModel> temasSeleccionadosList = accesoAGrupoTema.ObtenerTemasDelGrupo(idGrupo);
                 List<TemaModel> temasDisponiblesList = accesoATema.ObtenerTemas();
                 if (grupo == null)
                 {
@@ -325,7 +325,7 @@ namespace webMetics.Controllers
                     ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
                     ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                     grupo.TemasSeleccionados = temasSeleccionadosList.Select(t => t.idTema).ToList();
-                    ViewData["TemasSeleccionadosCheckList"] = accesoAGrupoTema.ObtenerTemasDelGrupoSelectList(1);
+                    ViewData["TemasSeleccionadosCheckList"] = accesoAGrupoTema.ObtenerTemasDelGrupoSelectList(idGrupo);
                     ViewData["TemasDisponiblesCheckList"] = temasDisponiblesList.Select(t => t.idTema).ToList();
 
                     ViewData["TemasId"] = temasSeleccionadosList.Select(t => t.idTema).ToList();
@@ -361,19 +361,6 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            if (temasSeleccionados != null)
-            {
-                Debug.WriteLine("Temas Seleccionados de regreso:");
-                foreach (var tema in temasSeleccionados)
-                {
-                    Debug.WriteLine(tema);
-                }
-            }
-            else
-            {
-                Debug.WriteLine("temasSeleccionados is null de regreso.");
-            }
-
             try
             {
                 // Obtener el archivo adjunto y convertirlo a base64 para mostrarlo en la vista
@@ -381,24 +368,10 @@ namespace webMetics.Controllers
                 string pdfBase64 = Convert.ToBase64String(pdfBytes);
                 ViewBag.Adjunto = pdfBase64;
 
-                //ViewBag.ErrorMessage = "lLa fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
+                // Cargar los datos necesarios para la vista
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
                 ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
-
-                // Print temasSeleccionados for debugging
-                if (temasSeleccionados != null)
-                {
-                    Console.WriteLine("Temas Seleccionados:");
-                    foreach (var tema in temasSeleccionados)
-                    {
-                        Console.WriteLine(tema);  // This will print each temaSeleccionado value
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("temasSeleccionados is null.");
-                }
 
                 if (ModelState.IsValid)
                 {
@@ -434,19 +407,24 @@ namespace webMetics.Controllers
                         return View(grupo);
                     }
 
+                    // Validar que se hayan seleccionado temas
+                    if (temasSeleccionados == null || !temasSeleccionados.Any())
+                    {
+                        ViewBag.ErrorMessage = "Debe seleccionar al menos una competencia.";
+                        ModelState.AddModelError("temasSeleccionados", "Debe seleccionar al menos una competencia.");
+                        return View(grupo);
+                    }
+
                     // Guardar los datos del grupo
                     accesoAGrupo.EditarGrupo(grupo);
 
                     // Actualizar los temas asociados al grupo
-                    if (temasSeleccionados != null && temasSeleccionados.Any())
-                    {
-                        bool exito = accesoAGrupoTema.ActualizarTemasPorGrupo(grupo.idGrupo, temasSeleccionados);
+                    bool exito = accesoAGrupoTema.ActualizarTemasPorGrupo(grupo.idGrupo, temasSeleccionados);
 
-                        if (!exito)
-                        {
-                            TempData["errorMessage"] = "Error al actualizar los temas.";
-                            return RedirectToAction("EditarGrupo", new { idGrupo = grupo.idGrupo });
-                        }
+                    if (!exito)
+                    {
+                        TempData["errorMessage"] = "Error al actualizar los temas.";
+                        return RedirectToAction("EditarGrupo", new { idGrupo = grupo.idGrupo });
                     }
 
                     TempData["successMessage"] = "Se guardaron los datos del módulo.";
@@ -463,6 +441,7 @@ namespace webMetics.Controllers
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
+
 
         public ActionResult VerAdjunto(int idGrupo)
         {
