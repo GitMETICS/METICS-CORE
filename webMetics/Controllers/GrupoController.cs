@@ -174,13 +174,15 @@ namespace webMetics.Controllers
         /* Vista del formulario para editar un grupo con los datos ingresados del modelo */
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CrearGrupo(GrupoModel grupo)
+        public ActionResult CrearGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             try
             {
+                List<TemaModel> temasDisponiblesList = accesoATema.ObtenerTemas();
+
                 if (ModelState.IsValid)
                 {
                     // Validar tamaño del archivo adjunto
@@ -226,7 +228,16 @@ namespace webMetics.Controllers
                         return View(grupo);
                     }
 
-                    accesoAGrupo.CrearGrupo(grupo);
+
+                    // Validar que se hayan seleccionado temas
+                    if (temasSeleccionados == null || !temasSeleccionados.Any())
+                    {
+                        ViewBag.ErrorMessage = "Debe seleccionar al menos una competencia.";
+                        ModelState.AddModelError("temasSeleccionados", "Debe seleccionar al menos una competencia.");
+                        return View(grupo);
+                    }
+
+                    accesoAGrupo.CrearGrupo(grupo, temasSeleccionados);
                     TempData["successMessage"] = "Se guardó el nuevo módulo.";
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
@@ -330,18 +341,6 @@ namespace webMetics.Controllers
 
                     ViewData["TemasId"] = temasSeleccionadosList.Select(t => t.idTema).ToList();
 
-                    if (grupo.TemasSeleccionados != null)
-                    {
-                        Debug.WriteLine("Temas Seleccionados:");
-                        foreach (var tema in grupo.TemasSeleccionados)
-                        {
-                            Debug.WriteLine(tema); 
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("temasSeleccionados is null.");
-                    }
 
                     return View(grupo);
                 }

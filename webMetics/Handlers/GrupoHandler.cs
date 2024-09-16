@@ -28,7 +28,7 @@ namespace webMetics.Handlers
         }
 
         // Crea un grupo en la base de datos.
-        public bool CrearGrupo(GrupoModel grupo)
+        public bool CrearGrupo(GrupoModel grupo, int[] idTemas)
         {
             bool exito = false;
 
@@ -37,7 +37,6 @@ namespace webMetics.Handlers
                 command.CommandType = CommandType.StoredProcedure;
 
                 string idAsesor = grupo.modalidad == "Autogestionado" ? null : grupo.idAsesor;
-                command.Parameters.AddWithValue("@idTema", grupo.idTema);
                 command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
                 command.Parameters.AddWithValue("@idAsesor", idAsesor);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
@@ -69,7 +68,22 @@ namespace webMetics.Handlers
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    // Ejecutar el comando y obtener el ID del grupo recién creado
+                    int idGrupo = Convert.ToInt32(command.ExecuteScalar());
+
+                    // Insertar los temas asociados al grupo
+                    foreach (var idTema in idTemas)
+                    {
+                        using (var commandTema = new SqlCommand("InsertGrupoTema", ConexionMetics))
+                        {
+                            commandTema.CommandType = CommandType.StoredProcedure;
+                            commandTema.Parameters.AddWithValue("@idGrupo", idGrupo);
+                            commandTema.Parameters.AddWithValue("@idTema", idTema);
+                            commandTema.ExecuteNonQuery();
+                        }
+                    }
+
+                    exito = true;
                 }
                 catch (Exception ex)
                 {
@@ -84,6 +98,7 @@ namespace webMetics.Handlers
             return exito;
         }
 
+
         // Método para editar un grupo en la base de datos
         public bool EditarGrupo(GrupoModel grupo)
         {
@@ -96,7 +111,6 @@ namespace webMetics.Handlers
                 string idAsesor = grupo.modalidad == "Autogestionado" ? null : grupo.idAsesor;
 
                 command.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
-                command.Parameters.AddWithValue("@idTema", grupo.idTema);
                 command.Parameters.AddWithValue("@idCategoria", grupo.idCategoria);
                 command.Parameters.AddWithValue("@idAsesor", idAsesor);
                 command.Parameters.AddWithValue("@nombre", grupo.nombre);
@@ -191,8 +205,6 @@ namespace webMetics.Handlers
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
-                    idTema = Convert.ToInt32(row["id_tema_FK"]),
-                    nombreTema = Convert.ToString(row["nombre_tema"]),
                     idCategoria = Convert.ToInt32(row["id_categoria_FK"]),
                     nombreCategoria = Convert.ToString(row["nombre_categoria"]),
                     idAsesor = Convert.ToString(row["id_asesor_FK"]),
@@ -250,8 +262,6 @@ namespace webMetics.Handlers
                             grupo = new GrupoModel
                             {
                                 idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_PK")),
-                                idTema = reader.GetInt32(reader.GetOrdinal("id_tema_FK")),
-                                nombreTema = reader.GetString(reader.GetOrdinal("nombre_tema")),
                                 idCategoria = reader.GetInt32(reader.GetOrdinal("id_categoria_FK")),
                                 nombreCategoria = reader.GetString(reader.GetOrdinal("nombre_categoria")),
                                 idAsesor = reader.IsDBNull(reader.GetOrdinal("id_asesor_FK")) ? null : reader.GetString(reader.GetOrdinal("id_asesor_FK")),
@@ -349,8 +359,6 @@ namespace webMetics.Handlers
                 GrupoModel grupo = new GrupoModel
                 {
                     idGrupo = Convert.ToInt32(row["id_grupo_PK"]),
-                    idTema = Convert.ToInt32(row["id_tema_FK"]),
-                    nombreTema = Convert.ToString(row["nombre_tema"]),
                     idCategoria = Convert.ToInt32(row["id_categoria_FK"]),
                     nombreCategoria = Convert.ToString(row["nombre_categoria"]),
                     idAsesor = Convert.ToString(row["id_asesor_FK"]),

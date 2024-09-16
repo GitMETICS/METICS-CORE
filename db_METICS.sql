@@ -2,6 +2,8 @@
 	SCRIPT PARA CREAR LA BASE DE DATOS
 */
 
+
+
 --Creacion de la tabla rol
 CREATE TABLE rol (
 	-- null = usuario sin registrar
@@ -80,7 +82,6 @@ CREATE TABLE tema (
 --Creación de la tabla grupo
 CREATE TABLE grupo (
     id_grupo_PK INT IDENTITY(1, 1) PRIMARY KEY,
-    id_tema_FK INT NOT NULL,
 	id_categoria_FK INT NOT NULL,
 	id_asesor_FK NVARCHAR(64),
 	nombre NVARCHAR(256) NOT NULL,
@@ -98,9 +99,6 @@ CREATE TABLE grupo (
     es_visible BIT,
     nombre_archivo NVARCHAR(256),
 	adjunto VARBINARY(MAX),
-
-    FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK)
-        ON DELETE NO ACTION,
 
 	FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
         ON DELETE NO ACTION,
@@ -126,6 +124,15 @@ CREATE TABLE inscripcion (
     FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
+);
+
+--Creacion de la tabla grupo_tema
+CREATE TABLE grupo_tema (
+    id_grupo_FK INT NOT NULL,
+    id_tema_FK INT NOT NULL,
+    PRIMARY KEY (id_grupo_FK, id_tema_FK),
+    FOREIGN KEY (id_grupo_FK) REFERENCES grupo(id_grupo_PK) ON DELETE CASCADE,
+    FOREIGN KEY (id_tema_FK) REFERENCES tema(id_tema_PK) ON DELETE CASCADE
 );
 
 /*
@@ -526,7 +533,6 @@ END
 GO
 --Creación de procedimiento para insertar un grupo
 CREATE OR ALTER PROCEDURE InsertGrupo
-    @idTema INT,
 	@idCategoria INT,
 	@idAsesor NVARCHAR(64) = NULL,
 	@nombre NVARCHAR(256),
@@ -548,9 +554,9 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Insertar el grupo en la tabla grupo
     INSERT INTO grupo
     (
-        id_tema_FK,
 		id_categoria_FK,
 		id_asesor_FK,
         nombre,
@@ -571,7 +577,6 @@ BEGIN
     )
     VALUES
     (
-        @idTema,
 		@idCategoria,
 		@idAsesor,
 		@nombre,
@@ -590,13 +595,36 @@ BEGIN
 		@nombre_archivo,
 		@adjunto
     );
-END
+
+    -- Obtener el ID del grupo recién insertado
+    DECLARE @idGrupo INT = SCOPE_IDENTITY();
+
+    -- Retornar el ID del grupo
+    SELECT @idGrupo AS idGrupo;
+END;
 
 GO
+
+
+-- Creación de procedimiento para insertar grupo-tema
+CREATE OR ALTER PROCEDURE InsertGrupoTema
+    @idGrupo INT,
+    @idTema INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insertar la relación en la tabla grupo_tema
+    INSERT INTO grupo_tema (id_grupo_FK, id_tema_FK)
+    VALUES (@idGrupo, @idTema);
+END;
+
+GO
+
+
 -- Creación de procedimiento para editar un grupo
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
-    @idTema INT,
 	@idCategoria INT,
 	@idAsesor NVARCHAR(64) = NULL,
 	@nombre NVARCHAR(256),
@@ -626,7 +654,6 @@ BEGIN
 
     UPDATE grupo
     SET
-        id_tema_FK = @idTema,
 		id_categoria_FK = @idCategoria,
 		id_asesor_FK = @idAsesor,
 		nombre = @nombre,
@@ -653,7 +680,6 @@ AS
 BEGIN
     SELECT 
 		G.id_grupo_PK, 
-		G.id_tema_FK,
 		G.id_categoria_FK,
 		G.id_asesor_FK,
 		G.modalidad, 
@@ -670,11 +696,9 @@ BEGIN
 		G.fecha_finalizacion_inscripcion, 
 		G.cantidad_horas, 
 		G.nombre_archivo,
-		T.nombre as nombre_tema,
 		C.nombre as nombre_categoria,
 		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
 	FROM grupo G
-		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK;
 END
@@ -687,7 +711,6 @@ AS
 BEGIN
     SELECT 
 		G.id_grupo_PK, 
-		G.id_tema_FK,
 		G.id_categoria_FK,
 		G.id_asesor_FK,
 		G.modalidad, 
@@ -705,11 +728,9 @@ BEGIN
 		G.cantidad_horas, 
 		G.nombre_archivo, 
 		G.adjunto,
-		T.nombre as nombre_tema,
 		C.nombre as nombre_categoria,
 		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
 	FROM grupo G
-		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
 	WHERE G.id_asesor_FK = @idAsesor;
@@ -723,7 +744,6 @@ AS
 BEGIN
     SELECT 
 		G.id_grupo_PK, 
-		G.id_tema_FK,
 		G.id_categoria_FK,
 		G.id_asesor_FK,
 		G.modalidad, 
@@ -741,11 +761,9 @@ BEGIN
 		G.cantidad_horas, 
 		G.nombre_archivo, 
 		G.adjunto,
-		T.nombre as nombre_tema,
 		C.nombre as nombre_categoria,
 		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
 	FROM grupo G
-		JOIN tema T ON T.id_tema_PK = G.id_tema_FK
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
     WHERE G.id_grupo_PK = @idGrupo;
@@ -966,7 +984,6 @@ FROM OPENROWSET(BULK '\\wsl.localhost\Ubuntu-20.04\home\yasty\src\METICS-CORE\Fi
 --Crear grupos
 
 INSERT INTO dbo.grupo(
-    id_tema_FK,
     id_categoria_FK,
     id_asesor_FK,
     modalidad,
@@ -984,7 +1001,7 @@ INSERT INTO dbo.grupo(
     fecha_finalizacion_inscripcion,
     nombre_archivo)
     VALUES
-    (6, 
+    ( 
     1, 
     N'AARON.MENAARAYA@ucr.ac.cr', 
     N'Virtual', 
@@ -1002,3 +1019,7 @@ INSERT INTO dbo.grupo(
     '2024-01-01 00:00:00', 
     '2024-12-09 00:00:00', 
     N'ArchivoPrueba.pdf');
+
+-- Insertar valores iniciales grupo_tema
+INSERT INTO grupo_tema (id_grupo_FK, id_tema_FK)
+VALUES (1, 1);
