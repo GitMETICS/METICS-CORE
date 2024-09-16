@@ -47,7 +47,12 @@
                                     <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
                                     <div class="d-flex">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras">
+                                            @{
+                                                string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
+                                                correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
+                                                
+                                                <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                            }
                                         </div>
                                         <input class="btn btn-secondary ms-2" type="submit" value="Guardar">
                                     </div>
@@ -127,16 +132,26 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                @if (participante.horasMatriculadas > 30)
+                                @if (participante.horasAprobadas > 30)
                                 {
-                                    <td class="text-success">
-                                        <i class="bi bi-bell"></i>
-                                    </td>
+                                    @if (participante.correoNotificacionEnviado != 0)
+                                    {
+                                        <td class="link-success text-center">
+                                            <i class="bi bi-bell"></i>
+                                        </td> @* Campana vacía cuando se envió el correo *@
+                                    }
+                                    else
+                                    {
+                                        <td class="link-success text-center">
+                                            @Html.ActionLink(" ", "NotificarLimiteHoras", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-success bi bi-bell-fill" })
+                                        </td>
+                                    }
                                 }
                                 else
                                 {
                                     <td></td>
                                 }
+
                                 <td>@participante.unidadAcademica</td>
                                 <td>@participante.nombre</td>
                                 <td>@participante.primerApellido</td>

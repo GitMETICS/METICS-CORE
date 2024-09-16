@@ -65,6 +65,8 @@ namespace webMetics.Models
         [Range(0, int.MaxValue, ErrorMessage = "Las horas aprobadas deben ser al menos 0.")]
         public int horasAprobadas { get; set; }
 
+        public int correoNotificacionEnviado { get; set; }
+
         public List<GrupoModel>? gruposInscritos { get; set; }
     }
     public enum TipoIdentificacion

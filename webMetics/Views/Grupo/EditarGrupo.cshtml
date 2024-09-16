@@ -1,8 +1,10 @@
-@model webMetics.Models.GrupoModel
+ï»¿@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Editar Módulo";
+
+    ViewBag.Title = "Editar MÃ³dulo";
+
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
@@ -127,7 +129,7 @@
                         </div>
 
 
-                        <!-- Dropdown para categorías -->
+                        <!-- Dropdown para categorÃ­as -->
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
@@ -143,7 +145,7 @@
 
                         <br />
                         <div class="row mt-3">
-                            <h4>Fechas de inscripción</h4>
+                            <h4>Fechas de inscripciÃ³n</h4>
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
                                 <br />
@@ -160,7 +162,7 @@
 
                         <br />
                         <div class="row mt-3">
-                            <h4>Fechas del módulo</h4>
+                            <h4>Fechas del mï¿½dulo</h4>
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
                                 <br />
@@ -192,5 +194,35 @@
 }
 else
 {
-    <h1>No tiene permisos para editar el módulo</h1>
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
 }
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function verificarModalidad() {
+            var modalidadSeleccionada = $('#modalidadSelect').val();
+            if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
+                $('#asesorSelect').prop('disabled', true);
+                $('#asesorSelect').val('');
+                $('#horarioText').prop('disabled', true);
+                $('#horarioText').val('');
+                $('#lugarText').prop('disabled', true);
+                $('#lugarText').val('');
+            } else {
+                $('#asesorSelect').prop('disabled', false);
+                $('#horarioText').prop('disabled', false);
+                $('#lugarText').prop('disabled', false);
+            }
+        }
+
+        verificarModalidad();
+
+        // Llamar a la funciÃ³n cuando cambie la modalidad
+        $('#modalidadSelect').change(function () {
+            verificarModalidad();
+        });
+    });
+</script>

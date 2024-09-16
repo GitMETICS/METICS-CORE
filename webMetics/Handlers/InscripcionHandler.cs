@@ -62,7 +62,7 @@ public class InscripcionHandler : BaseDeDatosHandler
                 observaciones = Convert.ToString(fila["observaciones"]),
                 horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
                 horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
-                calificacion = Convert.ToDouble(fila["calificacion"])
+                calificacion = Convert.ToDouble(fila["calificacion"]),
             };
 
             inscripciones.Add(inscripcion);
@@ -198,21 +198,42 @@ public class InscripcionHandler : BaseDeDatosHandler
 
     public string ObtenerCorreoLimiteHoras()
     {
-        string consulta = "SELECT correo_limite_horas FROM inscripcion;";
+        string consulta = "SELECT correo FROM correo_notificacion;";
+        string correo = string.Empty;
 
-        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+        {
+            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
 
-        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
-        DataRow fila = tablaResultado.Rows[0];
-
-        string correo = Convert.ToString(fila["correo_limite_horas"]);
+            if (tablaResultado.Rows.Count > 0)
+            {
+                DataRow fila = tablaResultado.Rows[0];
+                correo = Convert.ToString(fila["correo"]);
+            }
+        }
 
         return correo;
     }
 
+    public bool IngresarCorreoLimiteHoras(string correo)
+    {
+        string consulta = "INSERT INTO correo_notificacion (correo) VALUES (@correo);";
+
+        ConexionMetics.Open();
+
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@correo", correo);
+
+        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+        ConexionMetics.Close();
+
+        return exito;
+    }
+
     public bool ActualizarCorreoLimiteHoras(string correo)
     {
-        string consulta = "UPDATE inscripcion SET correo_limite_horas = @correo;";
+        string consulta = "UPDATE correo_notificacion SET correo = @correo;";
 
         ConexionMetics.Open();
 

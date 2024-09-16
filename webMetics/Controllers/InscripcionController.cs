@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using NPOI.SS.UserModel;
 using iText.Layout.Properties;
 using iText.Kernel.Font;
+using iText.Kernel.Geom;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -88,16 +89,6 @@ namespace webMetics.Controllers
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-
-                            if (MayorALimiteMaximoHoras(grupo.cantidadHoras, participante.horasMatriculadas))
-                            {
-                                string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
-                                if (!string.IsNullOrEmpty(correo))
-                                {
-                                    // Enviar correo "ha superado las 30 horas"
-                                    EnviarCorreoLimiteHoras(idGrupo, idParticipante, correo);
-                                }
-                            }
                         }
                         catch
                         {
@@ -125,50 +116,6 @@ namespace webMetics.Controllers
             }
 
             return View();
-        }
-
-        private void EnviarCorreoLimiteHoras(int idGrupo, string idParticipante, string correo)
-        {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
-
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = "<p>"; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Notificación sobre límite de horas"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correo);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.TextBody = $"El usuario {idParticipante} ha superado las 30 horas inscritas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
         }
 
         private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
@@ -230,7 +177,9 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            bool exito = accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
+            string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
+
+            bool exito = (string.IsNullOrEmpty(correo)) ? accesoAInscripcion.IngresarCorreoLimiteHoras(correoLimiteHoras) : accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
 
             if (exito)
             {
@@ -238,7 +187,7 @@ namespace webMetics.Controllers
             }
             else
             {
-                TempData["errorMessage"] = "Ocurrió un error al actualizar el correo de notificación.";
+                TempData["errorMessage"] = "Debe introducir un correo de notificación válido.";
             }
 
             return RedirectToAction("VerParticipantes", "Participante");
@@ -377,15 +326,15 @@ namespace webMetics.Controllers
             string mensaje = "" +
                 "<h2>Comprobante de inscripción a módulo - SISTEMA DE INSCRIPCIONES METICS</h2>" +
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
-                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " Grupo (" + grupo.numeroGrupo + ")</strong></p>" +
+                "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " (Grupo " + grupo.numeroGrupo + ")</strong></p>" +
                 
-                "<ul><li>Descripcion: " + grupo.descripcion + "</li>" +
+                "<ul><li>Descripción: " + grupo.descripcion + "</li>" +
                 "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
-                // "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
+                "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
-                "<li>Fecha de inicio: " + grupo.fechaInicioGrupo + "</li>" +
-                "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo + "</li>";
+                "<li>Fecha de inicio: " + grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") + "</li>" +
+                "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy") + "</li>";
             
             if (!(string.Equals(grupo.modalidad, "Autogestionado", StringComparison.OrdinalIgnoreCase) || string.Equals(grupo.modalidad, "Virtual", StringComparison.OrdinalIgnoreCase)))
             {
@@ -405,10 +354,12 @@ namespace webMetics.Controllers
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
 
-            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
+            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
-            iText.Layout.Document document = new iText.Layout.Document(pdf);
+
+            PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
+            iText.Layout.Document document = new iText.Layout.Document(pdf, pageSize);
 
             // Establecer fuente en negrita para encabezado
             PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
@@ -427,11 +378,11 @@ namespace webMetics.Controllers
             document.Add(header3);
 
             // Crear la tabla (9 columnas)
-            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 3, 2, 2, 3, 2, 3, 2, 2 });
             table.SetWidth(UnitValue.CreatePercentValue(100));
 
             // Agregar encabezados de la tabla con estilo
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
             foreach (var headerText in headers)
             {
                 table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
@@ -449,7 +400,6 @@ namespace webMetics.Controllers
                 {
                     foreach (var inscripcion in inscripcionesParticipante)
                     {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
@@ -465,7 +415,6 @@ namespace webMetics.Controllers
                 else
                 {
                     // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
