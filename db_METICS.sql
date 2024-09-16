@@ -12,6 +12,11 @@ CREATE TABLE rol (
 	nombre_rol NVARCHAR(16) NOT NULL,
 );
 
+--Creación del correo de notificación
+CREATE TABLE correo_notificacion (
+	correo NVARCHAR(64) NOT NULL,
+);
+
 --Creación de la tabla usuario
 CREATE TABLE usuario (
 	id_usuario_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
@@ -123,7 +128,6 @@ CREATE TABLE inscripcion (
 	horas_aprobadas INT DEFAULT 0,
 	horas_matriculadas INT DEFAULT 0,
 	calificacion FLOAT DEFAULT 0.0,
-	correo_limite_horas NVARCHAR(64) DEFAULT '',
 
     FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
         ON DELETE CASCADE
@@ -766,6 +770,10 @@ VALUES
 (0, N'Usuario'),
 (1, N'Administrador'),
 (2, N'Asesor')
+
+--Crear correo de notificación
+INSERT INTO correo_notificacion
+VALUES (N'soporte.metics@ucr.ac.cr')
 
 --Crear usuarios
 	-- admin

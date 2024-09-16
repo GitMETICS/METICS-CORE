@@ -177,7 +177,9 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            bool exito = correoLimiteHoras != null ? accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras) : false;
+            string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
+
+            bool exito = (string.IsNullOrEmpty(correo)) ? accesoAInscripcion.IngresarCorreoLimiteHoras(correoLimiteHoras) : accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
 
             if (exito)
             {
