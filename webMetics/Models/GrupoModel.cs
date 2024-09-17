@@ -8,12 +8,6 @@ namespace webMetics.Models
     {
         public int idGrupo { get; set; }
 
-        [Required(ErrorMessage = "Debe asociar un área de competencia al módulo.")]
-        public int idTema { get; set; }
-        
-        [Display(Name = "Área de competencia")]
-        public string? nombreTema { get; set; }
-
         [Required(ErrorMessage = "Debe asociar un nivel al módulo.")]
         public int idCategoria { get; set; }
 
@@ -79,6 +73,13 @@ namespace webMetics.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime fechaFinalizacionInscripcion { get; set; }
+
+        [Required(ErrorMessage = "Es necesario que seleccione al menos una competencia.")]
+        [Display(Name = "Área(s) de competencia")]
+        public List<int>? TemasSeleccionados { get; set; }
+
+        public List<string>? TemasSeleccionadosNombres { get; set; }
+
 
         public bool esVisible { get; set; }
 

@@ -2,6 +2,7 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
+
     ViewBag.Title = "Editar Módulo";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
@@ -104,18 +105,38 @@
                             @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                         </div>
 
+
+                        @{
+                            var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
+                            var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
+                        }
+
                         <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.nombreTema, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(grupoModel => grupoModel.idTema, ViewData["Temas"] as List<SelectListItem>, "Seleccione un tema...", new { @class = "form-select" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreTema, "", new { @class = "text-danger" })
+                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+
+                            @foreach (var item in temas)
+                            {
+                                bool isChecked = temasSeleccionados.Any(t => t.Value == item.Value);
+
+                                <div class="form-check">
+                                    <input type="checkbox" name="TemasSeleccionados" value="@item.Value" class="form-check-input" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@item.Text</label>
+                                </div>
+                            }
+
+                            @Html.ValidationMessageFor(model => model.TemasSeleccionados, "", new { @class = "text-danger" })
+
                         </div>
 
+
+                        <!-- Dropdown para categorías -->
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
                         </div>
 
+                        <!-- Dropdown para asesores -->
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { Style = "font-size:22px" })
                             @Html.DropDownListFor(grupoModel => grupoModel.idAsesor, ViewData["Asesores"] as List<SelectListItem>, "Seleccione un(a) facilitador(a)...", new { @class = "form-select", @id = "asesorSelect" })
@@ -130,7 +151,6 @@
                                 <br />
                                 @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
-
                             </div>
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
@@ -140,8 +160,9 @@
                             </div>
                         </div>
 
+                        <br />
                         <div class="row mt-3">
-                            <h4>Fecha de inicio y fin del grupo</h4>
+                            <h4>Fechas del módulo</h4>
                             <div class="col">
                                 @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
                                 <br />
@@ -156,31 +177,14 @@
                             </div>
                         </div>
 
+                        <br />
                         <div class="row mt-3">
-                            @if (ViewBag.Adjunto != null && ViewBag.Adjunto.Length > 0)
-                            {
-                                <div class="my-3">
-                                    <h4 class="mt-4">Archivo Actual</h4>
-                                    <iframe class="my-2 rounded" id="pdfPreview" src="data:application/pdf;base64,@(ViewBag.Adjunto)" width="100%" height="500" style="border: none;"></iframe>
-                                </div>
-                            }
-
-                            <div class="my-3 p-3 bg-light rounded">
-                                <h4>Adjuntar Nuevo Archivo</h4>
-                                <small class="text-muted">Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.</small>
-                                <div class="form-group mt-3">
-                                    @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
-                                </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            @Html.ActionLink("Cancelar", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "btn btn-secondary btn-block" })
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            <div class="col text-end">
+                                <a class="btn btn-danger" href="@Url.Action("Index")">Cancelar</a>
+                            </div>
                         </div>
                     </div>
                 </div>
