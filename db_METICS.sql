@@ -40,7 +40,6 @@ CREATE TABLE asesor (
     correo NVARCHAR(64) NOT NULL,
 	descripcion NVARCHAR(256),
     telefono NVARCHAR(15),
-    
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
         ON DELETE CASCADE
@@ -799,6 +798,11 @@ EXEC InsertUsuario
 	@id = N'admin.admin@ucr.ac.cr',
 	@rol = 1,
 	@contrasena = N'#Q+3n?OWk3i0:qG'
+
+EXEC InsertUsuario 
+	@id = N'admin.docencia.metics@ucr.ac.cr',
+	@rol = 1,
+	@contrasena = N'12345'
 
 --Crear asesores
 EXEC InsertUsuario
