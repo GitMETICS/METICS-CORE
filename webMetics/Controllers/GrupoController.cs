@@ -173,7 +173,7 @@ namespace webMetics.Controllers
 
         /* Vista del formulario para editar un grupo con los datos ingresados del modelo */
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public ActionResult CrearGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
             ViewBag.Role = GetRole();
@@ -354,7 +354,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public ActionResult EditarGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
             ViewBag.Role = GetRole();

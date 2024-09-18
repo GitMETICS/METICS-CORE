@@ -80,7 +80,6 @@ namespace webMetics.Models
 
         public List<string>? TemasSeleccionadosNombres { get; set; }
 
-
         public bool esVisible { get; set; }
 
         public string? nombreArchivo { get; set; }

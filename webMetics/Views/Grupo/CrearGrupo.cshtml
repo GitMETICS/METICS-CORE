@@ -7,6 +7,14 @@
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
+@{
+    string defaultAsesorId = "";
+    if (ViewBag.Role == 2)
+    {
+        defaultAsesorId = ViewBag.Id;
+    }
+}
+
 @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
 {
     <div class="contenedor-tipos-actividades container-fluid">
@@ -126,11 +134,28 @@
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
                         </div>
 
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { Style = "font-size:22px" })
-                            @Html.DropDownListFor(grupoModel => grupoModel.idAsesor, ViewData["Asesores"] as List<SelectListItem>, "Seleccione un(a) facilitador(a)...", new { @class = "form-select", @id = "asesorSelect" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
-                        </div>
+                        @if (ViewBag.Role == 2)
+                        {
+                            @Html.DropDownListFor(
+                                grupoModel => grupoModel.idAsesor,
+                                new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text", defaultAsesorId),
+                                "Seleccione un(a) facilitador(a)...",
+                                new { @class = "form-select", @hidden = true }
+                            )
+                        }
+                        else
+                        {
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { Style = "font-size:22px" })
+                                @Html.DropDownListFor(
+                                         grupoModel => grupoModel.idAsesor,
+                                         new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
+                                         "Seleccione un(a) facilitador(a)...",
+                                         new { @class = "form-select", @id = "asesorSelect" }
+                                         )
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
+                            </div>
+                        }
 
                         <br />
                         <div class="row mt-3">
@@ -200,21 +225,22 @@ else
             var modalidadSeleccionada = $('#modalidadSelect').val();
             if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
                 $('#asesorSelect').prop('disabled', true);
-                $('#asesorSelect').val(' ');
+                $('#asesorSelect').val('');
                 $('#horarioText').prop('disabled', true);
-                $('#horarioText').val(' ');
+                $('#horarioText').val('');
                 $('#lugarText').prop('disabled', true);
-                $('#lugarText').val(' ');
+                $('#lugarText').val('');
             } else {
-                $('#asesorSelect').prop('disabled', false);
+                if ('@ViewBag.Role' && '@ViewBag.Role' != 2) {
+                    $('#asesorSelect').prop('disabled', false);
+                }
                 $('#horarioText').prop('disabled', false);
                 $('#lugarText').prop('disabled', false);
             }
         }
-
+        
         verificarModalidad();
 
-        // Llamar a la función cuando cambie la modalidad
         $('#modalidadSelect').change(function () {
             verificarModalidad();
         });
