@@ -137,6 +137,23 @@ namespace webMetics.Handlers
             return exito;
         }
 
+        public bool EliminarUsuario(string idUsuario)
+        {
+            string consulta = "DELETE FROM usuario WHERE id_usuario_PK = @idUsuario";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoParaConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            bool exito = comandoParaConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         public bool AutenticarUsuario(string id, string contrasena)
         {
             bool autenticado = false;

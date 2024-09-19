@@ -688,23 +688,17 @@ namespace webMetics.Controllers
                 // Aquí se define que el identificador del usuario es el correo.
                 participante.idParticipante = participante.correo;
 
-                if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
+                try
                 {
-                    string contrasena = GenerateRandomPassword();
+                    IngresarParticipante(participante);
 
-                    accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                    TempData["successMessage"] = "Participante agregado.";
                 }
-
-                if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
+                catch
                 {
-                    accesoAParticipante.CrearParticipante(participante);
-                    TempData["successMessage"] = "Se agregó el nuevo participante.";
+                    TempData["errorMessage"] = "Error al agregar al participante.";
                 }
-                else
-                {
-                    TempData["errorMessage"] = "Ya existe un participante con los mismos datos.";
-                }
-
+                
                 return RedirectToAction("VerParticipantes");
             }
             else
@@ -791,21 +785,14 @@ namespace webMetics.Controllers
 
             try
             {
-                bool eliminadoExitosamente = accesoAParticipante.EliminarParticipante(idParticipante);
+                accesoAParticipante.EliminarParticipante(idParticipante);
+                accesoAUsuario.EliminarUsuario(idParticipante);
 
-                if (eliminadoExitosamente)
-                {
-                    TempData["successMessage"] = "Se eliminó al participante.";
-                }
-                else
-                {
-                    TempData["errorMessage"] = "No se pudo eliminar al participante.";
-                }
+                TempData["successMessage"] = "Participante eliminado.";
             }
-            catch (Exception)
+            catch
             {
-                // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                TempData["errorMessage"] = "Ocurrió un error y no se pudo eliminar al participante.";
+                TempData["errorMessage"] = "Error al eliminar al participante.";
             }
 
             return RedirectToAction("VerParticipantes", "Participante");
@@ -1134,7 +1121,7 @@ namespace webMetics.Controllers
                 // Contenido base del mensaje en HTML y texto plano
                 const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
                 const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Nuevo Usuario en el Sistema de Competencias Digitales para la Docencia-METICS"; // Asunto del correo
+                const string BASE_SUBJECT = "Nuevo Usuario en el SISTEMA DE COMPETENCIAS DIGITALES"; // Asunto del correo
 
                 MimeMessage message = new MimeMessage();
 
@@ -1150,7 +1137,7 @@ namespace webMetics.Controllers
                 BodyBuilder bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
                     "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es " + contrasena + "</p>" +
+                    "<p>Su contraseña temporal es <strong>" + contrasena + "</strong></p>" +
                     "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
                 bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
                 bodyBuilder.HtmlBody += "</p>";

@@ -354,7 +354,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        // [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public ActionResult EditarGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
             ViewBag.Role = GetRole();
@@ -473,7 +473,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del grupo.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del módulo.";
             }
 
             return RedirectToAction("ListaGruposDisponibles");
@@ -503,7 +503,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del grupo.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos del módulo.";
             }
 
             return RedirectToAction("ListaGruposDisponibles");
