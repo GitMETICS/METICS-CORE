@@ -50,58 +50,72 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarColor01">
-                    <ul class="navbar-nav me-auto">
+                <div class="collapse navbar-collapse justify-content-between" id="navbarColor01">
+                    <div>
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
+                                   role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i>
+                                </a>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
-                               role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i>
-                            </a>
-
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li>
-                                    @Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <li>
+                                        @Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    </li>
+                                    <li>
+                                        @Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        @Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item" })
+                                    </li>
+                                </ul>
+                            </li>
+                            @if (ViewBag.Role == 1)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Administrador</a>
+                                    <div class="dropdown-menu">
+                                        @Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
+                                    </div>
                                 </li>
-                                <li>
-                                    @Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", new { id = ViewBag.Id }, new { @class = "dropdown-item" })
+                            }
+                            @if (ViewBag.Role == 2)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Asesor</a>
+                                    <div class="dropdown-menu">
+                                        @Html.ActionLink("Mis módulos", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
+                                    </div>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    @Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item" })
-                                </li>
-                            </ul>
-                        </li>
-
+                            }
+                            <li class="nav-item">
+                                @Html.ActionLink(" ", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "nav-link active bi bi-house-door-fill" })
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="navbar-nav me-auto">
                         @if (ViewBag.Role == 1)
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Administrador</a>
-                                <div class="dropdown-menu">
-                                    @Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
-                                </div>
+                            <li class="nav-item">
+                                    @Html.ActionLink("      Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-circle-fill nav-link text-dark" })
                             </li>
                         }
                         @if (ViewBag.Role == 2)
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Asesor</a>
-                                <div class="dropdown-menu">
-                                    @Html.ActionLink("Mis módulos", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "dropdown-item" })
-                                    @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
-                                </div>
+                            <li class="nav-item">
+                                    @Html.ActionLink("      Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-circle-fill nav-link text-dark" })
                             </li>
                         }
-
-                        <li class="nav-item">
-                            @Html.ActionLink(" ", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "nav-link active bi bi-house-door-fill" })
-                        </li>
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
