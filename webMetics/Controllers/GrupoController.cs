@@ -134,6 +134,32 @@ namespace webMetics.Controllers
             return View();
         }
 
+        public IActionResult BuscarGrupos(string searchTerm)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            // Obtener la lista de participantes
+            var grupos = accesoAGrupo.ObtenerListaGrupos();
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                grupos = grupos.Where(p =>
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.descripcion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombreAsesor.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombreCategoria.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.modalidad.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.lugar.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.TemasSeleccionadosNombres.Any(t => t.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+
+            ViewBag.ListaGrupos = grupos;
+
+            return View("ListaGruposDisponibles");
+        }
 
         /* Método para descargar el programa del grupo */
         public ActionResult DescargarArchivo(int idGrupo)

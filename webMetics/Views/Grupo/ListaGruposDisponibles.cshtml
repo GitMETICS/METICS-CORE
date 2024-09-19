@@ -49,6 +49,14 @@
             if (ViewBag.GruposInscritos != null)
             {
             <h1>Módulos inscritos</h1>
+            <div>
+                <!-- Barra de búsqueda -->
+                <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
+                    <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+                </form>
+            </div>
+
             <br />
             <div class="row row-cols-1 row-cols-md-2 mb-4">
                 @foreach (var grupo in ViewBag.GruposInscritos)
@@ -180,6 +188,13 @@
         }
 
         <h1>@ViewBag.Title</h1>
+        <div class="my-4">
+            <!-- Barra de búsqueda -->
+            <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
+                <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
         <br />
         <div>
             <div class="row row-cols-1 row-cols-md-2">
