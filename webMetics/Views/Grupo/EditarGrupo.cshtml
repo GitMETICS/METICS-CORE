@@ -211,8 +211,14 @@
                                 <iframe class="my-2 rounded" id="pdfPreview" src="data:application/pdf;base64,@(ViewBag.Adjunto)" width="100%" height="500" style="border: none;"></iframe>
                             }
                             <h5 class="mt-4">Adjuntar nuevo archivo</h5>
-                            <div class="form-group">
-                                @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
+                            <div class="mb-4 bg-light p-3 rounded">
+                                <div class="d-flex align-text-center">
+                                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                                    <small class="text-muted">Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.</small>
+                                </div>
+                                <div class="form-group">
+                                    @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
+                                </div>
                             </div>
                         </div>
 

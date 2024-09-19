@@ -57,9 +57,11 @@
                                 </div>
                             }
 
-                            <div class="m-3 p-3 bg-light rounded">
-                                <h5>Adjuntar Archivo</h5>
-                                <small class="text-muted">Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.</small>
+                            <div class="mb-4 bg-light p-3 rounded">
+                                <div class="d-flex align-text-center">
+                                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                                    <small class="text-muted">Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.</small>
+                                </div>
                                 <div class="form-group mt-3">
                                     <input type="file" asp-for="archivoAdjunto" class="form-control" />
                                     <span asp-validation-for="archivoAdjunto" class="text-danger"></span>
