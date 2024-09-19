@@ -73,7 +73,8 @@
                             </div>
                         </form>
                     }
-                    <div class="mb-4 bg-light p-3 rounded">
+                    <div class="mb-4 bg-light p-3 rounded d-flex">
+                        <h4><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h4>
                         <small class="text-muted">
                             Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
                             <br />
@@ -100,10 +101,18 @@
 
             @if (ViewBag.ListaParticipantes == null)
             {
-                <h5 class="text-center">No hay personas inscritas en ningún módulo.</h5>
+                <h5 class="text-center">No hay personas inscritas en módulos.</h5>
             }
             else
             {
+                <div>
+                    <!-- Barra de búsqueda -->
+                    <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="input-group mb-3">
+                        <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
+                        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+                    </form>
+                </div>
+
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>

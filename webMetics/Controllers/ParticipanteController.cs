@@ -111,6 +111,29 @@ namespace webMetics.Controllers
             return View();
         }
 
+        public IActionResult BuscarParticipantes(string searchTerm)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            // Obtener la lista de participantes
+            var participantes = accesoAParticipante.ObtenerListaParticipantes();
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            ViewBag.ListaParticipantes = participantes;
+
+            return View("VerParticipantes");
+        }
 
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcel(IFormFile file)
