@@ -11,7 +11,7 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
                     <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
@@ -148,7 +148,9 @@
                 </table>
             }
             <div class="d-flex justify-content-center my-4">
-                <a href="#" class="btn btn-primary btn-block" onclick="history.go(-1); return false;">Regresar</a>
+                <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-primary btn-block">
+                    Regresar
+                </a>
             </div>
         </div>
     </div>
