@@ -219,7 +219,7 @@ namespace webMetics.Controllers
             return usuarioAutorizado;
         }
 
-        public ActionResult InformacionPersonal(string id)
+        public ActionResult InformacionPersonal()
         {
             const int RolUsuarioParticipante = 0;
             const int RolUsuarioAdmin = 1;
@@ -227,19 +227,28 @@ namespace webMetics.Controllers
 
             int role = GetRole();
 
-            ViewBag.Id = GetId();
+            string idUsuario = string.Empty;
+            if (Request.Cookies.ContainsKey("USUARIOAUTORIZADO"))
+            {
+                string idEncriptado = Request.Cookies["USUARIOAUTORIZADO"];
+                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
+                idUsuario = protector.Unprotect(idEncriptado);
+            }
+
+            ViewBag.Id = idUsuario;
+
             ViewBag.Role = role;
 
             switch (role)
             {
                 case RolUsuarioParticipante:
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(id);
-                    List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(id);
-                    List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(id);
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idUsuario);
+                    List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
 
                     UsuarioModel usuarioParticipante = new UsuarioModel()
                     {
-                        id = id,
+                        id = idUsuario,
                         nombre = participante.nombre,
                         primerApellido = participante.primerApellido,
                         segundoApellido = participante.segundoApellido,
@@ -266,12 +275,12 @@ namespace webMetics.Controllers
                     break;
 
                 case RolUsuarioAsesor:
-                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(id);
-                    List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(id);
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
 
                     UsuarioModel usuarioAsesor = new UsuarioModel()
                     {
-                        id = id,
+                        id = idUsuario,
                         nombre = asesor.nombre,
                         primerApellido = asesor.primerApellido,
                         segundoApellido = asesor.segundoApellido,
@@ -314,14 +323,23 @@ namespace webMetics.Controllers
             return RedirectToAction("IniciarSesion");
         }
 
-        public ActionResult CambiarContrasena(string id)
+        public ActionResult CambiarContrasena()
         {
-            if (GetId() == id)
+            string idUsuario = string.Empty;
+
+            if (Request.Cookies.ContainsKey("USUARIOAUTORIZADO"))
+            {
+                string idEncriptado = Request.Cookies["USUARIOAUTORIZADO"];
+                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
+                idUsuario = protector.Unprotect(idEncriptado);
+            }
+
+            if (!string.IsNullOrEmpty(idUsuario) && GetId() == idUsuario)
             {
                 ViewBag.Id = GetId();
                 ViewBag.Role = GetRole();
 
-                NewLoginModel usuario = new NewLoginModel() { id = id };
+                NewLoginModel usuario = new NewLoginModel() { id = idUsuario };
 
                 if (TempData["errorMessage"] != null)
                 {
@@ -339,6 +357,7 @@ namespace webMetics.Controllers
                 return RedirectToAction("CerrarSesion");
             }
         }
+
 
         [HttpPost]
         public ActionResult CambiarContrasena(NewLoginModel usuario)
