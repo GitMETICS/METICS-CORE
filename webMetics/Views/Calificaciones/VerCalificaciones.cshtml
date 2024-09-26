@@ -80,7 +80,7 @@
                             @Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
                         </div>
                         <div class="mx-1">
-                            @Html.ActionLink("   Enviar por correo", "EnviarCalificaciones", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-primary bi bi-send" })
+                            <button class="btn btn-outline-primary" id="sendEmailButton"><i class="bi bi-send me-2"></i>Enviar por correo</button>
                         </div>
                     </div>
                 </div>
@@ -88,6 +88,7 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
+                            <th scope="col" style="width: 3.33%;"></th>
                             <th scope="col" style="width: 30%;">Nombre Completo</th>
                             <th scope="col" style="width: 45%;">Correo Institucional</th>
                             <th class="text-center" scope="col" style="width: 20%;">Calificación</th>
@@ -105,6 +106,9 @@
                                 nombreCompleto += " " + calificacion.participante.segundoApellido;
                             }
                             <tr>
+                                <td>
+                                    <input type="checkbox" class="participante-checkbox" value="@calificacion.participante.idParticipante" />
+                                </td>
                                 <td>@nombreCompleto</td>
                                 <td>@calificacion.participante.idParticipante</td>
                                 <td class="text-center">@calificacion.calificacion</td>
@@ -130,3 +134,21 @@ else
         window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
     </script>
 }
+
+<script>
+    document.getElementById('sendEmailButton').onclick = function () {
+        var selectedParticipants = [];
+        // Gather selected checkboxes
+        document.querySelectorAll('.participante-checkbox:checked').forEach(function (checkbox) {
+            selectedParticipants.push(checkbox.value);
+        });
+
+        // Create a comma-separated string
+        var participantesSeleccionados = selectedParticipants.join(',');
+
+        // Redirect to the ActionLink with the parameters
+        window.location.href = '@Url.Action("EnviarCalificaciones", "Calificaciones", new { idGrupo = "__idGrupo__", participantesSeleccionados = "__participantesSeleccionados__" })'
+            .replace('__idGrupo__', '@ViewBag.IdGrupo')
+            .replace('__participantesSeleccionados__', participantesSeleccionados);
+    };
+</script>

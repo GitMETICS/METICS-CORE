@@ -366,13 +366,19 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
-        public ActionResult EnviarCalificaciones(int idGrupo)
+        public ActionResult EnviarCalificaciones(int idGrupo, List<string> participantesSeleccionados)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+            List<CalificacionModel> calificaciones = new List<CalificacionModel>();
+
+            foreach (string idParticipante in participantesSeleccionados)
+            {
+                CalificacionModel calificacion = accesoACalificaciones.ObtenerCalificacion(idGrupo, idParticipante);
+                calificaciones.Add(calificacion);
+            }
 
             try
             {
@@ -382,11 +388,11 @@ namespace webMetics.Controllers
                     EnviarCalificaciones(grupo.nombre, mensaje, calificacion.participante.correo);
                 }
 
-                TempData["successMessage"] = "Las calificaciones fueron enviadas éxitosamente al correo de cada participante.";
+                TempData["successMessage"] = "Calificaciones enviadas.";
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error al enviar las calificaciones.";
+                TempData["errorMessage"] = "Error al enviar las calificaciones.";
             }
 
             return RedirectToAction("VerCalificaciones", new { idGrupo });

@@ -11,7 +11,20 @@ namespace webMetics.Handlers
         public CalificacionesHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
         }
+        
+        public CalificacionModel ObtenerCalificacion(int idGrupo, string idParticipante)
+        {
+            string consulta = "SELECT * FROM inscripcion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
+            SqlCommand command = new SqlCommand(consulta, ConexionMetics);
+            command.Parameters.AddWithValue("@idGrupo", idGrupo);
+            command.Parameters.AddWithValue("@idParticipante", idParticipante);
 
+            DataTable result = CrearTablaConsulta(command);
+            CalificacionModel calificacion = result.Rows[0] != null ? ObtenerCalificacionParticipante(result.Rows[0]) : null;
+
+            return calificacion;
+        }
+        
         // Método para obtener la calificación de un participante
         public CalificacionModel ObtenerCalificacionParticipante(DataRow filaCalificacion)
         {
