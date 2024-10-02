@@ -51,7 +51,7 @@
                                                 string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
                                                 correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
                                                 
-                                                <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                                        <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
                                             }
                                         </div>
                                         <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
@@ -224,9 +224,21 @@ else
     </script>
 }
 
-
 <script type="text/javascript">
     function actualizarModalEliminar(idParticipante) {
         document.getElementById("idParticipante").value = idParticipante;
     }
+</script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+<script>
+    var table = new DataTable('#tblCustomers', {
+        language: {
+            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+        },
+        "searching": false
+    });
 </script>
