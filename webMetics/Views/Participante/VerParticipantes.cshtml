@@ -51,7 +51,7 @@
                                                 string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
                                                 correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
                                                 
-                                                <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                                        <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
                                             }
                                         </div>
                                         <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
@@ -223,7 +223,6 @@ else
         window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
     </script>
 }
-
 
 <script type="text/javascript">
     function actualizarModalEliminar(idParticipante) {
