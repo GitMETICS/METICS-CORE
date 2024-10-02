@@ -230,3 +230,16 @@ else
         document.getElementById("idParticipante").value = idParticipante;
     }
 </script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+<script>
+    var table = new DataTable('#tblCustomers', {
+        language: {
+            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+        },
+        "searching": false
+    });
+</script>
