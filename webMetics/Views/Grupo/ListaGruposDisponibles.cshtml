@@ -7,10 +7,6 @@
     El administrador puede modificar los grupos
     Los usuarios se pueden inscribir en un grupo y ver el programa del grupo
 -->
-<div class="my-4">
-    <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
-    <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleView()">Ver en modo lista</button>
-</div>
 @{
     ViewBag.Title = "Módulos disponibles";
 }
@@ -49,6 +45,11 @@
         }
         else
         {
+            <div class="my-4">
+                <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
+                <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleView()"><i class="bi bi-eye-fill me-2"></i>Modo lista</button>
+            </div>
+
             if (ViewBag.GruposInscritos != null)
             {
             <h1>Módulos inscritos</h1>
@@ -941,14 +942,14 @@ else
             if (gridView) gridView.classList.add("d-none");  
             if (listView0) listView0.classList.remove("d-none");
             if (listView) listView.classList.remove("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo cuadrícula";  
+            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-eye-fill me-2'></i>Modo cuadrícula";
         } else {
             isListView = false;
             if (gridView) gridView.classList.remove("d-none");  
             if (gridView0) gridView0.classList.remove("d-none");
             if (listView0) listView0.classList.add("d-none");
             if (listView) listView.classList.add("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo lista"; 
+            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-eye-fill me-2'></i>Modo lista";
         }
     };
 
@@ -966,14 +967,14 @@ else
             if (gridView0) gridView0.classList.add("d-none");
             if (listView0) listView0.classList.remove("d-none");
             if (listView) listView.classList.remove("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo cuadrícula";  
+            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-eye-fill me-2'></i>Modo cuadrícula";
             localStorage.setItem('viewMode', 'list');  
         } else {
             if (gridView) gridView.classList.remove("d-none");
             if (gridView0) gridView0.classList.remove("d-none");
             if (listView0) listView0.classList.add("d-none");
             if (listView) listView.classList.add("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo lista";  
+            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-eye-fill me-2'></i>Modo lista";
             localStorage.setItem('viewMode', 'grid');  
         }
     }
