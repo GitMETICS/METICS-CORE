@@ -937,18 +937,18 @@ else
 
         if (savedViewMode === 'list') {
             isListView = true;
-            gridView0.classList.add("d-none");
-            gridView.classList.add("d-none");  
-            listView0.classList.remove("d-none");
-            listView.classList.remove("d-none");  
-            toggleViewBtn.innerText = "Ver en modo cuadrícula";  
+            if (gridView0) gridView0.classList.add("d-none");
+            if (gridView) gridView.classList.add("d-none");  
+            if (listView0) listView0.classList.remove("d-none");
+            if (listView) listView.classList.remove("d-none");  
+            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo cuadrícula";  
         } else {
             isListView = false;
-            gridView.classList.remove("d-none");  
-            gridView0.classList.remove("d-none");
-            listView0.classList.add("d-none");
-            listView.classList.add("d-none");  
-            toggleViewBtn.innerText = "Ver en modo lista"; 
+            if (gridView) gridView.classList.remove("d-none");  
+            if (gridView0) gridView0.classList.remove("d-none");
+            if (listView0) listView0.classList.add("d-none");
+            if (listView) listView.classList.add("d-none");  
+            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo lista"; 
         }
     };
 
@@ -962,20 +962,19 @@ else
         const toggleViewBtn = document.getElementById("toggleViewBtn");
 
         if (isListView) {
-            gridView.classList.add("d-none");
-            gridView0.classList.add("d-none");
-            listView0.classList.remove("d-none");
-            listView.classList.remove("d-none");  
-            toggleViewBtn.innerText = "Ver en modo cuadrícula";  
+            if (gridView) gridView.classList.add("d-none");
+            if (gridView0) gridView0.classList.add("d-none");
+            if (listView0) listView0.classList.remove("d-none");
+            if (listView) listView.classList.remove("d-none");  
+            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo cuadrícula";  
             localStorage.setItem('viewMode', 'list');  
         } else {
-            gridView.classList.remove("d-none");
-            gridView0.classList.remove("d-none");
-            listView0.classList.add("d-none");
-            listView.classList.add("d-none");  
-            toggleViewBtn.innerText = "Ver en modo lista";  
+            if (gridView) gridView.classList.remove("d-none");
+            if (gridView0) gridView0.classList.remove("d-none");
+            if (listView0) listView0.classList.add("d-none");
+            if (listView) listView.classList.add("d-none");  
+            if (toggleViewBtn) toggleViewBtn.innerText = "Ver en modo lista";  
             localStorage.setItem('viewMode', 'grid');  
         }
     }
-
 </script>
