@@ -103,16 +103,10 @@
                     </div>
                     <div>
                         <ul class="navbar-nav me-auto">
-                        @if (ViewBag.Role == 1)
+                        @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                         {
                             <li class="nav-item">
-                                    @Html.ActionLink("      Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-circle-fill nav-link text-dark" })
-                            </li>
-                        }
-                        @if (ViewBag.Role == 2)
-                        {
-                            <li class="nav-item">
-                                    @Html.ActionLink("      Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-circle-fill nav-link text-dark" })
+                                    @Html.ActionLink("      Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-lg btn btn-secondary" })
                             </li>
                         }
                         </ul>
