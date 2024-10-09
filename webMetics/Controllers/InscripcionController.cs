@@ -1,12 +1,10 @@
 ﻿using webMetics.Handlers;
 using webMetics.Models;
 using Microsoft.AspNetCore.Mvc;
-using MimeKit;
 using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
 using NPOI.XWPF.UserModel;
-using System.Text.RegularExpressions;
 using NPOI.SS.UserModel;
 using iText.Layout.Properties;
 using iText.Kernel.Font;
@@ -26,11 +24,13 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
 
-        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration)
+        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
+            _emailService = emailService;
 
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
@@ -83,7 +83,7 @@ namespace webMetics.Controllers
 
                         try
                         {
-                            string mensaje = ConstructorDelMensaje(grupo, participante);
+                            string mensaje = ConstructorDelMensajeNotificacionInscripcion(grupo, participante);
                             EnviarCorreoInscripcion(grupo, mensaje, participante.correo);
 
                             ViewBag.Titulo = "Inscripción realizada";
@@ -247,76 +247,27 @@ namespace webMetics.Controllers
             return numeroHoras;
         }
 
-        /* Método para enviar confirmación de inscripción al usuario*/
-        private void EnviarCorreoInscripcion(GrupoModel grupo, string mensaje, string correoParticipante)
+        // Método para enviar confirmación de inscripción al usuario
+        private async Task<IActionResult> EnviarCorreoInscripcion(GrupoModel grupo, string mensaje, string correoParticipante)
         {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
+            string subject = "Comprobante de Inscripción a Módulo - SISTEMA DE INSCRIPCIONES METICS";
 
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Comprobante de inscripción"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + mensaje;
-            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-            bodyBuilder.HtmlBody += "</p>";
-
-            // Obtener los datos del archivo adjunto (si existe) y agregarlo al mensaje
-            byte[] attachmentData = accesoAGrupo.ObtenerArchivo(grupo.idGrupo);
-            if (attachmentData != null)
+            byte[] archivoAdjunto = accesoAGrupo.ObtenerArchivo(grupo.idGrupo);
+            if (archivoAdjunto != null)
             {
-                // Crear la parte adjunta del mensaje
-                var attachment = new MimeKit.MimePart("application", "octet-stream")
-                {
-                    Content = new MimeContent(new MemoryStream(attachmentData)),
-                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
-                    ContentTransferEncoding = ContentEncoding.Base64,
-                    FileName = accesoAGrupo.ObtenerNombreArchivo(grupo) // Nombre del archivo adjunto
-                };
-
-                // Crear una parte multipart para incluir tanto el cuerpo del mensaje como el archivo adjunto
-                var multipart = new Multipart("mixed");
-                multipart.Add(bodyBuilder.ToMessageBody());
-                multipart.Add(attachment);
-                message.Body = multipart;
+                await _emailService.SendEmailAsync(correoParticipante, subject, mensaje, archivoAdjunto, grupo.nombreArchivo);
             }
             else
             {
                 // Si no hay archivo adjunto, solo agregar el cuerpo del mensaje al mensaje principal
-                message.Body = bodyBuilder.ToMessageBody();
+                await _emailService.SendEmailAsync(correoParticipante, subject, mensaje);
             }
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
+         
+            return Ok();
         }
 
         //Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
-        public string ConstructorDelMensaje(GrupoModel grupo, ParticipanteModel participante)
+        public string ConstructorDelMensajeNotificacionInscripcion(GrupoModel grupo, ParticipanteModel participante)
         {
             // Construir el contenido del mensaje que se enviará por correo electrónico al usuario
             // Este método toma información del módulo y el participante y crea un mensaje personalizado

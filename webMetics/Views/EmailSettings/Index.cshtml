@@ -1,0 +1,57 @@
+﻿@model bool
+@{
+    ViewBag.Title = "Configuración del Correo";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+        <h1>@ViewBag.Title</h1>
+        <hr />
+
+        <form asp-action="ToggleEmailSending" method="post">
+            <div class="row mb-1">
+                <div class="container">
+                    <div class="form-group mt-1 d-flex justify-content-between w-25 p-3 bg-light rounded">
+                        <label class="form-check-label" for="emailToggle">
+                            Habilitar envío de correos
+                        </label>
+                        <div class="form-check form-switch">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="emailToggle"
+                                   name="isEnabled"
+                                   value="true"
+                            @(Model ? "checked" : "")
+                                   aria-label="Toggle email sending" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center m-4">
+                <div class="col-auto">
+                    <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
+                </div>
+                <div class="col-auto">
+                    <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                </div>
+            </div>
+        </form>
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}

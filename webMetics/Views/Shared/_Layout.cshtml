@@ -66,6 +66,10 @@
                                     <li>
                                         @Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item" })
                                     </li>
+                                    @if (ViewBag.Role == 1)
+                                    {
+                                        
+                                    }
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         @Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item" })
@@ -81,8 +85,11 @@
                                         @Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })
                                         @Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
                                         @Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
+                                        <hr class="dropdown-divider">
                                         @Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
                                         @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
+                                        <hr class="dropdown-divider">
+                                        @Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })
                                     </div>
                                 </li>
                             }

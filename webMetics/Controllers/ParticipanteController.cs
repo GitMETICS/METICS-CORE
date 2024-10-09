@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
-using MimeKit;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.XSSF.UserModel;
@@ -12,9 +11,6 @@ using NPOI.SS.UserModel;
 using iText.Kernel.Font;
 using iText.Layout.Properties;
 using iText.Kernel.Geom;
-using NPOI.OpenXmlFormats.Wordprocessing;
-using NPOI.XWPF.Model;
-using NPOI.OpenXmlFormats.Spreadsheet;
 
 
 namespace webMetics.Controllers
@@ -29,17 +25,20 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
 
-        public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration)
+        public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
+            _emailService = emailService;
 
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
+            _emailService = emailService;
         }
 
         public ActionResult ListaParticipantes(int idGrupo)
@@ -233,50 +232,14 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes");
         }
 
-        private void EnviarCorreoNotificacion(string idParticipante)
+        private async Task<IActionResult> EnviarCorreoNotificacion(string idParticipante)
         {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
-
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = "<p>"; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = "Notificación sobre límite de horas"; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente
-            message.From.Add(from);
-
+            string subject = "Notificación Límite de Horas Aprobadas - SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
             string receiver = accesoAInscripcion.ObtenerCorreoLimiteHoras() ?? "soporte.metics@ucr.ac.cr";
-            MailboxAddress to = new MailboxAddress("Receiver", receiver);
-            message.To.Add(to);
 
-            message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.TextBody = $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
+            await _emailService.SendEmailAsync(receiver, subject, message);
+            return Ok();
         }
 
         public ActionResult ExportarParticipantesPDF()
@@ -1133,56 +1096,16 @@ namespace webMetics.Controllers
             return -1;
         }
 
-        /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarContrasenaPorCorreo(string correo, string contrasena)
+        // Método para enviar confirmación de registro al usuario
+        private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
         {
-            try
-            {
-                // Se utiliza la librería MimeKit para construir el mensaje
-                // El mensaje incluye una versión en HTML y texto plano
+            string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-                // Contenido base del mensaje en HTML y texto plano
-                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-                const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Nuevo Usuario en el SISTEMA DE COMPETENCIAS DIGITALES"; // Asunto del correo
-
-                MimeMessage message = new MimeMessage();
-
-                // Configurar el remitente y el destinatario
-                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
-                message.From.Add(from);
-                MailboxAddress to = new MailboxAddress("Receiver", correo);
-                message.To.Add(to);
-
-                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-                BodyBuilder bodyBuilder = new BodyBuilder();
-                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "<p>Se ha creado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia-METICS.</p>" +
-                    "<p>Su contraseña temporal es <strong>" + contrasena + "</strong></p>" +
-                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
-                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-                bodyBuilder.HtmlBody += "</p>";
-
-                message.Body = bodyBuilder.ToMessageBody();
-
-                // Enviar el correo electrónico utilizando un cliente SMTP
-                using var client = new MailKit.Net.Smtp.SmtpClient();
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
         }
 
         private string GenerateRandomPassword()

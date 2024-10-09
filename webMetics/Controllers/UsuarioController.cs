@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
-using MimeKit;
 
 /* 
  * Controlador del proceso de login y logout del sistema
@@ -23,12 +22,14 @@ namespace webMetics.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly IDataProtectionProvider _protector;
+        private readonly EmailService _emailService;
 
-        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector)
+        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
             _protector = protector;
+            _emailService = emailService;
 
             cookiesController = new CookiesController(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
@@ -383,57 +384,16 @@ namespace webMetics.Controllers
             return RedirectToAction("CambiarContrasena", new { id = GetId() });
         }
 
-        /* Método para enviar confirmación de registro al usuario*/
-        private void EnviarCorreoRegistro(string correo, string contrasena)
+        // Método para enviar confirmación de registro al usuario
+        private async Task<IActionResult> EnviarCorreoRegistro(string correo, string contrasena)
         {
-            try
-            {
-                // Configurar el mensaje de correo electrónico de registro
-                // Se utiliza la librería MimeKit para construir el mensaje
-                // El mensaje incluye una versión en HTML y texto plano
+            string subject = "Registro en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha registrado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-                // Contenido base del mensaje en HTML y texto plano
-                const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-                const string BASE_MESSAGE_TEXT = "";
-                const string BASE_SUBJECT = "Registro en el SISTEMA DE INSCRIPCIONES METICS"; // Asunto del correo
-
-                MimeMessage message = new MimeMessage();
-
-                // Configurar el remitente y el destinatario
-                MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr");
-                message.From.Add(from);
-                MailboxAddress to = new MailboxAddress("Receiver", correo);
-                message.To.Add(to);
-
-                message.Subject = BASE_SUBJECT; // Asignar el asunto del correo
-
-                // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-                BodyBuilder bodyBuilder = new BodyBuilder();
-                bodyBuilder.HtmlBody = BASE_MESSAGE_HTML +
-                    "<p>Se ha registrado al usuario con identificación " + correo + " en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                    "<p>Su contraseña temporal es <strong>" + contrasena + "</strong></p>" +
-                    "<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.";
-                bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-                bodyBuilder.HtmlBody += "</p>";
-
-                message.Body = bodyBuilder.ToMessageBody();
-
-                // Enviar el correo electrónico utilizando un cliente SMTP
-                using var client = new MailKit.Net.Smtp.SmtpClient();
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]);
-
-                // Enviar el mensaje
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
         }
 
         private string GenerateRandomPassword()

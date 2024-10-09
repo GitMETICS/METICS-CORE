@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
-using MimeKit;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
 using iText.Kernel.Pdf;
@@ -16,13 +15,16 @@ namespace webMetics.Controllers
         private GrupoHandler accesoAGrupo;
         private ParticipanteHandler accesoAParticipante;
         private CalificacionesHandler accesoACalificaciones;
+
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly EmailService _emailService;
 
-        public CalificacionesController(IWebHostEnvironment environment, IConfiguration configuration)
+        public CalificacionesController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
+            _emailService = emailService;
 
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
@@ -292,52 +294,17 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        /* Método para enviar calificación y estado de un grupo */
-        private void EnviarCalificaciones(string grupo, string mensaje, string correoParticipante)
+        // Método para enviar calificación a un participante
+        private async Task<IActionResult> EnviarCalificacion(string grupo, string mensaje, string correoParticipante)
         {
-            // Configurar el mensaje de correo electrónico con el comprobante de inscripción y el archivo adjunto (si corresponde)
-            // Se utiliza la librería MimeKit para construir el mensaje
-            // El mensaje incluye una versión en HTML y texto plano
+            string subject = "Informe de Calificación Final - Módulo " + grupo;
 
-            // Contenido base del mensaje en HTML y texto plano
-            const string BASE_MESSAGE_HTML = ""; // Contenido HTML adicional puede ser agregado aquí
-            const string BASE_MESSAGE_TEXT = "";
-            const string BASE_SUBJECT = ""; // Asunto del correo
-
-            MimeMessage message = new MimeMessage();
-
-            // Configurar el remitente y el destinatario
-            MailboxAddress from = new MailboxAddress("COMPETENCIAS DIGITALES", "COMPETENCIAS.DIGITALES@ucr.ac.cr"); // TODO: Cambiar el correo del remitente al de UCR
-            message.From.Add(from);
-            MailboxAddress to = new MailboxAddress("Receiver", correoParticipante);
-            message.To.Add(to);
-
-            message.Subject = BASE_SUBJECT + "Informe de Calificación Final - Módulo " + grupo; // Asignar el asunto del correo
-
-            // Crear el cuerpo del mensaje con el contenido HTML y texto plano
-            BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = BASE_MESSAGE_HTML + mensaje;
-            bodyBuilder.TextBody = BASE_MESSAGE_TEXT;
-            bodyBuilder.HtmlBody += "</p>";
-
-            message.Body = bodyBuilder.ToMessageBody();
-
-            // Enviar el correo electrónico utilizando un cliente SMTP
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                // Configurar el cliente SMTP para el servidor de correo de la UCR
-                client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-                client.Authenticate(from.Address, _configuration["EmailSettings:SMTPPassword"]); 
-
-                client.Send(message);
-
-                // Desconectar el cliente SMTP
-                client.Disconnect(true);
-            }
+            await _emailService.SendEmailAsync(correoParticipante, subject, mensaje);
+            return Ok();
         }
 
         // Método del constructor del mensaje del correo que será enviado al usuario con la calificación
-        private string ConstructorDelMensaje(GrupoModel grupo, CalificacionModel calificacion)
+        private string ConstructorDelMensajeCorreoEnviarCalificacion(GrupoModel grupo, CalificacionModel calificacion)
         {
             // Construir el contenido del mensaje que se enviará por correo electrónico al usuario
             // Este método toma información del grupo y el participante y crea un mensaje personalizado
@@ -384,8 +351,8 @@ namespace webMetics.Controllers
             {
                 foreach (CalificacionModel calificacion in calificaciones)
                 {
-                    string mensaje = ConstructorDelMensaje(grupo, calificacion);
-                    EnviarCalificaciones(grupo.nombre, mensaje, calificacion.participante.correo);
+                    string mensaje = ConstructorDelMensajeCorreoEnviarCalificacion(grupo, calificacion);
+                    EnviarCalificacion(grupo.nombre, mensaje, calificacion.participante.correo);
                 }
 
                 TempData["successMessage"] = "Calificaciones enviadas.";

@@ -12,6 +12,8 @@ namespace webMetics
             builder.Services.AddRazorPages();
             builder.Services.AddDataProtection();
 
+            builder.Services.AddSingleton<EmailService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
