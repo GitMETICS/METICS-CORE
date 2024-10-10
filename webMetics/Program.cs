@@ -8,11 +8,11 @@ namespace webMetics
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddSingleton<EmailService>();
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
             builder.Services.AddDataProtection();
-
-            builder.Services.AddSingleton<EmailService>();
 
             var app = builder.Build();
 
