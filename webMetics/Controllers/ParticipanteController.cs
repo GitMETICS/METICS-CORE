@@ -204,7 +204,7 @@ namespace webMetics.Controllers
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-            if (participante != null && participante.horasAprobadas > 30)
+            if (participante != null && participante.horasAprobadas >= 30)
             {
                 try
                 {

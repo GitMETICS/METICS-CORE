@@ -38,11 +38,14 @@ public class EmailSettingsController : Controller
         return id;
     }
 
-    [HttpGet]
     public IActionResult Index()
     {
         ViewBag.Id = GetId();
         ViewBag.Role = GetRole();
+
+        // Gestionar mensajes de TempData
+        ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+        ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
 
         return View(_isEmailEnabled);
     }
@@ -55,8 +58,15 @@ public class EmailSettingsController : Controller
 
         _isEmailEnabled = isEnabled;
 
-        // If you want to save this back to appsettings.json
         SaveSettingsToJsonFile();
+
+        if (_isEmailEnabled)
+        {
+            TempData["successMessage"] = "Envío de correos habilitado.";
+        } else
+        {
+            TempData["errorMessage"] = "Envío de correos deshabilitado.";
+        }
 
         return RedirectToAction("Index");
     }
