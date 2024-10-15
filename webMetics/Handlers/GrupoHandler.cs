@@ -245,7 +245,6 @@ namespace webMetics.Handlers
         {
             GrupoModel grupo = null;
 
-
             using (SqlCommand command = new SqlCommand("SelectGrupo", ConexionMetics))
             {
                 command.CommandType = CommandType.StoredProcedure;
@@ -292,6 +291,15 @@ namespace webMetics.Handlers
                     Console.WriteLine($"Error al obtener el grupo: {ex.Message}");
                 }
             }
+
+            return grupo;
+        }
+
+        public GrupoModel ObtenerGrupoPorNombre(string nombreGrupo)
+        {
+            List<GrupoModel> grupos = ObtenerListaGrupos();
+
+            GrupoModel grupo = grupos.FirstOrDefault(g => g.nombre == nombreGrupo);
 
             return grupo;
         }

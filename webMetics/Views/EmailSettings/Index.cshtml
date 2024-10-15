@@ -34,6 +34,28 @@
             </div>
         }
 
+        <div class="mb-3 d-flex justify-content-between w-100">
+            <div class="w-100">
+                @using (Html.BeginForm("ActualizarCorreoLimiteHoras", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <form>
+                        <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
+                        <div class="d-flex">
+                            <div class="input-group">
+                                @{
+                                    string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
+                                    correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
+
+                                    <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                }
+                            </div>
+                            <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+
         <form asp-action="ToggleEmailSending" method="post">
             <div class="row mb-1">
                 <div class="container">

@@ -11,6 +11,8 @@ using NPOI.SS.UserModel;
 using iText.Kernel.Font;
 using iText.Layout.Properties;
 using iText.Kernel.Geom;
+using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace webMetics.Controllers
@@ -110,6 +112,40 @@ namespace webMetics.Controllers
             return View();
         }
 
+        public ActionResult VerParticipantesPorModulos()
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                    inscripcion.grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+                }
+
+                ViewBag.ListaInscripciones = inscripciones;
+            }
+            else
+            {
+                ViewBag.ListaInscripciones = null;
+            }
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View();
+        }
+
         public IActionResult BuscarParticipantes(string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -135,7 +171,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubirArchivoExcel(IFormFile file)
+        public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
             if (file == null)
             {
@@ -198,6 +234,66 @@ namespace webMetics.Controllers
             }
 
             return RedirectToAction("VerParticipantes");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirArchivoExcelParticipantesPorModulos(IFormFile file)
+        {
+            if (file == null)
+            {
+                TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
+                return RedirectToAction("VerParticipantesPorModulos");
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using var package = new ExcelPackage(stream);
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                    List<InscripcionModel> inscripciones = new List<InscripcionModel>();
+
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        string nombreGrupo = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text;
+                        GrupoModel grupo = accesoAGrupo.ObtenerGrupoPorNombre(nombreGrupo);
+
+                        InscripcionModel inscripcion = new InscripcionModel
+                        {
+                            idGrupo = grupo.idGrupo,
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                            numeroGrupo = grupo.numeroGrupo,
+                            nombreGrupo = grupo.nombre,
+                            horasMatriculadas = grupo.cantidadHoras,
+                            horasAprobadas = int.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text),
+                            estado = "Aprobado"
+                        };
+
+                        inscripciones.Add(inscripcion);
+                    }
+
+                    foreach (var inscripcion in inscripciones)
+                    {
+                        if (!string.IsNullOrEmpty(inscripcion.idParticipante))
+                        {
+                            accesoAInscripcion.InsertarInscripcion(inscripcion);
+                        }
+                    }
+                }
+
+                TempData["successMessage"] = "El archivo fue subido éxitosamente.";
+            }
+            catch
+            {
+                TempData["errorMessage"] = "Error al cargar los datos.";
+            }
+
+            return RedirectToAction("VerParticipantesPorModulos");
         }
 
         public IActionResult NotificarLimiteHoras(string idParticipante)

@@ -1,7 +1,7 @@
 ﻿@using webMetics.Controllers
 @{
 
-    ViewBag.Title = "Participantes";
+    ViewBag.Title = "Participantes por Módulos";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -40,7 +40,7 @@
 
             <div class="d-flex justify-content-between">
                 <div class="mb-3" style="width: 70%;">
-                    @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    @using (Html.BeginForm("SubirArchivoExcelParticipantesPorModulos", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
                         <form>
                             <small class="ms-1 text-secondary">Subir lista de participantes</small>
@@ -57,37 +57,15 @@
                             <br />
                             Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas
                             <br />
-                            @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantes", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
+                            @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
-                    </div>
-                </div>
-
-                <div class="mb-3 d-flex justify-content-between w-25">
-                    <div class="w-100">
-                        @using (Html.BeginForm("ActualizarCorreoLimiteHoras", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            <form>
-                                <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
-                                <div class="d-flex">
-                                    <div class="input-group">
-                                        @{
-                                            string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
-                                            correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
-
-                                            <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
-                                        }
-                                    </div>
-                                    <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
-                                </div>
-                            </form>
-                        }
                     </div>
                 </div>
             </div>
 
-            
 
-            @if (ViewBag.ListaParticipantes == null)
+
+            @if (ViewBag.ListaInscripciones == null)
             {
                 <h5 class="text-center">No hay personas inscritas en módulos.</h5>
             }
@@ -103,33 +81,17 @@
                             <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
                         </form>
                     </div>
-
-                    <div class="d-flex justify-content-end">
-                        <div class="mx-1">
-                            @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Agregar", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
-                        </div>
-                    </div>
                 </div>
 
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th scope="col">Unidad Académica</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Primer<br>Apellido</th>
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
-                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
+                            <th scope="col">Módulo</th>
+                            <th class="text-center" scope="col" style="width: 10%">Cantidad<br>de Horas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -138,55 +100,24 @@
                     </thead>
 
                     <tbody>
-                        @foreach (var participante in ViewBag.ListaParticipantes)
+                        @foreach (var inscripcion in ViewBag.ListaInscripciones)
                         {
-                            var gruposInscritos = participante.gruposInscritos;
-                            var nombreCompleto = participante.nombre;
-                            nombreCompleto += " " + participante.primerApellido;
-                            if (participante.segundoApellido != "-")
-                            {
-                                nombreCompleto += " " + participante.segundoApellido;
-                            }
                             <tr>
-                                @if (participante.horasAprobadas >= 30)
-                                {
-                                    @if (participante.correoNotificacionEnviado != 0)
-                                    {
-                                        <td class="link-success text-center">
-                                            <i class="bi bi-bell"></i>
-                                        </td> @* Campana vacía cuando se envió el correo *@
-                                    }
-                                    else
-                                    {
-                                        <td class="link-success text-center">
-                                            @Html.ActionLink(" ", "NotificarLimiteHoras", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-success bi bi-bell-fill" })
-                                        </td>
-                                    }
-                                }
-                                else
-                                {
-                                    <td></td>
-                                }
-
-                                <td>@participante.unidadAcademica</td>
-                                <td>@participante.nombre</td>
-                                <td>@participante.primerApellido</td>
-                                <td>@participante.segundoApellido</td>
-                                <td>@participante.correo</td>
-                                <td class="text-center">
-                                    <span>@participante.horasMatriculadas</span>
-                                </td>
-                                <td class="text-center">
-                                    <span>@participante.horasAprobadas</span>
+                                <td>@inscripcion.participante.nombre</td>
+                                <td>@inscripcion.participante.primerApellido</td>
+                                <td>@inscripcion.participante.segundoApellido</td>
+                                <td>@inscripcion.participante.correo</td>
+                                <td>@inscripcion.nombreGrupo</td>
+                                <td class="text-center">@inscripcion.grupo.cantidadHoras</td>
+                                <td class="text-center">@inscripcion.horasAprobadas</td>
+                                <td>
+                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
                                 </td>
                                 <td>
-                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
+                                    @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                 </td>
                                 <td>
-                                    @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')">
+                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@inscripcion.participante.idParticipante', '@inscripcion.grupo.idGrupo')">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -208,12 +139,13 @@
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar este participante?
 
-                    @using (Html.BeginForm("EliminarParticipante", "Participante"))
+                    @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
                     {
                         @Html.AntiForgeryToken()
 
                         <div class="modal-footer">
                             <input type="hidden" id="idParticipante" name="idParticipante">
+                            <input type="hidden" id="idGrupo" name="idGrupo">
                             <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         </div>
