@@ -13,6 +13,7 @@ using iText.Layout.Properties;
 using iText.Kernel.Geom;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
+using NPOI.SS.Formula.Functions;
 
 
 namespace webMetics.Controllers
@@ -256,12 +257,35 @@ namespace webMetics.Controllers
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
+                    List<ParticipanteModel> participantes = new List<ParticipanteModel>();
                     List<InscripcionModel> inscripciones = new List<InscripcionModel>();
 
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
                         string nombreGrupo = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text;
                         GrupoModel grupo = accesoAGrupo.ObtenerGrupoPorNombre(nombreGrupo);
+
+                        ParticipanteModel participante = new ParticipanteModel
+                        {
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                            tipoIdentificacion = "",
+                            numeroIdentificacion = "",
+                            correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
+                            primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
+                            segundoApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo Apellido")].Text,
+                            condicion = "",
+                            tipoParticipante = "",
+                            area = "",
+                            unidadAcademica = "",
+                            departamento = "",
+                            telefono = "",
+                            horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
+                            horasAprobadas = 0,
+                            gruposInscritos = new List<GrupoModel>()
+                        };
+
+                        participantes.Add(participante);
 
                         InscripcionModel inscripcion = new InscripcionModel
                         {
@@ -271,17 +295,25 @@ namespace webMetics.Controllers
                             nombreGrupo = grupo.nombre,
                             horasMatriculadas = grupo.cantidadHoras,
                             horasAprobadas = int.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text),
-                            estado = "Aprobado"
+                            estado = "Inscrito"
                         };
 
                         inscripciones.Add(inscripcion);
+                    }
+
+                    foreach (var participante in participantes)
+                    {
+                        if (participante.idParticipante != "")
+                        {
+                            IngresarParticipante(participante);
+                        }
                     }
 
                     foreach (var inscripcion in inscripciones)
                     {
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
-                            accesoAInscripcion.InsertarInscripcion(inscripcion);
+                            IngresaParticipantePrevio(inscripcion);
                         }
                     }
                 }
@@ -294,6 +326,27 @@ namespace webMetics.Controllers
             }
 
             return RedirectToAction("VerParticipantesPorModulos");
+        }
+
+        private void IngresaParticipantePrevio(InscripcionModel inscripcion)
+        {
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+
+            if (grupo != null && participante != null && accesoAInscripcion.NoEstaInscritoEnGrupo(inscripcion.idGrupo, inscripcion.idParticipante))
+            {
+                // Insertar la inscripción sin enviar el comprobante por correo electrónico
+                bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
+
+                if (exito)
+                {
+                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlInscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
+
+                    int horasAprobadas = accesoAInscripcion.CalcularNumeroHorasAprobadas(participante.horasAprobadas, inscripcion.horasAprobadas);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante, horasAprobadas);
+                }
+            }
         }
 
         public IActionResult NotificarLimiteHoras(string idParticipante)
@@ -676,6 +729,42 @@ namespace webMetics.Controllers
             cell36.SetCellValue("Horas Aprobadas");
 
             string fileName = "Plantilla_Lista_Participantes.xlsx";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        public ActionResult DescargarPlantillaSubirParticipantesPorModulos()
+        {
+            // Creamos el archivo de Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Plantilla_Participantes_Modulos");
+
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
+            cell31.SetCellValue("Nombre");
+
+            NPOI.SS.UserModel.ICell cell32 = row.CreateCell(1);
+            cell32.SetCellValue("Primer Apellido");
+
+            NPOI.SS.UserModel.ICell cell33 = row.CreateCell(2);
+            cell33.SetCellValue("Segundo Apellido");
+
+            NPOI.SS.UserModel.ICell cell66 = row.CreateCell(3);
+            cell66.SetCellValue("Correo Institucional");
+
+            NPOI.SS.UserModel.ICell cell34 = row.CreateCell(4);
+            cell34.SetCellValue("Módulo");
+
+            NPOI.SS.UserModel.ICell cell35 = row.CreateCell(5);
+            cell35.SetCellValue("Horas Matriculadas");
+
+            NPOI.SS.UserModel.ICell cell36 = row.CreateCell(6);
+            cell36.SetCellValue("Horas Aprobadas");
+
+            string fileName = "Plantilla_Participantes_Modulos.xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();

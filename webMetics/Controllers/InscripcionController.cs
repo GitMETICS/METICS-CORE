@@ -9,6 +9,7 @@ using NPOI.SS.UserModel;
 using iText.Layout.Properties;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
+using System.Text.RegularExpressions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -60,7 +61,7 @@ namespace webMetics.Controllers
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                 
-                if (grupo != null && participante != null && NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+                if (grupo != null && participante != null && accesoAInscripcion.NoEstaInscritoEnGrupo(idGrupo, idParticipante))
                 {
                     // Insertar la inscripción y enviar el comprobante por correo electrónico
                     InscripcionModel inscripcion = new InscripcionModel
@@ -78,7 +79,7 @@ namespace webMetics.Controllers
 
                     if (exito)
                     {
-                        int horasParticipante = CalcularNumeroHorasAlInscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
+                        int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlInscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                         accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
 
                         try
@@ -118,24 +119,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        private bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            bool noEstaInscrito = false;
-
-            List<InscripcionModel> listaInscritos = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
-
-            if (listaInscritos == null ||
-                listaInscritos.Find(inscripcionModel => inscripcionModel.idParticipante == idParticipante) == null)
-            {
-                noEstaInscrito = true;
-            }
-
-            return noEstaInscrito;
-        }
-
         /* Método para que un administrador elimine una inscripción de un usuario */
         public ActionResult EliminarInscripcion(string idParticipante, int idGrupo)
         {
@@ -151,7 +134,7 @@ namespace webMetics.Controllers
                     GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-                    int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
+                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
@@ -193,7 +176,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes", "Participante");
         }
 
-        /* Método para que un usuario se desinscriba de un grupo*/
+        // Método para que un usuario se desinscriba de un grupo
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
             try
@@ -208,7 +191,7 @@ namespace webMetics.Controllers
                     GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-                    int horasParticipante = CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
+                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
                 }
                 else
@@ -224,27 +207,6 @@ namespace webMetics.Controllers
 
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
-        }
-
-        private bool MayorALimiteMaximoHoras(int horasGrupo, int horasParticipante)
-        {
-            return horasParticipante + horasGrupo > 30;
-        }
-
-        private int CalcularNumeroHorasAlInscribirse(int horasGrupo, int horasParticipante)
-        {
-            return horasParticipante + horasGrupo;
-        }
-
-        private int CalcularNumeroHorasAlDesinscribirse(int horasGrupo, int horasParticipante)
-        {
-            int numeroHoras = horasParticipante - horasGrupo;
-            if (numeroHoras <= 0)
-            {
-                numeroHoras = 0;
-            }
-
-            return numeroHoras;
         }
 
         // Método para enviar confirmación de inscripción al usuario
@@ -266,7 +228,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
-        //Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
+        // Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
         public string ConstructorDelMensajeNotificacionInscripcion(GrupoModel grupo, ParticipanteModel participante)
         {
             // Construir el contenido del mensaje que se enviará por correo electrónico al usuario

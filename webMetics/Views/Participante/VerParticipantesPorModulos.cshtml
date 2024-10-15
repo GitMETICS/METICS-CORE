@@ -55,7 +55,7 @@
                         <small class="text-muted">
                             Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
                             <br />
-                            Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas
+                            Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Módulo, Horas Matriculadas, Horas Aprobadas
                             <br />
                             @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
@@ -91,7 +91,7 @@
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
                             <th scope="col">Módulo</th>
-                            <th class="text-center" scope="col" style="width: 10%">Cantidad<br>de Horas</th>
+                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -133,11 +133,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar este participante?
+                    ¿Está seguro de que desea eliminar la inscripción de este participante?
 
                     @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
                     {
@@ -163,8 +163,9 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminar(idParticipante) {
+    function actualizarModalEliminar(idParticipante, idGrupo) {
         document.getElementById("idParticipante").value = idParticipante;
+        document.getElementById("idGrupo").value = idGrupo;
     }
 </script>
 

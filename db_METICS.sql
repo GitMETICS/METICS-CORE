@@ -940,31 +940,6 @@ EXEC InsertParticipante @idUsuario = N'docencia.metics6@ucr.ac.cr', @idParticipa
     @tipoParticipante = N'Interino', @condicion = N'Activo', @horasMatriculadas = 0, @horasAprobadas = 0;
 
 
-
-EXEC InsertUsuario
-	@id = N'armandotorres_rojas@ucr.ac.cr',
-	@rol = 0,
-	@contrasena = N'1234';
-
-EXEC InsertParticipante
-    @idUsuario = N'armandotorres_rojas@ucr.ac.cr',
-    @idParticipante = N'armandotorres_rojas@ucr.ac.cr',
-    @tipoIdentificacion = N'Cédula',
-    @numeroIdentificacion = N'987654321',
-    @correo = N'armandotorres_rojas@ucr.ac.cr',
-    @nombre = N'Armando',
-    @apellido1 = N'Torres',
-    @apellido2 = N'Rojas',
-    @area = N'Área de Artes y Letras',
-    @departamento = N'Facultad de Letras',
-    @unidadAcademica = N'Escuela de Filología, Lingüística y Literatura',
-    @telefono = N'900900900',
-    @tipoParticipante = N'Docente',
-    @condicion = N'Interino',
-    @horasMatriculadas = 0,
-    @horasAprobadas = 0
-
-
 --Crear tipos de actividades
 /* INSERT INTO tipos_actividad
 (nombre, descripcion)

@@ -246,5 +246,41 @@ public class InscripcionHandler : BaseDeDatosHandler
 
         return exito;
     }
+
+    public bool NoEstaInscritoEnGrupo(int idGrupo, string idParticipante)
+    {
+        bool noEstaInscrito = false;
+
+        List<InscripcionModel> listaInscritos = ObtenerInscripcionesDelGrupo(idGrupo);
+
+        if (listaInscritos == null ||
+            listaInscritos.Find(inscripcionModel => inscripcionModel.idParticipante == idParticipante) == null)
+        {
+            noEstaInscrito = true;
+        }
+
+        return noEstaInscrito;
+    }
+
+    public int CalcularNumeroHorasAlInscribirse(int horasGrupo, int horasParticipante)
+    {
+        return horasParticipante + horasGrupo;
+    }
+
+    public int CalcularNumeroHorasAprobadas(int horasActuales, int horasNuevas)
+    {
+        return horasActuales + horasNuevas;
+    }
+
+    public int CalcularNumeroHorasAlDesinscribirse(int horasGrupo, int horasParticipante)
+    {
+        int numeroHoras = horasParticipante - horasGrupo;
+        if (numeroHoras <= 0)
+        {
+            numeroHoras = 0;
+        }
+
+        return numeroHoras;
+    }
 }
 
