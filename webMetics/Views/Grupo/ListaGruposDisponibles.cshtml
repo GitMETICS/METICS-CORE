@@ -45,23 +45,21 @@
         }
         else
         {
-            
-
             if (ViewBag.GruposInscritos != null)
             {
-            <h1>Módulos inscritos</h1>
+            <h1>Módulos Inscritos</h1>
             <div class="d-flex justify-content-between">
                 <!-- Barra de búsqueda -->
                 <div class="w-75 me-2">
                     <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
                         <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
-                        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+                        <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
                     </form>
                 </div>
 
                 <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
                 <div class="ms-2">
-                    <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
+                    <button class="btn btn-secondary" id="toggleViewBtn1" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
                 </div>
             </div>
 
@@ -349,7 +347,7 @@
 
             <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
             <div class="ms-2">
-                <button class="btn btn-secondary" id="toggleViewBtn" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
+                <button class="btn btn-secondary" id="toggleViewBtn2" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
             </div>
         </div>
 
@@ -945,7 +943,8 @@ else
         const gridView = document.getElementById("gridView");
         const listView0 = document.getElementById("listView0");
         const listView = document.getElementById("listView");
-        const toggleViewBtn = document.getElementById("toggleViewBtn");
+        const toggleViewBtn1 = document.getElementById("toggleViewBtn1");
+        const toggleViewBtn2 = document.getElementById("toggleViewBtn2");
 
         if (savedViewMode === 'list') {
             isListView = true;
@@ -953,14 +952,16 @@ else
             if (gridView) gridView.classList.add("d-none");  
             if (listView0) listView0.classList.remove("d-none");
             if (listView) listView.classList.remove("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
+            if (toggleViewBtn1) toggleViewBtn1.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
+            if (toggleViewBtn2) toggleViewBtn2.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
         } else {
             isListView = false;
             if (gridView) gridView.classList.remove("d-none");  
             if (gridView0) gridView0.classList.remove("d-none");
             if (listView0) listView0.classList.add("d-none");
             if (listView) listView.classList.add("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
+            if (toggleViewBtn) toggleViewBtn1.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
+            if (toggleViewBtn2) toggleViewBtn2.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
         }
     };
 
@@ -978,14 +979,16 @@ else
             if (gridView0) gridView0.classList.add("d-none");
             if (listView0) listView0.classList.remove("d-none");
             if (listView) listView.classList.remove("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
+            if (toggleViewBtn1) toggleViewBtn1.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
+            if (toggleViewBtn2) toggleViewBtn2.innerHTML = "<i class='bi bi-grid me-2'></i>Modo cuadrícula";
             localStorage.setItem('viewMode', 'list');  
         } else {
             if (gridView) gridView.classList.remove("d-none");
             if (gridView0) gridView0.classList.remove("d-none");
             if (listView0) listView0.classList.add("d-none");
             if (listView) listView.classList.add("d-none");  
-            if (toggleViewBtn) toggleViewBtn.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
+            if (toggleViewBtn1) toggleViewBtn1.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
+            if (toggleViewBtn2) toggleViewBtn2.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
             localStorage.setItem('viewMode', 'grid');  
         }
     }

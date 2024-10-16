@@ -1,7 +1,7 @@
 ﻿@using webMetics.Controllers
 @{
 
-    ViewBag.Title = "Participantes por Módulos";
+    ViewBag.Title = "Inscripciones";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -55,7 +55,7 @@
                         <small class="text-muted">
                             Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
                             <br />
-                            Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Módulo, Horas Matriculadas, Horas Aprobadas
+                            Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Módulo, Horas Aprobadas
                             <br />
                             @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
@@ -71,10 +71,10 @@
             }
             else
             {
-                <hr />
+                <br />
 
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-                    <div class="w-50">
+                    <div class="w-100">
                         <!-- Barra de búsqueda -->
                         <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
@@ -107,7 +107,7 @@
                                 <td>@inscripcion.participante.primerApellido</td>
                                 <td>@inscripcion.participante.segundoApellido</td>
                                 <td>@inscripcion.participante.correo</td>
-                                <td>@inscripcion.nombreGrupo</td>
+                                <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
                                 <td class="text-center">@inscripcion.grupo.cantidadHoras</td>
                                 <td class="text-center">@inscripcion.horasAprobadas</td>
                                 <td>

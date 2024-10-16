@@ -50,15 +50,15 @@
                     <table class="table table-striped" id="tblCustomers">
                         <thead>
                             <tr>
-                                <th scope="col">Nombre completo</th>
+                                <th scope="col">Nombre Completo</th>
                                 <th scope="col">Identificación</th>
 
                                 @if (ViewBag.Usuario.unidadAcademica != null)
                                 {
-                                    <th scope="col">Unidad académica</th>
+                                    <th scope="col">Unidad Académica</th>
                                 }
                                 
-                                <th scope="col">Correo institucional</th>
+                                <th scope="col">Correo Institucional</th>
 
                                 @if (ViewBag.Usuario.condicion != null)
                                 {
@@ -183,17 +183,19 @@
                     @if (ViewBag.Role == 0)
                     {
                         <br />
+                        <hr />
                         <div class="mt-4">
-                            <h3 class="">Inscripciones</h3>
+                            <h3 class="">Módulos Inscritos</h3>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th scope="col" style="width: 25%">Módulos Inscritos</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Calificación</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Horas<br>Matriculadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Horas<br>Aprobadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Matriculadas</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Total Horas<br>Aprobadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
+                                        <th class="text-center" scope="col" style="width: 3.33%"></th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
                                     </tr>
                                 </thead>
 
@@ -207,26 +209,119 @@
                                                         <td class="my-2" style="width: 25%">
                                                             <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
                                                         </td>
-                                                        <td class="my-2 text-center" style="width: 15%">
-                                                            @((inscripcion.calificacion ?? 0))
-                                                        </td>
-                                                        <td class="my-2 text-center" style="width: 15%">
+                                                        <td class="my-2 text-center" style="width: 7.5%">
                                                             @((inscripcion.horasMatriculadas ?? 0))
                                                         </td>
-                                                        <td class="my-2 text-center" style="width: 15%">
+                                                        <td class="my-2 text-center" style="width: 7.5%">
                                                             @((inscripcion.horasAprobadas ?? 0))
+                                                        </td>
+                                                        <td class="my-2 text-center" style="width: 7.5%">
+                                                            @((inscripcion.calificacion ?? 0))
                                                         </td>
                                                     </tr>
                                                 </table>
                                             }
                                         </td>
 
-                                        <td class="my-3 text-center" style="width: 15%">
+                                        <td style="width: 3.33%"></td>
+
+                                        <td class="my-3 text-center" style="width: 7.5%">
                                             <span>@ViewBag.Participante.horasMatriculadas</span>
                                         </td>
 
-                                        <td class="my-3 text-center" scope="col" style="width: 15%">
+                                        <td class="my-3 text-center" scope="col" style="width: 7.5%">
                                             <span>@ViewBag.Participante.horasAprobadas</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <br />
+                        <hr />
+                        <div class="mt-4">
+                            <h3 class="">Módulos Incompletos</h3>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 25%">Módulos Incompletos</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <td class="my-3" colspan="4">
+                                            @foreach (var inscripcion in ViewBag.Inscripciones)
+                                            {
+                                                if (inscripcion.estado == "Incompleto")
+                                                {
+                                                    <table class="w-100">
+                                                        <tr>
+                                                            <td class="my-2" style="width: 25%">
+                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasMatriculadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasAprobadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.calificacion ?? 0))
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <br />
+                        <hr />
+                        <div class="mt-4">
+                            <h3 class="">Módulos Aprobados</h3>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 25%">Módulos Aprobados</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <td class="my-3" colspan="4">
+                                            @foreach (var inscripcion in ViewBag.Inscripciones)
+                                            {
+                                                if (inscripcion.estado == "Aprobado")
+                                                {
+                                                    <table class="w-100">
+                                                        <tr>
+                                                            <td class="my-2" style="width: 25%">
+                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
+                                                            </td>
+
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasMatriculadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasAprobadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.calificacion ?? 0))
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                }
+                                            }
                                         </td>
                                     </tr>
                                 </tbody>

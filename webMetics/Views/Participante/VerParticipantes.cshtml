@@ -62,25 +62,18 @@
                     </div>
                 </div>
 
-                <div class="mb-3 d-flex justify-content-between w-25">
-                    <div class="w-100">
-                        @using (Html.BeginForm("ActualizarCorreoLimiteHoras", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            <form>
-                                <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
-                                <div class="d-flex">
-                                    <div class="input-group">
-                                        @{
-                                            string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
-                                            correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
-
-                                            <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
-                                        }
-                                    </div>
-                                    <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
-                                </div>
-                            </form>
-                        }
+                <div class="d-flex justify-content-end">
+                    <div class="mx-1">
+                        @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Agregar", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
                     </div>
                 </div>
             </div>
@@ -93,10 +86,10 @@
             }
             else
             {
-                <hr />
+                <br />
 
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-                    <div class="w-50">
+                    <div class="w-100">
                         <!-- Barra de búsqueda -->
                         <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
@@ -104,20 +97,7 @@
                         </form>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <div class="mx-1">
-                            @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                        </div>
-                        <div class="mx-1">
-                            @Html.ActionLink("   Agregar", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <table class="table table-striped" id="tblCustomers">
