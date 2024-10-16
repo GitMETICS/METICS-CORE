@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NETCore.MailKit.Core;
 using Newtonsoft.Json.Linq;
 using System;
 
@@ -7,11 +8,16 @@ public class EmailSettingsController : Controller
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
 
+    private protected InscripcionHandler accesoAInscripcion;
+
     private static bool _isEmailEnabled = false;
 
-    public EmailSettingsController(IWebHostEnvironment environment)
+    public EmailSettingsController(IWebHostEnvironment environment, IConfiguration configuration)
     {
         _environment = environment;
+        _configuration = configuration;
+
+        accesoAInscripcion = new InscripcionHandler(environment, configuration);
     }
 
     private int GetRole()
@@ -46,6 +52,8 @@ public class EmailSettingsController : Controller
         // Gestionar mensajes de TempData
         ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
         ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+        ViewBag.CorreoNotificacion = accesoAInscripcion.ObtenerCorreoLimiteHoras();
 
         return View(_isEmailEnabled);
     }

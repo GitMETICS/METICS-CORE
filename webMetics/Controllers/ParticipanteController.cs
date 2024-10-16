@@ -41,7 +41,6 @@ namespace webMetics.Controllers
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
-            _emailService = emailService;
         }
 
         public ActionResult ListaParticipantes(int idGrupo)
@@ -107,8 +106,6 @@ namespace webMetics.Controllers
             {
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
-
-            ViewBag.CorreoNotificacion = accesoAInscripcion.ObtenerCorreoLimiteHoras();
 
             return View();
         }
@@ -295,8 +292,10 @@ namespace webMetics.Controllers
                             nombreGrupo = grupo.nombre,
                             horasMatriculadas = grupo.cantidadHoras,
                             horasAprobadas = int.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text),
-                            estado = "Inscrito"
+                            estado = ""
                         };
+
+                        inscripcion = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
 
                         inscripciones.Add(inscripcion);
                     }
@@ -345,6 +344,8 @@ namespace webMetics.Controllers
 
                     int horasAprobadas = accesoAInscripcion.CalcularNumeroHorasAprobadas(participante.horasAprobadas, inscripcion.horasAprobadas);
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante, horasAprobadas);
+
+                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                 }
             }
         }
@@ -828,6 +829,7 @@ namespace webMetics.Controllers
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
                     accesoAInscripcion.EditarInscripcion(inscripcion);
+                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
 
                     if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
                     {
