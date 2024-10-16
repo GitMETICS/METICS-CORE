@@ -300,7 +300,7 @@ namespace webMetics.Controllers
 
                     foreach (var participante in participantes)
                     {
-                        if (participante.idParticipante != "")
+                        if (!string.IsNullOrEmpty(participante.idParticipante))
                         {
                             IngresarParticipante(participante);
                         }
@@ -310,7 +310,7 @@ namespace webMetics.Controllers
                     {
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
-                            IngresaParticipantePrevio(inscripcion);
+                            IngresarInscripcion(inscripcion);
                         }
                     }
                 }
@@ -325,7 +325,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantesPorModulos");
         }
 
-        private void IngresaParticipantePrevio(InscripcionModel inscripcion)
+        private void IngresarInscripcion(InscripcionModel inscripcion)
         {
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
@@ -334,6 +334,7 @@ namespace webMetics.Controllers
             {
                 // Insertar la inscripción sin enviar el comprobante por correo electrónico
                 bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
+                accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
 
                 if (exito)
                 {
@@ -342,8 +343,6 @@ namespace webMetics.Controllers
 
                     int horasAprobadas = accesoAInscripcion.CalcularNumeroHorasAprobadas(participante.horasAprobadas, inscripcion.horasAprobadas);
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante, horasAprobadas);
-
-                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                 }
             }
         }
