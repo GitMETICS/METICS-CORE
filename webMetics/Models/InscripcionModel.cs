@@ -25,7 +25,5 @@ namespace webMetics.Models
         public double calificacion {  get; set; }
 
         public ParticipanteModel? participante { get; set; }
-
-        public GrupoModel? grupo { get; set; }
     }
 }

@@ -122,7 +122,6 @@ namespace webMetics.Controllers
                 foreach (InscripcionModel inscripcion in inscripciones)
                 {
                     inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
-                    inscripcion.grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
                 }
 
                 ViewBag.ListaInscripciones = inscripciones;
@@ -166,6 +165,41 @@ namespace webMetics.Controllers
             ViewBag.ListaParticipantes = participantes;
 
             return View("VerParticipantes");
+        }
+
+        public IActionResult BuscarParticipantesPorModulos(string searchTerm)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            // Obtener la lista de inscripciones
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                }
+
+                ViewBag.ListaInscripciones = inscripciones;
+            }
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            ViewBag.ListaInscripciones = inscripciones;
+
+            return View("VerParticipantesPorModulos");
         }
 
         [HttpPost]

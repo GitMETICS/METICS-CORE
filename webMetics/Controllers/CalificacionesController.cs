@@ -79,10 +79,17 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                TempData["successMessage"] = "Calificación actualizada.";
             }
             catch
             {
                 TempData["errorMessage"] = "Ocurrió un error y no se pudo actualizar la calificación.";
+            }
+
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
             }
 
             return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });

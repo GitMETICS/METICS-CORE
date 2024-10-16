@@ -37,8 +37,7 @@
         }
 
         <div class="table-responsive">
-
-            <div class="d-flex justify-content-between">
+            <div>
                 <div class="mb-3" style="width: 70%;">
                     @using (Html.BeginForm("SubirArchivoExcelParticipantesPorModulos", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
@@ -64,19 +63,17 @@
             </div>
 
 
-
+            <br />
             @if (ViewBag.ListaInscripciones == null)
             {
                 <h5 class="text-center">No hay personas inscritas en módulos.</h5>
             }
             else
             {
-                <br />
-
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
                     <div class="w-100">
                         <!-- Barra de búsqueda -->
-                        <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="input-group">
+                        <form asp-action="BuscarParticipantesPorModulos" asp-controller="Participante" method="get" class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
                             <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
                         </form>
@@ -108,7 +105,7 @@
                                 <td>@inscripcion.participante.segundoApellido</td>
                                 <td>@inscripcion.participante.correo</td>
                                 <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                <td class="text-center">@inscripcion.grupo.cantidadHoras</td>
+                                <td class="text-center">@inscripcion.horasMatriculadas</td>
                                 <td class="text-center">@inscripcion.horasAprobadas</td>
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
@@ -117,7 +114,7 @@
                                     @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                 </td>
                                 <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@inscripcion.participante.idParticipante', '@inscripcion.grupo.idGrupo')">
+                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@inscripcion.idParticipante', '@inscripcion.idGrupo')">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 </td>
@@ -127,6 +124,8 @@
                 </table>
             }
         </div>
+        <br />
+        <br />
     </div>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">

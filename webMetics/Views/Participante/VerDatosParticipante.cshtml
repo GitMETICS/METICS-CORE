@@ -1,6 +1,6 @@
 ﻿@model webMetics.Models.ParticipanteModel
 @{
-    ViewBag.Title = "Módulos y Horas";
+    ViewBag.Title = "Módulos del Participante";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -51,7 +51,7 @@
                         <tr>
                             <th scope="col">Nombre Completo</th>
                             <th scope="col">Correo Institucional</th>
-                            <th scope="col">Módulos Matriculados</th>
+                            <th scope="col">Módulos Inscritos</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Matriculadas</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
                         </tr>
@@ -94,7 +94,6 @@
                     <tbody>
                         @if (ViewBag.Inscripciones != null)
                         {
-                            
                             @foreach (var inscripcion in ViewBag.Inscripciones)
                             {
                                 <tr data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" class="accordion-toggle">
@@ -109,12 +108,15 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <tr>
-                                                        <th class="" scope="col">Nombre Completo</th>
-                                                        <th class="" scope="col">Módulo</th>
-                                                        <th class="text-center" scope="col">Calificación</th>
+                                                        <th class="" scope="col" style="width:20%;">Nombre Completo</th>
+                                                        <th class="" scope="col" style="width:20%;">Módulo</th>
+
                                                         <th class="text-center" scope="col" style="width: 10%;">Horas<br>Matriculadas</th>
                                                         <th class="text-center" scope="col" style="width: 10%;">Horas<br>Aprobadas</th>
-                                                        <th class="" scope="col" style="width: 20%;">Aprobar Horas</th>
+                                                        <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
+
+                                                        <th class="text-center" scope="col" style="width: 10%;">Calificación</th>
+                                                        <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
                                                     </tr>
                                                 </thead>
 
@@ -122,7 +124,7 @@
                                                     <tr>
                                                         <td class="">@nombreCompleto</td>
                                                         <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
+                                                        
                                                         <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
                                                         <td class="text-center">
@@ -130,6 +132,16 @@
                                                             {
                                                                 <div class="my-2 align-items-center justify-content-start d-lg-flex">
                                                                     <input type="number" min="0" class="form-control" style="max-width: 125px;" name="horasAprobadas">
+                                                                    <button type="submit" class="m-1 btn btn-outline-secondary">Aceptar</button>
+                                                                </div>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
+                                                        <td class="text-center">
+                                                            @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
+                                                            {
+                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
+                                                                    <input type="number" min="0" , max="100" class="form-control" style="max-width: 125px;" name="calificacion" id="calificacion">
                                                                     <button type="submit" class="m-1 btn btn-outline-secondary">Aceptar</button>
                                                                 </div>
                                                             }
