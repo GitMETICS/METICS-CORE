@@ -294,7 +294,14 @@ public class InscripcionHandler : BaseDeDatosHandler
             inscripcion.estado = "Incompleto";
         }
 
-        EditarInscripcion(inscripcion);
+        try
+        {
+            EditarInscripcion(inscripcion);
+        }
+        catch (Exception ex)
+        {
+            // No existe la inscripción aún.
+        }
 
         return inscripcion;
     }

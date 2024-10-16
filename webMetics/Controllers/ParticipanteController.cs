@@ -295,8 +295,6 @@ namespace webMetics.Controllers
                             estado = ""
                         };
 
-                        inscripcion = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-
                         inscripciones.Add(inscripcion);
                     }
 
