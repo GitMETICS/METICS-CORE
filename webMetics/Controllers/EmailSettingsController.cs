@@ -97,4 +97,32 @@ public class EmailSettingsController : Controller
         // Write the updated JSON back to the file
         System.IO.File.WriteAllText(filePath, output);
     }
+
+    [HttpPost]
+    public ActionResult UpdateNotificationEmail(string correoLimiteHoras)
+    {
+        ViewBag.Role = GetRole();
+        ViewBag.Id = GetId();
+
+        string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
+
+        bool exito = (string.IsNullOrEmpty(correo)) ? accesoAInscripcion.IngresarCorreoLimiteHoras(correoLimiteHoras) : accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
+
+        if (exito)
+        {
+            TempData["successMessage"] = "Se actualizó el correo de notificación.";
+        }
+        else
+        {
+            TempData["errorMessage"] = "Debe introducir un correo de notificación válido.";
+        }
+
+        var refererUrl = Request.Headers["Referer"].ToString();
+        if (!string.IsNullOrEmpty(refererUrl))
+        {
+            return Redirect(refererUrl);
+        }
+
+        return RedirectToAction("Index", "EmailSettings");
+    }
 }

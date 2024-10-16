@@ -154,28 +154,6 @@ namespace webMetics.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult ActualizarCorreoLimiteHoras(string correoLimiteHoras)
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            string correo = accesoAInscripcion.ObtenerCorreoLimiteHoras();
-
-            bool exito = (string.IsNullOrEmpty(correo)) ? accesoAInscripcion.IngresarCorreoLimiteHoras(correoLimiteHoras) : accesoAInscripcion.ActualizarCorreoLimiteHoras(correoLimiteHoras);
-
-            if (exito)
-            {
-                TempData["successMessage"] = "Se actualizó el correo de notificación.";
-            }
-            else
-            {
-                TempData["errorMessage"] = "Debe introducir un correo de notificación válido.";
-            }
-
-            return RedirectToAction("VerParticipantes", "Participante");
-        }
-
         // Método para que un usuario se desinscriba de un grupo
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {

@@ -36,7 +36,7 @@
 
         <div class="mb-3 d-flex justify-content-between w-100">
             <div class="w-100">
-                @using (Html.BeginForm("ActualizarCorreoLimiteHoras", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                @using (Html.BeginForm("UpdateNotificationEmail", "EmailSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
                     <form>
                         <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
@@ -46,10 +46,10 @@
                                     string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
                                     correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
 
-                                    <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual">
+                                    <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual" oninput="toggleButton()">
                                 }
                             </div>
-                            <input class="btn btn-outline-primary ms-2" type="submit" value="Actualizar">
+                            <input class="btn btn-outline-secondary ms-2" type="submit" value="Actualizar" id="updateButton" disabled>
                         </div>
                     </form>
                 }
@@ -92,3 +92,17 @@ else
         window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
     </script>
 }
+
+<script>
+    function toggleButton() {
+        const inputField = document.getElementById("correoLimiteHoras");
+        const updateButton = document.getElementById("updateButton");
+
+        // Disable the button if input is empty, enable it otherwise
+        updateButton.disabled = inputField.value.trim() === "";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        toggleButton();
+    });
+</script>

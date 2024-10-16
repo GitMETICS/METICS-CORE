@@ -221,10 +221,18 @@ public class InscripcionHandler : BaseDeDatosHandler
 
         ConexionMetics.Open();
 
-        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-        comandoConsulta.Parameters.AddWithValue("@correo", correo);
+        bool exito;
+        try
+        {
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@correo", correo);
 
-        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+            exito = comandoConsulta.ExecuteNonQuery() >= 1;
+        }
+        catch (Exception ex)
+        {
+            exito = false; // No viene ningún correo en la consulta.
+        }
 
         ConexionMetics.Close();
 
@@ -237,10 +245,18 @@ public class InscripcionHandler : BaseDeDatosHandler
 
         ConexionMetics.Open();
 
-        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-        comandoConsulta.Parameters.AddWithValue("@correo", correo);
+        bool exito;
+        try
+        {
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@correo", correo);
 
-        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+            exito = comandoConsulta.ExecuteNonQuery() >= 1;
+        } 
+        catch (Exception ex) 
+        {
+            exito = false; // No viene ningún correo en la consulta.
+        }
 
         ConexionMetics.Close();
 
