@@ -72,7 +72,7 @@ namespace webMetics.Controllers
                         nombreGrupo = grupo.nombre,
                         horasMatriculadas = grupo.cantidadHoras,
                         horasAprobadas = 0,
-                        estado = "Incompleto"
+                        estado = "Inscrito"
                     };
 
                     bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);

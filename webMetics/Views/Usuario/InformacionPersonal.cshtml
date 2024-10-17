@@ -204,22 +204,25 @@
                                         <td class="my-3" colspan="4">
                                             @foreach (var inscripcion in ViewBag.Inscripciones)
                                             {
-                                                <table class="w-100">
-                                                    <tr>
-                                                        <td class="my-2" style="width: 25%">
-                                                            <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
-                                                        </td>
-                                                        <td class="my-2 text-center" style="width: 7.5%">
-                                                            @((inscripcion.horasMatriculadas ?? 0))
-                                                        </td>
-                                                        <td class="my-2 text-center" style="width: 7.5%">
-                                                            @((inscripcion.horasAprobadas ?? 0))
-                                                        </td>
-                                                        <td class="my-2 text-center" style="width: 7.5%">
-                                                            @((inscripcion.calificacion ?? 0))
-                                                        </td>
-                                                    </tr>
-                                                </table>
+                                                if (inscripcion.estado == "Inscrito")
+                                                {
+                                                    <table class="w-100">
+                                                        <tr>
+                                                            <td class="my-2" style="width: 25%">
+                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasMatriculadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.horasAprobadas ?? 0))
+                                                            </td>
+                                                            <td class="my-2 text-center" style="width: 7.5%">
+                                                                @((inscripcion.calificacion ?? 0))
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                }
                                             }
                                         </td>
 
