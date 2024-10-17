@@ -948,6 +948,8 @@ else
 
         if (savedViewMode === 'list') {
             isListView = true;
+            console.log('savedlistview:', isListView);  // Log the state change
+
             if (gridView0) gridView0.classList.add("d-none");
             if (gridView) gridView.classList.add("d-none");  
             if (listView0) listView0.classList.remove("d-none");
@@ -960,19 +962,19 @@ else
             if (gridView0) gridView0.classList.remove("d-none");
             if (listView0) listView0.classList.add("d-none");
             if (listView) listView.classList.add("d-none");  
-            if (toggleViewBtn) toggleViewBtn1.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
+            if (toggleViewBtn1) toggleViewBtn1.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
             if (toggleViewBtn2) toggleViewBtn2.innerHTML = "<i class='bi bi-list-ul me-2'></i>Modo lista";
         }
     };
 
     function toggleView() {
-        isListView = !isListView; 
-
+        isListView = !isListView;
         const gridView = document.getElementById("gridView");
         const gridView0 = document.getElementById("gridView0");
         const listView0 = document.getElementById("listView0");
         const listView = document.getElementById("listView");
-        const toggleViewBtn = document.getElementById("toggleViewBtn");
+        const toggleViewBtn1 = document.getElementById("toggleViewBtn");
+        const toggleViewBtn2 = document.getElementById("toggleViewBtn2");
 
         if (isListView) {
             if (gridView) gridView.classList.add("d-none");
