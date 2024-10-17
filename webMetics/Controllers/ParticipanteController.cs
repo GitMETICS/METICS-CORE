@@ -296,40 +296,43 @@ namespace webMetics.Controllers
                         string nombreGrupo = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text;
                         GrupoModel grupo = accesoAGrupo.ObtenerGrupoPorNombre(nombreGrupo);
 
-                        ParticipanteModel participante = new ParticipanteModel
+                        if (grupo != null) 
                         {
-                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                            tipoIdentificacion = "",
-                            numeroIdentificacion = "",
-                            correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
-                            primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
-                            segundoApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo Apellido")].Text,
-                            condicion = "",
-                            tipoParticipante = "",
-                            area = "",
-                            unidadAcademica = "",
-                            departamento = "",
-                            telefono = "",
-                            horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
-                            horasAprobadas = 0,
-                            gruposInscritos = new List<GrupoModel>()
-                        };
+                            ParticipanteModel participante = new ParticipanteModel
+                            {
+                                idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                                tipoIdentificacion = "",
+                                numeroIdentificacion = "",
+                                correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                                nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
+                                primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
+                                segundoApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo Apellido")].Text,
+                                condicion = "",
+                                tipoParticipante = "",
+                                area = "",
+                                unidadAcademica = "",
+                                departamento = "",
+                                telefono = "",
+                                horasMatriculadas = 0, // int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas matriculadas")].Text, out var horasMatriculadas) ? horasMatriculadas : 0,
+                                horasAprobadas = 0,
+                                gruposInscritos = new List<GrupoModel>()
+                            };
 
-                        participantes.Add(participante);
+                            participantes.Add(participante);
 
-                        InscripcionModel inscripcion = new InscripcionModel
-                        {
-                            idGrupo = grupo.idGrupo,
-                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                            numeroGrupo = grupo.numeroGrupo,
-                            nombreGrupo = grupo.nombre,
-                            horasMatriculadas = grupo.cantidadHoras,
-                            horasAprobadas = int.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text),
-                            estado = ""
-                        };
+                            InscripcionModel inscripcion = new InscripcionModel
+                            {
+                                idGrupo = grupo.idGrupo,
+                                idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
+                                numeroGrupo = grupo.numeroGrupo,
+                                nombreGrupo = grupo.nombre,
+                                horasMatriculadas = grupo.cantidadHoras,
+                                horasAprobadas = int.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text),
+                                estado = ""
+                            };
 
-                        inscripciones.Add(inscripcion);
+                            inscripciones.Add(inscripcion);
+                        }
                     }
 
                     foreach (var participante in participantes)
@@ -345,6 +348,7 @@ namespace webMetics.Controllers
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
                             IngresarInscripcion(inscripcion);
+                            accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                         }
                     }
                 }
@@ -368,7 +372,6 @@ namespace webMetics.Controllers
             {
                 // Insertar la inscripción sin enviar el comprobante por correo electrónico
                 bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
-                accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
 
                 if (exito)
                 {

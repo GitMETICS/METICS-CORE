@@ -141,7 +141,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
         comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
         comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
-        comandoConsulta.Parameters.AddWithValue("@estado", "Inscrito");
+        comandoConsulta.Parameters.AddWithValue("@estado", "Incompleto");
         comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
@@ -304,19 +304,15 @@ public class InscripcionHandler : BaseDeDatosHandler
         if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
         {
             inscripcion.estado = "Aprobado";
-        }
-        else
-        {
-            inscripcion.estado = "Incompleto";
-        }
 
-        try
-        {
-            EditarInscripcion(inscripcion);
-        }
-        catch (Exception ex)
-        {
-            // No existe la inscripción aún.
+            try
+            {
+                EditarInscripcion(inscripcion);
+            }
+            catch (Exception ex)
+            {
+                // No existe la inscripción aún.
+            }
         }
 
         return inscripcion;
