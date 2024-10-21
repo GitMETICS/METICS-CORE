@@ -141,7 +141,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
         comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
         comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
-        comandoConsulta.Parameters.AddWithValue("@estado", "Inscrito");
+        comandoConsulta.Parameters.AddWithValue("@estado", inscripcion.estado);
         comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;

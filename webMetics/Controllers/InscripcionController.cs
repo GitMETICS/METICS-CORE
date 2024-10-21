@@ -138,20 +138,25 @@ namespace webMetics.Controllers
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
-                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
                 }
                 else
                 {
                     TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
-                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
                 }
             }
             catch (Exception)
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                TempData["errorMessage"] = "Error al eliminar la inscripción del participante.";
-                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
             }
+
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
         }
 
         // Método para que un usuario se desinscriba de un grupo
