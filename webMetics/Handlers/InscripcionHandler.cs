@@ -127,6 +127,34 @@ public class InscripcionHandler : BaseDeDatosHandler
         return inscripcion;
     }
 
+    public InscripcionModel ObtenerInscripcionDeGrupoInexistenteParticipante(string nombreGrupo, int numeroGrupo, string idParticipante)
+    {
+        string consulta = "SELECT * FROM inscripcion WHERE nombre_grupo = @nombreGrupo AND numero_grupo = @numeroGrupo AND id_participante_FK = @idParticipante;";
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@nombreGrupo", nombreGrupo);
+        comandoConsulta.Parameters.AddWithValue("@numeroGrupo", numeroGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        DataRow fila = tablaResultado.Rows[0];
+
+        InscripcionModel inscripcion = new InscripcionModel
+        {
+            idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+            idParticipante = Convert.ToString(fila["id_participante_FK"]),
+            idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+            numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+            nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
+            estado = Convert.ToString(fila["estado"]),
+            observaciones = Convert.ToString(fila["observaciones"]),
+            horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+            horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+            calificacion = Convert.ToDouble(fila["calificacion"])
+        };
+
+        return inscripcion;
+    }
+
     public bool InsertarInscripcion(InscripcionModel inscripcion)
     {
         string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, numero_grupo, nombre_grupo, estado, observaciones, horas_aprobadas, horas_matriculadas)" +
@@ -307,11 +335,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         }
         else
         {
-            if (grupo.fechaFinalizacionGrupo == DateTime.MinValue)
-            {
-                inscripcion.estado = "Desconocido";
-            }
-            else if (grupo.fechaFinalizacionGrupo < DateTime.Now)
+            if (grupo != null && grupo.fechaFinalizacionGrupo < DateTime.Now)
             {
                 inscripcion.estado = "Incompleto";
             }

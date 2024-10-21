@@ -300,35 +300,9 @@ namespace webMetics.Controllers
                             cantidadHoras = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas")].Text, out var cantidadHoras) ? cantidadHoras : 0,
                         };
 
-                        ParticipanteModel participante = new ParticipanteModel
-                        {
-                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo institucional")].Text,
-                            tipoIdentificacion = worksheet.Cells[row, GetColumnIndex(worksheet, "Tipo de identificación")].Text,
-                            numeroIdentificacion = worksheet.Cells[row, GetColumnIndex(worksheet, "Número del documento")].Text,
-                            correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo institucional")].Text,
-                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
-                            primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer apellido")].Text,
-                            segundoApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo apellido")].Text,
-                            condicion = worksheet.Cells[row, GetColumnIndex(worksheet, "Condición en la institución")].Text,
-                            tipoParticipante = "",
-                            area = worksheet.Cells[row, GetColumnIndex(worksheet, "Área académica en la que está nombrado(a)")].Text,
-                            unidadAcademica = worksheet.Cells[row, GetColumnIndex(worksheet, "Unidad académica en la que está nombrado(a)")].Text,
-                            departamento = "",
-                            sede = worksheet.Cells[row, GetColumnIndex(worksheet, "Sede y/o Recinto en que imparte sus cursos")].Text,
-                            telefono = worksheet.Cells[row, GetColumnIndex(worksheet, "Número de celular")].Text,
-                            horasMatriculadas = 0,
-                            horasAprobadas = 0,
-                            gruposInscritos = new List<GrupoModel>()
-                        };
-
-                        if (!string.IsNullOrEmpty(participante.idParticipante))
-                        {
-                            IngresarParticipante(participante);
-                        }
-
                         InscripcionModel inscripcion = new InscripcionModel
                         {
-                            idParticipante = participante.idParticipante,
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo institucional")].Text,
                             numeroGrupo = grupo.numeroGrupo,
                             nombreGrupo = grupo.nombre,
                             horasMatriculadas = grupo.cantidadHoras,
@@ -824,7 +798,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubirHorasAprobadas(int? idGrupo, string idParticipante, int horasAprobadas)
+        public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
         {
             if (!idGrupo.HasValue)
             {
@@ -841,16 +815,26 @@ namespace webMetics.Controllers
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                 int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
 
-                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                InscripcionModel inscripcion;
+
+                if (grupo != null)
+                {
+                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                }
+                else
+                {
+                    inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
+                }
+
                 int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
 
-                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas && nuevasHorasAprobadas >= 0)
+                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
                     accesoAInscripcion.EditarInscripcion(inscripcion);
                     accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
 
-                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
+                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas)
                     {
                         accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
                     }
