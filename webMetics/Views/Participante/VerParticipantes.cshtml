@@ -114,6 +114,8 @@
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
+
                         </tr>
                     </thead>
 
@@ -164,6 +166,15 @@
                                 </td>
                                 <td>
                                     @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
+                                </td>
+                                <td>
+                                    @Html.ActionLink(" ", "CambiarContrasenaAdmin", "Usuario",
+                                             new
+                                             {
+                                                 idUsuario = participante.idParticipante,
+                                                 nombreCompleto = $"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}"
+                                             },
+                                             new { @class = "text-secondary bi bi-key" })
                                 </td>
                                 <td>
                                     <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')">
