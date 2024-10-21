@@ -837,7 +837,6 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                bool grupoIncompleto = grupo == null || grupo.esVisible == false;
 
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                 int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
@@ -849,7 +848,7 @@ namespace webMetics.Controllers
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
                     accesoAInscripcion.EditarInscripcion(inscripcion);
-                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupoIncompleto);
+                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
 
                     if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
                     {
