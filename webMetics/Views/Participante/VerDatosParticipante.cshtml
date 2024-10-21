@@ -52,7 +52,7 @@
                             <th scope="col">Nombre Completo</th>
                             <th scope="col">Correo Institucional</th>
                             <th scope="col">Módulos Inscritos</th>
-                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Matriculadas</th>
+                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
                         </tr>
                     </thead>
@@ -110,12 +110,13 @@
                                                     <tr>
                                                         <th class="" scope="col" style="width:20%;">Nombre Completo</th>
                                                         <th class="" scope="col" style="width:20%;">Módulo</th>
+                                                        <th class="" scope="col" style="width:7.5%;">Estado</th>
 
-                                                        <th class="text-center" scope="col" style="width: 10%;">Horas<br>Matriculadas</th>
-                                                        <th class="text-center" scope="col" style="width: 10%;">Horas<br>Aprobadas</th>
+                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
+                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
                                                         <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
 
-                                                        <th class="text-center" scope="col" style="width: 10%;">Calificación</th>
+                                                        <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
                                                         <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
                                                     </tr>
                                                 </thead>
@@ -124,6 +125,7 @@
                                                     <tr>
                                                         <td class="">@nombreCompleto</td>
                                                         <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                                        <td class="">@inscripcion.estado</td>
                                                         
                                                         <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>

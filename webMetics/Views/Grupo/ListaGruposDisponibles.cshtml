@@ -517,13 +517,13 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">
-                                    @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+                                    @if (string.Equals(grupo.modalidad, "Presencial", StringComparison.OrdinalIgnoreCase))
                                     {
                                         @grupo.lugar
                                     }
                                     else
                                     {
-                                            @EnumHelper.GetDisplayName(grupo.modalidad)
+                                        @EnumHelper.GetDisplayName(grupo.modalidad)
                                     }
                                     <br />
                                     @grupo.horario

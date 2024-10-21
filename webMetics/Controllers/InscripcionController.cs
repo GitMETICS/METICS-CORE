@@ -149,7 +149,7 @@ namespace webMetics.Controllers
             catch (Exception)
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
+                TempData["errorMessage"] = "Error al eliminar la inscripción del participante.";
                 return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
             }
         }

@@ -98,7 +98,6 @@ namespace webMetics.Handlers
             return exito;
         }
 
-
         // Método para editar un grupo en la base de datos
         public bool EditarGrupo(GrupoModel grupo)
         {
@@ -295,11 +294,11 @@ namespace webMetics.Handlers
             return grupo;
         }
 
-        public GrupoModel ObtenerGrupoPorNombre(string nombreGrupo)
+        public GrupoModel ObtenerGrupoPorNombre(string nombreGrupo, int numeroGrupo)
         {
             List<GrupoModel> grupos = ObtenerListaGrupos();
 
-            GrupoModel grupo = grupos.FirstOrDefault(g => g.nombre == nombreGrupo);
+            GrupoModel grupo = grupos.FirstOrDefault(g => g.nombre == nombreGrupo && g.numeroGrupo == numeroGrupo);
 
             return grupo;
         }

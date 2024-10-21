@@ -299,7 +299,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         return numeroHoras;
     }
 
-    public InscripcionModel CambiarEstadoDeInscripcion(InscripcionModel inscripcion)
+    public InscripcionModel CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
     {
         if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
         {
@@ -307,7 +307,18 @@ public class InscripcionHandler : BaseDeDatosHandler
         }
         else
         {
-            inscripcion.estado = "Incompleto";
+            if (grupo.fechaFinalizacionGrupo == DateTime.MinValue)
+            {
+                inscripcion.estado = "Desconocido";
+            }
+            else if (grupo.fechaFinalizacionGrupo < DateTime.Now)
+            {
+                inscripcion.estado = "Incompleto";
+            }
+            else
+            {
+                inscripcion.estado = "Inscrito";
+            }
         }
 
         try
@@ -316,10 +327,13 @@ public class InscripcionHandler : BaseDeDatosHandler
         }
         catch (Exception ex)
         {
-            // No existe la inscripción aún.
+            // Handle exception, log it, or add more specific actions here.
+            // For now, assuming it might not exist, consider logging the error.
+            Console.WriteLine($"Error editing Inscription: {ex.Message}");
         }
 
         return inscripcion;
     }
+
 }
 

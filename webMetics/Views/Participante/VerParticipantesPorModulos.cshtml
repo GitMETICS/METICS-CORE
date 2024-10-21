@@ -52,9 +52,12 @@
                     <div class="mb-4 bg-light p-3 rounded d-flex" style="max-width: 750px;">
                         <h4><i class="bi bi-exclamation-circle-fill me-2 p-2 text-secondary"></i></h4>
                         <small class="text-muted">
-                            Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
+                            Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas:
                             <br />
-                            Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Módulo, Horas Aprobadas
+                            Módulo, Grupo, Horas, Primer Apellido, Segundo Apellido, Nombre, Tipo de Identificación,<br />
+                            Número del Documento, Correo Institucional, Número de Celular, Condición en la Institución,<br />
+                            Área Académica en la que está nombrado(a), Unidad Académica en la que está nombrado(a),<br />
+                            Sede y/o Recinto en que imparte sus cursos, Estado, Horas Completadas, Horas Aprobadas
                             <br />
                             @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
@@ -88,10 +91,8 @@
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
                             <th scope="col">Módulo</th>
-                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Matriculadas</th>
+                            <th class="text-center" scope="col" style="width: 10%">Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                         </tr>
                     </thead>
@@ -109,14 +110,6 @@
                                 <td class="text-center">@inscripcion.horasAprobadas</td>
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
-                                </td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@inscripcion.idParticipante', '@inscripcion.idGrupo')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
                                 </td>
                             </tr>
                         }
