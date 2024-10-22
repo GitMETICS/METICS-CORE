@@ -327,36 +327,27 @@ public class InscripcionHandler : BaseDeDatosHandler
         return numeroHoras;
     }
 
-    public InscripcionModel CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
+    public string CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
     {
+        string estado;
+
         if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
         {
-            inscripcion.estado = "Aprobado";
+            estado = "Aprobado";
         }
         else
         {
             if (grupo != null && grupo.fechaFinalizacionGrupo < DateTime.Now)
             {
-                inscripcion.estado = "Incompleto";
+                estado = "Incompleto";
             }
             else
             {
-                inscripcion.estado = "Inscrito";
+                estado = "Inscrito";
             }
         }
 
-        try
-        {
-            EditarInscripcion(inscripcion);
-        }
-        catch (Exception ex)
-        {
-            // Handle exception, log it, or add more specific actions here.
-            // For now, assuming it might not exist, consider logging the error.
-            Console.WriteLine($"Error editing Inscription: {ex.Message}");
-        }
-
-        return inscripcion;
+        return estado;
     }
 
 }

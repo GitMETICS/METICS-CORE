@@ -123,6 +123,18 @@ namespace webMetics.Controllers
             {
                 foreach (InscripcionModel inscripcion in inscripciones)
                 {
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+                }
+            }
+
+            inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
                     inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
                 }
 
@@ -740,11 +752,7 @@ namespace webMetics.Controllers
             var sheet = workbook.CreateSheet("Plantilla_Participantes_Modulos");
 
             string[] columnNames = {
-                "Módulo", "Grupo", "Modalidad", "Horas", "Primer Apellido", "Segundo Apellido",
-                "Nombre", "Tipo de Identificación", "Número del Documento", "Correo Institucional",
-                "Número de Celular", "Condición en la Institución",
-                "Área Académica en la que está nombrado(a)", "Unidad Académica en la que está nombrado(a)",
-                "Sede y/o Recinto en que imparte sus cursos", "Estado", "Horas Completadas", "Horas Aprobadas"
+                "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas"
             };
 
             NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
@@ -772,9 +780,29 @@ namespace webMetics.Controllers
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
 
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+                }
+            }
+
             ViewBag.Participante = participante;
-            ViewBag.Inscripciones = inscripciones;
-          
+            ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+                }
+            }
+
             if (GetRole() == 2)
             {
                 string idAsesor = GetId();
@@ -831,8 +859,8 @@ namespace webMetics.Controllers
                 if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
-                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
 
                     if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas)
                     {

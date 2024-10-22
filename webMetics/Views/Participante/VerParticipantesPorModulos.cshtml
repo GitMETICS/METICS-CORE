@@ -54,10 +54,7 @@
                         <small class="text-muted">
                             Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas:
                             <br />
-                            Módulo, Grupo, Horas, Primer Apellido, Segundo Apellido, Nombre, Tipo de Identificación,<br />
-                            Número del Documento, Correo Institucional, Número de Celular, Condición en la Institución,<br />
-                            Área Académica en la que está nombrado(a), Unidad Académica en la que está nombrado(a),<br />
-                            Sede y/o Recinto en que imparte sus cursos, Estado, Horas Completadas, Horas Aprobadas
+                            Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas
                             <br />
                             @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
@@ -91,6 +88,7 @@
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
                             <th scope="col">Módulo</th>
+                            <th scope="col">Estado</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -106,6 +104,7 @@
                                 <td>@inscripcion.participante.segundoApellido</td>
                                 <td>@inscripcion.participante.correo</td>
                                 <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                <td>@inscripcion.estado</td>
                                 <td class="text-center">@inscripcion.horasMatriculadas</td>
                                 <td class="text-center">@inscripcion.horasAprobadas</td>
                                 <td>
