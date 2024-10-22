@@ -5,8 +5,11 @@ using webMetics.Handlers;
 
 public class InscripcionHandler : BaseDeDatosHandler
 {
+    private protected GrupoHandler accesoAGrupo;
+
     public InscripcionHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
     {
+        accesoAGrupo = new GrupoHandler(environment, configuration);
     }
 
     public List<InscripcionModel> ObtenerInscripciones()
@@ -35,6 +38,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
 
         return inscripciones;
@@ -96,6 +103,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
         return inscripciones;
     }

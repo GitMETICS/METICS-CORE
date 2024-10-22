@@ -123,18 +123,6 @@ namespace webMetics.Controllers
             {
                 foreach (InscripcionModel inscripcion in inscripciones)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
-                }
-            }
-
-            inscripciones = accesoAInscripcion.ObtenerInscripciones();
-
-            if (inscripciones != null)
-            {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
                     inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
                 }
 
@@ -780,28 +768,8 @@ namespace webMetics.Controllers
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
 
-            if (inscripciones != null)
-            {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
-                }
-            }
-
             ViewBag.Participante = participante;
-            ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
-
-            if (inscripciones != null)
-            {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
-                }
-            }
+            ViewBag.Inscripciones = inscripciones;
 
             if (GetRole() == 2)
             {
