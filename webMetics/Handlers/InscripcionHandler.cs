@@ -73,6 +73,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
         return inscripciones;
     }
@@ -135,6 +139,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             calificacion = Convert.ToDouble(fila["calificacion"])
         };
 
+        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        EditarInscripcion(inscripcion);
+
         return inscripcion;
     }
 
@@ -162,6 +170,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
             calificacion = Convert.ToDouble(fila["calificacion"])
         };
+
+        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        EditarInscripcion(inscripcion);
 
         return inscripcion;
     }
