@@ -1007,9 +1007,7 @@ INSERT INTO dbo.grupo(
     fecha_finalizacion_grupo,
     fecha_inicio_inscripcion, 
     fecha_finalizacion_inscripcion,
-    nombre_archivo,
-    enlace,
-    clave_inscripcion)
+    nombre_archivo)
     VALUES
     ( 
     1, 
@@ -1028,9 +1026,7 @@ INSERT INTO dbo.grupo(
     '2024-09-27 00:00:00', 
     '2024-01-01 00:00:00', 
     '2024-12-09 00:00:00', 
-    N'ArchivoPrueba.pdf',
-    'https://encuestas.ucr.ac.cr/index.php/256355?lang=es-MX',
-    'DDDPC');
+    N'ArchivoPrueba.pdf');
 
 -- Insertar valores iniciales grupo_tema
 INSERT INTO grupo_tema (id_grupo_FK, id_tema_FK)
