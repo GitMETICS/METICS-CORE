@@ -52,20 +52,13 @@
                             <tr>
                                 <th scope="col">Nombre Completo</th>
                                 <th scope="col">Identificación</th>
-
-                                @if (ViewBag.Usuario.unidadAcademica != null)
-                                {
-                                    <th scope="col">Unidad Académica</th>
-                                }
-                                
+                                <th scope="col">Unidad Académica</th>
                                 <th scope="col">Correo Institucional</th>
-
-                                @if (ViewBag.Usuario.condicion != null)
-                                {
-                                    <th scope="col">Condición</th>
-                                }
-                                
+                                <th scope="col">Condición</th>
                                 <th scope="col" style="width:10%">Teléfono</th>
+
+                                <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Inscritas</th>
+                                <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
 
                                 @if (ViewBag.Participante != null)
                                 {
@@ -76,6 +69,8 @@
                                 {
                                     <td scope="col" style="width: 3.33%;"></td>
                                 }
+
+                                
                             </tr>
                         </thead>
 
@@ -101,6 +96,14 @@
                                 }
 
                                 <td class="">@ViewBag.Usuario.telefono</td>
+
+                                <td class="my-3 text-center" style="width: 7.5%">
+                                    <span>@ViewBag.Participante.horasMatriculadas</span>
+                                </td>
+
+                                <td class="my-3 text-center" scope="col" style="width: 7.5%">
+                                    <span>@ViewBag.Participante.horasAprobadas</span>
+                                </td>
 
                                 @if (ViewBag.Participante != null)
                                 {
@@ -190,12 +193,10 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" style="width: 25%">Módulos Inscritos</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
-                                        <th class="text-center" scope="col" style="width: 3.33%"></th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Matriculadas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
+                                        
                                     </tr>
                                 </thead>
 
@@ -225,16 +226,6 @@
                                                 }
                                             }
                                         </td>
-
-                                        <td style="width: 3.33%"></td>
-
-                                        <td class="my-3 text-center" style="width: 7.5%">
-                                            <span>@ViewBag.Participante.horasMatriculadas</span>
-                                        </td>
-
-                                        <td class="my-3 text-center" scope="col" style="width: 7.5%">
-                                            <span>@ViewBag.Participante.horasAprobadas</span>
-                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -248,7 +239,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" style="width: 25%">Módulos Incompletos</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
                                     </tr>
@@ -293,7 +284,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" style="width: 25%">Módulos Aprobados</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Matriculadas</th>
+                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
                                         <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
                                     </tr>

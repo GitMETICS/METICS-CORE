@@ -14,6 +14,8 @@ using iText.Kernel.Geom;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
 using NPOI.SS.Formula.Functions;
+using System.Globalization;
+using System.Text;
 
 
 namespace webMetics.Controllers
@@ -288,66 +290,29 @@ namespace webMetics.Controllers
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    List<ParticipanteModel> participantes = new List<ParticipanteModel>();
-                    List<InscripcionModel> inscripciones = new List<InscripcionModel>();
-
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
-                        string nombreGrupo = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text;
-                        GrupoModel grupo = accesoAGrupo.ObtenerGrupoPorNombre(nombreGrupo);
-
-                        if (grupo != null) 
+                        GrupoModel grupo = new GrupoModel
                         {
-                            ParticipanteModel participante = new ParticipanteModel
-                            {
-                                idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                                tipoIdentificacion = "",
-                                numeroIdentificacion = "",
-                                correo = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                                nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Nombre")].Text,
-                                primerApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Primer Apellido")].Text,
-                                segundoApellido = worksheet.Cells[row, GetColumnIndex(worksheet, "Segundo Apellido")].Text,
-                                condicion = "",
-                                tipoParticipante = "",
-                                area = "",
-                                unidadAcademica = "",
-                                departamento = "",
-                                telefono = "",
-                                horasMatriculadas = 0,
-                                horasAprobadas = 0,
-                                gruposInscritos = new List<GrupoModel>()
-                            };
+                            numeroGrupo = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Grupo")].Text, out var numeroGrupo) ? numeroGrupo : 0,
+                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text,
+                            modalidad = "",
+                            cantidadHoras = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas")].Text, out var cantidadHoras) ? cantidadHoras : 0,
+                        };
 
-                            participantes.Add(participante);
-
-                            InscripcionModel inscripcion = new InscripcionModel
-                            {
-                                idGrupo = grupo.idGrupo,
-                                idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text,
-                                numeroGrupo = grupo.numeroGrupo,
-                                nombreGrupo = grupo.nombre,
-                                horasMatriculadas = grupo.cantidadHoras,
-                                horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadas) ? horasAprobadas : 0, // TODO: Cambiar a horas completadas
-                                estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text,
-                            };
-
-                            inscripciones.Add(inscripcion);
-                        }
-                    }
-
-                    foreach (var participante in participantes)
-                    {
-                        if (!string.IsNullOrEmpty(participante.idParticipante))
+                        InscripcionModel inscripcion = new InscripcionModel
                         {
-                            IngresarParticipante(participante);
-                        }
-                    }
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo institucional")].Text,
+                            numeroGrupo = grupo.numeroGrupo,
+                            nombreGrupo = grupo.nombre,
+                            horasMatriculadas = grupo.cantidadHoras,
+                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas completadas")].Text, out var horasCompletadas) ? horasCompletadas : 0,
+                            estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text
+                        };
 
-                    foreach (var inscripcion in inscripciones)
-                    {
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
-                            IngresarInscripcion(inscripcion);
+                            IngresarInscripcion(inscripcion, grupo);
                         }
                     }
                 }
@@ -362,12 +327,11 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantesPorModulos");
         }
 
-        private void IngresarInscripcion(InscripcionModel inscripcion)
+        private void IngresarInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
         {
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
 
-            if (grupo != null && participante != null && accesoAInscripcion.NoEstaInscritoEnGrupo(inscripcion.idGrupo, inscripcion.idParticipante))
+            if (grupo != null && participante != null)
             {
                 // Insertar la inscripción sin enviar el comprobante por correo electrónico
                 bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
@@ -772,31 +736,21 @@ namespace webMetics.Controllers
 
         public ActionResult DescargarPlantillaSubirParticipantesPorModulos()
         {
-            // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Plantilla_Participantes_Modulos");
 
+            string[] columnNames = {
+                "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas"
+            };
+
             NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
-            NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
-            cell31.SetCellValue("Nombre");
 
-            NPOI.SS.UserModel.ICell cell32 = row.CreateCell(1);
-            cell32.SetCellValue("Primer Apellido");
+            for (int i = 0; i < columnNames.Length; i++)
+            {
+                NPOI.SS.UserModel.ICell cell = row.CreateCell(i);
 
-            NPOI.SS.UserModel.ICell cell33 = row.CreateCell(2);
-            cell33.SetCellValue("Segundo Apellido");
-
-            NPOI.SS.UserModel.ICell cell66 = row.CreateCell(3);
-            cell66.SetCellValue("Correo Institucional");
-
-            NPOI.SS.UserModel.ICell cell34 = row.CreateCell(4);
-            cell34.SetCellValue("Módulo");
-
-            NPOI.SS.UserModel.ICell cell35 = row.CreateCell(5);
-            cell35.SetCellValue("Horas Matriculadas");
-
-            NPOI.SS.UserModel.ICell cell36 = row.CreateCell(6);
-            cell36.SetCellValue("Horas Aprobadas");
+                cell.SetCellValue(columnNames[i]);
+            }
 
             string fileName = "Plantilla_Participantes_Modulos.xlsx";
             var stream = new MemoryStream();
@@ -816,7 +770,7 @@ namespace webMetics.Controllers
 
             ViewBag.Participante = participante;
             ViewBag.Inscripciones = inscripciones;
-          
+
             if (GetRole() == 2)
             {
                 string idAsesor = GetId();
@@ -840,7 +794,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubirHorasAprobadas(int? idGrupo, string idParticipante, int horasAprobadas)
+        public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
         {
             if (!idGrupo.HasValue)
             {
@@ -853,21 +807,30 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                bool grupoIncompleto = grupo == null || grupo.esVisible == false;
 
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
                 int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
 
-                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                InscripcionModel inscripcion;
+
+                if (grupo != null)
+                {
+                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                }
+                else
+                {
+                    inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
+                }
+
                 int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
 
-                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas && nuevasHorasAprobadas >= 0)
+                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
-                    accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupoIncompleto);
 
-                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas && nuevoTotalHorasAprobadas >= 0)
+                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas)
                     {
                         accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
                     }
@@ -1309,27 +1272,43 @@ namespace webMetics.Controllers
 
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
         {
+            // Normalize and remove accents from the input column name
+            string normalizedColumnName = RemoveAccents(columnName.Trim().ToLower());
+
+            // Iterate over the first row to find the column index
             for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
             {
-                if (worksheet.Cells[1, col].Text == columnName)
+                // Get the header, normalize it, and remove accents
+                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
+
+                // Compare normalized header with the normalized column name
+                if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return col;
                 }
             }
-            return -1;
+            throw new Exception($"Column '{columnName}' not found");
+        }
+
+        // Helper method to remove accents (diacritics)
+        private string RemoveAccents(string text)
+        {
+            return string.Concat(text.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
+                .Normalize(NormalizationForm.FormC);
         }
 
         // Método para enviar confirmación de registro al usuario
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
-        {
-            string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
-            string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
-                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
+            {
+                string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
+                string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                    $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                    $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-            await _emailService.SendEmailAsync(correo, subject, message);
-            return Ok();
-        }
+                await _emailService.SendEmailAsync(correo, subject, message);
+                return Ok();
+            }
 
         private string GenerateRandomPassword()
         {

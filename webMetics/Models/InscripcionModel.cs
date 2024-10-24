@@ -6,7 +6,7 @@ namespace webMetics.Models
     {
         public int idInscripcion { get; set; }
 
-        public required int idGrupo { get; set; }
+        public int idGrupo { get; set; }
 
         public required string idParticipante { get; set; }
 

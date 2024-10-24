@@ -5,8 +5,11 @@ using webMetics.Handlers;
 
 public class InscripcionHandler : BaseDeDatosHandler
 {
+    private protected GrupoHandler accesoAGrupo;
+
     public InscripcionHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
     {
+        accesoAGrupo = new GrupoHandler(environment, configuration);
     }
 
     public List<InscripcionModel> ObtenerInscripciones()
@@ -35,6 +38,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
 
         return inscripciones;
@@ -66,6 +73,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
         return inscripciones;
     }
@@ -96,6 +107,10 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            EditarInscripcion(inscripcion);
         }
         return inscripciones;
     }
@@ -123,6 +138,42 @@ public class InscripcionHandler : BaseDeDatosHandler
             horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
             calificacion = Convert.ToDouble(fila["calificacion"])
         };
+
+        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        EditarInscripcion(inscripcion);
+
+        return inscripcion;
+    }
+
+    public InscripcionModel ObtenerInscripcionDeGrupoInexistenteParticipante(string nombreGrupo, int numeroGrupo, string idParticipante)
+    {
+        string consulta = "SELECT * FROM inscripcion WHERE nombre_grupo = @nombreGrupo AND numero_grupo = @numeroGrupo AND id_participante_FK = @idParticipante;";
+        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+        comandoConsulta.Parameters.AddWithValue("@nombreGrupo", nombreGrupo);
+        comandoConsulta.Parameters.AddWithValue("@numeroGrupo", numeroGrupo);
+        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+        DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+        DataRow fila = tablaResultado.Rows[0];
+
+        InscripcionModel inscripcion = new InscripcionModel
+        {
+            idInscripcion = Convert.ToInt32(fila["id_inscripcion_PK"]),
+            idParticipante = Convert.ToString(fila["id_participante_FK"]),
+            idGrupo = Convert.ToInt32(fila["id_grupo_FK"]),
+            numeroGrupo = Convert.ToInt32(fila["numero_grupo"]),
+            nombreGrupo = Convert.ToString(fila["nombre_grupo"]),
+            estado = Convert.ToString(fila["estado"]),
+            observaciones = Convert.ToString(fila["observaciones"]),
+            horasAprobadas = Convert.ToInt32(fila["horas_aprobadas"]),
+            horasMatriculadas = Convert.ToInt32(fila["horas_matriculadas"]),
+            calificacion = Convert.ToDouble(fila["calificacion"])
+        };
+
+        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        EditarInscripcion(inscripcion);
 
         return inscripcion;
     }
@@ -299,35 +350,28 @@ public class InscripcionHandler : BaseDeDatosHandler
         return numeroHoras;
     }
 
-    public InscripcionModel CambiarEstadoDeInscripcion(InscripcionModel inscripcion, bool incompleto)
+    public string CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
     {
+        string estado;
 
-        if (incompleto)
+        if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
         {
-            inscripcion.estado = "Incompleto";
+            estado = "Aprobado";
         }
-        else 
+        else
         {
-            if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
+            if (grupo != null && grupo.fechaFinalizacionGrupo < DateTime.Now)
             {
-                inscripcion.estado = "Aprobado";
+                estado = "Incompleto";
             }
             else
             {
-                inscripcion.estado = "Inscrito";
+                estado = "Inscrito";
             }
         }
-        
-        try
-        {
-            EditarInscripcion(inscripcion);
-        }
-        catch (Exception ex)
-        {
-            // No existe la inscripción aún.
-        }
 
-        return inscripcion;
+        return estado;
     }
+
 }
 
