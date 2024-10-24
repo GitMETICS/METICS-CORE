@@ -558,8 +558,8 @@ CREATE OR ALTER PROCEDURE InsertGrupo
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL,
-    @enlace NVARCHAR(64),
-    @clave_inscripcion NVARCHAR(64)
+    @enlace NVARCHAR(64) = '',
+    @clave_inscripcion NVARCHAR(64) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -656,8 +656,8 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL,
-    @enlace NVARCHAR(64),
-    @clave_inscripcion NVARCHAR(64)
+    @enlace NVARCHAR(64) = '',
+    @clave_inscripcion NVARCHAR(64) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
