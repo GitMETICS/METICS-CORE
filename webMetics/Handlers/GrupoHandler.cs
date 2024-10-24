@@ -51,6 +51,9 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@numeroGrupo", grupo.numeroGrupo);
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
+                command.Parameters.AddWithValue("@enlace", grupo.enlace);
+                command.Parameters.AddWithValue("@clave_inscripcion", grupo.clave_inscripcion);
+
 
                 if (grupo.archivoAdjunto != null)
                 {
@@ -125,6 +128,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@descripcion", grupo.descripcion);
                 command.Parameters.AddWithValue("@lugar", grupo.lugar);
                 command.Parameters.AddWithValue("@es_visible", grupo.esVisible);
+                command.Parameters.AddWithValue("@enlace", grupo.enlace);
+                command.Parameters.AddWithValue("@clave_inscripcion", grupo.clave_inscripcion);
 
                 if (grupo.archivoAdjunto != null)
                 {
@@ -224,6 +229,10 @@ namespace webMetics.Handlers
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(row["nombre_archivo"]),
                     TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
+                    enlace = Convert.ToString(row["enlace"]),
+                    clave_inscripcion = Convert.ToString(row["clave_inscripcion"]),
+
+
 
                 };
 
@@ -279,6 +288,10 @@ namespace webMetics.Handlers
                                 cantidadHoras = reader.IsDBNull(reader.GetOrdinal("cantidad_horas")) ? (byte)0 : reader.GetByte(reader.GetOrdinal("cantidad_horas")),
                                 nombreArchivo = reader.IsDBNull(reader.GetOrdinal("nombre_archivo")) ? "Sin archivo adjunto" : reader.GetString(reader.GetOrdinal("nombre_archivo")),
                                 TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
+                                enlace = reader.IsDBNull(reader.GetOrdinal("enlace")) ? "Sin enlace del curso" : reader.GetString(reader.GetOrdinal("enlace")),
+                                clave_inscripcion = reader.IsDBNull(reader.GetOrdinal("clave_inscripcion")) ? "Sin clave de inscripción" : reader.GetString(reader.GetOrdinal("clave_inscripcion")),
+
+
                             };
                         }
                     }
@@ -386,6 +399,8 @@ namespace webMetics.Handlers
                     cupoActual = ObtenerCupoActual(Convert.ToInt32(row["id_grupo_PK"])),
                     nombreArchivo = Convert.ToString(row["nombre_archivo"]),
                     TemasSeleccionadosNombres = accesoAGrupoTema.ObtenerNombresTemasDelGrupo(idGrupo),
+                    enlace = Convert.ToString(row["enlace"]),
+                    clave_inscripcion = Convert.ToString(row["clave_inscripcion"]),
 
                 };
 

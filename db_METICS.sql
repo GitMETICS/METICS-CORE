@@ -105,6 +105,9 @@ CREATE TABLE grupo (
     es_visible BIT,
     nombre_archivo NVARCHAR(256),
 	adjunto VARBINARY(MAX),
+    enlace NVARCHAR(64),
+    clave_inscripcion NVARCHAR(64),
+
 
 	FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
         ON DELETE NO ACTION,
@@ -554,7 +557,9 @@ CREATE OR ALTER PROCEDURE InsertGrupo
 	@lugar NVARCHAR(512) = '',
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
-	@adjunto VARBINARY(MAX) = NULL
+	@adjunto VARBINARY(MAX) = NULL,
+    @enlace NVARCHAR(64),
+    @clave_inscripcion NVARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -578,7 +583,9 @@ BEGIN
         lugar,
         es_visible,
 		nombre_archivo,
-		adjunto
+		adjunto,
+        enlace,
+        clave_inscripcion
     )
     VALUES
     (
@@ -598,7 +605,9 @@ BEGIN
 		@lugar,
 		@es_visible,
 		@nombre_archivo,
-		@adjunto
+		@adjunto,
+        @enlace,
+        @clave_inscripcion
     );
 
     -- Obtener el ID del grupo recién insertado
@@ -646,7 +655,9 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
 	@lugar NVARCHAR(512) = '',
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
-	@adjunto VARBINARY(MAX) = NULL
+	@adjunto VARBINARY(MAX) = NULL,
+    @enlace NVARCHAR(64),
+    @clave_inscripcion NVARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -673,7 +684,9 @@ BEGIN
 		numero_grupo = @numeroGrupo,
         descripcion = @descripcion,
         lugar = @lugar,
-        es_visible = @es_visible
+        es_visible = @es_visible,
+        enlace = @enlace,
+        clave_inscripcion = @clave_inscripcion
     WHERE
         id_grupo_PK = @idGrupo;
 END
@@ -702,7 +715,9 @@ BEGIN
 		G.cantidad_horas, 
 		G.nombre_archivo,
 		C.nombre as nombre_categoria,
-		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor,
+        G.enlace,
+        G.clave_inscripcion
 	FROM grupo G
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK;
@@ -734,7 +749,9 @@ BEGIN
 		G.nombre_archivo, 
 		G.adjunto,
 		C.nombre as nombre_categoria,
-		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor,
+        G.enlace,
+        G.clave_inscripcion
 	FROM grupo G
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
@@ -767,7 +784,9 @@ BEGIN
 		G.nombre_archivo, 
 		G.adjunto,
 		C.nombre as nombre_categoria,
-		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor
+		A.nombre + ' ' + A.apellido_1 + ' ' + A.apellido_2 as nombre_asesor,
+        G.enlace,
+        G.clave_inscripcion
 	FROM grupo G
 		JOIN categoria C ON C.id_categoria_PK = G.id_categoria_FK
 		LEFT JOIN asesor A ON A.id_asesor_PK = G.id_asesor_FK 
@@ -988,7 +1007,9 @@ INSERT INTO dbo.grupo(
     fecha_finalizacion_grupo,
     fecha_inicio_inscripcion, 
     fecha_finalizacion_inscripcion,
-    nombre_archivo)
+    nombre_archivo,
+    enlace,
+    clave_inscripcion)
     VALUES
     ( 
     1, 
@@ -1007,7 +1028,9 @@ INSERT INTO dbo.grupo(
     '2024-09-27 00:00:00', 
     '2024-01-01 00:00:00', 
     '2024-12-09 00:00:00', 
-    N'ArchivoPrueba.pdf');
+    N'ArchivoPrueba.pdf',
+    'https://encuestas.ucr.ac.cr/index.php/256355?lang=es-MX',
+    'DDDPC');
 
 -- Insertar valores iniciales grupo_tema
 INSERT INTO grupo_tema (id_grupo_FK, id_tema_FK)
