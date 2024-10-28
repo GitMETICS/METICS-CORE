@@ -91,6 +91,12 @@ namespace webMetics.Models
 
         [Display(Name = "Facilitador(a)")]
         public string? nombreAsesor { get; set; }
+
+        [Display(Name = "Enlace del curso")]
+        public string? enlace { get; set; }
+
+        [Display(Name = "Clave de inscripción")]
+        public string? clave_inscripcion { get; set; }
     }
 
     public enum TipoModalidad
