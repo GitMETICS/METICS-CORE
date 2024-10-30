@@ -247,7 +247,10 @@ namespace webMetics.Handlers
 
             foreach (InscripcionModel inscripcion in inscripciones)
             {
-                total += inscripcion.horasAprobadas;
+                if (inscripcion.estado == "Aprobado")
+                {
+                    total += inscripcion.horasAprobadas;
+                }
             }
             return total;
         }
