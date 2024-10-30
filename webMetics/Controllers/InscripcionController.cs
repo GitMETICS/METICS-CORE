@@ -10,6 +10,7 @@ using iText.Layout.Properties;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
 using System.Text.RegularExpressions;
+using NPOI.SS.Formula.Functions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -223,14 +224,20 @@ namespace webMetics.Controllers
                 "<h2>Comprobante de inscripción a módulo - SISTEMA DE INSCRIPCIONES METICS</h2>" +
                 "<p>Nombre: " + participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido + "</p>" +
                 "<p>Se ha inscrito al módulo: <strong>" + grupo.nombre + " (Grupo " + grupo.numeroGrupo + ")</strong></p>" +
-                
-                "<ul><li>Descripción: " + grupo.descripcion + "</li>" +
+
+                "<ul>" +
+                "<li>Descripción: " + grupo.descripcion + "</li>" +
+                "<br>" +
+                "<li>Enlace: " + grupo.enlace + "</li>" +
+                "<li>Clave de inscripción: " + grupo.claveInscripcion + "</li>" +
+                "<br>" +
                 "<li>Horario: " + grupo.horario + "</li>" +
                 "<li>Modalidad: " + grupo.modalidad + "</li>" +
                 "<li>Cantidad de horas: " + grupo.cantidadHoras + "</li>" +
                 "<li>Facilitador(a): " + grupo.nombreAsesor + "</li>" +
                 "<li>Fecha de inicio: " + grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") + "</li>" +
                 "<li>Fecha de finalización: " + grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy") + "</li>";
+                
             
             if (!(string.Equals(grupo.modalidad, "Autogestionado", StringComparison.OrdinalIgnoreCase) || string.Equals(grupo.modalidad, "Virtual", StringComparison.OrdinalIgnoreCase)))
             {

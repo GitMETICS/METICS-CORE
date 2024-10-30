@@ -107,9 +107,9 @@
                             @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.clave_inscripcion, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.clave_inscripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.clave_inscripcion, "", new { @class = "text-danger" })
+                            @Html.LabelFor(grupoModel => grupoModel.claveInscripcion, new { Style = "font-size:22px" })
+                            @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
+                            @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })

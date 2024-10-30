@@ -96,7 +96,7 @@ namespace webMetics.Models
         public string? enlace { get; set; }
 
         [Display(Name = "Clave de inscripción")]
-        public string? clave_inscripcion { get; set; }
+        public string? claveInscripcion { get; set; }
     }
 
     public enum TipoModalidad
