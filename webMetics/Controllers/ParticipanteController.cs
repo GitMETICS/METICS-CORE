@@ -734,7 +734,7 @@ namespace webMetics.Controllers
         public ActionResult DescargarPlantillaSubirParticipantesPorModulos()
         {
             XSSFWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet("Plantilla_Participantes_Modulos");
+            var sheet = workbook.CreateSheet("Plantilla_Inscripciones");
 
             string[] columnNames = {
                 "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas"
@@ -749,7 +749,7 @@ namespace webMetics.Controllers
                 cell.SetCellValue(columnNames[i]);
             }
 
-            string fileName = "Plantilla_Participantes_Modulos.xlsx";
+            string fileName = "Plantilla_Inscripciones.xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();
