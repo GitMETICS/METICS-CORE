@@ -338,11 +338,8 @@ namespace webMetics.Controllers
 
                 if (exito)
                 {
-                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlInscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
-
-                    int horasAprobadas = accesoAInscripcion.CalcularNumeroHorasAprobadas(participante.horasAprobadas, inscripcion.horasAprobadas);
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante, horasAprobadas);
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
                 }
             }
         }
@@ -830,10 +827,7 @@ namespace webMetics.Controllers
                     inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                    if (nuevoTotalHorasAprobadas <= participante.horasMatriculadas)
-                    {
-                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante, nuevoTotalHorasAprobadas);
-                    }
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
 
                     TempData["successMessage"] = "Las horas fueron aprobadas.";
                 }

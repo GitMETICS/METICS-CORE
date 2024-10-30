@@ -329,27 +329,6 @@ public class InscripcionHandler : BaseDeDatosHandler
         return noEstaInscrito;
     }
 
-    public int CalcularNumeroHorasAlInscribirse(int horasGrupo, int horasParticipante)
-    {
-        return horasParticipante + horasGrupo;
-    }
-
-    public int CalcularNumeroHorasAprobadas(int horasActuales, int horasNuevas)
-    {
-        return horasActuales + horasNuevas;
-    }
-
-    public int CalcularNumeroHorasAlDesinscribirse(int horasGrupo, int horasParticipante)
-    {
-        int numeroHoras = horasParticipante - horasGrupo;
-        if (numeroHoras <= 0)
-        {
-            numeroHoras = 0;
-        }
-
-        return numeroHoras;
-    }
-
     public string CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
     {
         string estado;

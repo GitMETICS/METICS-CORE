@@ -9,9 +9,11 @@ namespace webMetics.Handlers
 {
     public class ParticipanteHandler : BaseDeDatosHandler
     {
+        private protected InscripcionHandler accesoAInscripcion;
+
         public ParticipanteHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
-
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
         // Verificar la existencia de un participante en la base de datos
@@ -151,7 +153,7 @@ namespace webMetics.Handlers
                         {
                             participante = new ParticipanteModel
                             {
-                                idParticipante = reader["id_participante_PK"].ToString(),
+                                idParticipante = idParticipante,
                                 nombre = reader["nombre"].ToString(),
                                 primerApellido = reader["apellido_1"].ToString(),
                                 segundoApellido = reader["apellido_2"].ToString(),
@@ -222,8 +224,36 @@ namespace webMetics.Handlers
             return comprobacionConsultaExitosa;
         }
 
+        private int CalcularHorasMatriculadasParticipante(string idParticipante)
+        {
+            int total = 0;
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
+
+            foreach (InscripcionModel inscripcion in inscripciones)
+            {
+                if (inscripcion.estado == "Inscrito")
+                {
+                    total += inscripcion.horasMatriculadas;
+                }
+
+            }
+            return total;
+        }
+
+        private int CalcularHorasAprobadasParticipante(string idParticipante)
+        {
+            int total = 0;
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idParticipante);
+
+            foreach (InscripcionModel inscripcion in inscripciones)
+            {
+                total += inscripcion.horasAprobadas;
+            }
+            return total;
+        }
+
         // Método para editar las horas matriculadas de un participante existente en la base de datos
-        public bool ActualizarHorasMatriculadasParticipante(string idParticipante, int horasParticipante)
+        public bool ActualizarHorasMatriculadasParticipante(string idParticipante)
         {
             bool exito;
             string consulta = "UPDATE participante SET total_horas_matriculadas = @horasMatriculadas " +
@@ -233,7 +263,7 @@ namespace webMetics.Handlers
 
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoParaConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-            comandoParaConsulta.Parameters.AddWithValue("@horasMatriculadas", horasParticipante);
+            comandoParaConsulta.Parameters.AddWithValue("@horasMatriculadas", CalcularHorasMatriculadasParticipante(idParticipante));
 
             exito = comandoParaConsulta.ExecuteNonQuery() >= 1;
 
@@ -243,7 +273,7 @@ namespace webMetics.Handlers
         }
 
         // Método para editar las horas aprobadas de un participante existente en la base de datos
-        public bool ActualizarHorasAprobadasParticipante(string idParticipante, int horasParticipante)
+        public bool ActualizarHorasAprobadasParticipante(string idParticipante)
         {
             bool exito;
             string consulta = "UPDATE participante SET total_horas_aprobadas = @horasAprobadas " +
@@ -253,7 +283,7 @@ namespace webMetics.Handlers
 
             SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoParaConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-            comandoParaConsulta.Parameters.AddWithValue("@horasAprobadas", horasParticipante);
+            comandoParaConsulta.Parameters.AddWithValue("@horasAprobadas", CalcularHorasAprobadasParticipante(idParticipante));
 
             exito = comandoParaConsulta.ExecuteNonQuery() >= 1;
 

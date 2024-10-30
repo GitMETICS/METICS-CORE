@@ -80,8 +80,7 @@ namespace webMetics.Controllers
 
                     if (exito)
                     {
-                        int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlInscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
-                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
+                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
 
                         try
                         {
@@ -135,8 +134,7 @@ namespace webMetics.Controllers
                     GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
                 }
@@ -175,8 +173,7 @@ namespace webMetics.Controllers
                     GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
-                    int horasParticipante = accesoAInscripcion.CalcularNumeroHorasAlDesinscribirse(grupo.cantidadHoras, participante.horasMatriculadas);
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante, horasParticipante);
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
                 }
                 else
                 {
