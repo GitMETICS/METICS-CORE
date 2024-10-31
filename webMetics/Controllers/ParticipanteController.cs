@@ -824,7 +824,7 @@ namespace webMetics.Controllers
                 if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion, grupo);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
 
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);

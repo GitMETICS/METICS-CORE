@@ -38,9 +38,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
-
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
             EditarInscripcion(inscripcion);
         }
 
@@ -73,9 +71,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
-
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
             EditarInscripcion(inscripcion);
         }
         return inscripciones;
@@ -107,9 +103,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             };
 
             inscripciones.Add(inscripcion);
-
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+            inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
             EditarInscripcion(inscripcion);
         }
         return inscripciones;
@@ -139,8 +133,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             calificacion = Convert.ToDouble(fila["calificacion"])
         };
 
-        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
         EditarInscripcion(inscripcion);
 
         return inscripcion;
@@ -171,8 +164,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             calificacion = Convert.ToDouble(fila["calificacion"])
         };
 
-        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
-        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion, grupo);
+        inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
         EditarInscripcion(inscripcion);
 
         return inscripcion;
@@ -329,7 +321,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         return noEstaInscrito;
     }
 
-    public string CambiarEstadoDeInscripcion(InscripcionModel inscripcion, GrupoModel grupo)
+    public string CambiarEstadoDeInscripcion(InscripcionModel inscripcion)
     {
         string estado;
 
@@ -339,7 +331,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         }
         else
         {
-            if (grupo != null && grupo.fechaFinalizacionGrupo < DateTime.Now)
+            if (inscripcion.horasAprobadas < inscripcion.horasMatriculadas)
             {
                 estado = "Incompleto";
             }
