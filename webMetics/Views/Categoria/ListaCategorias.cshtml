@@ -11,7 +11,7 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
                     <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
