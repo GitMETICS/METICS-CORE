@@ -331,7 +331,7 @@ public class InscripcionHandler : BaseDeDatosHandler
         }
         else
         {
-            if (inscripcion.horasAprobadas < inscripcion.horasMatriculadas)
+            if (inscripcion.horasAprobadas < inscripcion.horasMatriculadas && inscripcion.horasAprobadas > 0)
             {
                 estado = "Incompleto";
             }
