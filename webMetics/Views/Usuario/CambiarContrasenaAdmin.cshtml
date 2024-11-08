@@ -55,7 +55,8 @@
             @using (Html.BeginForm("CambiarContrasenaAdmin", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title - @ViewBag.NombreCompleto</h1>
+                <h1>@ViewBag.Title</h1>
+                <h2>@ViewBag.NombreCompleto</h2>
                 <hr />
 
                 if (ViewBag.ErrorMessage != null)
@@ -72,7 +73,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
-
+                
                 <div class="row mb-1">
                     <div class="col">
                         <div class="container">
@@ -93,6 +94,16 @@
                                         <i id="toggleIcon2" class="fas fa-eye"></i>
                                     </button>
                                     @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col">
+                                    <div class="form-check d-flex justify-content-start align-items-center">
+                                        @Html.CheckBoxFor(model => model.enviarPorCorreo, new { @class = "form-check-input" })
+                                        <label class="form-check-label ms-2" style="font-size: 18px">
+                                            Enviar contraseña por correo
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

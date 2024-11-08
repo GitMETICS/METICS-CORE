@@ -392,6 +392,7 @@ namespace webMetics.Controllers
                 // Validate the user ID to be changed
                 if (!string.IsNullOrEmpty(idUsuario))
                 {
+                    ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
                     ViewBag.NombreCompleto = nombreCompleto;
 
                     NewLoginModel usuario = new NewLoginModel() { id = idUsuario };
@@ -433,6 +434,9 @@ namespace webMetics.Controllers
                 {
                     // Admin resets the user's password without needing the old one
                     accesoAUsuario.EditarUsuario(usuario.id, 0, usuario.nuevaContrasena);
+
+                    if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
+
                     TempData["successMessage"] = "La contraseña del usuario se cambió correctamente.";
                 }
                 else
@@ -453,6 +457,17 @@ namespace webMetics.Controllers
         {
             string subject = "Registro en el SISTEMA DE INSCRIPCIONES METICS";
             string message = $"<p>Se ha registrado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
+
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
+        }
+
+        private async Task<IActionResult> EnviarContrasenaAdmin(string correo, string contrasena)
+        {
+            string subject = "Cambio de contraseña en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha cambiado la contraseña del usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
                 $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
                 $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 

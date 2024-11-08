@@ -130,6 +130,9 @@ namespace webMetics.Models
         [Required(ErrorMessage = "Es necesario confirmar la nueva contraseña.")]
         [Display(Name = "Confirmar nueva contraseña")]
         public string confirmarContrasena { get; set; }
+
+        [Display(Name = "Enviar contraseña por correo")]
+        public bool enviarPorCorreo { get; set; }
     }
 }
 
