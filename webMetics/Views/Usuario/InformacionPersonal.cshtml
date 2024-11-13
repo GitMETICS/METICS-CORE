@@ -191,20 +191,22 @@
                         <div class="d-flex justify-content-start mt-4">
                             @foreach (var inscripcion in ViewBag.Inscripciones)
                             {
-                                <div class="card me-2" style="height: 305px;">
-                                    @if (inscripcion.estado == "Aprobado")
-                                    {
-                                        var medalName = $"Medalla_ {inscripcion.nombreGrupo}.png";
-                                        var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", $"*.Medalla_ {inscripcion.nombreGrupo}.png").FirstOrDefault();
-
-                                        if (medalPath != null)
+                                
+                                @if (inscripcion.estado == "Aprobado")
+                                {
+                                    <div class="card me-2" style="height: 305px;">
+                                        @{
+                                            var medalName = $"Medalla_ {inscripcion.nombreGrupo}.png";
+                                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", $"*.Medalla_ {inscripcion.nombreGrupo}.png").FirstOrDefault();
+                                        }
+                                        @if (medalPath != null)
                                         {
                                             var normalizedMedalPath = medalPath.Replace('\\', '/');
                                             var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
                                             <img class="card-img" src="@relativeMedalPath" alt="Medalla de @inscripcion.nombreGrupo" style="height: 300px;" />
                                         }
-                                    }
-                                </div>
+                                    </div>
+                                }
                             }
                         </div>
 

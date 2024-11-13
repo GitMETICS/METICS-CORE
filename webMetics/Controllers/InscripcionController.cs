@@ -135,6 +135,7 @@ namespace webMetics.Controllers
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
                 }

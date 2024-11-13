@@ -804,15 +804,11 @@ namespace webMetics.Controllers
                 ViewBag.Id = GetId();
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-
-                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
-                int nuevoTotalHorasAprobadas = participante.horasAprobadas + horasAprobadas;
-
                 InscripcionModel inscripcion;
 
                 if (grupo != null)
                 {
-                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo.Value, idParticipante);
+                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
                 }
                 else
                 {
@@ -827,6 +823,7 @@ namespace webMetics.Controllers
                     inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
 
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
 
                     TempData["successMessage"] = "Las horas fueron aprobadas.";
