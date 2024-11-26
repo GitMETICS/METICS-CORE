@@ -1,6 +1,5 @@
 ﻿@using webMetics.Controllers
 @{
-
     ViewBag.Title = "Inscripciones";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
@@ -36,7 +35,7 @@
             </div>
         }
 
-        <div class="table-responsive">
+        <div class="table-responsive" style="padding-bottom: 220px;">
             <div>
                 <div class="mb-3" style="width: 70%;">
                     @using (Html.BeginForm("SubirArchivoExcelParticipantesPorModulos", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -122,8 +121,6 @@
                 </table>
             }
         </div>
-        <br />
-        <br />
     </div>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
@@ -144,7 +141,7 @@
                             <input type="hidden" id="nombreGrupo" name="nombreGrupo">
                             <input type="hidden" id="numeroGrupo" name="numeroGrupo">
                             <input type="hidden" id="idParticipante" name="idParticipante">
-                            
+
                             <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
