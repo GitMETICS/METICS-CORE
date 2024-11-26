@@ -52,13 +52,15 @@ namespace webMetics.Controllers
 
             try
             {
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
                 ViewBag.IdGrupo = idGrupo;
+                ViewBag.NombreGrupo = grupo.nombre;
+                ViewBag.NumeroGrupo = grupo.numeroGrupo;
+
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
-
-                ViewBag.Title = "Lista de participantes";
-                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-                ViewBag.NombreGrupo = grupo.nombre;
+                
 
                 if (TempData["errorMessage"] != null)
                 {
@@ -333,8 +335,19 @@ namespace webMetics.Controllers
 
             if (grupo != null && participante != null)
             {
-                // Insertar la inscripción sin enviar el comprobante por correo electrónico
-                bool exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
+                bool exito = false;
+                InscripcionModel inscripcionEncontrada = accesoAInscripcion.ObtenerInscripcion(inscripcion);
+                if (inscripcionEncontrada != null)
+                {
+                    // Si existe la inscripción, editarla en lugar de volverla a agregar
+                    inscripcion.idInscripcion = inscripcionEncontrada.idInscripcion;
+                    exito = accesoAInscripcion.EditarInscripcion(inscripcion);
+                }
+                else
+                {
+                    // Insertar la inscripción sin enviar el comprobante por correo electrónico
+                    exito = accesoAInscripcion.InsertarInscripcion(inscripcion);
+                }
 
                 if (exito)
                 {

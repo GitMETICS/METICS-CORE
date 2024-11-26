@@ -135,9 +135,9 @@
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
                                 </td>
                                 @if (ViewBag.Role == 1)
-                                {
+                                {                                    
                                     <td>
-                                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@participante.idParticipante', '@ViewBag.IdGrupo')">
+                                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
@@ -171,8 +171,10 @@
                         @Html.AntiForgeryToken()
 
                         <div class="modal-footer">
+                            <input type="hidden" id="nombreGrupo" name="nombreGrupo">
+                            <input type="hidden" id="numeroGrupo" name="numeroGrupo">
                             <input type="hidden" id="idParticipante" name="idParticipante">
-                            <input type="hidden" id="idGrupo" name="idGrupo">
+
                             <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
@@ -191,8 +193,9 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminarInscripcion(idParticipante, idGrupo) {
+    function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
+        document.getElementById("nombreGrupo").value = nombreGrupo;
+        document.getElementById("numeroGrupo").value = numeroGrupo;
         document.getElementById("idParticipante").value = idParticipante;
-        document.getElementById("idGrupo").value = idGrupo;
     }
 </script>

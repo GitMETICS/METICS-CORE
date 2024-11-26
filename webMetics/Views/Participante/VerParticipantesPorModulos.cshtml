@@ -92,6 +92,7 @@
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
+                            <th class="text-center" scope="col" style="width:3.33%;"></th>
                         </tr>
                     </thead>
 
@@ -109,6 +110,11 @@
                                 <td class="text-center">@inscripcion.horasAprobadas</td>
                                 <td>
                                     @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
+                                </td>
+                                <td>
+                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         }
@@ -129,16 +135,19 @@
                 </div>
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar la inscripción de este participante?
-
+                    <br />
                     @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
                     {
                         @Html.AntiForgeryToken()
 
                         <div class="modal-footer">
+                            <input type="hidden" id="nombreGrupo" name="nombreGrupo">
+                            <input type="hidden" id="numeroGrupo" name="numeroGrupo">
                             <input type="hidden" id="idParticipante" name="idParticipante">
-                            <input type="hidden" id="idGrupo" name="idGrupo">
+                            
                             <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
                         </div>
                     }
                 </div>
@@ -154,9 +163,10 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminar(idParticipante, idGrupo) {
+    function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
+        document.getElementById("nombreGrupo").value = nombreGrupo;
+        document.getElementById("numeroGrupo").value = numeroGrupo;
         document.getElementById("idParticipante").value = idParticipante;
-        document.getElementById("idGrupo").value = idGrupo;
     }
 </script>
 

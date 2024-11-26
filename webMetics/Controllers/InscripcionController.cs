@@ -120,18 +120,17 @@ namespace webMetics.Controllers
         }
 
         /* Método para que un administrador elimine una inscripción de un usuario */
-        public ActionResult EliminarInscripcion(string idParticipante, int idGrupo)
+        public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             try
             {
-                bool exito = accesoAInscripcion.EliminarInscripcion(idGrupo, idParticipante);
+                bool exito = accesoAInscripcion.EliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante);
 
                 if (exito)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
@@ -156,10 +155,10 @@ namespace webMetics.Controllers
                 return Redirect(refererUrl);
             }
 
-            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
-        // Método para que un usuario se desinscriba de un grupo
+        // TODO: Eliminar esto porque está repetido
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
             try
@@ -167,14 +166,15 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
-                bool exito = accesoAInscripcion.EliminarInscripcion(idGrupo, idParticipante);
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                bool exito = accesoAInscripcion.EliminarInscripcion(grupo.nombre, grupo.numeroGrupo, idParticipante);
 
                 if (exito)
                 {
-                    GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                     ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
                 }
                 else
                 {

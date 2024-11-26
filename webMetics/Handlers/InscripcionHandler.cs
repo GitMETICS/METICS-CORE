@@ -12,6 +12,17 @@ public class InscripcionHandler : BaseDeDatosHandler
         accesoAGrupo = new GrupoHandler(environment, configuration);
     }
 
+    public InscripcionModel ObtenerInscripcion(InscripcionModel inscripcion)
+    {
+        List<InscripcionModel> inscripciones = ObtenerInscripciones();
+        InscripcionModel inscripcionEncontrada = inscripciones.Find(
+            inscripcionModel => inscripcionModel.nombreGrupo == inscripcion.nombreGrupo 
+            && inscripcionModel.numeroGrupo == inscripcion.numeroGrupo
+            && inscripcionModel.idParticipante == inscripcion.idParticipante);
+        
+        return inscripcionEncontrada;
+    }
+
     public List<InscripcionModel> ObtenerInscripciones()
     {
         List<InscripcionModel> inscripciones = new List<InscripcionModel>();
@@ -221,15 +232,16 @@ public class InscripcionHandler : BaseDeDatosHandler
         return exito;
     }
 
-    public bool EliminarInscripcion(int idGrupo, string idParticipante)
+    public bool EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
     {
-        string consulta = "DELETE FROM inscripcion WHERE id_grupo_FK = @idGrupo AND id_participante_FK = @idParticipante;";
+        string consulta = "DELETE FROM inscripcion WHERE nombre_grupo = @nombreGrupo AND numero_grupo = @numeroGrupo AND id_participante_FK = @idParticipante;";
 
         ConexionMetics.Open();
 
         SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
 
-        comandoConsulta.Parameters.AddWithValue("@idGrupo", idGrupo);
+        comandoConsulta.Parameters.AddWithValue("@nombreGrupo", nombreGrupo);
+        comandoConsulta.Parameters.AddWithValue("@numeroGrupo", numeroGrupo);
         comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
 
         bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
