@@ -97,12 +97,14 @@
                                 </div>
                             </div>
                             <div class="row mt-3">
-                                <div class="col">
-                                    <div class="form-check d-flex justify-content-start align-items-center">
-                                        @Html.CheckBoxFor(model => model.enviarPorCorreo, new { @class = "form-check-input" })
-                                        <label class="form-check-label ms-2" style="font-size: 18px">
+                                <div class="container">
+                                    <div class="form-group mt-1 d-flex justify-content-between w-25 p-3 bg-light rounded">
+                                        <label class="form-check-label">
                                             Enviar contraseña por correo
                                         </label>
+                                        <div class="form-check form-switch">
+                                            @Html.CheckBoxFor(model => model.enviarPorCorreo, new { @class = "form-check-input" })
+                                        </div>
                                     </div>
                                 </div>
                             </div>
