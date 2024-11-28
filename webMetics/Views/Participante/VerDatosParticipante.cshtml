@@ -36,17 +36,61 @@
         }
 
         <div class="table-responsive">
-
             @if (ViewBag.Participante == null)
             {
                 <h5 class="text-center">Los datos de este participante no están disponibles.</h5>
             }
             else
             {
+                <!-- Medallas -->
+                @if (ViewBag.Medallas != null)
+                {
+                    <br />
+                    <h3 class="">Medallas</h3>
+
+                    <!-- Agregar medallas (admin) -->
+                    if (ViewBag.Role == 1)
+                    {
+                        <br />
+                        <div class="mb-4 bg-light p-3 rounded w-50">
+                            <div class="d-flex align-text-center">
+                                <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                                <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> menor a 5 MB.</small>
+                            </div>
+                            <div class="form-group mt-3">
+                                <form method="post" enctype="multipart/form-data" asp-controller="Participante" asp-action="SubirMedalla">
+                                    <div class="d-flex justify-content-between">
+                                        <input name="idParticipante" value="@ViewBag.Participante.idParticipante" hidden />
+                                        <input type="file" name="imageFile" class="form-control" />
+                                        <button type="submit" class="btn btn-secondary ms-2 w-50"><i class="bi bi-plus-lg me-2"></i>Agregar medalla</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-start mt-4">
+                        @foreach (string nombreMedalla in ViewBag.Medallas)
+                        {
+                            <div class="card me-2" style="height: 305px;">
+                                @{
+                                    var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                                }
+                                @if (medalPath != null)
+                                {
+                                    var normalizedMedalPath = medalPath.Replace('\\', '/');
+                                    var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                                    <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                
                 var nombreCompleto = ViewBag.Participante.nombre;
                 nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
-                <table class="table table-striped">
+                <table class="table table-striped mt-3">
                     <thead>
                         <tr>
                             <th scope="col">Nombre Completo</th>

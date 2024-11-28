@@ -780,6 +780,7 @@ namespace webMetics.Controllers
 
             ViewBag.Participante = participante;
             ViewBag.Inscripciones = inscripciones;
+            ViewBag.Medallas = accesoAParticipante.ObtenerMedallas(idParticipante);
 
             if (GetRole() == 2)
             {
@@ -801,6 +802,31 @@ namespace webMetics.Controllers
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirMedalla(string idParticipante, IFormFile imageFile)
+        {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                // Guardar la ruta de la medalla en la base de datos
+                accesoAParticipante.AgregarMedalla(idParticipante, imageFile.FileName);
+
+                TempData["successMessage"] = "Se subió la medalla.";
+            }
+            else
+            {
+                TempData["errorMessage"] = "Elija una imagen válida.";
+            }
+
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante } );
         }
 
         [HttpPost]

@@ -187,28 +187,27 @@
                     @if (ViewBag.Role == 0)
                     {
                         <!-- Medallas -->
-                        <br />
-                        <div class="d-flex justify-content-start mt-4">
-                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                            {
-                                
-                                @if (inscripcion.estado == "Aprobado")
+                        @if (ViewBag.Medallas != null)
+                        {
+                            <br />
+                            <h3 class="">Medallas</h3>
+                            <div class="d-flex justify-content-start mt-4">
+                                @foreach (string nombreMedalla in ViewBag.Medallas)
                                 {
                                     <div class="card me-2" style="height: 305px;">
                                         @{
-                                            var medalName = $"Medalla_ {inscripcion.nombreGrupo}.png";
-                                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", $"*.Medalla_ {inscripcion.nombreGrupo}.png").FirstOrDefault();
+                                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
                                         }
                                         @if (medalPath != null)
                                         {
                                             var normalizedMedalPath = medalPath.Replace('\\', '/');
                                             var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                                            <img class="card-img" src="@relativeMedalPath" alt="Medalla de @inscripcion.nombreGrupo" style="height: 300px;" />
+                                            <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
                                         }
                                     </div>
                                 }
-                            }
-                        </div>
+                            </div>
+                        }
 
                         <!-- Módulos Participante -->
                         <br />

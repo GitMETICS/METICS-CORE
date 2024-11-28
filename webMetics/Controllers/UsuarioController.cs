@@ -269,6 +269,7 @@ namespace webMetics.Controllers
                     ViewBag.Participante = participante;
                     ViewBag.Inscripciones = inscripciones;
                     ViewBag.ListaGrupos = gruposParticipante;
+                    ViewBag.Medallas = accesoAParticipante.ObtenerMedallas(idUsuario);
 
                     break;
 

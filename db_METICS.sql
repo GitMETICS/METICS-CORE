@@ -72,6 +72,12 @@ CREATE TABLE participante (
         ON UPDATE CASCADE
 );
 
+--Creación de la tabla de medallas
+CREATE TABLE medallas (
+	id_participante_FK NVARCHAR(64) NOT NULL,
+	nombre_medalla NVARCHAR(512) NOT NULL,
+);
+
 --Creación de la tabla categoria
 CREATE TABLE categoria (
 	id_categoria_PK INT IDENTITY(1,1) PRIMARY KEY,

@@ -445,6 +445,50 @@ namespace webMetics.Handlers
             return exito;
         }
 
+        public List<string> ObtenerMedallas(string idParticipante)
+        {
+            string consulta = "SELECT nombre_medalla FROM medallas WHERE id_participante_FK = @idParticipante;";
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+            List<string> listaMedallas = new List<string>();
+
+            // Iterar sobre las filas de resultado y agregar la información del participante a la lista
+            foreach (DataRow fila in tablaResultado.Rows)
+            {
+                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
+            }
+
+            // Si la lista está vacía, devolver null
+            if (listaMedallas.Count == 0)
+            {
+                return null;
+            }
+
+            return listaMedallas;
+        }
+
+        public bool AgregarMedalla(string idParticipante, string fileName)
+        {
+            string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         // Método para leer un archivo JSON y devolver su contenido como una cadena
         public string ReadJsonFile(string filePath)
         {
