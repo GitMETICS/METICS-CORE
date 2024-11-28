@@ -23,6 +23,17 @@ public class InscripcionHandler : BaseDeDatosHandler
         return inscripcionEncontrada;
     }
 
+    public async Task<InscripcionModel> ObtenerInscripcionAsync(InscripcionModel inscripcion)
+    {
+        List<InscripcionModel> inscripciones = await ObtenerInscripcionesAsync(); // Assuming ObtenerInscripciones is also async
+        InscripcionModel inscripcionEncontrada = inscripciones.Find(
+            inscripcionModel => inscripcionModel.nombreGrupo == inscripcion.nombreGrupo
+                                 && inscripcionModel.numeroGrupo == inscripcion.numeroGrupo
+                                 && inscripcionModel.idParticipante == inscripcion.idParticipante);
+
+        return inscripcionEncontrada;
+    }
+
     public List<InscripcionModel> ObtenerInscripciones()
     {
         List<InscripcionModel> inscripciones = new List<InscripcionModel>();
@@ -51,6 +62,51 @@ public class InscripcionHandler : BaseDeDatosHandler
             inscripciones.Add(inscripcion);
             inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
             EditarInscripcion(inscripcion);
+        }
+
+        return inscripciones;
+    }
+
+    public async Task<List<InscripcionModel>> ObtenerInscripcionesAsync()
+    {
+        List<InscripcionModel> inscripciones = new List<InscripcionModel>();
+        string consulta = "SELECT * FROM inscripcion;";
+
+        using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+        {
+            try
+            {
+                await ConexionMetics.OpenAsync();
+
+                using (SqlDataReader reader = await comandoConsulta.ExecuteReaderAsync())
+                {
+                    InscripcionModel inscripcion = new InscripcionModel
+                    {
+                        idInscripcion = reader.GetInt32(reader.GetOrdinal("id_inscripcion_PK")),
+                        idParticipante = reader.GetString(reader.GetOrdinal("id_participante_FK")),
+                        idGrupo = reader.GetInt32(reader.GetOrdinal("id_grupo_FK")),
+                        numeroGrupo = reader.GetInt32(reader.GetOrdinal("numero_grupo")),
+                        nombreGrupo = reader.GetString(reader.GetOrdinal("nombre_grupo")),
+                        estado = reader.GetString(reader.GetOrdinal("estado")),
+                        observaciones = !reader.IsDBNull(reader.GetOrdinal("observaciones")) ? reader.GetString(reader.GetOrdinal("observaciones")) : null,
+                        horasAprobadas = reader.GetInt32(reader.GetOrdinal("horas_aprobadas")),
+                        horasMatriculadas = reader.GetInt32(reader.GetOrdinal("horas_matriculadas")),
+                        calificacion = reader.GetDouble(reader.GetOrdinal("calificacion"))
+                    };
+
+                    inscripciones.Add(inscripcion);
+                    inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
+                    await EditarInscripcionAsync(inscripcion);
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
         }
 
         return inscripciones;
@@ -205,6 +261,35 @@ public class InscripcionHandler : BaseDeDatosHandler
         return exito;
     }
 
+    public async Task<bool> InsertarInscripcionAsync(InscripcionModel inscripcion)
+    {
+        string consulta = "INSERT INTO inscripcion (id_grupo_FK, id_participante_FK, numero_grupo, nombre_grupo, estado, observaciones, horas_aprobadas, horas_matriculadas)" +
+                          "VALUES (@idGrupo, @idParticipante, @numeroGrupo, @nombreGrupo, @estado, @observaciones, @horasAprobadas, @horasMatriculadas);";
+
+        using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+        {
+            comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
+            comandoConsulta.Parameters.AddWithValue("@numeroGrupo", inscripcion.numeroGrupo);
+            comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
+            comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
+            comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
+            comandoConsulta.Parameters.AddWithValue("@estado", inscripcion.estado);
+            comandoConsulta.Parameters.AddWithValue("@observaciones", "");
+
+            try
+            {
+                await ConexionMetics.OpenAsync(); // Asynchronously open the connection
+                int rowsAffected = await comandoConsulta.ExecuteNonQueryAsync(); // Asynchronously execute the command
+                return rowsAffected >= 1;
+            }
+            finally
+            {
+                ConexionMetics.Close(); // Ensure the connection is closed even if an exception occurs
+            }
+        }
+    }
+
     public bool EditarInscripcion(InscripcionModel inscripcion)
     {
         string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, numero_grupo = @numeroGrupo, nombre_grupo = @nombreGrupo, " +
@@ -230,6 +315,38 @@ public class InscripcionHandler : BaseDeDatosHandler
         ConexionMetics.Close();
 
         return exito;
+    }
+
+    public async Task<bool> EditarInscripcionAsync(InscripcionModel inscripcion)
+    {
+        string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, numero_grupo = @numeroGrupo, nombre_grupo = @nombreGrupo, " +
+                          "id_participante_FK = @idParticipante, estado = @estado, observaciones = @observaciones, " +
+                          "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas " +
+                          "WHERE id_inscripcion_PK = @idInscripcion";
+
+        using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+        {
+            comandoConsulta.Parameters.AddWithValue("@idInscripcion", inscripcion.idInscripcion);
+            comandoConsulta.Parameters.AddWithValue("@idGrupo", inscripcion.idGrupo);
+            comandoConsulta.Parameters.AddWithValue("@numeroGrupo", inscripcion.numeroGrupo);
+            comandoConsulta.Parameters.AddWithValue("@nombreGrupo", inscripcion.nombreGrupo);
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", inscripcion.idParticipante);
+            comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
+            comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
+            comandoConsulta.Parameters.AddWithValue("@estado", inscripcion.estado);
+            comandoConsulta.Parameters.AddWithValue("@observaciones", "");
+
+            try
+            {
+                await ConexionMetics.OpenAsync();
+                int rowsAffected = await comandoConsulta.ExecuteNonQueryAsync();
+                return rowsAffected >= 1;
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+        }
     }
 
     public bool EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)

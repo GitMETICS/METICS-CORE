@@ -314,16 +314,16 @@ namespace webMetics.Controllers
 
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
-                            IngresarInscripcion(inscripcion, grupo);
+                            await IngresarInscripcionAsync(inscripcion, grupo);
                         }
                     }
                 }
 
                 TempData["successMessage"] = "El archivo fue subido éxitosamente.";
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["errorMessage"] = "Error al cargar los datos.";
+                TempData["errorMessage"] = "Error al cargar los datos: " + ex;
             }
 
             return RedirectToAction("VerParticipantesPorModulos");
@@ -353,6 +353,33 @@ namespace webMetics.Controllers
                 {
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
+                }
+            }
+        }
+
+        private async Task IngresarInscripcionAsync(InscripcionModel inscripcion, GrupoModel grupo) // Make method async
+        {
+            ParticipanteModel participante = await accesoAParticipante.ObtenerParticipanteAsync(inscripcion.idParticipante); // Use async method
+
+            if (grupo != null && participante != null)
+            {
+                bool exito = false;
+                InscripcionModel inscripcionEncontrada = await accesoAInscripcion.ObtenerInscripcionAsync(inscripcion); // Use async method
+                if (inscripcionEncontrada != null)
+                {
+                    inscripcion.idInscripcion = inscripcionEncontrada.idInscripcion;
+                    exito = await accesoAInscripcion.EditarInscripcionAsync(inscripcion); // Use async method
+                }
+                else
+                {
+                    exito = await accesoAInscripcion.InsertarInscripcionAsync(inscripcion); // Use async method
+                }
+
+                if (exito)
+                {
+                    // Potentially combine these into a single update operation
+                    await accesoAParticipante.ActualizarHorasMatriculadasParticipanteAsync(participante.idParticipante); // Use async method
+                    await accesoAParticipante.ActualizarHorasAprobadasParticipanteAsync(participante.idParticipante); // Use async method
                 }
             }
         }

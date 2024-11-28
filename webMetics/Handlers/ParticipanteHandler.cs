@@ -187,7 +187,61 @@ namespace webMetics.Handlers
             return participante;
         }
 
+        // Método async para obtener un participante específico según su ID
+        public async Task<ParticipanteModel> ObtenerParticipanteAsync(string idParticipante)
+        {
+            ParticipanteModel participante = null;
 
+            using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", idParticipante);
+
+                try
+                {
+                    await ConexionMetics.OpenAsync();
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            participante = new ParticipanteModel
+                            {
+                                idParticipante = idParticipante,
+                                nombre = reader["nombre"].ToString(),
+                                primerApellido = reader["apellido_1"].ToString(),
+                                segundoApellido = reader["apellido_2"].ToString(),
+                                tipoIdentificacion = reader["tipo_identificacion"].ToString(),
+                                numeroIdentificacion = reader["numero_identificacion"].ToString(),
+                                correo = reader["correo"].ToString(),
+                                tipoParticipante = reader["tipo_participante"].ToString(),
+                                condicion = reader["condicion"].ToString(),
+                                telefono = reader["telefono"].ToString(),
+                                area = reader["area"].ToString(),
+                                departamento = reader["departamento"].ToString(),
+                                unidadAcademica = reader["unidad_academica"].ToString(),
+                                sede = reader["sede"].ToString(),
+                                horasAprobadas = reader.GetInt32(reader.GetOrdinal("total_horas_aprobadas")),
+                                horasMatriculadas = reader.GetInt32(reader.GetOrdinal("total_horas_matriculadas")),
+                                correoNotificacionEnviado = reader.GetInt32(reader.GetOrdinal("correo_notificacion_enviado")),
+                                gruposInscritos = new List<GrupoModel>()
+                            };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al obtener el participante: {ex.Message}");
+                    participante = null;
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return participante;
+        }
 
 
 
@@ -275,6 +329,30 @@ namespace webMetics.Handlers
             return exito;
         }
 
+        // Método async para editar las horas matriculadas de un participante existente en la base de datos
+        public async Task<bool> ActualizarHorasMatriculadasParticipanteAsync(string idParticipante)
+        {
+            string consulta = "UPDATE participante SET total_horas_matriculadas = @horasMatriculadas " +
+                              "WHERE id_participante_PK = @idParticipante";
+
+            using (SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics))
+            {
+                comandoParaConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                comandoParaConsulta.Parameters.AddWithValue("@horasMatriculadas", CalcularHorasMatriculadasParticipante(idParticipante));
+
+                try
+                {
+                    await ConexionMetics.OpenAsync(); // Asynchronously open the connection
+                    int rowsAffected = await comandoParaConsulta.ExecuteNonQueryAsync(); // Asynchronously execute the command
+                    return rowsAffected >= 1;
+                }
+                finally
+                {
+                    ConexionMetics.Close(); // Ensure the connection is closed even if an exception occurs
+                }
+            }
+        }
+
         // Método para editar las horas aprobadas de un participante existente en la base de datos
         public bool ActualizarHorasAprobadasParticipante(string idParticipante)
         {
@@ -293,6 +371,30 @@ namespace webMetics.Handlers
             ConexionMetics.Close();
 
             return exito;
+        }
+
+        // Método async para editar las horas aprobadas de un participante existente en la base de datos
+        public async Task<bool> ActualizarHorasAprobadasParticipanteAsync(string idParticipante)
+        {
+            string consulta = "UPDATE participante SET total_horas_aprobadas = @horasAprobadas " +
+                              "WHERE id_participante_PK = @idParticipante";
+
+            using (SqlCommand comandoParaConsulta = new SqlCommand(consulta, ConexionMetics))
+            {
+                comandoParaConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                comandoParaConsulta.Parameters.AddWithValue("@horasAprobadas", CalcularHorasAprobadasParticipante(idParticipante));
+
+                try
+                {
+                    await ConexionMetics.OpenAsync(); // Asynchronously open the connection
+                    int rowsAffected = await comandoParaConsulta.ExecuteNonQueryAsync(); // Asynchronously execute the command
+                    return rowsAffected >= 1;
+                }
+                finally
+                {
+                    ConexionMetics.Close(); // Ensure the connection is closed even if an exception occurs
+                }
+            }
         }
 
         // Método para obtener información detallada del participante a partir de una fila de datos
