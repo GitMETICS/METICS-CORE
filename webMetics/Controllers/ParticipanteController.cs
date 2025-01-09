@@ -159,10 +159,13 @@ namespace webMetics.Controllers
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
             }
 
@@ -193,13 +196,18 @@ namespace webMetics.Controllers
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
             }
+
 
             ViewBag.ListaInscripciones = inscripciones;
 
