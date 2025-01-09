@@ -1,0 +1,84 @@
+﻿@model webMetics.Models.InscripcionModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Formulario de Inscripción";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Role == 1 || ViewBag.Role == 2)
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+
+        @using (Html.BeginForm("FormularioInscripcion", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <h1>@ViewBag.Title</h1>
+            <hr />
+
+            if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.ErrorMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                    <span>@ViewBag.SuccessMessage</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="row mb-1">
+                <div class="col">
+                    <div class="container">
+                        <div class="form-group">
+                            <label style="font-size:22px">Correo institucional</label> <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(model => model.idParticipante, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                            @Html.ValidationMessageFor(model => model.idParticipante, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <label style="font-size:22px">Nombre del grupo</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(model => model.nombreGrupo, (SelectList)ViewBag.ListaNombresGrupos, "Seleccione un grupo...", new { @class = "form-control", id = "nombreGrupoDropdown" })
+                                @Html.ValidationMessageFor(model => model.nombreGrupo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col">
+                                <label style="font-size:22px">Número del grupo</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(model => model.numeroGrupo, (SelectList)ViewBag.ListaNumerosGrupos, "Seleccione un número de grupo...", new { @class = "form-control", id = "numeroGrupoDropdown" })
+                                @Html.ValidationMessageFor(model => model.numeroGrupo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center m-4">
+                        <div class="col-auto">
+                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
+                        </div>
+                        <div class="col-auto">
+                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>

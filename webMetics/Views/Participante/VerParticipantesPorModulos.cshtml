@@ -36,7 +36,8 @@
         }
 
         <div class="table-responsive" style="padding-bottom: 220px;">
-            <div>
+
+            <div class="d-flex justify-content-between">
                 <div class="mb-3" style="width: 70%;">
                     @using (Html.BeginForm("SubirArchivoExcelParticipantesPorModulos", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
@@ -57,6 +58,21 @@
                             <br />
                             @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantesPorModulos", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
                         </small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <div class="mx-1">
+                        @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Agregar", "FormularioInscripcion", "Inscripcion", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
                     </div>
                 </div>
             </div>

@@ -11,6 +11,8 @@ using iText.Kernel.Font;
 using iText.Kernel.Geom;
 using System.Text.RegularExpressions;
 using NPOI.SS.Formula.Functions;
+using MailKit.Search;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -49,6 +51,49 @@ namespace webMetics.Controllers
             ViewBag.InscritosEnGrupo = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
 
             return View();
+        }
+
+        public ActionResult FormularioInscripcion()
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            var grupos = accesoAGrupo.ObtenerListaGrupos();
+
+            ViewBag.ListaNombresGrupos = new SelectList(grupos, "nombre", "nombre");
+            ViewBag.ListaNumerosGrupos = new SelectList(grupos, "numeroGrupo", "numeroGrupo");
+
+            return View("FormularioInscripcion");
+        }
+
+        [HttpPost]
+        public ActionResult FormularioInscripcion(InscripcionModel inscripcion)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            if (ModelState.IsValid)
+            {
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupoPorNombre(inscripcion.nombreGrupo, inscripcion.numeroGrupo);
+                inscripcion.idGrupo = grupo.idGrupo;
+
+                try
+                {
+                    Inscribir(inscripcion.idGrupo, inscripcion.idParticipante);
+
+                    TempData["successMessage"] = "Participante inscrito.";
+                }
+                catch
+                {
+                    TempData["errorMessage"] = "Error al inscribir al participante.";
+                }
+
+                return RedirectToAction("VerParticipantesPorModulos", "Participante");
+            }
+            else
+            {
+                return View("FormularioInscripcion", inscripcion);
+            }
         }
 
         /* Método para inscribir a un usuario a un grupo */
@@ -249,11 +294,39 @@ namespace webMetics.Controllers
         }
 
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
-        public ActionResult ExportarParticipantesPDF(int idGrupo)
+        public ActionResult ExportarParticipantesPDF(int idGrupo, string? searchTerm)
         {
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes.docx");
             PdfWriter writer = new PdfWriter(filePath);
@@ -339,12 +412,40 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
-        public ActionResult ExportarParticipantesWord(int idGrupo)
+        public ActionResult ExportarParticipantesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             var fileName = "Lista_de_Participantes_" + grupo.nombre + ".docx";
 
@@ -422,12 +523,40 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
-        public ActionResult ExportarParticipantesExcel(int idGrupo)
+        public ActionResult ExportarParticipantesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             XSSFWorkbook workbook = new XSSFWorkbook();
 

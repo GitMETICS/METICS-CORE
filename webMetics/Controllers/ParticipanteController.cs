@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using NPOI.SS.Formula.Functions;
 using System.Globalization;
 using System.Text;
+using MailKit.Search;
 
 
 namespace webMetics.Controllers
@@ -434,11 +435,25 @@ namespace webMetics.Controllers
             return Ok();
         }
 
-        public ActionResult ExportarParticipantesPDF()
+        public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             // Crear el archivo PDF
             var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes_Módulos.pdf");
@@ -524,11 +539,25 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
-        public ActionResult ExportarParticipantesWord()
+        public ActionResult ExportarParticipantesWord(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             var fileName = "Lista_de_Participantes_Módulos.docx";
 
@@ -626,11 +655,25 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
-        public ActionResult ExportarParticipantesExcel()
+        public ActionResult ExportarParticipantesExcel(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
