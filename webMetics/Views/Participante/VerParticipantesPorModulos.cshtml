@@ -63,13 +63,13 @@
 
                 <div class="d-flex justify-content-end">
                     <div class="mx-1">
-                        @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   PDF", "ExportarTodosParticipantesPDF", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
-                        @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   Excel", "ExportarTodosParticipantesExcel", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
-                        @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   Word", "ExportarTodosParticipantesWord", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
                         @Html.ActionLink("   Agregar", "FormularioInscripcion", "Inscripcion", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
