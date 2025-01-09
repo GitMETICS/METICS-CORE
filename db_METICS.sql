@@ -38,8 +38,8 @@ CREATE TABLE asesor (
     tipo_identificacion NVARCHAR(16),
     numero_identificacion NVARCHAR(32),
     correo NVARCHAR(64) NOT NULL,
-	descripcion NVARCHAR(256),
-    telefono NVARCHAR(15),
+	descripcion NVARCHAR(512),
+    telefono NVARCHAR(64),
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
         ON DELETE CASCADE
@@ -59,10 +59,10 @@ CREATE TABLE participante (
 	tipo_participante NVARCHAR(64),
     condicion NVARCHAR(64),
 	telefono NVARCHAR(64),
-    area NVARCHAR(64) NOT NULL,
-    departamento NVARCHAR(64) NOT NULL,
-    unidad_academica NVARCHAR(64) NOT NULL,
-    sede NVARCHAR(64),
+    area NVARCHAR(512) NOT NULL,
+    departamento NVARCHAR(512) NOT NULL,
+    unidad_academica NVARCHAR(512) NOT NULL,
+    sede NVARCHAR(512),
     total_horas_matriculadas INT DEFAULT 0,
     total_horas_aprobadas INT DEFAULT 0,
 	correo_notificacion_enviado INT DEFAULT 0,
@@ -312,10 +312,10 @@ CREATE OR ALTER PROCEDURE InsertAsesor
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
-    @descripcion NVARCHAR(256) = '',
+    @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(64) = '',
-	@sede NVARCHAR(64) = ''
+	@unidadAcademica NVARCHAR(512) = '',
+	@sede NVARCHAR(512) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -359,9 +359,9 @@ CREATE OR ALTER PROCEDURE UpdateAsesor
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
-    @descripcion NVARCHAR(256) = '',
+    @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(64) = '',
+	@unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(64) = ''
 AS
 BEGIN
@@ -420,10 +420,10 @@ CREATE OR ALTER PROCEDURE InsertParticipante
 	@tipoParticipante NVARCHAR(64) = '',
     @condicion NVARCHAR(64) = '',
     @telefono NVARCHAR(64) = '',
-    @area NVARCHAR(64) = '',
-    @departamento NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(64) = '',
-	@sede NVARCHAR(64) = '',
+    @area NVARCHAR(512) = '',
+    @departamento NVARCHAR(512) = '',
+    @unidadAcademica NVARCHAR(512) = '',
+    @sede NVARCHAR(512) = '',
 	@horasMatriculadas INT = 0,
 	@horasAprobadas INT = 0
 AS
@@ -486,10 +486,10 @@ CREATE OR ALTER PROCEDURE UpdateParticipante
     @tipoParticipante NVARCHAR(64) = '',
     @condicion NVARCHAR(64) = '',
     @telefono NVARCHAR(64) = '',
-    @area NVARCHAR(64) = '',
-    @departamento NVARCHAR(64) = '',
-    @unidadAcademica NVARCHAR(64) = '',
-    @sede NVARCHAR(64) = '',
+    @area NVARCHAR(512) = '',
+    @departamento NVARCHAR(512) = '',
+    @unidadAcademica NVARCHAR(512) = '',
+    @sede NVARCHAR(512) = '',
     @horasMatriculadas INT = 0,
     @horasAprobadas INT = 0
 AS
