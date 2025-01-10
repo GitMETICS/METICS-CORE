@@ -88,7 +88,7 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "Error al inscribir al participante.";
                 }
 
-                return RedirectToAction("VerParticipantesPorModulos", "Participante");
+                return RedirectToAction("CargarParticipantesPorModulos", "Participante");
             }
             else
             {
@@ -182,6 +182,8 @@ namespace webMetics.Controllers
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
+                    return RedirectToAction("CargarParticipantesPorModulos", "Participante");
+
                 }
                 else
                 {

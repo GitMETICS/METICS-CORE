@@ -17,7 +17,8 @@ using NPOI.SS.Formula.Functions;
 using System.Globalization;
 using System.Text;
 using MailKit.Search;
-
+using Microsoft.Extensions.Caching.Memory;
+using System.ComponentModel;
 
 namespace webMetics.Controllers
 {
@@ -32,12 +33,15 @@ namespace webMetics.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
+        private readonly IMemoryCache _memoryCache;
 
-        public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
+        public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService, IMemoryCache memoryCache)
         {
             _environment = environment;
             _configuration = configuration;
             _emailService = emailService;
+            _memoryCache = memoryCache;
+
 
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
@@ -51,6 +55,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
+
             try
             {
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
@@ -61,7 +66,7 @@ namespace webMetics.Controllers
 
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
-                
+
 
                 if (TempData["errorMessage"] != null)
                 {
@@ -120,15 +125,29 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+            List<InscripcionModel> inscripciones;
+
+            // Check if the cache has the data
+            if (!_memoryCache.TryGetValue("Inscripciones", out inscripciones))
+            {
+                // If not in cache, get it from the database
+                inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+                // If data exists, cache it for 1 hour 
+                if (inscripciones != null)
+                {
+                    foreach (InscripcionModel inscripcion in inscripciones)
+                    {
+                        inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                    }
+
+                    // Cache the data for a period of time
+                    _memoryCache.Set("Inscripciones", inscripciones, TimeSpan.FromMinutes(30));
+                }
+            }
 
             if (inscripciones != null)
             {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
-                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
-                }
-
                 ViewBag.ListaInscripciones = inscripciones;
             }
             else
@@ -146,6 +165,43 @@ namespace webMetics.Controllers
             }
 
             return View();
+        }
+
+
+        public ActionResult CargarParticipantesPorModulos()
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                }
+
+                ViewBag.ListaInscripciones = inscripciones;
+
+                // Cache the data for a period of time
+                _memoryCache.Set("Inscripciones", inscripciones, TimeSpan.FromMinutes(30));
+
+            }
+            else
+            {
+                ViewBag.ListaInscripciones = null;
+            }
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+            return View("VerParticipantesPorModulos");
         }
 
         public IActionResult BuscarParticipantes(string searchTerm)
@@ -190,6 +246,10 @@ namespace webMetics.Controllers
                     inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
                 }
 
+
+                // Cache the data for a period of time
+                _memoryCache.Set("Inscripciones", inscripciones, TimeSpan.FromMinutes(30));
+
                 ViewBag.ListaInscripciones = inscripciones;
             }
 
@@ -232,7 +292,7 @@ namespace webMetics.Controllers
                     stream.Position = 0;
 
                     using var package = new ExcelPackage(stream);
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                     var participantes = new List<ParticipanteModel>();
@@ -298,7 +358,7 @@ namespace webMetics.Controllers
                     stream.Position = 0;
 
                     using var package = new ExcelPackage(stream);
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
@@ -412,9 +472,9 @@ namespace webMetics.Controllers
                     {
                         TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                     }
-                    
+
                 }
-                catch 
+                catch
                 {
                     TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                 }
@@ -904,7 +964,7 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Elija una imagen válida.";
             }
 
-            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante } );
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
         }
 
         [HttpPost]
@@ -978,7 +1038,7 @@ namespace webMetics.Controllers
                 {
                     TempData["errorMessage"] = "Error al agregar al participante.";
                 }
-                
+
                 return RedirectToAction("VerParticipantes");
             }
             else
@@ -1408,15 +1468,15 @@ namespace webMetics.Controllers
 
         // Método para enviar confirmación de registro al usuario
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
-            {
-                string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
-                string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                    $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
-                    $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
+        {
+            string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-                await _emailService.SendEmailAsync(correo, subject, message);
-                return Ok();
-            }
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
+        }
 
         private string GenerateRandomPassword()
         {
