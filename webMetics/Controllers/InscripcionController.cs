@@ -13,6 +13,9 @@ using System.Text.RegularExpressions;
 using NPOI.SS.Formula.Functions;
 using MailKit.Search;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
+using System.Globalization;
+using System.Text;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -53,6 +56,79 @@ namespace webMetics.Controllers
             return View();
         }
 
+        public ActionResult VerInscripciones()
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                }
+
+                ViewBag.ListaInscripciones = inscripciones;
+            }
+            else
+            {
+                ViewBag.ListaInscripciones = null;
+            }
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View();
+        }
+
+        public IActionResult BuscarInscripciones(string searchTerm)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            // Obtener la lista de inscripciones
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+            if (inscripciones != null)
+            {
+                foreach (InscripcionModel inscripcion in inscripciones)
+                {
+                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                }
+
+                ViewBag.ListaInscripciones = inscripciones;
+            }
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                inscripciones = inscripciones.Where(inscripcion =>
+                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+
+            ViewBag.ListaInscripciones = inscripciones;
+
+            return View("VerInscripciones");
+        }
+
         public ActionResult FormularioInscripcion()
         {
             ViewBag.Role = GetRole();
@@ -88,7 +164,7 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "Error al inscribir al participante.";
                 }
 
-                return RedirectToAction("VerParticipantesPorModulos", "Participante");
+                return RedirectToAction("VerInscripciones", "Inscripcion");
             }
             else
             {
@@ -291,6 +367,144 @@ namespace webMetics.Controllers
                 "<p>Si necesita desinscribirse de este módulo, puede ingresar al sistema y realizarlo desde la plataforma.</p>";
 
             return mensaje;
+        }
+
+        public ActionResult DescargarPlantillaSubirInscripciones()
+        {
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Plantilla_Inscripciones");
+
+            string[] columnNames = {
+                "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas"
+            };
+
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
+
+            for (int i = 0; i < columnNames.Length; i++)
+            {
+                NPOI.SS.UserModel.ICell cell = row.CreateCell(i);
+
+                cell.SetCellValue(columnNames[i]);
+            }
+
+            string fileName = "Plantilla_Inscripciones.xlsx";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirArchivoExcelInscripciones(IFormFile file)
+        {
+            if (file == null)
+            {
+                TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
+                return RedirectToAction("VerInscripciones");
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using var package = new ExcelPackage(stream);
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        GrupoModel grupo = new GrupoModel
+                        {
+                            numeroGrupo = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Grupo")].Text, out var numeroGrupo) ? numeroGrupo : 0,
+                            nombre = worksheet.Cells[row, GetColumnIndex(worksheet, "Módulo")].Text,
+                            modalidad = "",
+                            cantidadHoras = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas")].Text, out var cantidadHoras) ? cantidadHoras : 0,
+                        };
+
+                        InscripcionModel inscripcion = new InscripcionModel
+                        {
+                            idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo institucional")].Text,
+                            numeroGrupo = grupo.numeroGrupo,
+                            nombreGrupo = grupo.nombre,
+                            horasMatriculadas = grupo.cantidadHoras,
+                            horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas completadas")].Text, out var horasCompletadas) ? horasCompletadas : 0,
+                            estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text
+                        };
+
+                        if (!string.IsNullOrEmpty(inscripcion.idParticipante))
+                        {
+                            await IngresarInscripcionAsync(inscripcion, grupo);
+                        }
+                    }
+                }
+
+                TempData["successMessage"] = "El archivo fue subido éxitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Error al cargar los datos: " + ex;
+            }
+
+            return RedirectToAction("VerInscripciones");
+        }
+
+        private async Task IngresarInscripcionAsync(InscripcionModel inscripcion, GrupoModel grupo) // Make method async
+        {
+            ParticipanteModel participante = await accesoAParticipante.ObtenerParticipanteAsync(inscripcion.idParticipante); // Use async method
+
+            if (grupo != null && participante != null)
+            {
+                bool exito = false;
+                InscripcionModel inscripcionEncontrada = await accesoAInscripcion.ObtenerInscripcionAsync(inscripcion); // Use async method
+                if (inscripcionEncontrada != null)
+                {
+                    inscripcion.idInscripcion = inscripcionEncontrada.idInscripcion;
+                    exito = await accesoAInscripcion.EditarInscripcionAsync(inscripcion); // Use async method
+                }
+                else
+                {
+                    exito = await accesoAInscripcion.InsertarInscripcionAsync(inscripcion); // Use async method
+                }
+
+                if (exito)
+                {
+                    // Potentially combine these into a single update operation
+                    await accesoAParticipante.ActualizarHorasMatriculadasParticipanteAsync(participante.idParticipante); // Use async method
+                    await accesoAParticipante.ActualizarHorasAprobadasParticipanteAsync(participante.idParticipante); // Use async method
+                }
+            }
+        }
+
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            // Normalize and remove accents from the input column name
+            string normalizedColumnName = RemoveAccents(columnName.Trim().ToLower());
+
+            // Iterate over the first row to find the column index
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                // Get the header, normalize it, and remove accents
+                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
+
+                // Compare normalized header with the normalized column name
+                if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return col;
+                }
+            }
+            throw new Exception($"Column '{columnName}' not found");
+        }
+
+        // Helper method to remove accents (diacritics)
+        private string RemoveAccents(string text)
+        {
+            return string.Concat(text.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
+                .Normalize(NormalizationForm.FormC);
         }
 
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
