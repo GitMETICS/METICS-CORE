@@ -187,7 +187,7 @@ namespace webMetics.Handlers
             return participante;
         }
 
-        // Método async para obtener un participante específico según su ID
+        /*// Método async para obtener un participante específico según su ID
         public async Task<ParticipanteModel> ObtenerParticipanteAsync(string idParticipante)
         {
             ParticipanteModel participante = null;
@@ -241,7 +241,7 @@ namespace webMetics.Handlers
             }
 
             return participante;
-        }
+        }*/
 
 
 

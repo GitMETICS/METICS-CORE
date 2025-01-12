@@ -12,28 +12,6 @@ public class InscripcionHandler : BaseDeDatosHandler
         accesoAGrupo = new GrupoHandler(environment, configuration);
     }
 
-    public InscripcionModel ObtenerInscripcion(InscripcionModel inscripcion)
-    {
-        List<InscripcionModel> inscripciones = ObtenerInscripciones();
-        InscripcionModel inscripcionEncontrada = inscripciones.Find(
-            inscripcionModel => inscripcionModel.nombreGrupo == inscripcion.nombreGrupo 
-            && inscripcionModel.numeroGrupo == inscripcion.numeroGrupo
-            && inscripcionModel.idParticipante == inscripcion.idParticipante);
-        
-        return inscripcionEncontrada;
-    }
-
-    public async Task<InscripcionModel> ObtenerInscripcionAsync(InscripcionModel inscripcion)
-    {
-        List<InscripcionModel> inscripciones = await ObtenerInscripcionesAsync(); // Assuming ObtenerInscripciones is also async
-        InscripcionModel inscripcionEncontrada = inscripciones.Find(
-            inscripcionModel => inscripcionModel.nombreGrupo == inscripcion.nombreGrupo
-                                 && inscripcionModel.numeroGrupo == inscripcion.numeroGrupo
-                                 && inscripcionModel.idParticipante == inscripcion.idParticipante);
-
-        return inscripcionEncontrada;
-    }
-
     public List<InscripcionModel> ObtenerInscripciones()
     {
         List<InscripcionModel> inscripciones = new List<InscripcionModel>();
@@ -59,9 +37,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 calificacion = Convert.ToDouble(fila["calificacion"])
             };
 
-            inscripciones.Add(inscripcion);
             inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-            EditarInscripcion(inscripcion);
+            inscripciones.Add(inscripcion);
         }
 
         return inscripciones;
@@ -94,9 +71,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                         calificacion = reader.GetDouble(reader.GetOrdinal("calificacion"))
                     };
 
-                    inscripciones.Add(inscripcion);
                     inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-                    await EditarInscripcionAsync(inscripcion);
+                    inscripciones.Add(inscripcion);
                 }
             }
             catch (Exception ex)
@@ -137,9 +113,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 calificacion = Convert.ToDouble(fila["calificacion"]),
             };
 
-            inscripciones.Add(inscripcion);
             inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-            EditarInscripcion(inscripcion);
+            inscripciones.Add(inscripcion);
         }
         return inscripciones;
     }
@@ -169,9 +144,8 @@ public class InscripcionHandler : BaseDeDatosHandler
                 calificacion = Convert.ToDouble(fila["calificacion"])
             };
 
-            inscripciones.Add(inscripcion);
             inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-            EditarInscripcion(inscripcion);
+            inscripciones.Add(inscripcion);
         }
         return inscripciones;
     }
@@ -201,7 +175,6 @@ public class InscripcionHandler : BaseDeDatosHandler
         };
 
         inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-        EditarInscripcion(inscripcion);
 
         return inscripcion;
     }
@@ -232,7 +205,6 @@ public class InscripcionHandler : BaseDeDatosHandler
         };
 
         inscripcion.estado = CambiarEstadoDeInscripcion(inscripcion);
-        EditarInscripcion(inscripcion);
 
         return inscripcion;
     }

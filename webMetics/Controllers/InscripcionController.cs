@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using OfficeOpenXml;
 using System.Globalization;
 using System.Text;
+using System.Linq.Expressions;
 
 /* 
  * Controlador para el proceso de inscripción de los grupos
@@ -406,6 +407,8 @@ namespace webMetics.Controllers
 
             try
             {
+                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
                 using (var stream = new MemoryStream())
                 {
                     await file.CopyToAsync(stream);
@@ -435,9 +438,11 @@ namespace webMetics.Controllers
                             estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text
                         };
 
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+
                         if (!string.IsNullOrEmpty(inscripcion.idParticipante))
                         {
-                            await IngresarInscripcionAsync(inscripcion, grupo);
+                            inscripciones = await IngresarInscripcionAsync(inscripciones, inscripcion, grupo, participante);
                         }
                     }
                 }
@@ -452,31 +457,37 @@ namespace webMetics.Controllers
             return RedirectToAction("VerInscripciones");
         }
 
-        private async Task IngresarInscripcionAsync(InscripcionModel inscripcion, GrupoModel grupo) // Make method async
+        private async Task<List<InscripcionModel>> IngresarInscripcionAsync(List<InscripcionModel> inscripciones, InscripcionModel inscripcion, GrupoModel grupo, ParticipanteModel participante)
         {
-            ParticipanteModel participante = await accesoAParticipante.ObtenerParticipanteAsync(inscripcion.idParticipante); // Use async method
-
             if (grupo != null && participante != null)
             {
                 bool exito = false;
-                InscripcionModel inscripcionEncontrada = await accesoAInscripcion.ObtenerInscripcionAsync(inscripcion); // Use async method
+
+                InscripcionModel inscripcionEncontrada = inscripciones.Find(
+                    inscripcionModel => inscripcionModel.nombreGrupo == inscripcion.nombreGrupo
+                                         && inscripcionModel.numeroGrupo == inscripcion.numeroGrupo
+                                         && inscripcionModel.idParticipante == inscripcion.idParticipante);
+
                 if (inscripcionEncontrada != null)
                 {
                     inscripcion.idInscripcion = inscripcionEncontrada.idInscripcion;
-                    exito = await accesoAInscripcion.EditarInscripcionAsync(inscripcion); // Use async method
+                    exito = await accesoAInscripcion.EditarInscripcionAsync(inscripcion);
+
+                    inscripciones.Remove(inscripcionEncontrada);
                 }
-                else
+                else 
                 {
-                    exito = await accesoAInscripcion.InsertarInscripcionAsync(inscripcion); // Use async method
+                    exito = await accesoAInscripcion.InsertarInscripcionAsync(inscripcion);
                 }
 
                 if (exito)
                 {
-                    // Potentially combine these into a single update operation
-                    await accesoAParticipante.ActualizarHorasMatriculadasParticipanteAsync(participante.idParticipante); // Use async method
-                    await accesoAParticipante.ActualizarHorasAprobadasParticipanteAsync(participante.idParticipante); // Use async method
+                    await accesoAParticipante.ActualizarHorasMatriculadasParticipanteAsync(participante.idParticipante);
+                    await accesoAParticipante.ActualizarHorasAprobadasParticipanteAsync(participante.idParticipante);
                 }
             }
+
+            return inscripciones;
         }
 
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
