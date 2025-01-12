@@ -49,12 +49,12 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col">
-                                <label style="font-size:22px">Nombre del grupo</label> <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(model => model.nombreGrupo, (SelectList)ViewBag.ListaNombresGrupos, "Seleccione un grupo...", new { @class = "form-control", id = "nombreGrupoDropdown" })
+                                <label style="font-size:22px">Módulo</label> <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(model => model.nombreGrupo, (SelectList)ViewBag.ListaNombresGrupos, "Seleccione un módulo...", new { @class = "form-control", id = "nombreGrupoDropdown" })
                                 @Html.ValidationMessageFor(model => model.nombreGrupo, "", new { @class = "text-danger" })
                             </div>
                             <div class="col">
-                                <label style="font-size:22px">Número del grupo</label> <a style="color:red;font-size:22px">*</a>
+                                <label style="font-size:22px">Grupo</label> <a style="color:red;font-size:22px">*</a>
                                 @Html.DropDownListFor(model => model.numeroGrupo, (SelectList)ViewBag.ListaNumerosGrupos, "Seleccione un número de grupo...", new { @class = "form-control", id = "numeroGrupoDropdown" })
                                 @Html.ValidationMessageFor(model => model.numeroGrupo, "", new { @class = "text-danger" })
                             </div>
