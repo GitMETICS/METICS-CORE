@@ -12,7 +12,7 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                <a class="text-dark fs-4" href="@Url.Action("VerInscripciones", "Inscripcion")">
                     <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="row justify-content-center m-4">
                         <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
+                            <a href="@Url.Action("VerInscripciones", "Inscripcion")" class="btn btn-secondary btn-block">Cancelar</a>
                         </div>
                         <div class="col-auto">
                             <input type="submit" class="btn btn-primary btn-block" value="Guardar" />

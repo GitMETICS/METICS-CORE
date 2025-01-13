@@ -82,11 +82,29 @@
             @if (ViewBag.ListaInscripciones == null)
             {
                 <h5 class="text-center">No hay personas inscritas en módulos.</h5>
+
+                <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
+                    <form id="refreshForm" method="post" action="@Url.Action("CargarParticipantesPorModulos", "Participante")" class="text-center w-100">
+                        <input type="hidden" name="reload" value="true" />
+                        <button type="submit" class="btn btn-secondary" id="refreshButton">
+                            Recargar datos
+                        </button>
+                    </form>
+                </div>
             }
             else
             {
+
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-                    <div class="w-100">
+                    <!-- Botón de refrescar de búsqueda -->
+                    <form id="refreshForm" method="post" action="@Url.Action("VerInscripciones", "Inscripcion")">
+                        <input type="hidden" name="reload" value="true" />
+                        <button type="submit" class="btn btn-secondary" id="refreshButton">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </form>
+
+                    <div class="w-100 ms-3">
                         <!-- Barra de búsqueda -->
                         <form asp-action="BuscarInscripciones" asp-controller="Inscripcion" method="get" class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" />
@@ -193,5 +211,12 @@ else
             url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
         },
         "searching": false
+    });
+</script>
+
+<script>
+    document.getElementById('refreshButton').addEventListener('click', function (event) {
+        event.preventDefault();
+        document.getElementById('refreshForm').submit(); 
     });
 </script>
