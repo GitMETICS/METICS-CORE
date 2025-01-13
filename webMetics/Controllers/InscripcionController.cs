@@ -17,7 +17,7 @@ using OfficeOpenXml;
 using System.Globalization;
 using System.Text;
 using System.Linq.Expressions;
-
+using Microsoft.Extensions.Caching.Memory;
 /* 
  * Controlador para el proceso de inscripción de los grupos
  */
@@ -34,7 +34,9 @@ namespace webMetics.Controllers
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
 
-        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
+        private readonly IMemoryCache _memoryCache;
+
+        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService, IMemoryCache memoryCache)
         {
             _environment = environment;
             _configuration = configuration;
@@ -43,6 +45,7 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            _memoryCache = memoryCache;
         }
 
         /* Método para mostrar la lista de participantes inscritos en un grupo */
@@ -57,20 +60,35 @@ namespace webMetics.Controllers
             return View();
         }
 
-        public ActionResult VerInscripciones()
+        public ActionResult VerInscripciones(bool reload = false)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+            List<InscripcionModel> inscripciones;
 
+            // Verificar si los datos están en caché o si reload es true
+            if (reload || !_memoryCache.TryGetValue("Inscripciones", out inscripciones))
+            {
+                // Si no está en caché, obtener los datos de la base de datos
+                inscripciones = accesoAInscripcion.ObtenerInscripciones();
+
+                // Si los datos existen, almacenarlos en caché por 30 minutos
+                if (inscripciones != null)
+                {
+                    foreach (InscripcionModel inscripcion in inscripciones)
+                    {
+                        inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
+                    }
+
+                    // Almacenar los datos en caché
+                    _memoryCache.Set("Inscripciones", inscripciones, TimeSpan.FromMinutes(30));
+                }
+            }
+
+            // Asignar los datos al ViewBag
             if (inscripciones != null)
             {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
-                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
-                }
-
                 ViewBag.ListaInscripciones = inscripciones;
             }
             else
@@ -78,6 +96,7 @@ namespace webMetics.Controllers
                 ViewBag.ListaInscripciones = null;
             }
 
+            // Manejar los mensajes de TempData
             if (TempData["errorMessage"] != null)
             {
                 ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
@@ -165,7 +184,7 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "Error al inscribir al participante.";
                 }
 
-                return RedirectToAction("VerInscripciones", "Inscripcion");
+                return RedirectToAction("VerInscripciones", "Inscripcion", new { reload = true });
             }
             else
             {
@@ -259,6 +278,9 @@ namespace webMetics.Controllers
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
+
+                    return RedirectToAction("VerInscripciones", "Inscripcion", new { reload = true });
+
                 }
                 else
                 {
@@ -454,7 +476,7 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Error al cargar los datos: " + ex;
             }
 
-            return RedirectToAction("VerInscripciones");
+            return RedirectToAction("VerInscripciones", "Inscripcion", new { reload = true });
         }
 
         private async Task<List<InscripcionModel>> IngresarInscripcionAsync(List<InscripcionModel> inscripciones, InscripcionModel inscripcion, GrupoModel grupo, ParticipanteModel participante)
