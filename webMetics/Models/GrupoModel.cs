@@ -36,7 +36,7 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Es necesario ingresar el cupo del módulo.")]
         [Display(Name = "Cupo")]
-        [Range(1, 50, ErrorMessage = "El cupo debe ser un número entre 1 y 50.")]
+        [Range(1, 400, ErrorMessage = "El cupo debe ser un número entre 1 y 400.")]
         public int cupo { get; set; }
 
         [Display(Name = "Cupo actual")]

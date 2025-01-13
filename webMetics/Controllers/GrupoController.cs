@@ -242,12 +242,21 @@ namespace webMetics.Controllers
                     }
 
                     // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
-                    if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
+                    if (grupo.fechaFinalizacionInscripcion > grupo.fechaFinalizacionGrupo)
                     {
-                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
-                        ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
+                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de finalización del módulo.");
 
-                        ViewBag.ErrorMessage = "La fecha final de inscripción no puede ser después de la fecha de inicio de clases.";
+                        ViewBag.ErrorMessage = "La fecha final de inscripción debe ser antes de la fecha de fin de clases.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
+                        return View(grupo);
+                    }
+                    if (grupo.fechaInicioInscripcion > grupo.fechaInicioGrupo)
+                    {
+                        ModelState.AddModelError("fechaInicioInscripcion", "La fecha de inicio de inscripción no puede ser después de la fecha de inicio del módulo.");
+
+                        ViewBag.ErrorMessage = "La fecha de inicio de inscripción no puede ser después de la fecha de inicio de clases.";
                         ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                         ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
                         ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
@@ -432,11 +441,15 @@ namespace webMetics.Controllers
                         return View(grupo);
                     }
 
-                    // Validar fecha de finalización de inscripción antes de la fecha de inicio del grupo
-                    if (grupo.fechaFinalizacionInscripcion >= grupo.fechaInicioGrupo)
+                    // Validar fecha de finalización de inscripción antes de la fecha de finalización del grupo
+                    if (grupo.fechaFinalizacionInscripcion > grupo.fechaFinalizacionGrupo)
                     {
-                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de inicio del módulo.");
-                        ModelState.AddModelError("fechaInicioGrupo", "La fecha de inicio del módulo debe ser después de la fecha de finalización de inscripción.");
+                        ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de finalización de inscripción debe ser antes de la fecha de finalización del módulo.");
+                        return View(grupo);
+                    }
+                    if (grupo.fechaInicioInscripcion > grupo.fechaInicioGrupo)
+                    {
+                        ModelState.AddModelError("fechaInicioInscripcion", "La fecha de inicio de inscripción no puede ser después de la fecha de inicio del módulo.");
                         return View(grupo);
                     }
 
