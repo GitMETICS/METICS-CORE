@@ -184,9 +184,9 @@
                                                 <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy") </small>
                                             }
                                         </div>
-                                        <div class="mt-2">
+@*                                         <div class="mt-2">
                                             @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
-                                        </div>
+                                        </div> *@
                                     </div>
                                     <div class="card-footer bg-info bg-opacity-25 border-info border-1 border-opacity-25 text-muted">
                                         @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
@@ -347,11 +347,11 @@
                                                 <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy") </small>
                                             }
                                         </div>
-                                        <div class="mt-2">
+@*                                         <div class="mt-2">
                                             <div class="d-flex align-items-center justify-content-center">
                                                 @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
                                             </div>
-                                        </div>
+                                        </div> *@
                                     </div>
                                 </div>
                             </div>
@@ -549,10 +549,10 @@
                                                 </div>
                                             </div>
                                         }
-                                        else
+@*                                         else
                                         {
                                             @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
-                                        }
+                                        } *@
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted">
@@ -771,12 +771,12 @@
                                                 </div>
                                             </div>
                                         }
-                                        else
+@*                                         else
                                         {
                                             <div class="d-flex align-items-center justify-content-center">
                                                 @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
                                             </div>
-                                        }
+                                        } *@
                                     </div>
                                 </div>
                             </div>

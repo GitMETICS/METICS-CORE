@@ -111,8 +111,8 @@ CREATE TABLE grupo (
     es_visible BIT,
     nombre_archivo NVARCHAR(256),
 	adjunto VARBINARY(MAX),
-    enlace NVARCHAR(64),
-    clave_inscripcion NVARCHAR(64),
+    enlace NVARCHAR(512),
+    clave_inscripcion NVARCHAR(512),
 
 
 	FOREIGN KEY (id_categoria_FK) REFERENCES categoria(id_categoria_PK)
@@ -564,8 +564,8 @@ CREATE OR ALTER PROCEDURE InsertGrupo
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL,
-    @enlace NVARCHAR(64) = '',
-    @clave_inscripcion NVARCHAR(64) = ''
+    @enlace NVARCHAR(512) = '',
+    @clave_inscripcion NVARCHAR(512) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -662,8 +662,8 @@ CREATE OR ALTER PROCEDURE UpdateGrupo
 	@es_visible BIT = 1,
 	@nombre_archivo NVARCHAR(256) = '',
 	@adjunto VARBINARY(MAX) = NULL,
-    @enlace NVARCHAR(64) = '',
-    @clave_inscripcion NVARCHAR(64) = ''
+    @enlace NVARCHAR(512) = '',
+    @clave_inscripcion NVARCHAR(512) = ''
 AS
 BEGIN
     SET NOCOUNT ON;
