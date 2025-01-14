@@ -92,7 +92,7 @@ namespace webMetics.Models
         [Display(Name = "Facilitador(a)")]
         public string? nombreAsesor { get; set; }
 
-        [Display(Name = "Enlace del curso")]
+        [Display(Name = "Enlace de Mediación Virtual")]
         public string? enlace { get; set; }
 
         [Display(Name = "Clave de inscripción")]
