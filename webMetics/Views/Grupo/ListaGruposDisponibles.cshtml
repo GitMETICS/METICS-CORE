@@ -135,12 +135,7 @@
                                             </div>
                                         }
 
-                                        @if (!string.IsNullOrEmpty(grupo.claveInscripcion))
-                                        {
-                                            <div class="card-text mb-3">
-                                                    Clave de inscripción: @grupo.claveInscripcion
-                                            </div>
-                                        }
+      
                                         <div class="mt-3">
                                             @if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
                                             {
@@ -296,12 +291,7 @@
                                                     </div>
                                                 }
 
-                                                @if (!string.IsNullOrEmpty(grupo.claveInscripcion))
-                                                {
-                                                    <div class="card-text mb-3">
-                                                        <strong>Clave de inscripción:</strong> @grupo.claveInscripcion
-                                                    </div>
-                                                }
+
                                             </div>
                                         </div>
                                         <div class="mt-3 align-items-center text-center">
@@ -484,12 +474,7 @@
                                     </div>
                                 }
 
-                                @if (!string.IsNullOrEmpty(grupo.claveInscripcion))
-                                {
-                                    <div class="card-text mb-3">
-                                        Clave de inscripción: @grupo.claveInscripcion
-                                    </div>
-                                }
+
                                     <div class="mt-3">
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                                         {
@@ -703,12 +688,6 @@
                                                     </div>
                                                 }
 
-                                                @if (!string.IsNullOrEmpty(grupo.claveInscripcion))
-                                                {
-                                                    <div class="card-text mb-3">
-                                                        <strong>Clave de inscripción:</strong> @grupo.claveInscripcion
-                                                    </div>
-                                                }
 
                                             </div>
                                     </div>
