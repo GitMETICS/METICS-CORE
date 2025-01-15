@@ -250,6 +250,22 @@
               "name": "Escuela de Tecnologías en Salud"
             }
           ]
+        },
+        {
+          "name": "Facultad de Microbiología",
+          "secciones": [
+            {
+              "name": "Escuela de Microbiología"
+            }
+          ]
+        },
+        {
+          "name": "Facultad de Odontología",
+          "secciones": [
+            {
+              "name": "Escuela de Odontología"
+            }
+          ]
         }
       ]
     },

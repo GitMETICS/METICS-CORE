@@ -959,6 +959,8 @@ namespace webMetics.Controllers
                 case "Área de Salud":
                     departamentos.Add(new SelectListItem() { Text = "Facultad de Farmacia" });
                     departamentos.Add(new SelectListItem() { Text = "Facultad de Medicina" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Microbiología" });
+                    departamentos.Add(new SelectListItem() { Text = "Facultad de Odontología" });
                     break;
                 case "Sistema de Educación General":
                     departamentos.Add(new SelectListItem() { Text = "Estudios Generales" });
@@ -1052,6 +1054,12 @@ namespace webMetics.Controllers
                     unidades.Add(new SelectListItem() { Text = "Escuela de Nutrición" });
                     unidades.Add(new SelectListItem() { Text = "Escuela de Salud Pública" });
                     unidades.Add(new SelectListItem() { Text = "Escuela de Tecnologías en Salud" });
+                    break;
+                case "Facultad de Microbiología":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Microbiología" });
+                    break;
+                case "Facultad de Odontología":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Odontología" });
                     break;
                 case "Estudios Generales":
                     unidades.Add(new SelectListItem() { Text = "Escuela de Estudios Generales" });
