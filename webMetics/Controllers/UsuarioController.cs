@@ -227,18 +227,7 @@ namespace webMetics.Controllers
             const int RolUsuarioAsesor = 2;
 
             int role = GetRole();
-
-            string idUsuario = string.Empty;
-            if (Request.Cookies.ContainsKey("USUARIOAUTORIZADO"))
-            {
-                string idEncriptado = Request.Cookies["USUARIOAUTORIZADO"];
-                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
-                idUsuario = protector.Unprotect(idEncriptado);
-            }
-
-            ViewBag.Id = idUsuario;
-
-            ViewBag.Role = role;
+            string idUsuario = GetId();
 
             switch (role)
             {

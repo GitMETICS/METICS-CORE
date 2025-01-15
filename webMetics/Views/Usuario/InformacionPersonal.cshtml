@@ -5,7 +5,7 @@
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Title == "Información Personal")
+@if (!string.IsNullOrEmpty(ViewBag.Id))
 {
     <div class="contenedor-tipos-actividades container-fluid">
         @if (urlReferrer != null)
@@ -52,16 +52,25 @@
                             <tr>
                                 <th scope="col">Nombre Completo</th>
                                 <th scope="col">Identificación</th>
-                                <th scope="col">Unidad Académica</th>
-                                <th scope="col">Correo Institucional</th>
-                                <th scope="col">Condición</th>
-                                <th scope="col" style="width:10%">Teléfono</th>
-
-                                <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Inscritas</th>
-                                <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
 
                                 @if (ViewBag.Participante != null)
                                 {
+                                    <th scope="col">Unidad Académica</th>
+                                }
+                                
+                                <th scope="col">Correo Institucional</th>
+                                
+                                @if (ViewBag.Participante != null)
+                                {
+                                    <th scope="col">Condición</th>
+                                }
+                                
+                                <th scope="col" style="width:10%">Teléfono</th>
+
+                                @if (ViewBag.Participante != null)
+                                {
+                                    <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Inscritas</th>
+                                    <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
                                     <td scope="col" style="width: 3.33%;"></td>
                                 }
 
@@ -87,26 +96,32 @@
                                 {
                                     <td class="">@ViewBag.Usuario.unidadAcademica</td>
                                 }
-                                
-                                <td class="">@ViewBag.Usuario.correo</td>
+
+                                @if (ViewBag.Usuario.correo != null)
+                                {
+                                    <td class="">@ViewBag.Usuario.correo</td>
+                                }
 
                                 @if (ViewBag.Usuario.condicion != null)
                                 {
                                     <td class="">@ViewBag.Usuario.condicion</td>
                                 }
 
-                                <td class="">@ViewBag.Usuario.telefono</td>
-
-                                <td class="my-3 text-center" style="width: 7.5%">
-                                    <span>@ViewBag.Participante.horasMatriculadas</span>
-                                </td>
-
-                                <td class="my-3 text-center" scope="col" style="width: 7.5%">
-                                    <span>@ViewBag.Participante.horasAprobadas</span>
-                                </td>
+                                @if (ViewBag.Usuario.telefono != null)
+                                {
+                                    <td class="">@ViewBag.Usuario.telefono</td>
+                                }
 
                                 @if (ViewBag.Participante != null)
                                 {
+                                    <td class="my-3 text-center" style="width: 7.5%">
+                                        <span>@ViewBag.Participante.horasMatriculadas</span>
+                                    </td>
+
+                                    <td class="my-3 text-center" scope="col" style="width: 7.5%">
+                                        <span>@ViewBag.Participante.horasAprobadas</span>
+                                    </td>
+
                                     <td class="">
                                         @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                     </td>
@@ -123,63 +138,67 @@
                     </table>
                 </div>
                 
+
                 @if (ViewBag.Inscripciones == null)
                 {
-                    @if (ViewBag.ListaGrupos == null)
+                    @if (ViewBag.Role == 2)
                     {
-                        <br />
-                        <h5 class="text-center">No tiene grupos creados.</h5>
-                    }
-                    else
-                    {
-                        <!-- Módulos asesor -->
-                        <br />
-                        <div class="mt-4">
-                            <h3 class="">Módulos creados</h3>
-                            <table class="table table-striped" id="tblCustomers">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Módulos</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Horas del<br>Módulo</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Cupo</th>
-                                        <th class="text-center" scope="col" style="width: 15%">Cupo Actual</th>
-                                    </tr>
-                                </thead>
+                        @if (ViewBag.ListaGrupos == null)
+                        {
+                            <br />
+                            <h5 class="text-center">No tiene grupos asociados.</h5>
+                        }
+                        else
+                        {
+                            <!-- Módulos asesor -->
+                            <br />
+                            <div class="mt-4">
+                                <h3 class="">Módulos creados</h3>
+                                <table class="table table-striped" id="tblCustomers">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Módulos</th>
+                                            <th class="text-center" scope="col" style="width: 15%">Horas del<br>Módulo</th>
+                                            <th class="text-center" scope="col" style="width: 15%">Cupo</th>
+                                            <th class="text-center" scope="col" style="width: 15%">Cupo Actual</th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <td>
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-                                                <br />
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                @grupo.cantidadHoras
-                                                <br />
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                @grupo.cupo
-                                                <br />
-                                            }
-                                        </td>
-                                        <td class="text-center">
-                                            @foreach (var grupo in ViewBag.ListaGrupos)
-                                            {
-                                                @grupo.cupoActual
-                                                <br />
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <tbody class="align-middle">
+                                        <tr>
+                                            <td>
+                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                {
+                                                    <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
+                                                    <br />
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                {
+                                                    @grupo.cantidadHoras
+                                                    <br />
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                {
+                                                    @grupo.cupo
+                                                    <br />
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                {
+                                                    @grupo.cupoActual
+                                                    <br />
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
                     }
                 }
                 else
