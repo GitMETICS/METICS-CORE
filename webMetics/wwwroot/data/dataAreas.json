@@ -254,6 +254,22 @@
       ]
     },
     {
+      "name": "Sistema de Estudios Generales",
+      "departamentos": [
+        {
+          "name": "Estudios Generales",
+          "secciones": [
+            {
+              "name": "Escuela de Estudios Generales"
+            },
+            {
+              "name": "Escuela de Seminarios de Realidad Nacional"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Sistema de Estudios de Posgrado",
       "departamentos": [
         {

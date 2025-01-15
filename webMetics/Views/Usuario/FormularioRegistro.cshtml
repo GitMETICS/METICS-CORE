@@ -95,7 +95,7 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una facultad...", new { @class = "form-control", id = "departamentoDropdown" })
+                            @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -156,7 +156,7 @@ else
             var areaName = $(this).val();
 
             // Clear departamento and unidadAcademica dropdowns
-            $('#departamentoDropdown').empty().append('<option value="">Seleccione una facultad...</option>');
+            $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
             $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
 
             if (areaName !== '') {
@@ -177,7 +177,7 @@ else
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'An error occurred while fetching facultades: ' + error
+                            text: 'An error occurred while fetching departamentos: ' + error
                         });
                     }
                 });
