@@ -918,7 +918,9 @@ namespace webMetics.Controllers
                 new SelectListItem { Text = "Área de Ingeniería" },
                 new SelectListItem { Text = "Área de Salud" },
                 new SelectListItem { Text = "Sistema de Educación General" },
-                new SelectListItem { Text = "Sistema de Estudios de Posgrado" }
+                new SelectListItem { Text = "Sistema de Estudios de Posgrado" },
+                new SelectListItem { Text = "Sede Regional" },
+                new SelectListItem { Text = "Otros" }
             };
         }
 
@@ -969,6 +971,21 @@ namespace webMetics.Controllers
                     departamentos.Add(new SelectListItem() { Text = "Especialidad de Posgrado" });
                     departamentos.Add(new SelectListItem() { Text = "Programa de Doctorado" });
                     departamentos.Add(new SelectListItem() { Text = "Programa de Estudios de Posgrado" });
+                    break;
+                case "Sede Regional":
+                    departamentos.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede de Alajuela-CONARE" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional de Guanacaste" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional de Occidente" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional del Atlántico" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional del Caribe" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional del Pacífico" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Regional del Sur" });
+                    break;
+                case "Otros":
+                    departamentos.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
+                    departamentos.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    departamentos.Add(new SelectListItem() { Text = "Otro" });
                     break;
             }
             return departamentos;
@@ -1149,6 +1166,50 @@ namespace webMetics.Controllers
                     unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Tecnologías de Información y Comunicación para la Gestión Organizacional" });
                     unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Telemática" });
                     unidades.Add(new SelectListItem() { Text = "Programa de Posgrado en Trabajo Social" });
+                    break;
+                case "Ciudad Universitaria Rodrigo Facio":
+                    unidades.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio" });
+                    break;
+                case "Sede de Alajuela-CONARE":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Alajuela" });
+                    break;
+                case "Sede Regional de Guanacaste":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Liberia" });
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Santa Cruz" });
+                    break;
+                case "Sede Regional de Occidente":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de San Ramón" });
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Tacares" });
+                    break;
+                case "Sede Regional del Atlántico":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Turrialba" });
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Paraíso" });
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Guápiles" });
+                    break;
+                case "Sede Regional del Caribe":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Limón" });
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Siquirres" });
+                    break;
+                case "Sede Regional del Pacífico":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Puntarenas" });
+                    break;
+                case "Sede Regional del Sur":
+                    unidades.Add(new SelectListItem() { Text = "Recinto de Golfito" });
+                    break;
+                case "Vicerrectoría de Docencia":
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
+                    unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    unidades.Add(new SelectListItem() { Text = "Otro" });
+                    break;
+                case "Centros de Investigación":
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
+                    unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    unidades.Add(new SelectListItem() { Text = "Otro" });
+                    break;
+                case "Otro":
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
+                    unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    unidades.Add(new SelectListItem() { Text = "Otro" });
                     break;
             }
             return unidades;

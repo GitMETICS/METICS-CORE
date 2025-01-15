@@ -541,6 +541,137 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Sede Regional",
+      "departamentos": [
+        {
+          "name": "Ciudad Universitaria Rodrigo Facio",
+          "secciones": [
+            {
+              "name": "Ciudad Universitaria Rodrigo Facio"
+            }
+          ]
+        },
+        {
+          "name": "Sede de Alajuela-CONARE",
+          "secciones": [
+            {
+              "name": "Recinto de Alajuela"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional de Guanacaste",
+          "secciones": [
+            {
+              "name": "Recinto de Liberia"
+            },
+            {
+              "name": "Recinto de Santa Cruz"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional de Occidente",
+          "secciones": [
+            {
+              "name": "Recinto de San Ramón"
+            },
+            {
+              "name": "Recinto de Tacares"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Atlántico",
+          "secciones": [
+            {
+              "name": "Recinto de Turrialba"
+            },
+            {
+              "name": "Recinto de Paraíso"
+            },
+            {
+              "name": "Recinto de Guápiles"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Caribe",
+          "secciones": [
+            {
+              "name": "Recinto de Limón"
+            },
+            {
+              "name": "Recinto de Siquirres"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Pacífico",
+          "secciones": [
+            {
+              "name": "Recinto de Puntarenas"
+            }
+          ]
+        },
+        {
+          "name": "Sede Regional del Sur",
+          "secciones": [
+            {
+              "name": "Recinto de Golfito"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Otros",
+      "departamentos": [
+        {
+          "name": "Vicerrectoría de Docencia",
+          "secciones": [
+            {
+              "name": "Vicerrectoría de Docencia"
+            },
+            {
+              "name": "Centros de Investigación"
+            },
+            {
+              "name": "Otro"
+            }
+          ]
+        },
+        {
+          "name": "Centros de Investigación",
+          "secciones": [
+            {
+              "name": "Vicerrectoría de Docencia"
+            },
+            {
+              "name": "Centros de Investigación"
+            },
+            {
+              "name": "Otro"
+            }
+          ]
+        },
+        {
+          "name": "Otro",
+          "secciones": [
+            {
+              "name": "Vicerrectoría de Docencia"
+            },
+            {
+              "name": "Centros de Investigación"
+            },
+            {
+              "name": "Otro"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
