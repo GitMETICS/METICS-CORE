@@ -747,6 +747,9 @@ namespace webMetics.Controllers
 
         public ActionResult FormularioParticipante()
         {
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
             return View("FormularioParticipante");
         }
@@ -754,6 +757,9 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+
             if (ModelState.IsValid)
             {
                 // Aquí se define que el identificador del usuario es el correo.
