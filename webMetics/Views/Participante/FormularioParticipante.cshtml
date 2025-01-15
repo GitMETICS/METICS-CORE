@@ -96,7 +96,7 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Selecciona una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -151,7 +151,7 @@ else
 
             // Clear departamento and unidadAcademica dropdowns
             $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
-            $('#seccionDropdown').empty().append('<option value="">Selecciona una unidad académica...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
 
             if (areaName !== '') {
                 // Make AJAX request to fetch departamentos for selected area
@@ -205,7 +205,7 @@ else
             var areaName = $('#areaDropdown').val();
 
             // Clear unidadAcademica dropdown
-            $('#seccionDropdown').empty().append('<option value="">Selecciona una unidad académica...</option>');
+            $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
 
             if (departamentoName !== '') {
                 // Make AJAX request to fetch secciones for selected departamento
