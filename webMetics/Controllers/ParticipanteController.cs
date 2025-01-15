@@ -909,19 +909,18 @@ namespace webMetics.Controllers
         [HttpGet]
         public static List<SelectListItem> GetAreas()
         {
-            var areas = new List<SelectListItem>();
-            areas.Add(new SelectListItem() { Text = "Área de Artes y Letras" });
-            areas.Add(new SelectListItem() { Text = "Área de Ciencias Agroalimentarias" });
-            areas.Add(new SelectListItem() { Text = "Área de Ciencias Básicas" });
-            areas.Add(new SelectListItem() { Text = "Área de Ciencias Sociales" });
-            areas.Add(new SelectListItem() { Text = "Área de Ingeniería" });
-            areas.Add(new SelectListItem() { Text = "Área de Salud" });
-            areas.Add(new SelectListItem() { Text = "Sistema de Estudios de Posgrado" });
-
-            return areas;
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Área de Artes y Letras" },
+                new SelectListItem { Text = "Área de Ciencias Agroalimentarias" },
+                new SelectListItem { Text = "Área de Ciencias Básicas" },
+                new SelectListItem { Text = "Área de Ciencias Sociales" },
+                new SelectListItem { Text = "Área de Ingeniería" },
+                new SelectListItem { Text = "Área de Salud" },
+                new SelectListItem { Text = "Sistema de Educación General" },
+                new SelectListItem { Text = "Sistema de Estudios de Posgrado" }
+            };
         }
-
-
 
         [HttpGet]
         public JsonResult GetDepartamentoJSON(string areaName)
@@ -960,6 +959,9 @@ namespace webMetics.Controllers
                 case "Área de Salud":
                     departamentos.Add(new SelectListItem() { Text = "Facultad de Farmacia" });
                     departamentos.Add(new SelectListItem() { Text = "Facultad de Medicina" });
+                    break;
+                case "Sistema de Educación General":
+                    departamentos.Add(new SelectListItem() { Text = "Estudios Generales" });
                     break;
                 case "Sistema de Estudios de Posgrado":
                     departamentos.Add(new SelectListItem() { Text = "Especialidad de Posgrado" });
@@ -1050,6 +1052,10 @@ namespace webMetics.Controllers
                     unidades.Add(new SelectListItem() { Text = "Escuela de Nutrición" });
                     unidades.Add(new SelectListItem() { Text = "Escuela de Salud Pública" });
                     unidades.Add(new SelectListItem() { Text = "Escuela de Tecnologías en Salud" });
+                    break;
+                case "Estudios Generales":
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Estudios Generales" });
+                    unidades.Add(new SelectListItem() { Text = "Escuela de Seminarios de Realidad Nacional" });
                     break;
                 case "Especialidad de Posgrado":
                     unidades.Add(new SelectListItem() { Text = "Especialidades de Posgrado en Microbiología" });
