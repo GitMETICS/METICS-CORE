@@ -1233,6 +1233,8 @@ namespace webMetics.Controllers
             var group5 = new SelectListGroup() { Name = "Sede del Atlántico" };
             var group6 = new SelectListGroup() { Name = "Sede de Occidente" };
             var group7 = new SelectListGroup() { Name = "Sede Interuniversitaria de Alajuela" };
+            var group8 = new SelectListGroup() { Name = "Sede Regional del Pacífico" };
+
 
             sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
@@ -1246,6 +1248,8 @@ namespace webMetics.Controllers
             sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Puntarenas", Group = group8 });
+            
 
             return sedes;
         }
