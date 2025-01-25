@@ -27,6 +27,26 @@ namespace webMetics.Handlers
             accesoAGrupoTema = new GrupoTemaHandler(environment, configuration, accesoATema);
         }
 
+        public bool EditarIdGruposAsesor(string idUsuario, string oldIdUsuario)
+        {
+            bool exito = false;
+
+            string query = "UPDATE grupo SET id_asesor_FK = @idUsuario WHERE id_asesor_FK = @idAnterior;";
+
+            ConexionMetics.Open();
+
+            SqlCommand command = new SqlCommand(query, ConexionMetics);
+
+            command.Parameters.AddWithValue("@idUsuario", idUsuario);
+            command.Parameters.AddWithValue("@idAnterior", oldIdUsuario);
+
+            exito = command.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         // Crea un grupo en la base de datos.
         public bool CrearGrupo(GrupoModel grupo, int[] idTemas)
         {

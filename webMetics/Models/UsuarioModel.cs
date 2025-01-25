@@ -117,6 +117,11 @@ namespace webMetics.Models
         [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
+        public string oldId { get; set; }
+
+        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
+        [Display(Name = "Correo institucional")]
         public string id { get; set; }
 
         public int role { get; set; }

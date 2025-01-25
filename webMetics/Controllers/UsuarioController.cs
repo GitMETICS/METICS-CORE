@@ -291,9 +291,6 @@ namespace webMetics.Controllers
                     break;
             }
 
-
-
-
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
 
@@ -312,6 +309,141 @@ namespace webMetics.Controllers
             Response.Cookies.Delete("idUsuario");
 
             return RedirectToAction("IniciarSesion");
+        }
+
+        public ActionResult CambiarIdUsuario(string idUsuario, string nombreCompleto)
+        {
+            // Ensure the current user is an admin
+            if (GetRole() == 1)
+            {
+                // Validate the user ID to be changed
+                if (!string.IsNullOrEmpty(idUsuario))
+                {
+                    ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    int rolUsuario = 0;
+
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    if (asesor != null)
+                    {
+                        rolUsuario = 2;
+                    }
+
+                    ViewBag.NombreCompleto = nombreCompleto;
+
+                    NewLoginModel usuario = new NewLoginModel() { oldId = idUsuario, id = idUsuario, role = rolUsuario };
+
+                    if (TempData["errorMessage"] != null)
+                    {
+                        ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                    }
+                    if (TempData["successMessage"] != null)
+                    {
+                        ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                    }
+
+                    ViewBag.Id = GetId();
+                    ViewBag.Role = GetRole();
+
+                    return View(usuario);
+                }
+                else
+                {
+                    TempData["errorMessage"] = "ID de usuario no válido.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+            }
+            else
+            {
+                return RedirectToAction("CerrarSesion");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CambiarIdUsuario(NewLoginModel usuario)
+        {
+            // Ensure only admins can perform this action
+            if (GetRole() == 1)
+            {
+                if (string.IsNullOrWhiteSpace(usuario.id))
+                {
+                    TempData["errorMessage"] = "El identificador no puede estar en blanco.";
+                }
+                else if (string.IsNullOrWhiteSpace(usuario.nuevaContrasena) || string.IsNullOrWhiteSpace(usuario.confirmarContrasena))
+                {
+                    TempData["errorMessage"] = "Las contraseñas no pueden estar en blanco.";
+                }
+                else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
+                {
+                    accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
+
+                    if (usuario.role == 0)
+                    {
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
+
+                        participante.idParticipante = usuario.id;
+                        participante.correo = usuario.oldId;
+
+                        accesoAParticipante.EditarIdParticipante(participante);
+                    }
+
+                    if (usuario.role == 2)
+                    {
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
+
+                        if (participante != null)
+                        {
+                            participante.idParticipante = usuario.id;
+                            participante.correo = usuario.oldId;
+
+                            accesoAParticipante.EditarIdParticipante(participante);
+                        }
+
+                        AsesorModel existingAsesor = accesoAAsesor.ObtenerAsesor(usuario.oldId);
+
+                        if (existingAsesor != null)
+                        {
+                            AsesorModel newAsesor = new AsesorModel
+                            {
+                                idAsesor = usuario.id,
+                                correo = usuario.id,
+                                nombre = existingAsesor.nombre,
+                                primerApellido = existingAsesor.primerApellido,
+                                segundoApellido = existingAsesor.segundoApellido,
+                                tipoIdentificacion = existingAsesor.tipoIdentificacion,
+                                numeroIdentificacion = existingAsesor.numeroIdentificacion,
+                                descripcion = existingAsesor.descripcion,
+                                telefono = existingAsesor.telefono
+                            };
+
+                            accesoAAsesor.CrearAsesor(newAsesor);
+
+                            List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(usuario.oldId);
+
+                            if (gruposAsesor != null)
+                            {
+                                accesoAGrupo.EditarIdGruposAsesor(usuario.id, usuario.oldId);
+                            }
+
+                            accesoAAsesor.EliminarAsesor(usuario.oldId);
+                        }
+                    }
+
+                    accesoAUsuario.EliminarUsuario(usuario.oldId);
+
+                    if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
+
+                    TempData["successMessage"] = "El identificador del usuario se cambió correctamente.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Las contraseñas no coinciden.";
+                }
+
+                return RedirectToAction("CambiarIdUsuario", new { idUsuario = usuario.id });
+            }
+            else {
+                return RedirectToAction("CerrarSesion");
+            }
         }
 
         public ActionResult CambiarContrasena()
@@ -403,6 +535,9 @@ namespace webMetics.Controllers
                     {
                         ViewBag.SuccessMessage = TempData["successMessage"].ToString();
                     }
+
+                    ViewBag.Id = GetId();
+                    ViewBag.Role = GetRole();
 
                     return View(usuario);
                 }

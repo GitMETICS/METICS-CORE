@@ -130,7 +130,7 @@ namespace webMetics.Controllers
                                 .ToList();
                         }
 
-                        if (listaGruposAsesor != null)
+                        if (gruposAsesor != null)
                         {
                             listaGruposAsesor = listaGruposAsesor
                                 .Where(grupo => !gruposAsesor.Any(grupoAux => grupoAux.idGrupo == grupo.idGrupo))

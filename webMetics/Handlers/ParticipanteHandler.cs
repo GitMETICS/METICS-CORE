@@ -91,6 +91,27 @@ namespace webMetics.Handlers
         }
 
         // Actualizar la información de un participante en la base de datos
+        public bool EditarIdParticipante(ParticipanteModel participante)
+        {
+            bool exito = false;
+
+            string query = "UPDATE participante SET id_usuario_FK = @idUsuario, id_participante_PK = @idUsuario, correo = @idUsuario WHERE id_usuario_FK = @idAnterior;";
+
+            ConexionMetics.Open();
+
+            SqlCommand command = new SqlCommand(query, ConexionMetics);
+
+            command.Parameters.AddWithValue("@idUsuario", participante.idParticipante);
+            command.Parameters.AddWithValue("@idAnterior", participante.correo);
+
+            exito = command.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        // Actualizar la información de un participante en la base de datos
         public bool EditarParticipante(ParticipanteModel participante)
         {
             bool exito = false;
