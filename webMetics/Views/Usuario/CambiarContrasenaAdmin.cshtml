@@ -80,6 +80,7 @@
                             <div class="row mt-1">
                                 <div class="col input-wrapper">
                                     @Html.HiddenFor(model => model.id, new { })
+                                    @Html.HiddenFor(model => model.role, new { })
                                     <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
                                     @Html.PasswordFor(model => model.nuevaContrasena, new { id = "password", @class = "form-control" })
                                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">

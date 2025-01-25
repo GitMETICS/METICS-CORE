@@ -119,6 +119,8 @@ namespace webMetics.Models
         [Display(Name = "Correo institucional")]
         public string id { get; set; }
 
+        public int role { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar su contraseña actual.")]
         [Display(Name = "Contraseña actual")]
         public string contrasena { get; set; }

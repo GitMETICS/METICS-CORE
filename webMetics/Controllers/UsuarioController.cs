@@ -383,9 +383,17 @@ namespace webMetics.Controllers
                 if (!string.IsNullOrEmpty(idUsuario))
                 {
                     ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    int rolUsuario = 0;
+
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    if (asesor != null)
+                    {
+                        rolUsuario = 2;
+                    }
+
                     ViewBag.NombreCompleto = nombreCompleto;
 
-                    NewLoginModel usuario = new NewLoginModel() { id = idUsuario };
+                    NewLoginModel usuario = new NewLoginModel() { id = idUsuario, role = rolUsuario };
 
                     if (TempData["errorMessage"] != null)
                     {
@@ -423,7 +431,7 @@ namespace webMetics.Controllers
                 else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
                     // Admin resets the user's password without needing the old one
-                    accesoAUsuario.EditarUsuario(usuario.id, 0, usuario.nuevaContrasena);
+                    accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
 
                     if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
 
