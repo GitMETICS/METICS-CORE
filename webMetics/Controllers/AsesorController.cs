@@ -17,6 +17,7 @@ namespace webMetics.Controllers
         private protected AsesorHandler accesoAAsesor;
         private protected ParticipanteHandler accesoAParticipante;
         private protected GrupoHandler accesoAGrupo;
+        private protected InscripcionHandler accesoAInscripcion;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -31,9 +32,99 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
+            accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
-        
+        public ActionResult MisModulos()
+        {
+            const int RolUsuarioParticipante = 0;
+            const int RolUsuarioAdmin = 1;
+            const int RolUsuarioAsesor = 2;
+
+            int rolUsuario = GetRole();
+            string idUsuario = GetId();
+
+            // Obtener la lista de grupos y participantes
+            List<GrupoModel> listaGrupos = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+            List<InscripcionModel> participantesEnGrupos = accesoAInscripcion.ObtenerInscripciones();
+
+            // Inicializar las propiedades de ViewBag
+            ViewBag.ListaGrupos = listaGrupos;
+            ViewBag.ParticipantesEnGrupos = participantesEnGrupos;
+            ViewBag.IdParticipante = string.Empty;
+
+            // Manejar los roles de usuario y las suscripciones a grupos
+            if (!string.IsNullOrEmpty(idUsuario))
+            {
+                ViewBag.IdParticipante = idUsuario;
+
+                switch (rolUsuario)
+                {
+                    case RolUsuarioParticipante:
+                        var gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                        ViewBag.GruposInscritos = gruposInscritos;
+
+                        if (gruposInscritos != null)
+                        {
+                            ViewBag.ListaGrupos = listaGrupos
+                                .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+                        break;
+
+                    case RolUsuarioAdmin:
+                        ViewBag.ListaGrupos = listaGrupos;
+                        break;
+
+                    case RolUsuarioAsesor:
+                        var gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+                        ViewBag.ListaGrupos = gruposAsesor;
+
+                        break;
+                }
+            }
+
+            // Definir propiedades adicionales de ViewBag
+            ViewBag.DateNow = DateTime.Now;
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
+
+            // Gestionar mensajes de TempData
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View();
+        }
+
+        public IActionResult BuscarGrupos(string searchTerm)
+        {
+            int rolUsuario = GetRole();
+            string idUsuario = GetId();
+
+            // Obtener la lista de participantes
+            var grupos = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                grupos = grupos.Where(p =>
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.descripcion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombreAsesor.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombreCategoria.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.modalidad.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.lugar.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.TemasSeleccionadosNombres.Any(t => t.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+
+            ViewBag.ListaGrupos = grupos;
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
+
+            return View("MisModulos");
+        }
+
         /* Método de la vista ListaAsesores que muestra todos los asesores */
         public ActionResult ListaAsesores()
         {

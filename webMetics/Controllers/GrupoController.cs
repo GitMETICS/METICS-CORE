@@ -117,7 +117,28 @@ namespace webMetics.Controllers
                         break;
 
                     case RolUsuarioAsesor:
-                        ViewBag.ListaGrupos = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+                        var gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+                        var gruposInscritosAsesor = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+                        ViewBag.GruposInscritos = gruposInscritosAsesor;
+
+                        var listaGruposAsesor = listaGrupos;
+
+                        if (gruposInscritosAsesor != null)
+                        {
+                            listaGruposAsesor = listaGrupos
+                                .Where(grupo => !gruposInscritosAsesor.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+
+                        if (listaGruposAsesor != null)
+                        {
+                            listaGruposAsesor = listaGruposAsesor
+                                .Where(grupo => !gruposAsesor.Any(grupoAux => grupoAux.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+
+                        ViewBag.ListaGrupos = listaGruposAsesor;
+
                         break;
                 }
             }

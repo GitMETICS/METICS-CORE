@@ -351,7 +351,7 @@ namespace webMetics.Controllers
             // Cerrar el documento
             document.Close();
 
-            // Devolver el archivo PDF
+            // Devolver el archivo PDF 
             string fileName = "Lista_de_Participantes_Módulos.pdf";
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }

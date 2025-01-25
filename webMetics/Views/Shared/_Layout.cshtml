@@ -99,7 +99,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Facilitador(a)</a>
                                     <div class="dropdown-menu">
-                                        @Html.ActionLink("Mis módulos", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item" })
                                         @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
                                     </div>
                                 </li>
@@ -111,7 +111,7 @@
                     </div>
                     <div>
                         <ul class="navbar-nav me-auto">
-                        @if (ViewBag.Role == 1 || ViewBag.Role == 2)
+                            @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                         {
                             <li class="nav-item">
                                     @Html.ActionLink("      Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-lg btn btn-secondary" })
