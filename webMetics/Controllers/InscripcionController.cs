@@ -29,6 +29,8 @@ namespace webMetics.Controllers
         private InscripcionHandler accesoAInscripcion;
         private GrupoHandler accesoAGrupo;
         private ParticipanteHandler accesoAParticipante;
+        private AsesorHandler accesoAAsesor;
+        private UsuarioHandler accesoAUsuario;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
@@ -45,6 +47,10 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
+            accesoAAsesor = new AsesorHandler(environment, configuration);
+            accesoAUsuario = new UsuarioHandler(environment, configuration);
+
+
             _memoryCache = memoryCache;
         }
 
@@ -197,13 +203,53 @@ namespace webMetics.Controllers
         {
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
+                int rolUsuario = GetRole();
+                string idUsuario = GetId();
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                ParticipanteModel participante = null;
+                AsesorModel asesor = null;
+
+                if (rolUsuario == 0) 
+                {
+                    participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                }
+
+                if (rolUsuario == 2)
+                {
+                    asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
+                    ParticipanteModel participanteAux = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    
+                    if (participanteAux == null && asesor != null) // Si no existe un participante asociado al Id del usuario asesor, entonces se crea uno
+                    {
+                        ParticipanteModel nuevoParticipante = new ParticipanteModel
+                        {
+                            idParticipante = asesor.idAsesor,
+                            nombre = asesor.nombre,
+                            primerApellido = asesor.primerApellido,
+                            segundoApellido = asesor.segundoApellido,
+                            correo = asesor.correo,
+                            tipoIdentificacion = asesor.tipoIdentificacion,
+                            numeroIdentificacion = asesor.numeroIdentificacion,
+                            area = "",
+                            departamento = "",
+                            unidadAcademica = "",
+                            sede = "",
+                            tipoParticipante = "",
+                            condicion = "",
+                            telefono = "",
+                            horasMatriculadas = 0,
+                            horasAprobadas = 0
+                        };
+
+                        accesoAParticipante.CrearParticipante(nuevoParticipante);
+
+                        participante = nuevoParticipante;
+                    }
+                }
                 
-                if (grupo != null && participante != null && accesoAInscripcion.NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+                if (grupo != null && (participante != null || asesor != null) && accesoAInscripcion.NoEstaInscritoEnGrupo(idGrupo, idParticipante))
                 {
                     // Insertar la inscripción y enviar el comprobante por correo electrónico
                     InscripcionModel inscripcion = new InscripcionModel
@@ -250,11 +296,17 @@ namespace webMetics.Controllers
                     ViewBag.Titulo = "No se pudo realizar la inscripción";
                     ViewBag.Message = "No se puede inscribir en este grupo porque ya está inscrito o ha superado el límite máximo de horas.";
                 }
+
+                ViewBag.Role = rolUsuario;
+                ViewBag.Id = idUsuario;
             }
             catch
             {
                 ViewBag.Titulo = "No se pudo realizar la inscripción";
                 ViewBag.Message = "El módulo no se encuentra disponible.";
+
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
             }
 
             return View();
