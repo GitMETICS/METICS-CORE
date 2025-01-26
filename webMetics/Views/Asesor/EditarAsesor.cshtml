@@ -101,7 +101,15 @@
                             </div>
                             <div class="form-group">
                                 @Html.LabelFor(asesorModel => asesorModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @if (ViewBag.Role == 1)
+                                {
+                                    @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
+                                }
+
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
                             </div>
                             <div class="row mt-1">
@@ -125,7 +133,7 @@
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
-                                @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" })
+                                @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
                             </div>

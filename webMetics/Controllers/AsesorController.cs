@@ -257,44 +257,24 @@ namespace webMetics.Controllers
             {
                 try
                 {
+                    NewLoginModel usuario = new NewLoginModel
+                    {
+                        oldId = asesor.idAsesor,
+                        id = asesor.correo,
+                        role = 2,
+                        nuevaContrasena = asesor.contrasena
+                    };
+
                     if (GetRole() == 1)
                     {
                         if (asesor.contrasena == asesor.confirmarContrasena)
                         {
                             accesoAAsesor.EditarAsesor(asesor);
 
-                            NewLoginModel usuario = new NewLoginModel
-                            {
-                                oldId = asesor.idAsesor,
-                                id = asesor.correo,
-                                role = 2,
-                                nuevaContrasena = asesor.contrasena
-                            };
-
                             if (asesor.idAsesor != asesor.correo)
                             {
                                 EditarIdUsuario(usuario);
                             }
-
-                            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
-
-                            if (participante != null)
-                            {
-                                AsesorModel asesorActualizado = accesoAAsesor.ObtenerAsesor(usuario.id);
-
-                                participante.nombre = asesorActualizado.nombre;
-                                participante.primerApellido = asesorActualizado.primerApellido;
-                                participante.segundoApellido = asesorActualizado.segundoApellido;
-                                participante.correo = asesorActualizado.correo;
-                                participante.tipoIdentificacion = asesorActualizado.tipoIdentificacion;
-                                participante.numeroIdentificacion = asesorActualizado.numeroIdentificacion;
-                                participante.telefono = asesorActualizado.telefono;
-
-                                accesoAParticipante.EditarParticipante(participante);
-                            } 
-
-                            TempData["successMessage"] = "Los datos de/la facilitador(a) fueron guardados.";
-                            return RedirectToAction("ListaAsesores");
                         }
                         else
                         {
@@ -303,6 +283,38 @@ namespace webMetics.Controllers
                             ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                             return View("EditarAsesor", asesor);
                         }
+                    }
+                    else
+                    {
+                        accesoAAsesor.EditarAsesor(asesor);
+                    }
+
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
+
+                    if (participante != null)
+                    {
+                        AsesorModel asesorActualizado = accesoAAsesor.ObtenerAsesor(usuario.id);
+
+                        participante.nombre = asesorActualizado.nombre;
+                        participante.primerApellido = asesorActualizado.primerApellido;
+                        participante.segundoApellido = asesorActualizado.segundoApellido;
+                        participante.correo = asesorActualizado.correo;
+                        participante.tipoIdentificacion = asesorActualizado.tipoIdentificacion;
+                        participante.numeroIdentificacion = asesorActualizado.numeroIdentificacion;
+                        participante.telefono = asesorActualizado.telefono;
+
+                        accesoAParticipante.EditarParticipante(participante);
+                    }
+
+                    if (GetRole() == 1)
+                    {
+                        TempData["successMessage"] = "Los datos de/la facilitador(a) fueron guardados.";
+                        return RedirectToAction("ListaAsesores");
+                    }
+                    else
+                    {
+                        TempData["successMessage"] = "Sus datos fueron guardados.";
+                        return RedirectToAction("InformacionPersonal", "Usuario");
                     }
                 }
                 catch

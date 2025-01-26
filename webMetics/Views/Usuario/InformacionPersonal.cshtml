@@ -45,6 +45,7 @@
             {
                 var nombreCompleto = ViewBag.Usuario.nombre;
                 nombreCompleto += " " + ViewBag.Usuario.primerApellido;
+                nombreCompleto += " " + ViewBag.Usuario.segundoApellido;
 
                 <div>
                     <table class="table table-striped" id="tblCustomers">
@@ -84,17 +85,13 @@
                         </thead>
 
                         <tbody>
-                            @if (ViewBag.Usuario.segundoApellido != "-")
-                            {
-                                nombreCompleto += " " + ViewBag.Usuario.segundoApellido;
-                            }
                             <tr>
                                 <td class="">@nombreCompleto</td>
                                 <td class="">@ViewBag.Usuario.numeroIdentificacion</td>
 
-                                @if (ViewBag.Usuario.unidadAcademica != null)
+                                @if (ViewBag.Participante != null)
                                 {
-                                    <td class="">@ViewBag.Usuario.unidadAcademica</td>
+                                    <td class="">@ViewBag.Participante.unidadAcademica</td>
                                 }
 
                                 @if (ViewBag.Usuario.correo != null)
@@ -102,9 +99,9 @@
                                     <td class="">@ViewBag.Usuario.correo</td>
                                 }
 
-                                @if (ViewBag.Usuario.condicion != null)
+                                @if (ViewBag.Participante.condicion != null)
                                 {
-                                    <td class="">@ViewBag.Usuario.condicion</td>
+                                    <td class="">@ViewBag.Participante.condicion</td>
                                 }
 
                                 @if (ViewBag.Usuario.telefono != null)
@@ -115,11 +112,11 @@
                                 @if (ViewBag.Participante != null)
                                 {
                                     <td class="my-3 text-center" style="width: 7.5%">
-                                        <span>@ViewBag.Participante.horasMatriculadas</span>
+                                        <span>@(ViewBag.Participante.horasMatriculadas ?? 0)</span>
                                     </td>
 
                                     <td class="my-3 text-center" scope="col" style="width: 7.5%">
-                                        <span>@ViewBag.Participante.horasAprobadas</span>
+                                        <span>@(ViewBag.Participante.horasAprobadas ?? 0)</span>
                                     </td>
 
                                     <td class="">
@@ -141,12 +138,17 @@
 
                 @if (ViewBag.Inscripciones == null)
                 {
+                    <br />
+                    <h5 class="text-center">No tiene módulos inscritos.</h5>
+
                     @if (ViewBag.Role == 2)
                     {
-                        @if (ViewBag.ListaGrupos == null)
+                        @if (ViewBag.ListaGruposAsesor == null)
                         {
                             <br />
-                            <h5 class="text-center">No tiene grupos asociados.</h5>
+                            <hr />
+                            <br />
+                            <h5 class="text-center">No tiene módulos creados.</h5>
                         }
                         else
                         {
@@ -167,28 +169,28 @@
                                     <tbody class="align-middle">
                                         <tr>
                                             <td>
-                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
                                                 {
                                                     <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
                                                     <br />
                                                 }
                                             </td>
                                             <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
                                                 {
                                                     @grupo.cantidadHoras
                                                     <br />
                                                 }
                                             </td>
                                             <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
                                                 {
                                                     @grupo.cupo
                                                     <br />
                                                 }
                                             </td>
                                             <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGrupos)
+                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
                                                 {
                                                     @grupo.cupoActual
                                                     <br />
@@ -203,7 +205,7 @@
                 }
                 else
                 {
-                    @if (ViewBag.Role == 0)
+                    @if (ViewBag.Participante != null)
                     {
                         <!-- Medallas -->
                         @if (ViewBag.Medallas != null)
@@ -364,6 +366,66 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @if (ViewBag.Role == 2)
+                        {
+                            @if (ViewBag.ListaGruposAsesor == null)
+                            {
+                                <br />
+                                <h5 class="text-center">No tiene módulos creados.</h5>
+                            }
+                            else
+                            {
+                                <!-- Módulos asesor -->
+                                <br />
+                                <div class="mt-4">
+                                    <h3 class="">Módulos creados</h3>
+                                    <table class="table table-striped" id="tblCustomers">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Módulos</th>
+                                                <th class="text-center" scope="col" style="width: 15%">Horas del<br>Módulo</th>
+                                                <th class="text-center" scope="col" style="width: 15%">Cupo</th>
+                                                <th class="text-center" scope="col" style="width: 15%">Cupo Actual</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody class="align-middle">
+                                            <tr>
+                                                <td>
+                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
+                                                    {
+                                                        <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
+                                                        <br />
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
+                                                    {
+                                                        @grupo.cantidadHoras
+                                                        <br />
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
+                                                    {
+                                                        @grupo.cupo
+                                                        <br />
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
+                                                    {
+                                                        @grupo.cupoActual
+                                                        <br />
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        }
                     }
                 }
             }

@@ -229,13 +229,16 @@ namespace webMetics.Controllers
             int role = GetRole();
             string idUsuario = GetId();
 
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idUsuario);
+            List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
+
+            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+            List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
+
             switch (role)
             {
                 case RolUsuarioParticipante:
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-                    List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idUsuario);
-                    List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
-
                     UsuarioModel usuarioParticipante = new UsuarioModel()
                     {
                         id = idUsuario,
@@ -266,9 +269,6 @@ namespace webMetics.Controllers
                     break;
 
                 case RolUsuarioAsesor:
-                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
-                    List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
-
                     UsuarioModel usuarioAsesor = new UsuarioModel()
                     {
                         id = idUsuario,
@@ -283,7 +283,15 @@ namespace webMetics.Controllers
 
                     ViewBag.Usuario = usuarioAsesor;
                     ViewBag.Asesor = asesor;
-                    ViewBag.ListaGrupos = gruposAsesor;
+                    ViewBag.ListaGruposAsesor = gruposAsesor;
+
+                    if (participante != null)
+                    {
+                        ViewBag.Participante = participante;
+                        ViewBag.Inscripciones = inscripciones;
+                        ViewBag.ListaGrupos = gruposParticipante;
+                        ViewBag.Medallas = accesoAParticipante.ObtenerMedallas(idUsuario);
+                    }
 
                     break;
 
