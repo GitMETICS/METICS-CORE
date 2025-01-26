@@ -74,13 +74,11 @@
                                     <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
                                     <td scope="col" style="width: 3.33%;"></td>
                                 }
-
-                                @if (ViewBag.Asesor != null)
+                                else
                                 {
                                     <td scope="col" style="width: 3.33%;"></td>
                                 }
 
-                                
                             </tr>
                         </thead>
 
@@ -99,7 +97,7 @@
                                     <td class="">@ViewBag.Usuario.correo</td>
                                 }
 
-                                @if (ViewBag.Participante.condicion != null)
+                                @if (ViewBag.Participante != null && ViewBag.Participante.condicion != null)
                                 {
                                     <td class="">@ViewBag.Participante.condicion</td>
                                 }
@@ -123,8 +121,7 @@
                                         @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                     </td>
                                 }
-
-                                @if (ViewBag.Asesor != null)
+                                else
                                 {
                                     <td class="">
                                         @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = ViewBag.Id }, new { @class = "text-secondary bi bi-pencil-square" })
@@ -371,6 +368,8 @@
                         {
                             @if (ViewBag.ListaGruposAsesor == null)
                             {
+                                <br />
+                                <hr />
                                 <br />
                                 <h5 class="text-center">No tiene módulos creados.</h5>
                             }
