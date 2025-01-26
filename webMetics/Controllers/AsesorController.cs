@@ -275,6 +275,8 @@ namespace webMetics.Controllers
                             {
                                 EditarIdUsuario(usuario);
                             }
+
+                            accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
                         }
                         else
                         {

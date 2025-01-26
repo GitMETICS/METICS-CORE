@@ -124,6 +124,7 @@ namespace webMetics.Controllers
         private bool CrearUsuario(UsuarioModel usuario, string contrasena)
         {
             bool exito = false;
+            int rolUsuario = 0;
 
             try
             {
@@ -161,7 +162,24 @@ namespace webMetics.Controllers
                 // Si el usuario existe, verificar si fue registrado por el propio usuario
                 else if (!accesoAUsuario.ObtenerRegistradoPorUsuario(usuario.id)) // Si no fue registrado por el propio usuario, actualizar los datos del participante
                 {
-                    accesoAUsuario.EditarUsuario(usuario.id, 0, contrasena); // Rol de participante = 0
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(usuario.id);
+                    if (asesor != null)
+                    {
+                        asesor.nombre = usuario.nombre;
+                        asesor.primerApellido = usuario.primerApellido;
+                        asesor.segundoApellido = usuario.segundoApellido;
+                        asesor.tipoIdentificacion = usuario.tipoIdentificacion;
+                        asesor.numeroIdentificacion = usuario.numeroIdentificacion;
+                        asesor.correo = usuario.correo;
+                        asesor.telefono = usuario.telefono;
+
+                        rolUsuario = 2;
+
+                        accesoAAsesor.EditarAsesor(asesor);
+                        accesoAParticipante.CrearParticipante(participante);
+                    }
+
+                    accesoAUsuario.EditarUsuario(usuario.id, rolUsuario, contrasena); // Si el admin había ingresado un asesor con ese id, se guarda como asesor al registrarse
                     accesoAParticipante.EditarParticipante(participante);
                     accesoAUsuario.ActualizarRegistradoPorUsuario(usuario.id);
 
