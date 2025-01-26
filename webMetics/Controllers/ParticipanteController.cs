@@ -837,6 +837,21 @@ namespace webMetics.Controllers
                 {
                     participante.idParticipante = participante.correo;
                     accesoAParticipante.EditarParticipante(participante);
+
+                    AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
+                    if (asesorAsociado != null)
+                    {
+                        asesorAsociado.nombre = participante.nombre;
+                        asesorAsociado.primerApellido = participante.primerApellido;
+                        asesorAsociado.segundoApellido = participante.segundoApellido;
+                        asesorAsociado.correo = participante.correo;
+                        asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
+                        asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
+                        asesorAsociado.telefono = participante.telefono;
+
+                        accesoAAsesor.EditarAsesor(asesorAsociado);
+                    }
+
                     TempData["successMessage"] = "Los datos fueron guardados.";
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }

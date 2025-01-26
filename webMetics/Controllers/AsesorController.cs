@@ -245,57 +245,140 @@ namespace webMetics.Controllers
         [HttpPost]
         public ActionResult ActualizarAsesor(AsesorModel asesor)
         {
-            int role = GetRole();
-
             ViewBag.Id = GetId();
-            ViewBag.Role = role;
+            ViewBag.Role = GetRole();
 
             if (!ModelState.IsValid)
             {
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 return View("EditarAsesor", asesor);
             }
-
-            try
+            else
             {
-                asesor.idAsesor = asesor.correo;
-                accesoAAsesor.EditarAsesor(asesor);
-
-                if (role == 1)
+                try
                 {
-                    if (asesor.contrasena == asesor.confirmarContrasena)
+                    if (GetRole() == 1)
                     {
-                        accesoAUsuario.EditarUsuario(asesor.idAsesor, 2, asesor.contrasena);
-                        TempData["successMessage"] = "Los datos fueron guardados.";
-                    }
-                    else
-                    {
-                        ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
-                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                        return View("EditarAsesor", asesor);
+                        if (asesor.contrasena == asesor.confirmarContrasena)
+                        {
+                            accesoAAsesor.EditarAsesor(asesor);
+
+                            NewLoginModel usuario = new NewLoginModel
+                            {
+                                oldId = asesor.idAsesor,
+                                id = asesor.correo,
+                                role = 2,
+                                nuevaContrasena = asesor.contrasena
+                            };
+
+                            if (asesor.idAsesor != asesor.correo)
+                            {
+                                EditarIdUsuario(usuario);
+                            }
+
+                            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
+
+                            if (participante != null)
+                            {
+                                AsesorModel asesorActualizado = accesoAAsesor.ObtenerAsesor(usuario.id);
+
+                                participante.nombre = asesorActualizado.nombre;
+                                participante.primerApellido = asesorActualizado.primerApellido;
+                                participante.segundoApellido = asesorActualizado.segundoApellido;
+                                participante.correo = asesorActualizado.correo;
+                                participante.tipoIdentificacion = asesorActualizado.tipoIdentificacion;
+                                participante.numeroIdentificacion = asesorActualizado.numeroIdentificacion;
+                                participante.telefono = asesorActualizado.telefono;
+
+                                accesoAParticipante.EditarParticipante(participante);
+                            } 
+
+                            TempData["successMessage"] = "Los datos de/la facilitador(a) fueron guardados.";
+                            return RedirectToAction("ListaAsesores");
+                        }
+                        else
+                        {
+                            ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
+
+                            ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                            return View("EditarAsesor", asesor);
+                        }
                     }
                 }
-                else
+                catch
                 {
-                    TempData["successMessage"] = "Los datos fueron guardados.";
+                    TempData["errorMessage"] = "Ocurrió un error al editar los datos del/la facilitador(a).";
                 }
 
-                if (role == 1)
-                {
-                    return RedirectToAction("ListaAsesores");
-                }
-                else
-                {
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
-                }
-            }
-            catch
-            {
-                TempData["errorMessage"] = "Ocurrió un error al editar los datos del/la facilitador(a).";
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
 
+        private bool EditarIdUsuario(NewLoginModel usuario)
+        {
+            bool exito = accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
+
+            if (usuario.role == 0 && exito)
+            {
+                EditarIdParticipante(usuario);
+            }
+
+            if (usuario.role == 2 && exito)
+            {
+                EditarIdAsesor(usuario);
+            }
+
+            exito = accesoAUsuario.EliminarUsuario(usuario.oldId);
+
+            return exito;
+        }
+
+        private void EditarIdParticipante(NewLoginModel usuario)
+        {
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
+
+            if (participante != null)
+            {
+                participante.idParticipante = usuario.id;
+                participante.correo = usuario.oldId;
+
+                accesoAParticipante.EditarIdParticipante(participante);
+            }
+        }
+
+        private void EditarIdAsesor(NewLoginModel usuario)
+        {
+            EditarIdParticipante(usuario);
+
+            AsesorModel existingAsesor = accesoAAsesor.ObtenerAsesor(usuario.oldId);
+
+            if (existingAsesor != null)
+            {
+                AsesorModel newAsesor = new AsesorModel
+                {
+                    idAsesor = usuario.id,
+                    correo = usuario.id,
+                    nombre = existingAsesor.nombre,
+                    primerApellido = existingAsesor.primerApellido,
+                    segundoApellido = existingAsesor.segundoApellido,
+                    tipoIdentificacion = existingAsesor.tipoIdentificacion,
+                    numeroIdentificacion = existingAsesor.numeroIdentificacion,
+                    descripcion = existingAsesor.descripcion,
+                    telefono = existingAsesor.telefono
+                };
+
+                accesoAAsesor.CrearAsesor(newAsesor);
+
+                List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(usuario.oldId);
+
+                if (gruposAsesor != null)
+                {
+                    accesoAGrupo.EditarIdGruposAsesor(usuario.id, usuario.oldId);
+                }
+
+                accesoAAsesor.EliminarAsesor(usuario.oldId);
+            }
+        }
 
         public ActionResult EliminarAsesor(string idAsesor)
         {

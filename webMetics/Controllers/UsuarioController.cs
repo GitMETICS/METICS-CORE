@@ -319,10 +319,11 @@ namespace webMetics.Controllers
                 // Validate the user ID to be changed
                 if (!string.IsNullOrEmpty(idUsuario))
                 {
-                    ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
                     int rolUsuario = 0;
 
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
                     AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
                     if (asesor != null)
                     {
                         rolUsuario = 2;
@@ -374,61 +375,7 @@ namespace webMetics.Controllers
                 }
                 else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
-                    accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
-
-                    if (usuario.role == 0)
-                    {
-                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
-
-                        participante.idParticipante = usuario.id;
-                        participante.correo = usuario.oldId;
-
-                        accesoAParticipante.EditarIdParticipante(participante);
-                    }
-
-                    if (usuario.role == 2)
-                    {
-                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
-
-                        if (participante != null)
-                        {
-                            participante.idParticipante = usuario.id;
-                            participante.correo = usuario.oldId;
-
-                            accesoAParticipante.EditarIdParticipante(participante);
-                        }
-
-                        AsesorModel existingAsesor = accesoAAsesor.ObtenerAsesor(usuario.oldId);
-
-                        if (existingAsesor != null)
-                        {
-                            AsesorModel newAsesor = new AsesorModel
-                            {
-                                idAsesor = usuario.id,
-                                correo = usuario.id,
-                                nombre = existingAsesor.nombre,
-                                primerApellido = existingAsesor.primerApellido,
-                                segundoApellido = existingAsesor.segundoApellido,
-                                tipoIdentificacion = existingAsesor.tipoIdentificacion,
-                                numeroIdentificacion = existingAsesor.numeroIdentificacion,
-                                descripcion = existingAsesor.descripcion,
-                                telefono = existingAsesor.telefono
-                            };
-
-                            accesoAAsesor.CrearAsesor(newAsesor);
-
-                            List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(usuario.oldId);
-
-                            if (gruposAsesor != null)
-                            {
-                                accesoAGrupo.EditarIdGruposAsesor(usuario.id, usuario.oldId);
-                            }
-
-                            accesoAAsesor.EliminarAsesor(usuario.oldId);
-                        }
-                    }
-
-                    accesoAUsuario.EliminarUsuario(usuario.oldId);
+                    EditarIdUsuario(usuario);
 
                     if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
 
@@ -443,6 +390,70 @@ namespace webMetics.Controllers
             }
             else {
                 return RedirectToAction("CerrarSesion");
+            }
+        }
+
+        private void EditarIdUsuario(NewLoginModel usuario)
+        {
+            accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
+
+            if (usuario.role == 0)
+            {
+                EditarIdParticipante(usuario);
+            }
+
+            if (usuario.role == 2)
+            {
+                EditarIdAsesor(usuario);
+            }
+
+            accesoAUsuario.EliminarUsuario(usuario.oldId);
+        }
+
+        private void EditarIdParticipante(NewLoginModel usuario)
+        {
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
+
+            if (participante != null)
+            {
+                participante.idParticipante = usuario.id;
+                participante.correo = usuario.oldId;
+
+                accesoAParticipante.EditarIdParticipante(participante);
+            }
+        }
+
+        private void EditarIdAsesor(NewLoginModel usuario)
+        {
+            EditarIdParticipante(usuario);
+
+            AsesorModel existingAsesor = accesoAAsesor.ObtenerAsesor(usuario.oldId);
+
+            if (existingAsesor != null)
+            {
+                AsesorModel newAsesor = new AsesorModel
+                {
+                    idAsesor = usuario.id,
+                    correo = usuario.id,
+                    nombre = existingAsesor.nombre,
+                    primerApellido = existingAsesor.primerApellido,
+                    segundoApellido = existingAsesor.segundoApellido,
+                    tipoIdentificacion = existingAsesor.tipoIdentificacion,
+                    numeroIdentificacion = existingAsesor.numeroIdentificacion,
+                    descripcion = existingAsesor.descripcion,
+                    telefono = existingAsesor.telefono
+                };
+
+                accesoAAsesor.CrearAsesor(newAsesor);
+
+                List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(usuario.oldId);
+
+                if (gruposAsesor != null)
+                {
+                    accesoAGrupo.EditarIdGruposAsesor(usuario.id, usuario.oldId);
+                }
+
+                accesoAAsesor.EliminarAsesor(usuario.oldId);
             }
         }
 

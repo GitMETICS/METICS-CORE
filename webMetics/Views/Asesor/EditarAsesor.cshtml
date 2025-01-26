@@ -81,6 +81,8 @@
                     <div class="col">
                         <div class="container">
                             <div class="form-group">
+                                @Html.HiddenFor(asesorModel => asesorModel.idAsesor, new { })
+
                                 @Html.LabelFor(asesorModel => asesorModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                                 @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
