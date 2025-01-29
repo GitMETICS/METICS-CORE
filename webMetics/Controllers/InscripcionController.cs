@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Text;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 /* 
  * Controlador para el proceso de inscripción de los grupos
  */
@@ -197,7 +198,59 @@ namespace webMetics.Controllers
                 return View("FormularioInscripcion", inscripcion);
             }
         }
+        public ActionResult FormularioInscripcionManual(int idGrupo)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
 
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+            ViewBag.IdGrupo = idGrupo;
+            ViewBag.NombreGrupo = grupo.nombre;
+            ViewBag.NumeroGrupo = grupo.numeroGrupo;
+
+            return View("FormularioInscripcionManual");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> FormularioInscripcionManual(InscripcionModel inscripcion)
+        {
+            int rolUsuario = GetRole();
+            ViewBag.Role = GetRole();
+            ViewBag.Id = rolUsuario;
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(inscripcion.idGrupo);
+            ViewBag.IdGrupo = inscripcion.idGrupo;
+            ViewBag.NombreGrupo = grupo.nombre;
+            ViewBag.NumeroGrupo = grupo.numeroGrupo;
+
+            if (ModelState.IsValid)
+            {
+
+                try
+                {
+                    await InscribirManualmente(inscripcion.idGrupo, inscripcion.idParticipante);
+                }
+                catch
+                {
+                    TempData["errorMessage"] = "Error al inscribir al participante.";
+                }
+                if (rolUsuario == 2)
+                {
+                    return RedirectToAction("MisModulos", "Asesor");
+
+                }
+                else
+                {
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+
+            }
+            else
+            {
+                return View("FormularioInscripcionManual", inscripcion);
+            }
+        }
         /* Método para inscribir a un usuario a un grupo */
         public ActionResult Inscribir(int idGrupo, string idParticipante)
         {
@@ -312,6 +365,104 @@ namespace webMetics.Controllers
             return View();
         }
 
+
+        public async Task<IActionResult> InscribirManualmente(int idGrupo, string idParticipante)
+        {
+            try
+            {
+                int rolUsuario = GetRole();
+                string idUsuario = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                ParticipanteModel participante = null;
+
+              
+
+                if (rolUsuario == 1 || rolUsuario == 2)
+                {
+                    ParticipanteModel participanteAux = accesoAParticipante.ObtenerParticipante(idParticipante);
+
+
+                    if (participanteAux == null)
+                    {
+                        TempData["errorMessage"] = "Error al inscribir al participante. El correo debe corresponder a un participante existente.";
+
+                        return View();
+                    }
+                    else
+                    {
+                        participante = participanteAux;
+
+                    }
+                }
+
+                      
+                if (grupo != null && (participante != null) && accesoAInscripcion.NoEstaInscritoEnGrupo(idGrupo, idParticipante))
+                {
+                    // Insertar la inscripción y enviar el comprobante por correo electrónico
+                    InscripcionModel inscripcion = new InscripcionModel
+                    {
+                        idGrupo = idGrupo,
+                        idParticipante = idParticipante,
+                        numeroGrupo = grupo.numeroGrupo,
+                        nombreGrupo = grupo.nombre,
+                        horasMatriculadas = grupo.cantidadHoras,
+                        horasAprobadas = 0,
+                        estado = "Inscrito"
+                    };
+
+                    bool exito = await accesoAInscripcion.InsertarInscripcionAsync(inscripcion);
+
+                    if (exito)
+                    {
+                        TempData["successMessage"] = "Participante inscrito.";
+
+                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+
+                        try
+                        {
+                            string mensaje = ConstructorDelMensajeNotificacionInscripcion(grupo, participante);
+                            EnviarCorreoInscripcion(grupo, mensaje, participante.correo);
+
+                            ViewBag.Titulo = "Inscripción realizada";
+                            ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
+                            ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                        }
+                        catch
+                        {
+                            // Configurar los datos para mostrar en la vista
+                            ViewBag.Titulo = "Inscripción realizada";
+                            ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el comprobante de inscripción a su correo institucional.";
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.Titulo = "No se pudo realizar la inscripción";
+                        ViewBag.Message = "Ocurrió un error al procesar la solicitud de inscripción.";
+                    }
+                }
+                else
+                {
+                    ViewBag.Titulo = "No se pudo realizar la inscripción";
+                    ViewBag.Message = "No se puede inscribir en este grupo porque ya está inscrito o ha superado el límite máximo de horas.";
+                    TempData["errorMessage"] = "No se puede inscribir en este grupo porque ya está inscrito o ha superado el límite máximo de horas.";
+
+                }
+
+                ViewBag.Role = rolUsuario;
+                ViewBag.Id = idUsuario;
+            }
+            catch
+            {
+                ViewBag.Titulo = "No se pudo realizar la inscripción";
+                ViewBag.Message = "El módulo no se encuentra disponible.";
+
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+            }
+
+            return View();
+        }
         /* Método para que un administrador elimine una inscripción de un usuario */
         public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {

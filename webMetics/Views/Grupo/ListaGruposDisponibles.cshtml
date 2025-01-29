@@ -481,7 +481,13 @@
                                     <div class="mt-3">
                                         @if (ViewBag.Role == 1)
                                         {
-                                            @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                            <div style="margin-bottom: 20px;">
+                                                @Html.ActionLink("Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                            </div>
+                                            <div>
+                                                @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                            </div>
+
                                         }
                                         else
                                         {
@@ -690,8 +696,9 @@
                                                         <strong><a href="@grupo.enlace" target="_blank">Enlace de Mediación Virtual</a></strong>
                                                     </div>
                                                 }
-
-
+                                                <div>
+                                                    @Html.ActionLink("Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                </div>
                                             </div>
                                     </div>
                                         <div class="mt-3 align-items-center text-center">
