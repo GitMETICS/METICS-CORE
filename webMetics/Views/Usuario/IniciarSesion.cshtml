@@ -85,9 +85,17 @@
                     </div>
                 </div>
                 <div class="card-footer text-center pt-2 pb-3">
+                    <p>
+                        <small>
+                            ¿Aprobó algún módulo antes del 1 de enero de 2025?
+                            <br />Solicite su contraseña a <span class="text-info">soporte.metics@ucr.ac.cr</span>.
+                        </small>
+                    </p>
                     <small>
-                        ¿No tiene un usuario?
-                        @Html.ActionLink("Registrarse", "FormularioRegistro", "Usuario", new { }, new { @class = "link-info" })
+                        <i>
+                            ¿Es un nuevo usuario?
+                            @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", new { }, new { @class = "link-info" })
+                        </i>
                     </small>
                 </div>
             </div>
