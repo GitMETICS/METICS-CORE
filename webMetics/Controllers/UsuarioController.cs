@@ -208,35 +208,32 @@ namespace webMetics.Controllers
                 if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
                 {
                     usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
+
                     int rolUsuario = usuarioAutorizado.rol;
                     string idUsuario = usuarioAutorizado.id;
+
+                    int minutos = 20;
+                    if (rolUsuario == 1)
+                    {
+                        minutos = 120;
+                    }
 
                     IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
                     string idEncriptado = protector.Protect(idUsuario);
 
                     Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(20)
+                        Expires = DateTime.Now.AddMinutes(minutos)
                     });
 
-                    if (rolUsuario == 1)
+                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
                     {
-                        Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddMinutes(120)
-                        });
-                    }
-                    else 
-                    {
-                        Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddMinutes(20)
-                        });
-                    }
+                        Expires = DateTime.Now.AddMinutes(minutos)
+                    });
 
                     Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(20)
+                        Expires = DateTime.Now.AddMinutes(minutos)
                     });
                 }
             }
