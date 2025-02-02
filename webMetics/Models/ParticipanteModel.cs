@@ -78,8 +78,16 @@ namespace webMetics.Models
 
     public enum TipoDeParticipantes
     {
+        [Display(Name = "Profesor")]
         Profesor,
+
+        [Display(Name = "Profesor Asociado")]
+        ProfesorAsociado,
+
+        [Display(Name = "Director")]
         Director,
+
+        [Display(Name = "Asistente")]
         Asistente
     }
 }

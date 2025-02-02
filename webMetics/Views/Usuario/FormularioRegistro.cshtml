@@ -1,4 +1,6 @@
 ﻿@model webMetics.Models.UsuarioModel
+@using webMetics.Controllers
+@using webMetics.Helpers
 @{
     ViewBag.Title = "Formulario de Registro";
 
@@ -85,7 +87,16 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.tipoParticipante, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))), "Seleccione un tipo de participante...", new { @class = "form-control" })
+                            @Html.DropDownListFor(
+                                     usuarioModel => usuarioModel.tipoParticipante,
+                                     new SelectList(
+                                     Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))
+                                     .Cast<webMetics.Models.TipoDeParticipantes>()
+                                     .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
+                                     "Value",
+                                     "Text"),
+                                     "Seleccione un tipo de participante...",
+                                     new { @class = "form-control" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
