@@ -54,7 +54,7 @@
                 <div class="col">
                     <div class="container">
                         <div class="form-group">
-                            <label for="idParticipante" style="font-size:22px">Correo institucional</label><a style="color:red;font-size:22px">*</a>
+                            <label for="idParticipante" style="font-size:22px">Correo institucional</label> <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(model => model.idParticipante, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(model => model.idParticipante, "", new { @class = "text-danger" })
                         </div>
