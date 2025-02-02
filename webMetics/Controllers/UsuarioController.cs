@@ -219,10 +219,20 @@ namespace webMetics.Controllers
                         Expires = DateTime.Now.AddMinutes(20)
                     });
 
-                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
+                    if (rolUsuario == 1)
                     {
-                        Expires = DateTime.Now.AddMinutes(20)
-                    });
+                        Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
+                        {
+                            Expires = DateTime.Now.AddMinutes(120)
+                        });
+                    }
+                    else 
+                    {
+                        Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
+                        {
+                            Expires = DateTime.Now.AddMinutes(20)
+                        });
+                    }
 
                     Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
                     {
