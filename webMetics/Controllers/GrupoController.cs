@@ -108,12 +108,17 @@ namespace webMetics.Controllers
                         {
                             ViewBag.ListaGrupos = listaGrupos
                                 .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
+                                .ThenBy(grupo => grupo.nombre) 
                                 .ToList();
                         }
                         break;
 
                     case RolUsuarioAdmin:
-                        ViewBag.ListaGrupos = listaGrupos;
+                        ViewBag.ListaGrupos = listaGrupos
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
+                            .ThenBy(grupo => grupo.nombre)
+                            .ToList();
                         break;
 
                     case RolUsuarioAsesor:
@@ -137,10 +142,18 @@ namespace webMetics.Controllers
                                 .ToList();
                         }
 
-                        ViewBag.ListaGrupos = listaGruposAsesor;
-
+                        ViewBag.ListaGrupos = listaGruposAsesor
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
+                            .ThenBy(grupo => grupo.nombre)
+                            .ToList();
                         break;
                 }
+
+
+
+
+
+
             }
 
             // Definir propiedades adicionales de ViewBag
