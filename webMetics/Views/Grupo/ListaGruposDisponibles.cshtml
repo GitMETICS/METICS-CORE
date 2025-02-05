@@ -319,6 +319,10 @@
                                             {
                                                 <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
                                             }
+                                            @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
+                                            {
+                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción fuera de plazo</span>
+                                            }
                                             @if (ViewBag.Role == 1)
                                             {
                                                 <span class="badge bg-info" style="float:left; margin-right: 10px;">Inscripciones: @(grupo.cupoActual)</span>
@@ -543,6 +547,10 @@
                                         {
                                             <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
                                         }
+                                        @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
+                                        {
+                                            <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción fuera de plazo</span>
+                                        }
                                         @if (ViewBag.Role == 1)
                                         {
                                             <span class="badge bg-info" style="float:left; margin-right: 10px;">Inscripciones: @(grupo.cupoActual)</span>
@@ -657,6 +665,7 @@
                                                     <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
                                                 }
                                             }
+
                                             else if (ViewBag.DateNow < grupo.fechaInicioInscripcion)
                                             {
                                                 <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
