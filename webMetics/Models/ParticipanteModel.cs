@@ -81,9 +81,6 @@ namespace webMetics.Models
         [Display(Name = "Profesor(a)")]
         Profesor,
 
-        [Display(Name = "Profesor(a) Asociado(a)")]
-        ProfesorAsociado,
-
         [Display(Name = "Director(a)")]
         Director,
 

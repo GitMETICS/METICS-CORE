@@ -121,13 +121,16 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br />
+                            
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Interino(a)") @Html.Label("Profesor(a) Interino(a)")<br />
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Instructor(a)") @Html.Label("Profesor(a) Instructor(a)")<br />
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Adjunto(a)") @Html.Label("Profesor(a) Adjunto(a)")<br />
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Catedrático(a)") @Html.Label("Profesor(a) Catedrático(a)")<br />
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Invitado(a)") @Html.Label("Profesor(a) Invitado(a)")<br />
+                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Asociado(a)") @Html.Label("Profesor(a) Asociado(a)")<br />
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Otro") @Html.Label("Otro")<br />
                             @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
+                            
                         </div>
                     </div>
                     <div class="row justify-content-center m-4">
