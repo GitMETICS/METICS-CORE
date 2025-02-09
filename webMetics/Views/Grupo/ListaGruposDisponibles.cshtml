@@ -47,14 +47,15 @@
         {
             if (ViewBag.GruposInscritos != null)
             {
-            <h1>Módulos Inscritos</h1>
-            <div class="d-flex justify-content-between my-4">
+            
+            <div class="d-flex justify-content-between mb-3">
                 <!-- Barra de búsqueda -->
                 <div class="w-75 me-2">
-                    <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
+                        <h1>Módulos Inscritos</h1>
+                    @* <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
                         <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
                         <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
-                    </form>
+                    </form> *@
                 </div>
 
                 <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
@@ -321,7 +322,7 @@
                                             }
                                             @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
                                             {
-                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción fuera de plazo</span>
+                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
                                             }
                                             @if (ViewBag.Role == 1)
                                             {
@@ -549,7 +550,7 @@
                                         }
                                         @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
                                         {
-                                            <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción fuera de plazo</span>
+                                            <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
                                         }
                                         @if (ViewBag.Role == 1)
                                         {
@@ -938,7 +939,7 @@ else
         const gridView0 = document.getElementById("gridView0");
         const listView0 = document.getElementById("listView0");
         const listView = document.getElementById("listView");
-        const toggleViewBtn1 = document.getElementById("toggleViewBtn");
+        const toggleViewBtn1 = document.getElementById("toggleViewBtn1");
         const toggleViewBtn2 = document.getElementById("toggleViewBtn2");
 
         if (isListView) {
