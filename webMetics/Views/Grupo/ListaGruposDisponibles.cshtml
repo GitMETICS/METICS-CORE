@@ -281,6 +281,9 @@
             <div class="w-75 me-2">
                 <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
                     <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
+                    <input type="number" name="userRole" value="@ViewBag.Role" hidden/>
+                    <input type="text" name="userId" value="@ViewBag.Id" hidden/>
+
                     <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
                 </form>
             </div>

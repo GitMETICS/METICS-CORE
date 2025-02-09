@@ -148,12 +148,6 @@ namespace webMetics.Controllers
                             .ToList();
                         break;
                 }
-
-
-
-
-
-
             }
 
             // Definir propiedades adicionales de ViewBag
@@ -168,18 +162,19 @@ namespace webMetics.Controllers
             return View();
         }
 
-        public IActionResult BuscarGrupos(string searchTerm)
+        public IActionResult BuscarGrupos(string searchTerm, int userRole, string userId)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
+            const int RolUsuarioParticipante = 0;
+            const int RolUsuarioAdmin = 1;
+            const int RolUsuarioAsesor = 2;
 
             // Obtener la lista de participantes
-            var grupos = accesoAGrupo.ObtenerListaGrupos();
+            var listaGrupos = accesoAGrupo.ObtenerListaGrupos();
 
             // Filtrar la lista si se ha ingresado un término de búsqueda
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                grupos = grupos.Where(p =>
+                listaGrupos = listaGrupos.Where(p =>
                     p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.descripcion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.nombreAsesor.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
@@ -190,7 +185,74 @@ namespace webMetics.Controllers
                 ).ToList();
             }
 
-            ViewBag.ListaGrupos = grupos;
+            ViewBag.ListaGrupos = listaGrupos;
+            ViewBag.ParticipantesEnGrupos = accesoAInscripcion.ObtenerInscripciones();
+            ViewBag.IdParticipante = string.Empty;
+
+            // Manejar los roles de usuario y las suscripciones a grupos
+            if (!string.IsNullOrEmpty(userId))
+            {
+                ViewBag.IdParticipante = userId;
+
+                switch (userRole)
+                {
+                    case RolUsuarioParticipante:
+                        var gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(userId);
+                        ViewBag.GruposInscritos = gruposInscritos;
+
+                        if (gruposInscritos != null)
+                        {
+                            ViewBag.ListaGrupos = listaGrupos
+                                .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
+                                .ThenBy(grupo => grupo.nombre)
+                                .ToList();
+                        }
+                        break;
+
+                    case RolUsuarioAdmin:
+                        ViewBag.ListaGrupos = listaGrupos
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
+                            .ThenBy(grupo => grupo.nombre)
+                            .ToList();
+                        break;
+
+                    case RolUsuarioAsesor:
+                        var gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(userId);
+                        var gruposInscritosAsesor = accesoAGrupo.ObtenerListaGruposParticipante(userId);
+                        ViewBag.GruposInscritos = gruposInscritosAsesor;
+
+                        var listaGruposAsesor = listaGrupos;
+
+                        if (gruposInscritosAsesor != null)
+                        {
+                            listaGruposAsesor = listaGrupos
+                                .Where(grupo => !gruposInscritosAsesor.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+
+                        if (gruposAsesor != null)
+                        {
+                            listaGruposAsesor = listaGruposAsesor
+                                .Where(grupo => !gruposAsesor.Any(grupoAux => grupoAux.idGrupo == grupo.idGrupo))
+                                .ToList();
+                        }
+
+                        ViewBag.ListaGrupos = listaGruposAsesor
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
+                            .ThenBy(grupo => grupo.nombre)
+                            .ToList();
+                        break;
+                }
+            }
+
+            ViewBag.DateNow = DateTime.Now;
+            ViewBag.Role = userRole;
+            ViewBag.Id = userId;
+
+            // Gestionar mensajes de TempData
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
 
             return View("ListaGruposDisponibles");
         }
