@@ -303,6 +303,9 @@
             <div class="row d-none" id="gridView">
                 @foreach (var grupo in ViewBag.ListaGrupos)
                 {
+                    DateTime fechaInicioInscripcion = grupo.fechaInicioInscripcion.Date.AddDays(-1).AddSeconds(1);
+                    DateTime fechaFinInscripcion = grupo.fechaFinalizacionInscripcion.Date.AddDays(1).AddSeconds(-1);
+
                     if (grupo.esVisible == true || ViewBag.Role == 1)
                     {
                         var visible = "";
@@ -323,7 +326,7 @@
                                             {
                                                 <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
                                             }
-                                            @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
+                                            @if (ViewBag.DateNow.Date > fechaFinInscripcion)
                                             {
                                                 <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
                                             }
@@ -419,7 +422,7 @@
                                         }
                                         else
                                         {
-                                            if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
+                                            if (fechaInicioInscripcion < ViewBag.DateNow.Date && ViewBag.DateNow.Date < fechaFinInscripcion)
                                             {
                                                 if (grupo.cupoActual < grupo.cupo)
                                                 {
@@ -448,7 +451,7 @@
                                                     <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
                                                 }
                                             }
-                                            else if (ViewBag.DateNow < grupo.fechaInicioInscripcion)
+                                            else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
                                             {
                                                 <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
                                                 <br />
@@ -509,6 +512,9 @@
                     if (grupo.esVisible == true || ViewBag.Role == 1)
                     {
                         var visible = "";
+                        DateTime fechaInicioInscripcion = grupo.fechaInicioInscripcion.Date.AddDays(-1).AddSeconds(1);
+                        DateTime fechaFinInscripcion = grupo.fechaFinalizacionInscripcion.Date.AddDays(1).AddSeconds(-1);
+
                         if (grupo.esVisible == false)
                         {
                             visible = "0.5";
@@ -551,7 +557,7 @@
                                         {
                                             <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
                                         }
-                                        @if (ViewBag.DateNow > grupo.fechaFinalizacionInscripcion)
+                                        @if (ViewBag.DateNow.Date > fechaFinInscripcion)
                                         {
                                             <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
                                         }
@@ -640,7 +646,7 @@
                                         }
                                         else
                                         {
-                                            if (grupo.fechaInicioInscripcion < ViewBag.DateNow && ViewBag.DateNow < grupo.fechaFinalizacionInscripcion)
+                                            if (fechaInicioInscripcion < ViewBag.DateNow.Date && ViewBag.DateNow.Date < fechaFinInscripcion)
                                             {
                                                 if (grupo.cupoActual < grupo.cupo)
                                                 {
@@ -670,7 +676,7 @@
                                                 }
                                             }
 
-                                            else if (ViewBag.DateNow < grupo.fechaInicioInscripcion)
+                                            else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
                                             {
                                                 <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
                                                 <br />

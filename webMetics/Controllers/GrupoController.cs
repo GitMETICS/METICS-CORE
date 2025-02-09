@@ -318,14 +318,14 @@ namespace webMetics.Controllers
                     }
 
                     // Validar fechas de inicio y finalización
-                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                    if (grupo.fechaInicioInscripcion > grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo > grupo.fechaFinalizacionGrupo)
                     {
-                        if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
+                        if (grupo.fechaInicioInscripcion > grupo.fechaFinalizacionInscripcion)
                         {
                             ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
                         }
 
-                        if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                        if (grupo.fechaInicioGrupo > grupo.fechaFinalizacionGrupo)
                         {
                             ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
                         }
@@ -521,14 +521,14 @@ namespace webMetics.Controllers
                     }
 
                     // Validar fechas de inicio y finalización
-                    if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                    if (grupo.fechaInicioInscripcion > grupo.fechaFinalizacionInscripcion || grupo.fechaInicioGrupo > grupo.fechaFinalizacionGrupo)
                     {
-                        if (grupo.fechaInicioInscripcion >= grupo.fechaFinalizacionInscripcion)
+                        if (grupo.fechaInicioInscripcion > grupo.fechaFinalizacionInscripcion)
                         {
                             ModelState.AddModelError("fechaFinalizacionInscripcion", "La fecha de inicio de la inscripción debe ser antes de la fecha de finalización.");
                         }
 
-                        if (grupo.fechaInicioGrupo >= grupo.fechaFinalizacionGrupo)
+                        if (grupo.fechaInicioGrupo > grupo.fechaFinalizacionGrupo)
                         {
                             ModelState.AddModelError("fechaFinalizacionGrupo", "La fecha de inicio del módulo debe ser antes de la fecha de finalización.");
                         }
