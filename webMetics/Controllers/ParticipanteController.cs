@@ -723,7 +723,7 @@ namespace webMetics.Controllers
                     inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
                 }
 
-                int nuevasHorasAprobadas = inscripcion.horasAprobadas + horasAprobadas;
+                int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
                 if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
                 {
