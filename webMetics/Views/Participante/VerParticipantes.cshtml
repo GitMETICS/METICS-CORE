@@ -66,7 +66,10 @@
                         @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
-                        @Html.ActionLink("   Excel", "ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                        @Html.ActionLink("   Excel (1)", "ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
+                    </div>
+                    <div class="mx-1">
+                        @Html.ActionLink("   Excel (2)", "ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
                         @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })

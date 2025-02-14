@@ -605,6 +605,103 @@ namespace webMetics.Controllers
             }
         }
 
+        public ActionResult ExportarParticipantesExcel2(string? searchTerm)
+        {
+            // Obtener la lista de participantes e inscripciones
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Creamos el archivo de Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Lista_de_Participantes_Módulos");
+
+            // Crear estilos para el encabezado
+            ICellStyle headerStyle = workbook.CreateCellStyle();
+            headerStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+            headerStyle.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
+
+            // Añadir borde y fondo al encabezado
+            headerStyle.BorderBottom = BorderStyle.Thin;
+            headerStyle.BorderTop = BorderStyle.Thin;
+            headerStyle.BorderLeft = BorderStyle.Thin;
+            headerStyle.BorderRight = BorderStyle.Thin;
+
+            // Crear fuente en negrita para el encabezado
+            IFont font = workbook.CreateFont();
+            headerStyle.SetFont(font);
+
+            // Crear estilos para las celdas del cuerpo
+            ICellStyle bodyStyle = workbook.CreateCellStyle();
+            bodyStyle.BorderBottom = BorderStyle.Thin;
+            bodyStyle.BorderTop = BorderStyle.Thin;
+            bodyStyle.BorderLeft = BorderStyle.Thin;
+            bodyStyle.BorderRight = BorderStyle.Thin;
+
+            // Crear el encabezado de la tabla
+            IRow rowHeaders = sheet.CreateRow(3);
+            string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                NPOI.SS.UserModel.ICell cell = rowHeaders.CreateCell(i);
+                cell.SetCellValue(headers[i]);
+                cell.CellStyle = headerStyle;  // Aplicar estilo de encabezado
+            }
+
+            int rowN = 4;
+            foreach (var participante in participantes)
+            {
+                IRow row = sheet.CreateRow(rowN);
+
+                // Completar los datos del participante en cada fila
+                row.CreateCell(0).SetCellValue(participante.unidadAcademica);
+                row.CreateCell(1).SetCellValue(participante.nombre);
+                row.CreateCell(2).SetCellValue(participante.primerApellido);
+                row.CreateCell(3).SetCellValue(participante.segundoApellido);
+                row.CreateCell(4).SetCellValue(participante.idParticipante);
+                row.CreateCell(5).SetCellValue(participante.horasMatriculadas);
+                row.CreateCell(6).SetCellValue(participante.horasAprobadas);
+
+                // Aplicar estilo al cuerpo
+                for (int i = 0; i < 7; i++)
+                {
+                    row.GetCell(i).CellStyle = bodyStyle;
+                }
+
+                rowN++; // Incrementar para la siguiente fila
+
+
+                // Ajustar automáticamente el ancho de las columnas
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    sheet.AutoSizeColumn(i);
+                }
+            }
+
+            // Crear el archivo de Excel y devolverlo como respuesta
+            string fileName = "Lista_de_Participantes_Módulos.xlsx";
+            using (var stream = new MemoryStream())
+            {
+                workbook.Write(stream);
+                var file = stream.ToArray();
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+        }
+
 
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
