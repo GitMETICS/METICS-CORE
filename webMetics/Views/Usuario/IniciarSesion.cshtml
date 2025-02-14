@@ -84,18 +84,19 @@
                         }
                     </div>
                 </div>
-                <div class="card-footer text-center pt-2 pb-3">
+                <div class="card-footer text-center pt-2 pb-3 bg-info bg-opacity-25">
                     <p>
                         <small>
-                            ¿Aprobó algún módulo antes del 1 de enero de 2025?
-                            <br />Solicite su contraseña a <span class="text-info">soporte.metics@ucr.ac.cr</span>.
+                            <i>¿Aprobó algún módulo antes del 1 de enero de 2025?</i>
+                            <br />Solicite su contraseña a <span class="text-primary">soporte.metics@ucr.ac.cr</span>.
+                            
                         </small>
                     </p>
+                    <hr />
                     <small>
-                        <i>
-                            ¿Es un nuevo usuario?
-                            @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", new { }, new { @class = "link-info" })
-                        </i>
+                        <i>¿Es un nuevo usuario?</i>
+                        @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", new { }, new { @class = "link-primary" })
+                        
                     </small>
                 </div>
             </div>
