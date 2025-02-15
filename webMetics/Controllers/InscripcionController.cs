@@ -482,7 +482,7 @@ namespace webMetics.Controllers
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
 
-                    return RedirectToAction("VerInscripciones", "Inscripcion", new { reload = true });
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo", new { reload = true });
 
                 }
                 else
