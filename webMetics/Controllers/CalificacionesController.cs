@@ -175,15 +175,19 @@ namespace webMetics.Controllers
 
 
 
-            Table table = new Table(3, true);
+            Table table = new Table(5, true);
             table.AddHeaderCell("Nombre del participante").SetFontSize(10);
-            table.AddHeaderCell("Correo Institucional").SetFontSize(10);          
+            table.AddHeaderCell("Correo Institucional").SetFontSize(10);
+            table.AddHeaderCell("Estado").SetFontSize(10);
+            table.AddHeaderCell("Horas Aprobados").SetFontSize(10);
             table.AddHeaderCell("Calificación").SetFontSize(10);
 
             foreach (var calificacion in calificaciones)
             {
                 table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
                 table.AddCell(calificacion.participante.idParticipante);
+                table.AddCell(calificacion.estado);
+                table.AddCell(calificacion.horas_aprobadas.ToString());
                 table.AddCell(calificacion.calificacion.ToString());
             }
 
@@ -208,10 +212,12 @@ namespace webMetics.Controllers
             XWPFDocument wordDoc = new XWPFDocument();
 
             // Create a table
-            XWPFTable table = wordDoc.CreateTable(calificaciones.Count + 4, 3);
-            table.SetColumnWidth(0, 3750);
-            table.SetColumnWidth(1, 3750);
-            table.SetColumnWidth(2, 1500);
+            XWPFTable table = wordDoc.CreateTable(calificaciones.Count + 4, 5);
+            table.SetColumnWidth(0, 3400);
+            table.SetColumnWidth(1, 3500);
+            table.SetColumnWidth(2, 1200);
+            table.SetColumnWidth(3, 800);
+            table.SetColumnWidth(4, 1300);
 
             var headerRow0 = table.Rows[0];
             headerRow0.GetCell(0).SetText("Nombre del/la Facilitador(a)");
@@ -224,14 +230,18 @@ namespace webMetics.Controllers
             var headerRow = table.Rows[3];
             headerRow.GetCell(0).SetText("Correo Institucional");
             headerRow.GetCell(1).SetText("Nombre");
-            headerRow.GetCell(2).SetText("Calificación");
+            headerRow.GetCell(2).SetText("Estado");
+            headerRow.GetCell(3).SetText("Horas Apr.");
+            headerRow.GetCell(4).SetText("Calificación");
 
             for (int i = 0; i < calificaciones.Count; i++)
             {
                 var row = table.Rows[i + 4];
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.primerApellido + " " + calificaciones[i].participante.segundoApellido);
-                row.GetCell(2).SetText(calificaciones[i].calificacion.ToString());
+                row.GetCell(2).SetText(calificaciones[i].estado.ToString());
+                row.GetCell(3).SetText(calificaciones[i].horas_aprobadas.ToString());
+                row.GetCell(4).SetText(calificaciones[i].calificacion.ToString());
             }
 
             var stream = new MemoryStream();
@@ -275,7 +285,13 @@ namespace webMetics.Controllers
             cell32.SetCellValue("Nombre del participante");
 
             NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
-            cell33.SetCellValue("Calificación");
+            cell33.SetCellValue("Estado");
+
+            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
+            cell34.SetCellValue("Horas Aprobadas");
+
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
+            cell35.SetCellValue("Calificación");
 
             int rowN = 4;
             foreach (var calificacion in calificaciones)
@@ -288,12 +304,18 @@ namespace webMetics.Controllers
                 cell2.SetCellValue(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
 
                 NPOI.SS.UserModel.ICell cell3 = row.CreateCell(2);
-                cell3.SetCellValue(calificacion.calificacion);
+                cell3.SetCellValue(calificacion.estado);
+
+                NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
+                cell4.SetCellValue(calificacion.horas_aprobadas);
+
+                NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
+                cell5.SetCellValue(calificacion.calificacion);
 
                 rowN++;
             }
 
-            string fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".xlsx";
+            string fileName = "Lista_de_Calificacionex_" + grupo.nombre + ".xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();

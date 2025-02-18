@@ -88,11 +88,13 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 3.33%;"></th>
-                            <th scope="col" style="width: 30%;">Nombre Completo</th>
-                            <th scope="col" style="width: 45%;">Correo Institucional</th>
-                            <th class="text-center" scope="col" style="width: 20%;">Calificación</th>
-                            <th scope="col" style="width: 3.33%;"></th>
+                            <th scope="col" style="width: 2.5%;"></th>
+                            <th scope="col" style="width: 19%;">Nombre Completo</th>
+                            <th scope="col" style="width: 19%;">Correo Institucional</th>
+                            <th scope="col" style="width: 19%;">Estado</th>
+                            <th scope="col" style="width: 19%;">Horas Aprobadas</th>
+                            <th class="text-center" scope="col" style="width: 19%;">Calificación</th>
+                            <th scope="col" style="width: 2.5%;"></th>
                         </tr>
                     </thead>
 
@@ -111,6 +113,8 @@
                                 </td>
                                 <td>@nombreCompleto</td>
                                 <td>@calificacion.participante.idParticipante</td>
+                                <td>@calificacion.estado</td>
+                                <td>@calificacion.horas_aprobadas</td>
                                 <td class="text-center">@calificacion.calificacion</td>
                                 <td>
                                     @Html.ActionLink(" ", "EditarCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = calificacion.participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
