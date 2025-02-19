@@ -39,7 +39,7 @@ namespace webMetics.Handlers
                 idGrupo = Convert.ToInt32(filaCalificacion["id_grupo_FK"]),
                 participante = participante,
                 calificacion = Convert.ToDouble(filaCalificacion["calificacion"]),
-                horas_aprobadas = Convert.ToInt32(filaCalificacion["horas_aprobadas"]),
+                horasAprobadas = Convert.ToInt32(filaCalificacion["horas_aprobadas"]),
                 estado = Convert.ToString(filaCalificacion["estado"]),
 
             };

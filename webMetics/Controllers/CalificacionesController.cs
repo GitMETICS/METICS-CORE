@@ -146,7 +146,40 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
             }
 
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+        }
+
+        public ActionResult DescargarPlantillaSubirCalificaciones()
+        {
+            // Creamos el archivo de Excel
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Plantilla_Lista_Calificaciones");
+
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
+            NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
+            cell31.SetCellValue("Nombre");
+
+            NPOI.SS.UserModel.ICell cell32 = row.CreateCell(1);
+            cell32.SetCellValue("Primer Apellido");
+
+            NPOI.SS.UserModel.ICell cell33 = row.CreateCell(2);
+            cell33.SetCellValue("Segundo Apellido");
+
+            NPOI.SS.UserModel.ICell cell34 = row.CreateCell(3);
+            cell34.SetCellValue("Correo Institucional");
+
+            NPOI.SS.UserModel.ICell cell35 = row.CreateCell(4);
+            cell35.SetCellValue("Horas Aprobadas");
+
+            NPOI.SS.UserModel.ICell cell36 = row.CreateCell(5);
+            cell36.SetCellValue("Calificación");
+
+            string fileName = "Plantilla_Lista_Calificaciones.xlsx";
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            var file = stream.ToArray();
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
@@ -176,10 +209,10 @@ namespace webMetics.Controllers
 
 
             Table table = new Table(5, true);
-            table.AddHeaderCell("Nombre del participante").SetFontSize(10);
+            table.AddHeaderCell("Nombre").SetFontSize(10);
             table.AddHeaderCell("Correo Institucional").SetFontSize(10);
             table.AddHeaderCell("Estado").SetFontSize(10);
-            table.AddHeaderCell("Horas Aprobados").SetFontSize(10);
+            table.AddHeaderCell("Horas Aprobadas").SetFontSize(10);
             table.AddHeaderCell("Calificación").SetFontSize(10);
 
             foreach (var calificacion in calificaciones)
@@ -187,7 +220,7 @@ namespace webMetics.Controllers
                 table.AddCell(calificacion.participante.nombre + " " + calificacion.participante.primerApellido + " " + calificacion.participante.segundoApellido);
                 table.AddCell(calificacion.participante.idParticipante);
                 table.AddCell(calificacion.estado);
-                table.AddCell(calificacion.horas_aprobadas.ToString());
+                table.AddCell(calificacion.horasAprobadas.ToString());
                 table.AddCell(calificacion.calificacion.ToString());
             }
 
@@ -231,7 +264,7 @@ namespace webMetics.Controllers
             headerRow.GetCell(0).SetText("Correo Institucional");
             headerRow.GetCell(1).SetText("Nombre");
             headerRow.GetCell(2).SetText("Estado");
-            headerRow.GetCell(3).SetText("Horas Apr.");
+            headerRow.GetCell(3).SetText("Horas Aprobadas");
             headerRow.GetCell(4).SetText("Calificación");
 
             for (int i = 0; i < calificaciones.Count; i++)
@@ -240,7 +273,7 @@ namespace webMetics.Controllers
                 row.GetCell(0).SetText(calificaciones[i].participante.idParticipante.ToString());
                 row.GetCell(1).SetText(calificaciones[i].participante.nombre + " " + calificaciones[i].participante.primerApellido + " " + calificaciones[i].participante.segundoApellido);
                 row.GetCell(2).SetText(calificaciones[i].estado.ToString());
-                row.GetCell(3).SetText(calificaciones[i].horas_aprobadas.ToString());
+                row.GetCell(3).SetText(calificaciones[i].horasAprobadas.ToString());
                 row.GetCell(4).SetText(calificaciones[i].calificacion.ToString());
             }
 
@@ -282,7 +315,7 @@ namespace webMetics.Controllers
             cell31.SetCellValue("Correo Institucional");
 
             NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
-            cell32.SetCellValue("Nombre del participante");
+            cell32.SetCellValue("Nombre");
 
             NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
             cell33.SetCellValue("Estado");
@@ -307,7 +340,7 @@ namespace webMetics.Controllers
                 cell3.SetCellValue(calificacion.estado);
 
                 NPOI.SS.UserModel.ICell cell4 = row.CreateCell(3);
-                cell4.SetCellValue(calificacion.horas_aprobadas);
+                cell4.SetCellValue(calificacion.horasAprobadas);
 
                 NPOI.SS.UserModel.ICell cell5 = row.CreateCell(4);
                 cell5.SetCellValue(calificacion.calificacion);
@@ -391,7 +424,7 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Error al enviar las calificaciones.";
             }
 
-            return RedirectToAction("VerCalificaciones", new { idGrupo });
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
         private int GetRole()

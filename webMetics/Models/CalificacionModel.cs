@@ -11,7 +11,9 @@ namespace webMetics.Models
 
         [Range(0, 100, ErrorMessage = "Debe ser un número entre 0 y 100.")]
         public double calificacion { get; set; }
-        public int horas_aprobadas { get; set; }
+
+        public int horasAprobadas { get; set; }
+
         required public string estado { get; set; }
 
     }
