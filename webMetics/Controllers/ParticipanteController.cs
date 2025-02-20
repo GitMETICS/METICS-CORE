@@ -911,6 +911,11 @@ namespace webMetics.Controllers
                 ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
+                ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area,participante.departamento);
+
+
+
                 return View(participante);
             }
             catch
