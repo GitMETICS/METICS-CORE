@@ -1,7 +1,7 @@
 ﻿@model webMetics.Models.NewLoginModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Cambiar Identificador de Usuario";
+    ViewBag.Title = "Actualizar Credenciales de Usuario";
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
@@ -52,7 +52,7 @@
                 </div>
             }
 
-            @using (Html.BeginForm("CambiarIdUsuario", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("CambiarCredencialesUsuario", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
                 <h1>@ViewBag.Title</h1>

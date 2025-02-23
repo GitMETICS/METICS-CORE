@@ -113,7 +113,7 @@
                             <th scope="col">Correo Institucional</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
+                            @* <th class="text-center" scope="col" style="width:3.33%;"></th> *@
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -171,16 +171,7 @@
                                     @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
                                 </td>
                                 <td>
-                                    @Html.ActionLink(" ", "CambiarIdUsuario", "Usuario",
-                                             new
-                                             {
-                                                 idUsuario = participante.idParticipante,
-                                                 nombreCompleto = $"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}"
-                                             },
-                                             new { @class = "text-secondary bi bi-fingerprint" })
-                                </td>
-                                <td>
-                                    @Html.ActionLink(" ", "CambiarContrasenaAdmin", "Usuario",
+                                    @Html.ActionLink(" ", "CambiarCredencialesUsuario", "Usuario",
                                              new
                                              {
                                                  idUsuario = participante.idParticipante,
@@ -188,6 +179,15 @@
                                              },
                                              new { @class = "text-secondary bi bi-key" })
                                 </td>
+                                @* <td>
+                                    @Html.ActionLink(" ", "CambiarContrasenaAdmin", "Usuario",
+                                             new
+                                             {
+                                                 idUsuario = participante.idParticipante,
+                                                 nombreCompleto = $"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}"
+                                             },
+                                             new { @class = "text-secondary bi bi-key" })
+                                </td> *@
                                 <td>
                                     <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')">
                                         <i class="bi bi-trash"></i>
