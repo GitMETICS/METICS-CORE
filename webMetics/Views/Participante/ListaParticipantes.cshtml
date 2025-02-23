@@ -56,30 +56,27 @@
             {
                 <div class="d-flex justify-content-between mb-4">
                     <div>
-                        @using (Html.BeginForm("CargarDesdeExcel", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        @using (Html.BeginForm("SubirExcelCalificaciones", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
                         {
-                            @Html.AntiForgeryToken()
                             <form>
-                                <div class="mb-3 d-flex" style="max-width: 600px">
-                                    <label for="file"></label>
-                                    <input type="file" class="form-control" name="file" id="file">
+                                <div class="mb-2 d-flex align-items-center">
+                                    <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="max-width: 500px;" required>
                                     <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-
                                     <input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
-                                </div>
-
-                                <div class="mb-4 bg-light p-3 rounded d-flex">
-                                    <h4><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h4>
-                                    <small class="text-muted">
-                                        Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
-                                        <br />
-                                        Correo Institucional, Horas Aprobadas, Calificación
-                                        <br />
-                                        @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
-                                    </small>
                                 </div>
                             </form>
                         }
+
+                        <div class="mb-4 bg-light p-3 rounded d-flex">
+                            <h4><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h4>
+                            <small class="text-muted">
+                                Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
+                                <br />
+                                Correo Institucional, Horas Aprobadas, Calificación
+                                <br />
+                                @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
+                            </small>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-end">

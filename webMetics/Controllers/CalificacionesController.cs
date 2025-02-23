@@ -1,11 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
+using OfficeOpenXml;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.XSSF.UserModel;
-using NPOI.XWPF.UserModel;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
-using OfficeOpenXml;
+using NPOI.XWPF.UserModel;
+using NPOI.SS.UserModel;
+using iText.Kernel.Font;
+using iText.Layout.Properties;
+using iText.Kernel.Geom;
+using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
+using NPOI.SS.Formula.Functions;
+using System.Globalization;
+using System.Text;
+using MailKit.Search;
 
 namespace webMetics.Controllers
 {
@@ -83,7 +94,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["errorMessage"] = "Ocurrió un error y no se pudo actualizar la calificación.";
+                TempData["errorMessage"] = "No se pudo actualizar la calificación.";
             }
 
             var refererUrl = Request.Headers["Referer"].ToString();
@@ -96,57 +107,82 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CargarDesdeExcel(IFormFile file, int idGrupo)
+        public async Task<IActionResult> SubirExcelCalificaciones(IFormFile file, int idGrupo)
         {
-            if (file != null)
-            {
-                try
-                {
-                    using (var stream = new MemoryStream())
-                    {
-                        await file.CopyToAsync(stream);
-                        stream.Position = 0;
-
-                        using (var package = new ExcelPackage(stream))
-                        {
-                            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-
-                            int rowBegin = 0;
-                            int colId = 0;
-                            int colCalificacion = 0;
-                            bool seguir = true;
-                            for (int row = 1; row <= worksheet.Dimension.End.Row && seguir; row++)
-                            {
-                                for (int col = 1; col <= worksheet.Dimension.End.Column && seguir; col++)
-                                {
-                                    if (worksheet.Cells[row, col].Text == "Correo Institucional") { rowBegin = row; colId = col; }
-                                    if (worksheet.Cells[row, col].Text == "Calificación") { rowBegin = row; colCalificacion = col; seguir = false; }
-                                }
-                            }
-                            for (int row = rowBegin + 1; row <= worksheet.Dimension.End.Row; row++)
-                            {
-                                string idParticipante = worksheet.Cells[row, colId].Text;
-                                int calificacion = int.Parse(worksheet.Cells[row, colCalificacion].Text);
-
-                                bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-                            }
-
-                            TempData["successMessage"] = "El archivo fue subido éxitosamente.";
-                        }
-                    }
-                }
-                catch
-                {
-                    TempData["errorMessage"] = "Error al cargar los datos.";
-                }
-            }
-            else
+            if (file == null)
             {
                 TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
             }
 
+            try
+            {
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    using var package = new ExcelPackage(stream);
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+                    // Iterar sobre las filas con datos (ignorando la primera fila de encabezados)
+                    for (int row = 5; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        string idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text;
+                        int horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadasAux) ? horasAprobadasAux : 0;
+                        int calificacion = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text, out var calificacionAux) ? calificacionAux : 0;
+
+                        bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+
+                        InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(grupo.nombre, grupo.numeroGrupo, idParticipante);
+
+                        inscripcion.horasAprobadas = horasAprobadas;
+                        inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                        accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    }
+
+                    TempData["successMessage"] = "El archivo fue subido éxitosamente.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Error al cargar los datos " + ex;
+            }
+
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+        }
+
+        private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
+        {
+            // Normalize and remove accents from the input column name
+            string normalizedColumnName = RemoveAccents(columnName.Trim().ToLower());
+
+            // Iterate over the first row to find the column index
+            for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+            {
+                // Get the header, normalize it, and remove accents
+                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
+
+                // Compare normalized header with the normalized column name
+                if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return col;
+                }
+            }
+            throw new Exception($"Column '{columnName}' not found");
+        }
+
+        // Helper method to remove accents (diacritics)
+        private string RemoveAccents(string text)
+        {
+            return string.Concat(text.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
+                .Normalize(NormalizationForm.FormC);
         }
 
         public ActionResult DescargarPlantillaSubirCalificaciones()
@@ -188,7 +224,7 @@ namespace webMetics.Controllers
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
-            var filePath = Path.Combine(_environment.WebRootPath, "data", "Lista_de_Calificaciones.docx");
+            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Calificaciones.docx");
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
             iText.Layout.Document document = new iText.Layout.Document(pdf);
@@ -208,7 +244,7 @@ namespace webMetics.Controllers
 
 
 
-            Table table = new Table(5, true);
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(5, true);
             table.AddHeaderCell("Nombre").SetFontSize(10);
             table.AddHeaderCell("Correo Institucional").SetFontSize(10);
             table.AddHeaderCell("Estado").SetFontSize(10);
