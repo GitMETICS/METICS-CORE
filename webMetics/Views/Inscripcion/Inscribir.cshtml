@@ -10,12 +10,20 @@
         <div class="card-header">
             <h2>@ViewBag.Titulo</h2>
         </div>
-        <div class="card-body ">
-            <h5> @ViewBag.Message</h5>
+        <div class="card-body">
+            <h5>@ViewBag.Message</h5>
             @if (ViewBag.Participante != null)
             {
                 <p>@ViewBag.Participante.correo</p>
             }
+            @if (ViewBag.Grupo != null)
+            {
+                <p class="mb-0">
+                    <strong>Enlace:</strong> <span>@ViewBag.Grupo.enlace</span><br>
+                    <strong>Contraseña:</strong> <span>@ViewBag.Grupo.claveInscripcion</span>
+                </p>
+            }
+            
         </div>
         <div class="card-footer text-muted">
             <div class="d-flex justify-content-center">

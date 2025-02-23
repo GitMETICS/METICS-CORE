@@ -330,12 +330,14 @@ namespace webMetics.Controllers
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                            ViewBag.Grupo = grupo;
                         }
                         catch
                         {
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el comprobante de inscripción a su correo institucional.";
+                            ViewBag.Grupo = grupo;
                         }
                     }
                     else
@@ -425,14 +427,16 @@ namespace webMetics.Controllers
                             EnviarCorreoInscripcion(grupo, mensaje, participante.correo);
 
                             ViewBag.Titulo = "Inscripción realizada";
-                            ViewBag.Message = "El comprobante de inscripción se le ha enviado al correo";
+                            ViewBag.Message = "El comprobante de inscripción se ha enviado al correo";
                             ViewBag.Participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                            ViewBag.Grupo = grupo;
                         }
                         catch
                         {
                             // Configurar los datos para mostrar en la vista
                             ViewBag.Titulo = "Inscripción realizada";
                             ViewBag.Message = "Se ha inscrito en el grupo, pero hubo un error al enviar el comprobante de inscripción a su correo institucional.";
+                            ViewBag.Grupo = grupo;
                         }
                     }
                     else
@@ -463,6 +467,7 @@ namespace webMetics.Controllers
 
             return View();
         }
+
         /* Método para que un administrador elimine una inscripción de un usuario */
         public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {
