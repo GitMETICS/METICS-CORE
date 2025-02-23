@@ -914,8 +914,6 @@ namespace webMetics.Controllers
                 ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
                 ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area,participante.departamento);
 
-
-
                 return View(participante);
             }
             catch
@@ -955,7 +953,7 @@ namespace webMetics.Controllers
                     }
 
                     TempData["successMessage"] = "Los datos fueron guardados.";
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return RedirectToAction("VerParticipantes", "Participante");
                 }
                 else
                 {
@@ -966,7 +964,7 @@ namespace webMetics.Controllers
             catch
             {
                 TempData["Message"] = "Ocurrió un error al editar los datos.";
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                return RedirectToAction("VerParticipantes", "Participante");
             }
         }
 
