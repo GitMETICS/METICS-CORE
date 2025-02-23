@@ -826,6 +826,7 @@ namespace webMetics.Controllers
                 {
                     inscripcion.horasAprobadas = nuevasHorasAprobadas;
                     inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                    inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
 
                     inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                     accesoAInscripcion.EditarInscripcion(inscripcion);

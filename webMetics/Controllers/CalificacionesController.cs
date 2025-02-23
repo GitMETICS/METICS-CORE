@@ -140,6 +140,7 @@ namespace webMetics.Controllers
 
                         inscripcion.horasAprobadas = horasAprobadas;
                         inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                        inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
                         inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                         accesoAInscripcion.EditarInscripcion(inscripcion);
 
@@ -167,7 +168,7 @@ namespace webMetics.Controllers
             for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
             {
                 // Get the header, normalize it, and remove accents
-                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
+                string header = RemoveAccents(worksheet.Cells[4, col].Text.Trim().ToLower());
 
                 // Compare normalized header with the normalized column name
                 if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
