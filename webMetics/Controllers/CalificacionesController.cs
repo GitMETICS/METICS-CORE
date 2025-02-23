@@ -193,7 +193,7 @@ namespace webMetics.Controllers
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Plantilla_Lista_Calificaciones");
 
-            NPOI.SS.UserModel.IRow row = sheet.CreateRow(4);
+            NPOI.SS.UserModel.IRow row = sheet.CreateRow(3);
             NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
             cell31.SetCellValue("Nombre");
 
