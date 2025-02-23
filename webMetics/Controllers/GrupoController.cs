@@ -89,7 +89,12 @@ namespace webMetics.Controllers
             List<InscripcionModel> participantesEnGrupos = accesoAInscripcion.ObtenerInscripciones();
 
             // Inicializar las propiedades de ViewBag
-            ViewBag.ListaGrupos = listaGrupos;
+            ViewBag.ListaGrupos = listaGrupos
+                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
+                .ToList();
+
             ViewBag.ParticipantesEnGrupos = participantesEnGrupos;
             ViewBag.IdParticipante = string.Empty;
 
@@ -108,16 +113,18 @@ namespace webMetics.Controllers
                         {
                             ViewBag.ListaGrupos = listaGrupos
                                 .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
-                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
-                                .ThenBy(grupo => grupo.nombre) 
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
                         break;
 
                     case RolUsuarioAdmin:
                         ViewBag.ListaGrupos = listaGrupos
-                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
-                            .ThenBy(grupo => grupo.nombre)
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                            .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                            .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                             .ToList();
                         break;
 
@@ -132,6 +139,9 @@ namespace webMetics.Controllers
                         {
                             listaGruposAsesor = listaGrupos
                                 .Where(grupo => !gruposInscritosAsesor.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
 
@@ -139,12 +149,16 @@ namespace webMetics.Controllers
                         {
                             listaGruposAsesor = listaGruposAsesor
                                 .Where(grupo => !gruposAsesor.Any(grupoAux => grupoAux.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
 
                         ViewBag.ListaGrupos = listaGruposAsesor
-                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) 
-                            .ThenBy(grupo => grupo.nombre)
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                            .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                            .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                             .ToList();
                         break;
                 }
@@ -204,17 +218,19 @@ namespace webMetics.Controllers
                         {
                             ViewBag.ListaGrupos = listaGrupos
                                 .Where(grupo => !gruposInscritos.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
-                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
-                                .ThenBy(grupo => grupo.nombre)
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
                         break;
 
                     case RolUsuarioAdmin:
                         ViewBag.ListaGrupos = listaGrupos
-                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
-                            .ThenBy(grupo => grupo.nombre)
-                            .ToList();
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
+                                .ToList();
                         break;
 
                     case RolUsuarioAsesor:
@@ -228,6 +244,9 @@ namespace webMetics.Controllers
                         {
                             listaGruposAsesor = listaGrupos
                                 .Where(grupo => !gruposInscritosAsesor.Any(inscrito => inscrito.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
 
@@ -235,12 +254,16 @@ namespace webMetics.Controllers
                         {
                             listaGruposAsesor = listaGruposAsesor
                                 .Where(grupo => !gruposAsesor.Any(grupoAux => grupoAux.idGrupo == grupo.idGrupo))
+                                .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                                .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                                .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                                 .ToList();
                         }
 
                         ViewBag.ListaGrupos = listaGruposAsesor
-                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1)
-                            .ThenBy(grupo => grupo.nombre)
+                            .OrderBy(grupo => grupo.cupoActual < grupo.cupo ? 0 : 1) // Prioriza cupo disponible
+                            .ThenBy(grupo => grupo.fechaInicioInscripcion) // Luego, prioriza fecha de inscripción
+                            .ThenBy(grupo => grupo.nombre) // Finalmente, ordena por nombre
                             .ToList();
                         break;
                 }
