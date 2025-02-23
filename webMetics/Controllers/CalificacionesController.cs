@@ -139,6 +139,7 @@ namespace webMetics.Controllers
                         InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(grupo.nombre, grupo.numeroGrupo, idParticipante);
 
                         inscripcion.horasAprobadas = horasAprobadas;
+                        inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
                         inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                         accesoAInscripcion.EditarInscripcion(inscripcion);
 
