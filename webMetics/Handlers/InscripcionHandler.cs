@@ -426,7 +426,7 @@ public class InscripcionHandler : BaseDeDatosHandler
     {
         string estado;
 
-        if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas)
+        if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas && inscripcion.horasAprobadas > 0)
         {
             estado = "Aprobado";
         }
