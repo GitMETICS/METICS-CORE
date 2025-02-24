@@ -193,23 +193,36 @@ namespace webMetics.Controllers
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Plantilla_Lista_Calificaciones");
 
-            NPOI.SS.UserModel.IRow row = sheet.CreateRow(3);
-            NPOI.SS.UserModel.ICell cell31 = row.CreateCell(0);
+            NPOI.SS.UserModel.IRow row0 = sheet.CreateRow(0);
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(1);
+            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(2);
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+
+            NPOI.SS.UserModel.ICell cell01 = row0.CreateCell(0);
+            cell01.SetCellValue("   ");
+
+            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
+            cell11.SetCellValue("   ");
+
+            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
+            cell21.SetCellValue("   ");
+
+            NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Nombre");
 
-            NPOI.SS.UserModel.ICell cell32 = row.CreateCell(1);
+            NPOI.SS.UserModel.ICell cell32 = row3.CreateCell(1);
             cell32.SetCellValue("Primer Apellido");
 
-            NPOI.SS.UserModel.ICell cell33 = row.CreateCell(2);
+            NPOI.SS.UserModel.ICell cell33 = row3.CreateCell(2);
             cell33.SetCellValue("Segundo Apellido");
 
-            NPOI.SS.UserModel.ICell cell34 = row.CreateCell(3);
+            NPOI.SS.UserModel.ICell cell34 = row3.CreateCell(3);
             cell34.SetCellValue("Correo Institucional");
 
-            NPOI.SS.UserModel.ICell cell35 = row.CreateCell(4);
+            NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
             cell35.SetCellValue("Horas Aprobadas");
 
-            NPOI.SS.UserModel.ICell cell36 = row.CreateCell(5);
+            NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
             cell36.SetCellValue("Calificación");
 
             string fileName = "Plantilla_Lista_Calificaciones.xlsx";
@@ -386,7 +399,7 @@ namespace webMetics.Controllers
                 rowN++;
             }
 
-            string fileName = "Lista_de_Calificacionex_" + grupo.nombre + ".xlsx";
+            string fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();
