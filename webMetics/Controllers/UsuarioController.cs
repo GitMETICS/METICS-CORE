@@ -401,25 +401,35 @@ namespace webMetics.Controllers
                 if (string.IsNullOrWhiteSpace(usuario.id))
                 {
                     TempData["errorMessage"] = "El identificador no puede estar en blanco.";
+
+                    return RedirectToAction("CambiarCredencialesUsuario", new { idUsuario = usuario.id });
                 }
-                else if (string.IsNullOrWhiteSpace(usuario.nuevaContrasena) || string.IsNullOrWhiteSpace(usuario.confirmarContrasena))
+                
+                if (string.IsNullOrWhiteSpace(usuario.nuevaContrasena) || string.IsNullOrWhiteSpace(usuario.confirmarContrasena))
                 {
                     TempData["errorMessage"] = "Las contraseñas no pueden estar en blanco.";
+
+                    return RedirectToAction("CambiarCredencialesUsuario", new { idUsuario = usuario.id });
                 }
-                else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
+
+                if (usuario.nuevaContrasena == usuario.confirmarContrasena)
                 {
                     EditarIdUsuario(usuario);
 
                     if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
 
                     TempData["successMessage"] = "Las credenciales del usuario se cambiaron correctamente.";
+
+                    return RedirectToAction("CambiarCredencialesUsuario", new { idUsuario = usuario.id });
                 }
                 else
                 {
                     TempData["errorMessage"] = "Las contraseñas no coinciden.";
+
+                    return RedirectToAction("CambiarCredencialesUsuario", new { idUsuario = usuario.id });
                 }
 
-                return RedirectToAction("CambiarCredencialesUsuario", new { idUsuario = usuario.id });
+                
             }
             else {
                 return RedirectToAction("CerrarSesion");
@@ -440,7 +450,7 @@ namespace webMetics.Controllers
                 EditarIdAsesor(usuario);
             }
 
-            accesoAUsuario.EliminarUsuario(usuario.oldId);
+            // accesoAUsuario.EliminarUsuario(usuario.oldId);
         }
 
         private void EditarIdParticipante(NewLoginModel usuario)
