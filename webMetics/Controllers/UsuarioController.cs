@@ -416,7 +416,7 @@ namespace webMetics.Controllers
                 {
                     EditarIdUsuario(usuario);
 
-                    if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
+                    if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.confirmarContrasena); }
 
                     TempData["successMessage"] = "Las credenciales del usuario se cambiaron correctamente.";
 
@@ -438,7 +438,7 @@ namespace webMetics.Controllers
 
         private void EditarIdUsuario(NewLoginModel usuario)
         {
-            accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
+            accesoAUsuario.CrearUsuario(usuario.id, usuario.confirmarContrasena, usuario.role);
 
             if (usuario.role == 0)
             {
@@ -449,6 +449,8 @@ namespace webMetics.Controllers
             {
                 EditarIdAsesor(usuario);
             }
+
+            accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.confirmarContrasena);
 
             // accesoAUsuario.EliminarUsuario(usuario.oldId);
         }
