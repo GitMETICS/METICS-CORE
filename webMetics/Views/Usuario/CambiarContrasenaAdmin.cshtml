@@ -1,0 +1,165 @@
+﻿@model webMetics.Models.NewLoginModel
+@using webMetics.Controllers
+@{
+    ViewBag.Title = "Actualizar Contraseña de Usuario";
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+            .input-wrapper input {
+                padding-right: 50px;
+            }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(10%);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    @if (!string.IsNullOrEmpty(Model.id))
+    {
+        <div class="contenedor-tipos-actividades container-fluid">
+            @if (urlReferrer != null)
+            {
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            }
+
+            @using (Html.BeginForm("CambiarContrasenaAdmin", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <h1>@ViewBag.Title</h1>
+                <h2>@ViewBag.NombreCompleto</h2>
+                <hr />
+
+                if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.ErrorMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.SuccessMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="row mb-1">
+                    <div class="col">
+                        <div class="container">
+                            <div class="row mt-1">
+                                @Html.HiddenFor(model => model.id, new { })
+                                @Html.HiddenFor(model => model.role, new { })
+
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.nuevaContrasena, new { id = "password", @class = "form-control" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                        <i id="toggleIcon" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.PasswordFor(model => model.confirmarContrasena, new { id = "passwordCheck", @class = "form-control" })
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
+                                        <i id="toggleIcon2" class="fas fa-eye"></i>
+                                    </button>
+                                    @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="container">
+                                    <div class="form-group mt-1 d-flex justify-content-between w-25 p-3 bg-light rounded">
+                                        <label class="form-check-label">
+                                            Enviar contraseña por correo
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            @Html.CheckBoxFor(model => model.enviarPorCorreo, new { @class = "form-check-input" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center m-4">
+                            <div class="col-auto">
+                                <a href="@Url.Action("VerParticipantes", "Participante")" class="btn btn-secondary btn-block">Cancelar</a>
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <script>
+            window.location.href = '@Url.Action("CerrarSesion", "Admin")';
+        </script>
+    }
+
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+    <script>
+        function togglePasswordVisibility2() {
+            var passwordInput = document.getElementById('passwordCheck');
+            var toggleIcon = document.getElementById('toggleIcon2');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

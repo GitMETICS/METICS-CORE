@@ -562,83 +562,83 @@ namespace webMetics.Controllers
             return RedirectToAction("CambiarContrasena", new { id = GetId() });
         }
 
-        //public ActionResult CambiarContrasenaAdmin(string idUsuario, string nombreCompleto)
-        //{
-        //    // Ensure the current user is an admin
-        //    if (GetRole() == 1)
-        //    {
-        //        // Validate the user ID to be changed
-        //        if (!string.IsNullOrEmpty(idUsuario))
-        //        {
-        //            ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
-        //            int rolUsuario = 0;
+        public ActionResult CambiarContrasenaAdmin(string idUsuario, string nombreCompleto)
+        {
+            // Ensure the current user is an admin
+            if (GetRole() == 1)
+            {
+                // Validate the user ID to be changed
+                if (!string.IsNullOrEmpty(idUsuario))
+                {
+                    ViewBag.Usuario = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    int rolUsuario = 0;
 
-        //            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
-        //            if (asesor != null)
-        //            {
-        //                rolUsuario = 2;
-        //            }
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    if (asesor != null)
+                    {
+                        rolUsuario = 2;
+                    }
 
-        //            ViewBag.NombreCompleto = nombreCompleto;
+                    ViewBag.NombreCompleto = nombreCompleto;
 
-        //            NewLoginModel usuario = new NewLoginModel() { id = idUsuario, role = rolUsuario };
+                    NewLoginModel usuario = new NewLoginModel() { id = idUsuario, role = rolUsuario };
 
-        //            if (TempData["errorMessage"] != null)
-        //            {
-        //                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-        //            }
-        //            if (TempData["successMessage"] != null)
-        //            {
-        //                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-        //            }
+                    if (TempData["errorMessage"] != null)
+                    {
+                        ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                    }
+                    if (TempData["successMessage"] != null)
+                    {
+                        ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                    }
 
-        //            ViewBag.Id = GetId();
-        //            ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Role = GetRole();
 
-        //            return View(usuario);
-        //        }
-        //        else
-        //        {
-        //            TempData["errorMessage"] = "ID de usuario no válido.";
-        //            return RedirectToAction("AdminDashboard");
-        //        }
-        //    }
+                    return View(usuario);
+                }
+                else
+                {
+                    TempData["errorMessage"] = "ID de usuario no válido.";
+                    return RedirectToAction("VerParticipantes", "Participante");
+                }
+            }
 
-        //    // If not admin, redirect to logout or dashboard
-        //    return RedirectToAction("CerrarSesion");
-        //}
+            // If not admin, redirect to logout or dashboard
+            return RedirectToAction("CerrarSesion");
+        }
 
-        //[HttpPost]
-        //public ActionResult CambiarContrasenaAdmin(NewLoginModel usuario)
-        //{
-        //    // Ensure only admins can perform this action
-        //    if (GetRole() == 1)
-        //    {
-        //        // Check if the new passwords are blank
-        //        if (string.IsNullOrWhiteSpace(usuario.nuevaContrasena) || string.IsNullOrWhiteSpace(usuario.confirmarContrasena))
-        //        {
-        //            TempData["errorMessage"] = "Las nuevas contraseñas no pueden estar en blanco.";
-        //        }
-        //        else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
-        //        {
-        //            // Admin resets the user's password without needing the old one
-        //            accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
+        [HttpPost]
+        public ActionResult CambiarContrasenaAdmin(NewLoginModel usuario)
+        {
+            // Ensure only admins can perform this action
+            if (GetRole() == 1)
+            {
+                // Check if the new passwords are blank
+                if (string.IsNullOrWhiteSpace(usuario.nuevaContrasena) || string.IsNullOrWhiteSpace(usuario.confirmarContrasena))
+                {
+                    TempData["errorMessage"] = "Las nuevas contraseñas no pueden estar en blanco.";
+                }
+                else if (usuario.nuevaContrasena == usuario.confirmarContrasena)
+                {
+                    // Admin resets the user's password without needing the old one
+                    accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
 
-        //            if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
+                    if (usuario.enviarPorCorreo) { EnviarContrasenaAdmin(usuario.id, usuario.nuevaContrasena); }
 
-        //            TempData["successMessage"] = "La contraseña del usuario se cambió correctamente.";
-        //        }
-        //        else
-        //        {
-        //            TempData["errorMessage"] = "Las nuevas contraseñas no coinciden.";
-        //        }
+                    TempData["successMessage"] = "La contraseña del usuario se cambió correctamente.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Las nuevas contraseñas no coinciden.";
+                }
 
-        //        return RedirectToAction("CambiarContrasenaAdmin", new { idUsuario = usuario.id });
-        //    }
+                return RedirectToAction("CambiarContrasenaAdmin", new { idUsuario = usuario.id });
+            }
 
-        //    // If not admin, redirect to logout or dashboard
-        //    return RedirectToAction("CerrarSesion");
-        //}
+            // If not admin, redirect to logout or dashboard
+            return RedirectToAction("CerrarSesion");
+        }
 
 
         // Método para enviar confirmación de registro al usuario
