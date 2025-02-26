@@ -57,15 +57,10 @@
                     <div class="row d-none" id="gridView">
                         @foreach (var grupo in ViewBag.ListaGrupos)
                         {
-                            if (grupo.esVisible == true || ViewBag.Role == 1)
+                            if (ViewBag.Role == 1 || ViewBag.Role == 2)
                             {
-                                var visible = "";
-                                if (grupo.esVisible == false)
-                                {
-                                    visible = "0.5";
-                                }
                                 <div class="col-12 col-md-6 mb-4">
-                                    <div id="@grupo.idGrupo" class="card h-100 text-center mb-1" style="opacity:@visible">
+                                    <div id="@grupo.idGrupo" class="card h-100 text-center mb-1">
                                         <div class="card-header">
                                             <div>
                                                 <div style="float:left">
@@ -259,16 +254,10 @@
                     <div class="row d-none" id="listView">
                         @foreach (var grupo in ViewBag.ListaGrupos)
                         {
-                            @if (grupo.esVisible == true || ViewBag.Role == 1)
+                            @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                             {
-                                var visible2 = "";
-                                @if (grupo.esVisible == false)
-                                {
-                                    visible2 = "0.5";
-                                }
-
                                 <div class="col-12 mb-3">
-                                    <div id="@grupo.idGrupo" class="list-group" style="opacity:@visible2">
+                                    <div id="@grupo.idGrupo" class="list-group">
                                         <div class="list-group-item border rounded shadow-sm">
                                             <div class="d-flex card-header justify-content-between align-items-start">
                                                 <h4 class="mb-2">@grupo.nombre</h4>
