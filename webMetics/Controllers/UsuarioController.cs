@@ -129,7 +129,8 @@ namespace webMetics.Controllers
             try
             {
                 usuario.id = usuario.correo; // Esto define que el identificador del usuario es el correo
-                ParticipanteModel participante = new ParticipanteModel()
+
+                ParticipanteModel nuevoParticipante = new ParticipanteModel()
                 {
                     idParticipante = usuario.id,
                     nombre = usuario.nombre,
@@ -149,19 +150,14 @@ namespace webMetics.Controllers
                     horasAprobadas = 0
                 };
 
-                // Verificar si el usuario ya existe
-                bool usuarioExiste = accesoAUsuario.ExisteUsuario(usuario.id);
+                bool registradoPorAdmin = !accesoAUsuario.ObtenerRegistradoPorUsuario(usuario.id);
+                if (registradoPorAdmin)
+                {
+                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
+                    {
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+                    }
 
-                // Si el usuario no existe, crear un nuevo registro
-                if (!usuarioExiste)
-                {
-                    accesoAUsuario.CrearUsuario(usuario.id, contrasena);
-                    accesoAParticipante.CrearParticipante(participante);
-                    exito = true;
-                }
-                // Si el usuario existe, verificar si fue registrado por el propio usuario
-                else if (!accesoAUsuario.ObtenerRegistradoPorUsuario(usuario.id)) // Si no fue registrado por el propio usuario, actualizar los datos del participante
-                {
                     AsesorModel asesor = accesoAAsesor.ObtenerAsesor(usuario.id);
                     if (asesor != null)
                     {
@@ -176,23 +172,37 @@ namespace webMetics.Controllers
                         rolUsuario = 2;
 
                         accesoAAsesor.EditarAsesor(asesor);
-                        accesoAParticipante.CrearParticipante(participante);
                     }
 
                     accesoAUsuario.EditarUsuario(usuario.id, rolUsuario, contrasena); // Si el admin había ingresado un asesor con ese id, se guarda como asesor al registrarse
-                    accesoAParticipante.EditarParticipante(participante);
-                    accesoAUsuario.ActualizarRegistradoPorUsuario(usuario.id);
 
+                    if (!accesoAParticipante.ExisteParticipante(usuario.id))
+                    {
+                        accesoAParticipante.CrearParticipante(nuevoParticipante);
+                    }
+                    else
+                    {
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
+                        nuevoParticipante.idParticipante = usuario.id;
+                        nuevoParticipante.horasMatriculadas = participante.horasMatriculadas;
+                        nuevoParticipante.horasAprobadas = participante.horasAprobadas;
+
+                        accesoAParticipante.EditarParticipante(nuevoParticipante);
+                    }
+
+                    accesoAUsuario.ActualizarRegistradoPorUsuario(usuario.id);
                     exito = true;
                 }
                 else
                 {
                     TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional.";
+                    exito = false;
                 }
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = "No se pudo crear el usuario. Inténtelo de nuevo.";
+                exito = false;
             }
 
             return exito;
@@ -599,7 +609,7 @@ namespace webMetics.Controllers
                 }
                 else
                 {
-                    TempData["errorMessage"] = "ID de usuario no válido.";
+                    TempData["errorMessage"] = "Identificador de usuario no válido.";
                     return RedirectToAction("VerParticipantes", "Participante");
                 }
             }
