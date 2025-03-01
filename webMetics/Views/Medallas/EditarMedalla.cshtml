@@ -1,0 +1,82 @@
+﻿@using webMetics.Controllers
+@{
+    ViewBag.Title = "Editar Medalla";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    <div class="contenedor-tipos-actividades container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+
+        <h1>@ViewBag.Title</h1>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="container">
+            @if (ViewBag.Medalla != null)
+            {
+                <br />
+                <h3 class="">@ViewBag.Title</h3>
+
+                <div class="d-flex justify-content-start mt-4">
+                    <div class="card me-2" style="height: 305px;">
+                        @{
+                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                        }
+                        @if (medalPath != null)
+                        {
+                            var normalizedMedalPath = medalPath.Replace('\\', '/');
+                            var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                            <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mb-4 bg-light p-3 rounded w-50">
+                <div class="d-flex align-text-center">
+                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                    <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> menor a 5 MB.</small>
+                </div>
+                <div class="form-group mt-3">
+                    <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
+                        <div class="d-flex justify-content-between">
+                            <input name="idParticipante" value="@ViewBag.Participante.idParticipante" hidden />
+                            <input type="file" name="imageFile" class="form-control" />
+                            <button type="submit" class="btn btn-secondary ms-2 w-50"><i class="bi bi-plus-lg me-2"></i>Subir</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}

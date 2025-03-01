@@ -19,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Medallas\EditarMedalla.cshtml" />
+    <Content Remove="Views\Medallas\VerMedallas.cshtml" />
     <Content Remove="wwwroot\css\site.css" />
   </ItemGroup>
 
@@ -39,6 +41,8 @@
     <None Include="Views\Home\Index.cshtml" />
     <None Include="Views\Inscripcion\ExportarParticipantes.cshtml" />
     <None Include="Views\Inscripcion\Inscribir.cshtml" />
+    <None Include="Views\Medallas\VerMedallas.cshtml" />
+    <None Include="Views\Medallas\EditarMedalla.cshtml" />
     <None Include="Views\Usuario\FormularioRegistro.cshtml" />
     <None Include="Views\Usuario\CambiarContrasena.cshtml" />
     <None Include="Views\Usuario\IniciarSesion.cshtml" />

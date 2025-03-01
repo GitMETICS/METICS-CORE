@@ -783,7 +783,7 @@ namespace webMetics.Controllers
                 }
 
                 // Guardar la ruta de la medalla en la base de datos
-                accesoAParticipante.AgregarMedalla(idParticipante, imageFile.FileName);
+                accesoAParticipante.AgregarMedallaParticipante(idParticipante, imageFile.FileName);
 
                 TempData["successMessage"] = "Se subió la medalla.";
             }
