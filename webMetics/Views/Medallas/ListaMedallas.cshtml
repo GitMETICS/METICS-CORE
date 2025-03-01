@@ -7,7 +7,7 @@
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-tipos-actividades container-fluid">
+    <div class="container">
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
@@ -35,36 +35,35 @@
             </div>
         }
 
-        <div class="container">
-            <!-- Agregar medallas (admin) -->
-            <div class="mb-4 bg-light p-3 rounded w-50">
-                <div class="d-flex align-text-center">
-                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
-                    <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> menor a 5 MB.</small>
-                </div>
-                <div class="form-group mt-3">
-                    <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
-                        <div class="d-flex justify-content-between">
-                            <input type="file" name="imageFile" class="form-control" />
-                            <button type="submit" class="btn btn-secondary ms-2 w-50"><i class="bi bi-plus-lg me-2"></i>Agregar</button>
-                        </div>
-                    </form>
-                </div>
+        <div class="mb-4 bg-light p-3 rounded w-50">
+            <div class="d-flex align-text-center">
+                <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> o <strong>JPG</strong> menor a 5 MB.</small>
             </div>
+            <div class="form-group mt-3">
+                <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
+                    <div class="d-flex justify-content-between">
+                        <input type="file" name="imageFile" class="form-control" />
+                        <button type="submit" class="btn btn-secondary ms-2 w-25"><i class="bi bi-plus-lg me-2"></i>Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-            <!-- Medallas -->
-            @if (ViewBag.Medallas != null)
-            {
-                <div class="d-flex justify-content-start mt-4">
-                    @foreach (string nombreMedalla in ViewBag.Medallas)
-                    {
-                        <div class="card me-2" style="height: 305px;">
-                            <div class="card-header text-muted">
-                                <div style="float:right">
-                                    @Html.ActionLink("", "EditarMedalla", "Medallas", new { nombreMedalla = nombreMedalla }, new { @class = "text-muted bi bi-pencil-square" })
-                                    <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@nombreMedalla)"></i>
-                                </div>
+        <!-- Medallas -->
+        @if (ViewBag.Medallas != null)
+        {
+            <div class="d-flex justify-content-start mt-4">
+                @foreach (string nombreMedalla in ViewBag.Medallas)
+                {
+                    <div class="card me-2" style="height: 420px;">
+                        <div class="card-header text-muted">
+                            <div style="float:right">
+                                @Html.ActionLink("", "EditarMedalla", "Medallas", new { nombreMedalla = nombreMedalla }, new { @class = "text-muted bi bi-pencil-square" })
+                                <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@nombreMedalla)"></i>
                             </div>
+                        </div>
+                        <div class="card-body">
                             @{
                                 var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
                             }
@@ -74,34 +73,34 @@
                                 var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
                                 <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
                             }
-                            <div class="card-footer">
-                                @nombreMedalla
-                            </div>
                         </div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
+                        <div class="card-footer">
+                            <span>@nombreMedalla</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta medalla?
-                    <br />
-                    @using (Html.BeginForm("EliminarMedalla", "Medalla"))
-                    {
-                        <div class="modal-footer">
-                            <input type="hidden" id="nombreMedalla" name="nombreMedalla">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        </div>
-                    }
+        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar esta medalla?
+                        <br />
+                        @using (Html.BeginForm("EliminarMedalla", "Medallas"))
+                        {
+                            <div class="modal-footer">
+                                <input type="hidden" id="nombreMedalla" name="nombreMedalla">
+                                <input type="submit" class="btn btn-danger" value="Aceptar" />
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,9 +114,6 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEditar(nombreMedalla) {
-        document.getElementById("nombreMedalla").value = nombreMedalla;
-    }
     function actualizarModalEliminar(nombreMedalla) {
         document.getElementById("nombreMedalla").value = nombreMedalla;
     }

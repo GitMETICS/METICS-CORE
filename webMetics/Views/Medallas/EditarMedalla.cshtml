@@ -11,7 +11,7 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
+                <a class="text-dark fs-4" href="@Url.Action("ListaMedallas", "Medallas")">
                     <i class="bi bi-arrow-left"></i>
                 </a>
             </div>
@@ -35,36 +35,35 @@
             </div>
         }
 
-        <div class="container">
-            @if (ViewBag.NombreMedalla != null)
-            {
-                <div class="card me-2" style="height: 305px;">
-                    @{
-                        var medalPath = ""; // Directory.EnumerateFiles("wwwroot/images/medallas", ViewBag.NombreMedalla).FirstOrDefault();
-                    }
-                    @if (medalPath != null)
-                    {
-                        var normalizedMedalPath = medalPath.Replace('\\', '/');
-                        var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                        <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
-                    }
-                </div>
-            }
+        @if (ViewBag.NombreMedalla != null)
+        {
+            <div class="card me-2" style="height: 305px; width: 305px;">
+                @{
+                    string nombreMedalla = ViewBag.NombreMedalla;
+                    var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                }
+                @if (medalPath != null)
+                {
+                    var normalizedMedalPath = medalPath.Replace('\\', '/');
+                    var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                    <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                }
+            </div>
+        }
 
-            <br />
-            <div class="mb-4 bg-light p-3 rounded w-50">
-                <div class="d-flex align-text-center">
-                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
-                    <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> menor a 5 MB.</small>
-                </div>
-                <div class="form-group mt-3">
-                    <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
-                        <div class="d-flex justify-content-between">
-                            <input type="file" name="imageFile" class="form-control" />
-                            <button type="submit" class="btn btn-secondary ms-2 w-50"><i class="bi bi-plus-lg me-2"></i>Subir</button>
-                        </div>
-                    </form>
-                </div>
+        <br />
+        <div class="mb-4 bg-light p-3 rounded w-50">
+            <div class="d-flex align-text-center">
+                <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
+                <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> o <strong>JPG</strong> menor a 5 MB.</small>
+            </div>
+            <div class="form-group mt-3">
+                <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
+                    <div class="d-flex justify-content-between">
+                        <input type="file" name="imageFile" class="form-control" />
+                        <button type="submit" class="btn btn-secondary ms-2 w-25"><i class="bi bi-plus-lg me-2"></i>Subir</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

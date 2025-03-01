@@ -119,7 +119,24 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "No se pudo eliminar la medalla.";
             }
 
-            return RedirectToAction("ListaCategorias");
+            return RedirectToAction("ListaMedallas");
+        }
+
+        [HttpPost]
+        public IActionResult EliminarMedallaParticipante(string idParticipante, string nombreMedalla)
+        {
+            try
+            {
+                accesoAParticipante.EliminarMedallaParticipante(idParticipante, nombreMedalla);
+
+                TempData["successMessage"] = "Se eliminó la medalla.";
+            }
+            catch
+            {
+                TempData["errorMessage"] = "No se pudo eliminar la medalla.";
+            }
+
+            return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
         }
     }
 }

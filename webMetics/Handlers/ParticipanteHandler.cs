@@ -570,7 +570,7 @@ namespace webMetics.Handlers
 
         public List<string> ObtenerTodasMedallas()
         {
-            string consulta = "SELECT nombre_medalla FROM medallas;";
+            string consulta = "SELECT DISTINCT nombre_medalla FROM medallas;";
 
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
 
@@ -639,6 +639,24 @@ namespace webMetics.Handlers
         public bool AgregarMedallaParticipante(string idParticipante, string fileName)
         {
             string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public bool EliminarMedallaParticipante(string idParticipante, string fileName)
+        {
+            string consulta = "DELETE FROM medallas WHERE nombre_medalla = @nombreMedalla AND id_participante_FK = @idParticipante;";
 
             ConexionMetics.Open();
 

@@ -17,6 +17,7 @@ using NPOI.SS.Formula.Functions;
 using System.Globalization;
 using System.Text;
 using MailKit.Search;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace webMetics.Controllers
@@ -140,6 +141,40 @@ namespace webMetics.Controllers
             ViewBag.ListaParticipantes = participantes;
 
             return View("VerParticipantes");
+        }
+
+        [HttpPost]
+        public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
+        {
+            try
+            {
+                // 1. Retrieve the participant.
+                var participante = accesoAParticipante.ObtenerParticipante(idParticipante); // Assuming you have a method to get the participant
+
+                if (participante == null)
+                {
+                    ViewBag.ErrorMessage = "Participante no encontrado.";
+                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante }); //Or some other error page.
+                }
+
+                // 2. Assign the selected medals.
+                if (selectedMedallas != null && selectedMedallas.Any())
+                {
+                    foreach (var medalla in selectedMedallas)
+                    {
+                        accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla); // Assuming you have a method to assign a single medalla
+                    }
+                }
+
+                ViewBag.SuccessMessage = "Medallas asignadas correctamente.";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Error al asignar medallas: {ex.Message}";
+                // Log the exception
+            }
+
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante }); // Or some other appropriate redirect.
         }
 
         [HttpPost]
@@ -747,6 +782,7 @@ namespace webMetics.Controllers
             ViewBag.Participante = participante;
             ViewBag.Inscripciones = inscripciones;
             ViewBag.Medallas = accesoAParticipante.ObtenerMedallas(idParticipante);
+            ViewBag.TodasMedallas = accesoAParticipante.ObtenerTodasMedallas();
 
             if (GetRole() == 2)
             {
@@ -768,31 +804,6 @@ namespace webMetics.Controllers
             }
 
             return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SubirMedalla(string idParticipante, IFormFile imageFile)
-        {
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                // Guardar la ruta de la medalla en la base de datos
-                accesoAParticipante.AgregarMedallaParticipante(idParticipante, imageFile.FileName);
-
-                TempData["successMessage"] = "Se subió la medalla.";
-            }
-            else
-            {
-                TempData["errorMessage"] = "Elija una imagen válida.";
-            }
-
-            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante } );
         }
 
         [HttpPost]
