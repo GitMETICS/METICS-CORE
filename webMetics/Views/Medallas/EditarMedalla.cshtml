@@ -36,26 +36,22 @@
         }
 
         <div class="container">
-            @if (ViewBag.Medalla != null)
+            @if (ViewBag.NombreMedalla != null)
             {
-                <br />
-                <h3 class="">@ViewBag.Title</h3>
-
-                <div class="d-flex justify-content-start mt-4">
-                    <div class="card me-2" style="height: 305px;">
-                        @{
-                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
-                        }
-                        @if (medalPath != null)
-                        {
-                            var normalizedMedalPath = medalPath.Replace('\\', '/');
-                            var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                            <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
-                        }
-                    </div>
+                <div class="card me-2" style="height: 305px;">
+                    @{
+                        var medalPath = ""; // Directory.EnumerateFiles("wwwroot/images/medallas", ViewBag.NombreMedalla).FirstOrDefault();
+                    }
+                    @if (medalPath != null)
+                    {
+                        var normalizedMedalPath = medalPath.Replace('\\', '/');
+                        var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                        <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                    }
                 </div>
             }
 
+            <br />
             <div class="mb-4 bg-light p-3 rounded w-50">
                 <div class="d-flex align-text-center">
                     <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
@@ -64,7 +60,6 @@
                 <div class="form-group mt-3">
                     <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
                         <div class="d-flex justify-content-between">
-                            <input name="idParticipante" value="@ViewBag.Participante.idParticipante" hidden />
                             <input type="file" name="imageFile" class="form-control" />
                             <button type="submit" class="btn btn-secondary ms-2 w-50"><i class="bi bi-plus-lg me-2"></i>Subir</button>
                         </div>

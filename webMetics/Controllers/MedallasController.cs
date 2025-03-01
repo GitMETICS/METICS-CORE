@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NETCore.MailKit.Core;
-using webMetics.Handlers;
 using webMetics.Models;
+using webMetics.Handlers;
 
 namespace webMetics.Controllers
 {
@@ -50,7 +49,7 @@ namespace webMetics.Controllers
             return id;
         }
 
-        public ActionResult VerMedallas()
+        public ActionResult ListaMedallas()
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
@@ -76,7 +75,7 @@ namespace webMetics.Controllers
                 }
 
                 // Guardar la ruta de la medalla en la base de datos
-                accesoAParticipante.AgregarMedalla(imageFile.FileName);
+                accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
 
                 TempData["successMessage"] = "Se subió la medalla.";
             }
@@ -85,15 +84,15 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = "Elija una imagen válida.";
             }
 
-            return RedirectToAction("VerMedallas");
+            return RedirectToAction("ListaMedallas");
         }
 
-        public ActionResult EditarMedalla(IFormFile imageFile)
+        public ActionResult EditarMedalla(string nombreMedalla)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewBag.Medalla = imageFile;
+            ViewBag.NombreMedalla = nombreMedalla;
 
             return View();
         }

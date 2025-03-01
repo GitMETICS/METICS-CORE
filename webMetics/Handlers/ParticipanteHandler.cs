@@ -618,14 +618,15 @@ namespace webMetics.Handlers
             return listaMedallas;
         }
 
-        public bool AgregarMedalla(string fileName)
+        public bool AgregarMedalla(string idUsuario, string fileName)
         {
-            string consulta = "INSERT INTO medallas VALUES (@nombreMedalla);";
+            string consulta = "INSERT INTO medallas VALUES (@idUsuario, @nombreMedalla);";
 
             ConexionMetics.Open();
 
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
 
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
             comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
 
             bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
