@@ -7,7 +7,7 @@
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="container">
+    <div class="contenedor-tipos-actividades container-fluid">
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
@@ -53,7 +53,7 @@
         <!-- Medallas -->
         @if (ViewBag.Medallas != null)
         {
-            <div class="d-flex justify-content-start mt-4">
+            <div class="d-flex justify-content-start my-4">
                 @foreach (string nombreMedalla in ViewBag.Medallas)
                 {
                     <div class="card me-2" style="height: 420px;">

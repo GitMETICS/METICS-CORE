@@ -7,28 +7,28 @@
 
 <style>
     .medalla-list-container {
-        max-height: 300px; /* Increased height */
-        overflow-y: auto;
-        border: 0px solid #ccc;
-        padding: 10px;
-        display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        gap: 10px; /* Added gap for better spacing */
+    max-height: 300px; /* Increased height */
+    overflow-y: auto;
+    border: 0px solid #ccc;
+    padding: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px; /* Added gap for better spacing */
     }
 
     .medalla-item {
-        display: flex; /* Use flexbox for vertical layout */
-        flex-direction: column; /* Stack image and checkbox vertically */
-        align-items: center; /* Center items horizontally */
-        text-align: center;
-        width: 200px;
+    display: flex; /* Use flexbox for vertical layout */
+    flex-direction: column; /* Stack image and checkbox vertically */
+    align-items: center; /* Center items horizontally */
+    text-align: center;
+    width: 200px;
     }
 
     .medalla-image {
-        max-width: 200px; /* Increased image size */
-        max-height: 200px;
-        margin-bottom: 5px;
+    max-width: 200px; /* Increased image size */
+    max-height: 200px;
+    margin-bottom: 5px;
     }
 </style>
 
@@ -138,11 +138,14 @@
                         @foreach (string nombreMedalla in ViewBag.Medallas)
                         {
                             <div class="card me-2" style="height: 305px;">
-                                <div class="card-header text-muted">
-                                    <div style="float:right">
-                                        <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')"></i>
+                                @if (ViewBag.Role == 1)
+                                {
+                                    <div class="card-header text-muted">
+                                        <div style="float:right">
+                                            <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')"></i>
+                                        </div>
                                     </div>
-                                </div>
+                                }
                                 @{
                                     var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
                                 }
