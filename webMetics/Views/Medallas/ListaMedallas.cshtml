@@ -60,7 +60,7 @@
                         <div class="card-header text-muted">
                             <div style="float:right">
                                 @Html.ActionLink("", "EditarMedalla", "Medallas", new { nombreMedalla = nombreMedalla }, new { @class = "text-muted bi bi-pencil-square" })
-                                <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@nombreMedalla)"></i>
+                                <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')"></i>
                             </div>
                         </div>
                         <div class="card-body">
@@ -81,26 +81,26 @@
                 }
             </div>
         }
+    </div>
 
-        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        ¿Está seguro de que desea eliminar esta medalla?
-                        <br />
-                        @using (Html.BeginForm("EliminarMedalla", "Medallas"))
-                        {
-                            <div class="modal-footer">
-                                <input type="hidden" id="nombreMedalla" name="nombreMedalla">
-                                <input type="submit" class="btn btn-danger" value="Aceptar" />
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            </div>
-                        }
-                    </div>
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar esta medalla?
+                    <br />
+                    @using (Html.BeginForm("EliminarMedalla", "Medallas"))
+                    {
+                        <div class="modal-footer">
+                            <input type="hidden" id="nombreMedalla" name="nombreMedalla">
+                            <input type="submit" class="btn btn-danger" value="Aceptar" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
