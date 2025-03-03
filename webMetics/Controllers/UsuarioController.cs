@@ -195,8 +195,29 @@ namespace webMetics.Controllers
                 }
                 else
                 {
-                    TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional.";
-                    exito = false;
+                    if (!accesoAUsuario.ExisteUsuario(usuario.id))
+                    {
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+
+                        if (!accesoAParticipante.ExisteParticipante(usuario.id))
+                        {
+                            accesoAParticipante.CrearParticipante(nuevoParticipante);
+                        }
+                        else
+                        {
+                            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.id);
+                            nuevoParticipante.idParticipante = usuario.id;
+                            nuevoParticipante.horasMatriculadas = participante.horasMatriculadas;
+                            nuevoParticipante.horasAprobadas = participante.horasAprobadas;
+
+                            accesoAParticipante.EditarParticipante(nuevoParticipante);
+                        }
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "Ya existe un usuario con el mismo correo institucional.";
+                        exito = false;
+                    }
                 }
             }
             catch (Exception ex)
