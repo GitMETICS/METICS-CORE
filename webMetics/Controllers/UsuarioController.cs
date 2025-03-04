@@ -212,6 +212,7 @@ namespace webMetics.Controllers
 
                             accesoAParticipante.EditarParticipante(nuevoParticipante);
                         }
+                        exito = true;
                     }
                     else
                     {
