@@ -618,6 +618,34 @@ namespace webMetics.Handlers
             return listaMedallas;
         }
 
+        public bool ExisteMedalla(string fileName)
+        {
+            string consulta = "SELECT * FROM medallas WHERE nombre_medalla = @nombreMedalla;";
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
+
+            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+            List<string> listaMedallas = new List<string>();
+
+            // Iterar sobre las filas de resultado y agregar la información del participante a la lista
+            foreach (DataRow fila in tablaResultado.Rows)
+            {
+                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
+            }
+
+            // Si la lista está vacía, devolver null
+            if (listaMedallas.Count == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public bool AgregarMedalla(string idUsuario, string fileName)
         {
             string consulta = "INSERT INTO medallas VALUES (@idUsuario, @nombreMedalla);";
