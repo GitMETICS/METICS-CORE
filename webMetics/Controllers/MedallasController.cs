@@ -97,6 +97,34 @@ namespace webMetics.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditarMedalla(string nombreMedalla, IFormFile imageFile)
+        {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                // Eliminar la medalla existente
+                accesoAParticipante.EliminarMedalla(nombreMedalla);
+                
+                // Guardar la ruta de la medalla en la base de datos
+                accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
+
+                TempData["successMessage"] = "Se editó la medalla.";
+            }
+            else
+            {
+                TempData["errorMessage"] = "Elija una imagen válida.";
+            }
+
+            return RedirectToAction("ListaMedallas");
+        }
+
         public ActionResult EliminarMedalla(string nombreMedalla)
         {
             try

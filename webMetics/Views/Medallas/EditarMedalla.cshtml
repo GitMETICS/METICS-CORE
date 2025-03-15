@@ -58,8 +58,9 @@
                 <small class="text-muted">Subir una imagen en formato <strong>PNG</strong> o <strong>JPG</strong> menor a 5 MB.</small>
             </div>
             <div class="form-group mt-3">
-                <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
+                <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="EditarMedalla">
                     <div class="d-flex justify-content-between">
+                        <input type="text" name="nombreMedalla" value="@ViewBag.NombreMedalla" hidden/>
                         <input type="file" name="imageFile" class="form-control" />
                         <button type="submit" class="btn btn-secondary ms-2 w-25"><i class="bi bi-plus-lg me-2"></i>Subir</button>
                     </div>
