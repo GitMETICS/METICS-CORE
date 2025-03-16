@@ -492,10 +492,10 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
                 }
             }
-            catch (Exception ex )
+            catch
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante." + ex;
+                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
             }
 
             var refererUrl = Request.Headers["Referer"].ToString();
