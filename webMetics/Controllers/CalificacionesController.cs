@@ -134,18 +134,50 @@ namespace webMetics.Controllers
                         int horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadasAux) ? horasAprobadasAux : 0;
                         int calificacion = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text, out var calificacionAux) ? calificacionAux : 0;
 
+                        InscripcionModel inscripcion = null;
+
+                        try
+                        {
+                            inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(grupo.nombre, grupo.numeroGrupo, idParticipante);
+
+                            if (inscripcion != null)
+                            {
+                                inscripcion.horasAprobadas = horasAprobadas;
+                                inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                                inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+                                inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                                accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                                accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                                accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                            }
+                        }
+                        catch
+                        {
+                            int horasMatriculadas = grupo.cantidadHoras;
+                            horasMatriculadas -= horasAprobadas;
+                            horasMatriculadas = Math.Max(0, grupo.cantidadHoras);
+
+                            InscripcionModel nuevaInscripcion = new InscripcionModel
+                            {
+                                idParticipante = idParticipante,
+                                idGrupo = idGrupo,
+                                nombreGrupo = grupo.nombre,
+                                numeroGrupo = grupo.numeroGrupo,
+                                horasAprobadas = horasAprobadas,
+                                horasMatriculadas = horasMatriculadas,
+                                estado = "Inscrito"
+                            };
+
+                            accesoAInscripcion.InsertarInscripcion(nuevaInscripcion);
+                            nuevaInscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(nuevaInscripcion);
+                            accesoAInscripcion.EditarInscripcion(nuevaInscripcion);
+
+                            accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                            accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                        }
+
                         bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-
-                        InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(grupo.nombre, grupo.numeroGrupo, idParticipante);
-
-                        inscripcion.horasAprobadas = horasAprobadas;
-                        inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                        inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
-                        inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                        accesoAInscripcion.EditarInscripcion(inscripcion);
-
-                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
                     }
 
                     TempData["successMessage"] = "El archivo fue subido éxitosamente.";
@@ -153,7 +185,7 @@ namespace webMetics.Controllers
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = "Error al cargar los datos " + ex;
+                TempData["errorMessage"] = "Error al cargar los datos. " + ex;
             }
 
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });

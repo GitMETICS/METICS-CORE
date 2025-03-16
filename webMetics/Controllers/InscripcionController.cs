@@ -486,19 +486,16 @@ namespace webMetics.Controllers
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
 
                     TempData["successMessage"] = "Se eliminó la inscripción del participante.";
-
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo", new { reload = true });
-
                 }
                 else
                 {
                     TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
                 }
             }
-            catch (Exception)
+            catch (Exception ex )
             {
                 // Si ocurrió una excepción al intentar eliminar la inscripción, mostrar un mensaje y redirigir a la lista de participantes del grupo
-                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante.";
+                TempData["errorMessage"] = "No se pudo eliminar la inscripción del participante." + ex;
             }
 
             var refererUrl = Request.Headers["Referer"].ToString();
