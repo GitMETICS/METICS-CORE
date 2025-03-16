@@ -53,10 +53,10 @@
         <!-- Medallas -->
         @if (ViewBag.Medallas != null)
         {
-            <div class="d-flex justify-content-start my-4">
+            <div class="d-flex justify-content-start my-4 flex-wrap">
                 @foreach (string nombreMedalla in ViewBag.Medallas)
                 {
-                    <div class="card me-2" style="height: 420px;">
+                    <div class="card m-2" style="height: 420px;">
                         <div class="card-header text-muted">
                             <div style="float:right">
                                 @Html.ActionLink("", "EditarMedalla", "Medallas", new { nombreMedalla = nombreMedalla }, new { @class = "text-muted bi bi-pencil-square" })
@@ -71,7 +71,7 @@
                             {
                                 var normalizedMedalPath = medalPath.Replace('\\', '/');
                                 var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                                <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                                <img class="card-img" src="@relativeMedalPath" style="height: 300px; width: 300px;" />
                             }
                         </div>
                         <div class="card-footer">
