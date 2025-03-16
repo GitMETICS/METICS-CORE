@@ -183,7 +183,7 @@ namespace webMetics.Controllers
                     TempData["successMessage"] = "El archivo fue subido éxitosamente.";
                 }
             }
-            catch¿
+            catch
             {
                 TempData["errorMessage"] = "Error al cargar los datos.";
             }
