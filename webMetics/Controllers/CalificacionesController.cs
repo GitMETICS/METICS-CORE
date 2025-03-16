@@ -183,9 +183,9 @@ namespace webMetics.Controllers
                     TempData["successMessage"] = "El archivo fue subido éxitosamente.";
                 }
             }
-            catch (Exception ex)
+            catch¿
             {
-                TempData["errorMessage"] = "Error al cargar los datos. " + ex;
+                TempData["errorMessage"] = "Error al cargar los datos.";
             }
 
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
