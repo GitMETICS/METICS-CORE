@@ -105,8 +105,10 @@
                                             {
                                                 @foreach (var medalla in ViewBag.TodasMedallas)
                                                 {
-                                                    <div class="medalla-item">
-                                                        <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" />
+                                                    <div class="d-flex flex-column">
+                                                        <div class="medalla-item">
+                                                            <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" />
+                                                        </div>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="selectedMedallas" value="@medalla" id="medalla-@medalla">
                                                             <label class="form-check-label" for="medalla-@medalla">
@@ -137,7 +139,7 @@
                     <div class="d-flex justify-content-start mt-4">
                         @foreach (string nombreMedalla in ViewBag.Medallas)
                         {
-                            <div class="card me-2" style="height: 305px;">
+                            <div class="card me-2 h-100" style="width: 300px; height: 300px;">
                                 @if (ViewBag.Role == 1)
                                 {
                                     <div class="card-header text-muted">
@@ -153,7 +155,10 @@
                                 {
                                     var normalizedMedalPath = medalPath.Replace('\\', '/');
                                     var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                                    <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
+                                    
+                                    <div class="card-body">
+                                        <img class="card-img" src="@relativeMedalPath" style="height: 250px; width: 250px;" />
+                                    </div>
                                 }
                             </div>
                         }
