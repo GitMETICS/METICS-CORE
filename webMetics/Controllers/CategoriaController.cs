@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -23,23 +24,24 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            if (User.Identity.IsAuthenticated)
             {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (roleClaim != null)
+                {
+                    role = Convert.ToInt32(roleClaim);
+                }
             }
-
             return role;
         }
 
         private string GetId()
         {
             string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            if (User.Identity.IsAuthenticated)
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
             }
-
             return id;
         }
 

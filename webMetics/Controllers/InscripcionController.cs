@@ -19,6 +19,7 @@ using System.Text;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
+using System.Security.Claims;
 /* 
  * Controlador para el proceso de inscripción de los grupos
  */
@@ -1460,23 +1461,24 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            if (User.Identity.IsAuthenticated)
             {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (roleClaim != null)
+                {
+                    role = Convert.ToInt32(roleClaim);
+                }
             }
-
             return role;
         }
 
         private string GetId()
         {
             string id = "";
-
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            if (User.Identity.IsAuthenticated)
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
             }
-
             return id;
         }
     }

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -56,13 +59,13 @@ namespace webMetics.Controllers
 
         // Método para procesar el inicio de sesión cuando se envía el formulario de inicio de sesión
         [HttpPost]
-        public ActionResult IniciarSesion(LoginModel usuario)
+        public async Task<ActionResult> IniciarSesion(LoginModel usuario)
         {
             if (ModelState.IsValid)
             {
-                LoginModel usuarioAutorizado = AutenticarUsuario(usuario);
+                bool usuarioAutorizado = await AutenticarUsuario(usuario);
 
-                if (usuarioAutorizado != null)
+                if (usuarioAutorizado)
                 {
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
@@ -230,51 +233,49 @@ namespace webMetics.Controllers
             return exito;
         }
 
-        // Método para autenticar el usuario y realizar el inicio de sesión
-        private LoginModel AutenticarUsuario(LoginModel usuario)
+        // Método para autenticar al usuario e iniciar sesión
+        private async Task<bool> AutenticarUsuario(LoginModel usuario)
         {
             LoginModel usuarioAutorizado = null;
 
             try
             {
-                if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
+                if (accesoAUsuario.ObtenerUsuario(usuario.id) != null)
                 {
                     usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
 
-                    int rolUsuario = usuarioAutorizado.rol;
-                    string idUsuario = usuarioAutorizado.id;
-
-                    int minutos = 20;
-                    if (rolUsuario == 1)
+                    // Crear Claims para el usuario autenticado
+                    var claims = new List<Claim>
                     {
-                        minutos = 120;
-                    }
+                        new Claim(ClaimTypes.NameIdentifier, usuarioAutorizado.id),
+                        new Claim(ClaimTypes.Role, usuarioAutorizado.rol.ToString()), // Agregar el rol como un Claim
+                    };
 
-                    IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
-                    string idEncriptado = protector.Protect(idUsuario);
-
-                    Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
+                    // Crear la identidad del usuario
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme); // El nombre del esquema debe coincidir con el configurado en Program.cs
+                    var authProperties = new AuthenticationProperties
                     {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
+                        IsPersistent = true, // Para recordar al usuario
+                        ExpiresUtc = DateTime.UtcNow.AddMinutes(20) // Establecer la duración de la sesión
+                    };
 
-                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
+                    // Iniciar sesión del usuario utilizando el esquema de autenticación de la aplicación
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties); // Utilizar el esquema "Cookies"
 
-                    Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
+                    return true;
+                }
+                else
+                {
+                    //Si la autenticación falla, lanzar una excepción
+                    throw new Exception("Authentication failed");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in AutenticarUsuario: {ex.Message}");
+                // Considerar registrar el error o mostrar un mensaje al usuario
+                return false; // o lanzar la excepción, dependiendo de su manejo de errores
             }
-
-            return usuarioAutorizado;
         }
 
         public ActionResult InformacionPersonal()

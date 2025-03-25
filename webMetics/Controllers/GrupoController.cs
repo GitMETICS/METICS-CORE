@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
@@ -26,12 +27,14 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration)
+        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _environment = environment;
             _configuration = configuration;
-            
+            _httpContextAccessor = httpContextAccessor;
+
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoACategoria = new CategoriaHandler(environment, configuration);
             accesoAGrupo = new GrupoHandler(environment, configuration);
@@ -44,12 +47,15 @@ namespace webMetics.Controllers
         private int GetRole()
         {
             int role = 0;
-
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            
+            if (HttpContext.User.Identity.IsAuthenticated)
             {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
+                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (roleClaim != null)
+                {
+                    role = Convert.ToInt32(roleClaim);
+                }
             }
-
             return role;
         }
 
@@ -57,11 +63,10 @@ namespace webMetics.Controllers
         {
             string id = "";
 
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            if (HttpContext.User.Identity.IsAuthenticated)
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
             }
-
             return id;
         }
 
