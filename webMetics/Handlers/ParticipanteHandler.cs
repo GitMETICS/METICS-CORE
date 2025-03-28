@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using MailKit.Search;
 
 
 namespace webMetics.Handlers
@@ -469,6 +470,34 @@ namespace webMetics.Handlers
             }
 
             return listaParticipantes;
+        }
+
+        public List<ParticipanteModel> ObtenerListaParticipantesFiltrada(string searchTerm)
+        {
+            // Obtener la lista de participantes
+            List<ParticipanteModel> participantes = ObtenerListaParticipantes();
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Si la lista está vacía, devolver null
+            if (participantes.Count == 0)
+            {
+                return null;
+            }
+
+            return participantes;
         }
 
         // Método para obtener una lista de participantes asociados a un grupo específico
