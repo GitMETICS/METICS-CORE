@@ -35,9 +35,11 @@ namespace webMetics
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>  // Add this
             {
-                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+                options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(20); //configure the cookie expiration
                 options.SlidingExpiration = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.LoginPath = "/Usuario/IniciarSesion";
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {

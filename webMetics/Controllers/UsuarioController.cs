@@ -236,13 +236,13 @@ namespace webMetics.Controllers
         // Método para autenticar al usuario e iniciar sesión
         private async Task<bool> AutenticarUsuario(LoginModel usuario)
         {
-            LoginModel usuarioAutorizado = null;
-
             try
             {
-                if (accesoAUsuario.ObtenerUsuario(usuario.id) != null)
+                bool usuarioValidacion = accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena);
+                if (usuarioValidacion)
                 {
-                    usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
+                    // Se obtiene el usuario solo si fue autorizado
+                    LoginModel usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
 
                     // Crear Claims para el usuario autenticado
                     var claims = new List<Claim>
@@ -252,16 +252,22 @@ namespace webMetics.Controllers
                     };
 
                     // Crear la identidad del usuario
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme); // El nombre del esquema debe coincidir con el configurado en Program.cs
+                    var claimsIdentity = new ClaimsIdentity(
+                        claims,
+                        authenticationType: CookieAuthenticationDefaults.AuthenticationScheme,
+                        nameType: ClaimTypes.NameIdentifier,
+                        roleType: ClaimTypes.Role); // El nombre del esquema debe coincidir con el configurado en Program.cs
+                    
                     var authProperties = new AuthenticationProperties
                     {
                         IsPersistent = true, // Para recordar al usuario
                         ExpiresUtc = DateTime.UtcNow.AddMinutes(20) // Establecer la duración de la sesión
                     };
 
+                    ClaimsPrincipal cp = new ClaimsPrincipal(claimsIdentity);
                     // Iniciar sesión del usuario utilizando el esquema de autenticación de la aplicación
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties); // Utilizar el esquema "Cookies"
-
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp , authProperties); // Utilizar el esquema "Cookies"
+                    HttpContext.User = cp;
                     return true;
                 }
                 else
@@ -367,12 +373,10 @@ namespace webMetics.Controllers
         }
 
         // Método para cerrar la sesión del usuario
-        public ActionResult CerrarSesion()
+        public async Task<ActionResult>CerrarSesion()
         {
-            // Eliminar datos del usuario
-            Response.Cookies.Delete("USUARIOAUTORIZADO");
-            Response.Cookies.Delete("rolUsuario");
-            Response.Cookies.Delete("idUsuario");
+            // Administrar sesión del usuario
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return RedirectToAction("IniciarSesion");
         }

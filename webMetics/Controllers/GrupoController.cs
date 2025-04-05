@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,6 +17,7 @@ using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace webMetics.Controllers
 {
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class GrupoController : Controller
     {
         private protected ParticipanteHandler accesoAParticipante;
@@ -48,7 +51,8 @@ namespace webMetics.Controllers
         {
             int role = 0;
             
-            if (HttpContext.User.Identity.IsAuthenticated)
+            //if (HttpContext.User.Identity.IsAuthenticated)
+            if (true)
             {
                 string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
                 if (roleClaim != null)
