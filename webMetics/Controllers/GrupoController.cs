@@ -50,15 +50,14 @@ namespace webMetics.Controllers
         private int GetRole()
         {
             int role = 0;
-            
-            //if (HttpContext.User.Identity.IsAuthenticated)
-            if (true)
+
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-                if (roleClaim != null)
-                {
-                    role = Convert.ToInt32(roleClaim);
-                }
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                role = session.GetInt32("UsuarioRol") ?? 0;
             }
             return role;
         }
@@ -67,10 +66,15 @@ namespace webMetics.Controllers
         {
             string id = "";
 
-            if (HttpContext.User.Identity.IsAuthenticated)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                id = session.GetString("UsuarioId") ?? "";
             }
+
             return id;
         }
 

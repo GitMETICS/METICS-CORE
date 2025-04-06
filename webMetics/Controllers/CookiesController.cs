@@ -7,11 +7,13 @@ namespace webMetics.Controllers
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CookiesController(IWebHostEnvironment environment, IConfiguration configuration)
+        public CookiesController(IWebHostEnvironment environment, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _environment = environment;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public IActionResult CreateCookie(string cookieName, string cookieValue, DateTimeOffset expirationTime)

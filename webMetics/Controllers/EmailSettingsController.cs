@@ -8,15 +8,17 @@ public class EmailSettingsController : Controller
 {
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     private protected InscripcionHandler accesoAInscripcion;
 
     private static bool _isEmailEnabled = false;
 
-    public EmailSettingsController(IWebHostEnvironment environment, IConfiguration configuration)
+    public EmailSettingsController(IWebHostEnvironment environment, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _environment = environment;
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
 
         accesoAInscripcion = new InscripcionHandler(environment, configuration);
     }
@@ -25,13 +27,13 @@ public class EmailSettingsController : Controller
     {
         int role = 0;
 
-        if (User.Identity.IsAuthenticated)
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext != null)
         {
-            string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-            if (roleClaim != null)
-            {
-                role = Convert.ToInt32(roleClaim);
-            }
+            var session = httpContext.Session;
+            var cookies = httpContext.Request.Cookies;
+
+            role = session.GetInt32("UsuarioRol") ?? 0;
         }
         return role;
     }
@@ -39,10 +41,16 @@ public class EmailSettingsController : Controller
     private string GetId()
     {
         string id = "";
-        if (User.Identity.IsAuthenticated)
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext != null)
         {
-            id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+            var session = httpContext.Session;
+            var cookies = httpContext.Request.Cookies;
+
+            id = session.GetString("UsuarioId") ?? "";
         }
+
         return id;
     }
 

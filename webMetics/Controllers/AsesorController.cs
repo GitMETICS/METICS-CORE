@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
@@ -22,11 +24,13 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AsesorController(IWebHostEnvironment environment, IConfiguration configuration)
+        public AsesorController(IWebHostEnvironment environment, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _environment = environment;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
 
             accesoATema = new TemaHandler(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
@@ -36,6 +40,7 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
+        [Authorize(AuthenticationSchemes = "Cookies")]
         public ActionResult MisModulos()
         {
             const int RolUsuarioParticipante = 0;
@@ -446,13 +451,13 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (User.Identity.IsAuthenticated)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-                if (roleClaim != null)
-                {
-                    role = Convert.ToInt32(roleClaim);
-                }
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                role = session.GetInt32("UsuarioRol")?? 0;
             }
             return role;
         }
@@ -460,10 +465,16 @@ namespace webMetics.Controllers
         private string GetId()
         {
             string id = "";
-            if (User.Identity.IsAuthenticated)
+
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                id = session.GetString("UsuarioId") ?? "";
             }
+
             return id;
         }
     }

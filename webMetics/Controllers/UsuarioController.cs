@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Json;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -21,20 +23,20 @@ namespace webMetics.Controllers
         private protected GrupoHandler accesoAGrupo;
         private protected InscripcionHandler accesoAInscripcion;
 
-
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly IDataProtectionProvider _protector;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly EmailService _emailService;
 
-        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector, EmailService emailService)
+        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector, IHttpContextAccessor httpContextAccessor, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
             _protector = protector;
+            _httpContextAccessor = httpContextAccessor;
             _emailService = emailService;
 
-            cookiesController = new CookiesController(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
@@ -266,8 +268,16 @@ namespace webMetics.Controllers
 
                     ClaimsPrincipal cp = new ClaimsPrincipal(claimsIdentity);
                     // Iniciar sesión del usuario utilizando el esquema de autenticación de la aplicación
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp , authProperties); // Utilizar el esquema "Cookies"
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp, authProperties); // Utilizar el esquema "Cookies"
                     HttpContext.User = cp;
+
+                    // Almacenamiento en Sesión
+                    HttpContext.Session.SetString("UsuarioId", usuarioAutorizado.id);
+                    HttpContext.Session.SetInt32("UsuarioRol", usuarioAutorizado.rol);
+
+                    //Almacenar objeto en la sesion.
+                    HttpContext.Session.SetString("UsuarioAutorizado", JsonSerializer.Serialize(usuarioAutorizado));
+
                     return true;
                 }
                 else
@@ -711,16 +721,18 @@ namespace webMetics.Controllers
 
             return password;
         }
-
         private int GetRole()
         {
             int role = 0;
 
-            if (HttpContext.Request.Cookies.ContainsKey("rolUsuario"))
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                role = Convert.ToInt32(Request.Cookies["rolUsuario"]);
-            }
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
 
+                role = session.GetInt32("UsuarioRol") ?? 0;
+            }
             return role;
         }
 
@@ -728,9 +740,13 @@ namespace webMetics.Controllers
         {
             string id = "";
 
-            if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                id = session.GetString("UsuarioId") ?? "";
             }
 
             return id;

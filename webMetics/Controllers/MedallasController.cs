@@ -13,12 +13,14 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly EmailService _emailService;
 
-        public MedallasController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
+        public MedallasController(IWebHostEnvironment environment, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
             _emailService = emailService;
 
             accesoAUsuario = new UsuarioHandler(environment, configuration);
@@ -30,13 +32,13 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (User.Identity.IsAuthenticated)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-                if (roleClaim != null)
-                {
-                    role = Convert.ToInt32(roleClaim);
-                }
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                role = session.GetInt32("UsuarioRol") ?? 0;
             }
             return role;
         }
@@ -44,10 +46,16 @@ namespace webMetics.Controllers
         private string GetId()
         {
             string id = "";
-            if (User.Identity.IsAuthenticated)
+
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                id = session.GetString("UsuarioId") ?? "";
             }
+
             return id;
         }
 

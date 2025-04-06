@@ -36,14 +36,16 @@ namespace webMetics.Controllers
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly EmailService _emailService;
 
-        private readonly IMemoryCache _memoryCache;
-
-        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService, IMemoryCache memoryCache)
+        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, IMemoryCache memoryCache, IHttpContextAccessor httpContextAccessor, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
+            _memoryCache = memoryCache;
+            _httpContextAccessor = httpContextAccessor;
             _emailService = emailService;
 
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
@@ -51,9 +53,6 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
-
-
-            _memoryCache = memoryCache;
         }
 
         /* Método para mostrar la lista de participantes inscritos en un grupo */
@@ -1461,13 +1460,13 @@ namespace webMetics.Controllers
         {
             int role = 0;
 
-            if (User.Identity.IsAuthenticated)
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                string roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-                if (roleClaim != null)
-                {
-                    role = Convert.ToInt32(roleClaim);
-                }
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                role = session.GetInt32("UsuarioRol") ?? 0;
             }
             return role;
         }
@@ -1475,10 +1474,16 @@ namespace webMetics.Controllers
         private string GetId()
         {
             string id = "";
-            if (User.Identity.IsAuthenticated)
+
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
             {
-                id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                var session = httpContext.Session;
+                var cookies = httpContext.Request.Cookies;
+
+                id = session.GetString("UsuarioId") ?? "";
             }
+
             return id;
         }
     }

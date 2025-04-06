@@ -25,6 +25,16 @@ namespace webMetics
             builder.Services.AddRazorPages();
             builder.Services.AddDataProtection();
 
+            builder.Services.AddDistributedMemoryCache(); // Almacenamiento en memoria para sesiones
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(20); // Tiempo de inactividad de la sesión
+                options.Cookie.HttpOnly = true; // Solo accesible por HTTP
+                options.Cookie.IsEssential = true; // Permite el funcionamiento de la sesion aunque el usuario no permita cookies de seguimiento.
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            });
+
             builder.Services.AddHttpContextAccessor();
 
             // Add authentication services
@@ -38,8 +48,7 @@ namespace webMetics
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(20); //configure the cookie expiration
                 options.SlidingExpiration = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                options.LoginPath = "/Usuario/IniciarSesion";
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
@@ -66,7 +75,7 @@ namespace webMetics
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddTestUsers(Config.GetUsers()); // Use test users
-            
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -83,15 +92,19 @@ namespace webMetics
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            
             app.UseRouting();
-            app.UseIdentityServer(); // Add IdentityServer to the pipeline. Make sure it's before UseAuthentication and UseAuthorization
-            app.UseAuthentication();  //Make sure this is called.
+
+            app.UseSession();
+
+            app.UseIdentityServer();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Usuario}/{action=IniciarSesion}/{id?}");
+            app.MapControllers();
             app.MapRazorPages();
 
             app.Run();
@@ -148,19 +161,19 @@ namespace webMetics
             {
                 new TestUser
                 {
-                    SubjectId = "docencia.metics2@ucr.ac.cr",
-                    Username = "docencia.metics2",
+                    SubjectId = "admin.docencia.metics@ucr.ac.cr",
+                    Username = "admin.docencia.metics",
                     Password = "12345",
                     Claims = new List<System.Security.Claims.Claim>
                     {
                         new System.Security.Claims.Claim("name", "Alice"),
-                        new System.Security.Claims.Claim("role", "0"),
+                        new System.Security.Claims.Claim("role", "1"),
                     }
                 },
                 new TestUser
                 {
-                    SubjectId = "docencia.metics3@ucr.ac.cr",
-                    Username = "docencia.metics3",
+                    SubjectId = "docencia.metics2@ucr.ac.cr",
+                    Username = "docencia.metics2",
                     Password = "12345",
                     Claims = new List<System.Security.Claims.Claim>
                     {
@@ -170,8 +183,8 @@ namespace webMetics
                 },
                 new TestUser
                 {
-                    SubjectId = "docencia.metics1@ucr.ac.cr",
-                    Username = "docencia.metics1",
+                    SubjectId = "docencia.metics3@ucr.ac.cr",
+                    Username = "docencia.metics3",
                     Password = "12345",
                     Claims = new List<System.Security.Claims.Claim>
                     {
