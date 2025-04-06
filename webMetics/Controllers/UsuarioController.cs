@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Specialized;
 using System.Security.Claims;
 using System.Text.Json;
 using webMetics.Handlers;
@@ -551,37 +552,24 @@ namespace webMetics.Controllers
 
         public ActionResult CambiarContrasena()
         {
-            string idUsuario = string.Empty;
+            string idUsuario = GetId();
+            int role = GetRole();
 
-            if (Request.Cookies.ContainsKey("USUARIOAUTORIZADO"))
+            NewLoginModel usuario = new NewLoginModel() { id = idUsuario };
+
+            if (TempData["errorMessage"] != null)
             {
-                string idEncriptado = Request.Cookies["USUARIOAUTORIZADO"];
-                IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
-                idUsuario = protector.Unprotect(idEncriptado);
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
 
-            if (!string.IsNullOrEmpty(idUsuario) && GetId() == idUsuario)
-            {
-                ViewBag.Id = GetId();
-                ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
 
-                NewLoginModel usuario = new NewLoginModel() { id = idUsuario };
-
-                if (TempData["errorMessage"] != null)
-                {
-                    ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-                }
-                if (TempData["successMessage"] != null)
-                {
-                    ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-                }
-
-                return View(usuario);
-            }
-            else
-            {
-                return RedirectToAction("CerrarSesion");
-            }
+            return View(usuario);
         }
 
 
