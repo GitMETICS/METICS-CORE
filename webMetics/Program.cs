@@ -1,16 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Duende.IdentityServer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.Cookies; // Add this using statement
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Generic;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Test;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
 
 namespace webMetics
 {
@@ -40,48 +34,55 @@ namespace webMetics
             // Add authentication services
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Set default scheme
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>  // Add this
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(20); //configure the cookie expiration
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
                 options.SlidingExpiration = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
-                options.Authority = "https://localhost:5001"; // Use the default Duende IdentityServer URL for testing
-                options.ClientId = "client";       // And these to match your client configuration
-                options.ClientSecret = "secret";   // IMPORTANT: Store securely in production
+                options.Authority = "https://localhost:5001";
+                options.ClientId = "client";
+                options.ClientSecret = "secret";
                 options.ResponseType = "code";
                 options.SaveTokens = true;
-                options.RequireHttpsMetadata = false;  // Only for development! Use HTTPS in production.
+                options.RequireHttpsMetadata = false;
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
-                options.Scope.Add("api1"); // Add the scope for your API
+                options.Scope.Add("api1");
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "name",
                     RoleClaimType = "role"
                 };
+                options.CallbackPath = "/signin-oidc"; // Ensure this matches the redirect_uri
+                options.SignedOutCallbackPath = "/signout-callback-oidc";// Ensure this matches the PostLogoutRedirectUris
+                options.Events.OnRemoteFailure = context =>
+                {
+                    context.Response.Redirect("/Usuario/IniciarSesion"); // Redirigir a una página de error personalizada
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+                };
             });
 
             // Add IdentityServer services
-            var identityServerBuilder = builder.Services.AddIdentityServer()
+            builder.Services.AddIdentityServer()
                 .AddInMemoryClients(Config.Clients)
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
-                .AddInMemoryApiResources(Config.ApiResources)
-                .AddTestUsers(Config.GetUsers()); // Use test users
+                .AddTestUsers(Config.GetUsers());
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Usuario/IniciarSesion");
                 app.UseHsts();
             }
 
@@ -142,8 +143,8 @@ namespace webMetics
                 {
                     ClientId = "client",
                     AllowedGrantTypes = GrantTypes.Code,
-                    RedirectUris = { "https://localhost:5002/signin-oidc" }, //  Use a port that you will use for your client application.
-                    PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },  //  Use a port that you will use for your client application.
+                    RedirectUris = { "https://localhost:5002/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +82,34 @@ namespace webMetics.Controllers
             else
             {
                 return View(usuario);
+            }
+        }
+
+        public IActionResult IniciarSesionSSO()
+        {
+            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
+        public async Task<IActionResult> InicioSesionSSOCallback()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                bool usuarioAutorizadoSSO = await AutenticarUsuarioSSO(User);
+
+                if (usuarioAutorizadoSSO)
+                {
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error en la autenticación SSO.";
+                    return RedirectToAction("IniciarSesion", "Usuario");
+                }
+            }
+            else
+            {
+                TempData["errorMessage"] = "No se pudo autenticar con SSO.";
+                return RedirectToAction("IniciarSesion", "Usuario");
             }
         }
 
@@ -292,6 +321,69 @@ namespace webMetics.Controllers
                 Console.WriteLine($"Error in AutenticarUsuario: {ex.Message}");
                 // Considerar registrar el error o mostrar un mensaje al usuario
                 return false; // o lanzar la excepción, dependiendo de su manejo de errores
+            }
+        }
+
+        private async Task<bool> AutenticarUsuarioSSO(ClaimsPrincipal userClaims)
+        {
+            try
+            {
+                // Obtener el ID del usuario del proveedor SSO
+                var userId = userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new Exception("User ID not found in claims.");
+                }
+
+                // Obtener información adicional del usuario desde los Claims
+                string nombre = userClaims.FindFirst(ClaimTypes.Name)?.Value;
+                string email = userClaims.FindFirst(ClaimTypes.Email)?.Value;
+                string rol = userClaims.FindFirst(ClaimTypes.Role)?.Value;
+
+                // Crear objeto LoginModel con los datos del usuario
+                var usuarioAutorizado = new LoginModel
+                {
+                    id = userId,
+                    rol = rol != null ? int.Parse(rol) : 0 // Asumiendo que el rol es un entero
+                };
+
+                // Crear Claims para la aplicación .NET Core
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, usuarioAutorizado.id),
+                    new Claim(ClaimTypes.Role, usuarioAutorizado.rol.ToString())
+                };
+
+                // Crear la identidad del usuario
+                var claimsIdentity = new ClaimsIdentity(
+                    claims,
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    ClaimTypes.NameIdentifier,
+                    ClaimTypes.Role);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(20)
+                };
+
+                ClaimsPrincipal cp = new ClaimsPrincipal(claimsIdentity);
+
+                // Iniciar sesión del usuario utilizando el esquema de autenticación de la aplicación
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, cp, authProperties);
+                HttpContext.User = cp;
+
+                // Almacenar datos en Sesión
+                HttpContext.Session.SetString("UsuarioId", usuarioAutorizado.id);
+                HttpContext.Session.SetInt32("UsuarioRol", usuarioAutorizado.rol);
+                HttpContext.Session.SetString("UsuarioAutorizado", JsonSerializer.Serialize(usuarioAutorizado));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in AutenticarUsuarioSSO: {ex.Message}");
+                return false;
             }
         }
 

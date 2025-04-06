@@ -26,5 +26,11 @@ namespace webMetics.Controllers
             //La página de inicio es la lista de los grupos disponibles
             return Redirect("~/Grupo/ListaGruposDisponibles");
         }
+
+        public IActionResult Error(string errorId)
+        {
+            ViewBag.ErrorId = errorId;
+            return View();
+        }
     }
 }
