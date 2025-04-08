@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Text.RegularExpressions;
 using webMetics.Handlers;
 using webMetics.Models;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
@@ -766,5 +767,30 @@ namespace webMetics.Controllers
             }
         }
 
+        public ActionResult CopiarGrupo(int idGrupo)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+
+            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+
+            // Obtener los temas asociados al grupo
+            List<TemaModel> temasAsociados = accesoAGrupoTema.ObtenerTemasDelGrupo(idGrupo);
+
+            int[] temasArray = new int[temasAsociados.Count];
+
+            // Convertir temas a valor asociado
+            for (int i = 0; i < temasAsociados.Count; i++)
+            {
+                temasArray[i] = temasAsociados[i].idTema;
+            }
+
+            // Copiar atributos del grupo y añadirlo a la lista de grupos como copia
+            accesoAGrupo.CrearGrupo(grupo, temasArray);
+
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
+        }
     }
 }
