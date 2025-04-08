@@ -7,7 +7,7 @@
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
-    <div class="contenedor-tipos-actividades container-fluid">
+    <div class="contenedor-caja container-fluid">
         @if (urlReferrer != null)
         {
             @if (ViewBag.Role == 1)
@@ -84,7 +84,7 @@
                         @Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
-                        <button class="btn btn-outline-primary" id="sendEmailButton"><i class="bi bi-send me-2"></i>Enviar por correo</button>
+                        @Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-primary bi bi-envelope" })
                     </div>
                 </div>
             </div>
@@ -98,7 +98,6 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col"></th>
                             <th scope="col">Unidad Académica</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Primer<br>Apellido</th>
@@ -124,9 +123,6 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                <td>
-                                    <input type="checkbox" class="participante-checkbox" value="@participante.idParticipante" />
-                                </td>
                                 <td>@participante.unidadAcademica</td>
                                 <td>@participante.nombre</td>
                                 <td>@participante.primerApellido</td>
@@ -232,22 +228,4 @@ else
         document.getElementById("numeroGrupo").value = numeroGrupo;
         document.getElementById("idParticipante").value = idParticipante;
     }
-</script>
-
-<script>
-    document.getElementById('sendEmailButton').onclick = function () {
-        var selectedParticipants = [];
-        // Gather selected checkboxes
-        document.querySelectorAll('.participante-checkbox:checked').forEach(function (checkbox) {
-            selectedParticipants.push(checkbox.value);
-        });
-
-        // Create a comma-separated string
-        var participantesSeleccionados = selectedParticipants.join(',');
-
-        // Redirect to the ActionLink with the parameters
-        window.location.href = '@Url.Action("EnviarCalificaciones", "Calificaciones", new { idGrupo = "__idGrupo__", participantesSeleccionados = "__participantesSeleccionados__" })'
-            .replace('__idGrupo__', '@ViewBag.IdGrupo')
-            .replace('__participantesSeleccionados__', participantesSeleccionados);
-    };
 </script>

@@ -478,17 +478,18 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
-        public ActionResult EnviarCalificaciones(int idGrupo, List<string> participantesSeleccionados)
+        public ActionResult EnviarCalificacionesAlCorreo(int idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<CalificacionModel> calificaciones = new List<CalificacionModel>();
 
-            foreach (string idParticipante in participantesSeleccionados)
+            foreach (ParticipanteModel participante in participantes)
             {
-                CalificacionModel calificacion = accesoACalificaciones.ObtenerCalificacion(idGrupo, idParticipante);
+                CalificacionModel calificacion = accesoACalificaciones.ObtenerCalificacion(idGrupo, participante.idParticipante);
                 calificaciones.Add(calificacion);
             }
 
@@ -497,7 +498,7 @@ namespace webMetics.Controllers
                 foreach (CalificacionModel calificacion in calificaciones)
                 {
                     string mensaje = ConstructorDelMensajeCorreoEnviarCalificacion(grupo, calificacion);
-                    EnviarCalificacion(grupo.nombre, mensaje, calificacion.participante.correo);
+                    EnviarCalificacion(grupo.nombre, mensaje, calificacion.participante.idParticipante);
                 }
 
                 TempData["successMessage"] = "Calificaciones enviadas.";
