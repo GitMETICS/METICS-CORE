@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
-using System.Text.RegularExpressions;
 using webMetics.Handlers;
 using webMetics.Models;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
