@@ -155,7 +155,7 @@
                                 {
                                     var normalizedMedalPath = medalPath.Replace('\\', '/');
                                     var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                                    
+
                                     <div class="card-body">
                                         <img class="card-img" src="@relativeMedalPath" style="height: 250px; width: 250px;" />
                                     </div>
@@ -165,7 +165,7 @@
                     </div>
                 }
                 <br />
-                
+
                 var nombreCompleto = ViewBag.Participante.nombre;
                 nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
@@ -196,10 +196,10 @@
                             </td>
 
                             <td class="">
-                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                            {
-                                <div class="my-2"><i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
-                            }
+                                @foreach (var inscripcion in ViewBag.Inscripciones)
+                                {
+                                    <div class="my-2"><i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
+                                }
                             </td>
 
                             <td class="text-center">
@@ -249,7 +249,7 @@
                                                         <td class="">@nombreCompleto</td>
                                                         <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
                                                         <td class="">@inscripcion.estado</td>
-                                                        
+
                                                         <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
                                                         <td class="text-center">
@@ -284,7 +284,13 @@
             }
             <hr />
             <div class="d-flex my-4 justify-content-center">
-                <a href="@Url.Action("VerInscripciones", "Inscripcion")" class="btn btn-secondary btn-block">Regresar</a>
+                @if (ViewBag.IdGrupo != null)
+                {
+                    <a href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })" class="btn btn-secondary btn-block">Regresar a Grupo</a>
+                }
+                else {
+                    <a href="@Url.Action("VerInscripciones", "Inscripcion")" class="btn btn-secondary btn-block">Regresar</a>
+                }
             </div>
         </div>
 
