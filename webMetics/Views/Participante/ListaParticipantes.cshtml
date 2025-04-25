@@ -157,7 +157,7 @@
                                     <td class="text-center">@calificacion</td>
                                 }
                                 <td>
-                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
+                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "text-secondary bi bi-search" })
                                 </td>
                                 @if (ViewBag.Role == 1)
                                 {                                    

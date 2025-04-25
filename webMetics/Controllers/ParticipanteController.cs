@@ -766,7 +766,7 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        public ActionResult VerDatosParticipante(string idParticipante)
+        public ActionResult VerDatosParticipante(string idParticipante, int? idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
@@ -796,6 +796,12 @@ namespace webMetics.Controllers
             if (TempData["successMessage"] != null)
             {
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            // Si se pasa un idGrupo, se guarda en ViewBag para usarlo en la vista cuando se regresa al grupo
+            if (idGrupo != null)
+            {
+                ViewBag.IdGrupo = idGrupo;
             }
 
             return View();
