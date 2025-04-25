@@ -96,14 +96,11 @@
                 </div>
                 <div class="card-footer text-center pt-2 pb-3" style="background-color: #333333; color: #fff; margin-bottom: 30px;">
                     <p class="fw-bold" style="font-size: 1rem;margin-top: 10px;">
-                        ¿Aprobó algún módulo antes del 1 de enero de 2025?
+                        ¿Olvidó su contraseña?
+                        @Html.ActionLink("Puede registrarse de nuevo aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline fst-italic", aria_label = "Formulario de registro" })
                         <br />
-                        Solicite su contraseña a
-                        <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
-                    </p>
-                    <p class="fw-bold" style="font-size: 1rem;  margin-bottom: 10px;">
-                        ¿Va a llevar un módulo por primera vez?
-                        @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline fst-italic", aria_label = "Formulario de registro" })
+                        o solicitar su contraseña a <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
+                        <br />
                     </p>
                 </div>
             </div>
