@@ -238,9 +238,9 @@
                                                         <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
                                                         <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
                                                         <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
-
                                                         <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
                                                         <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
+                                                        <th class="text-center" scope="col" style="width: 3.33%;"></th>
                                                     </tr>
                                                 </thead>
 
@@ -252,25 +252,25 @@
                                                         
                                                         <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
-                                                        <td class="text-center">
-                                                            @using (Html.BeginForm("SubirHorasAprobadas", "Participante", new { idGrupo = inscripcion.idGrupo, nombreGrupo = inscripcion.nombreGrupo, numeroGrupo = inscripcion.numeroGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
-                                                            {
+                                                        @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
+                                                        {
+                                                            <td class="text-center">
                                                                 <div class="my-2 align-items-center justify-content-start d-lg-flex">
                                                                     <input type="number" min="0" class="form-control" style="max-width: 125px;" name="horasAprobadas">
-                                                                    <button type="submit" class="m-1 btn btn-secondary bi bi-check-lg"></button>
                                                                 </div>
-                                                            }
-                                                        </td>
-                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
-                                                        <td class="text-center">
-                                                            @using (Html.BeginForm("SubirCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
-                                                            {
+                                                            </td>
+                                                            <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
+                                                            <td class="text-center">
                                                                 <div class="my-2 align-items-center justify-content-start d-lg-flex">
                                                                     <input type="number" min="0" , max="100" class="form-control" style="max-width: 125px;" name="calificacion" id="calificacion">
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
                                                                     <button type="submit" class="m-1 btn btn-secondary bi bi-check-lg"></button>
                                                                 </div>
-                                                            }
-                                                        </td>
+                                                            </td>
+                                                        }
                                                     </tr>
                                                 </tbody>
                                             </table>

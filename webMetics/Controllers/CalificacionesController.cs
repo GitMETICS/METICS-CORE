@@ -82,6 +82,50 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
+        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas, int calificacion)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
+                
+                int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
+
+                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
+                {
+                    inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                    inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                }
+
+                accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+
+                TempData["successMessage"] = "Datos actualizados.";
+            }
+            catch
+            {
+                TempData["errorMessage"] = "No se pudo actualizar los datos.";
+            }
+
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        }
+
+        [HttpPost]
         public ActionResult SubirCalificacion(int idGrupo, string idParticipante, int calificacion)
         {
             try
