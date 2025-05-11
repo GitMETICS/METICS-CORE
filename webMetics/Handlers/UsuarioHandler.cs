@@ -221,5 +221,31 @@ namespace webMetics.Handlers
 
             return exito;
         }
+
+        public bool ActualizarContrasena(string correo, string contrasena)
+        {
+            bool exito = false;
+
+            using (var command = new SqlCommand("UpdateUsuario", ConexionMetics))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@contrasena", contrasena);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    exito = command.ExecuteNonQuery() >= 1;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in ActualizarContrasena: {ex.Message}");
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+            return exito;
+        }
     }
 }
