@@ -82,7 +82,7 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
-        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas, int calificacion)
+        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
         {
             try
             {
@@ -91,23 +91,35 @@ namespace webMetics.Controllers
 
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-                
-                int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
-                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
+                if (horasAprobadas != 0) 
                 {
-                    inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                    inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+                    int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
+                    if (inscripcion.horasMatriculadas == 0)
+                    {
+                        inscripcion.horasMatriculadas = inscripcion.horasAprobadas;
+                        inscripcion.horasAprobadas = 0;
+                    }
 
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                    if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
+                    {
+                        inscripcion.horasAprobadas = nuevasHorasAprobadas;
+                        inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                        inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+
+                        inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                        accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                    }
                 }
 
-                accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                if (calificacion != 0)
+                {
+                    accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                }
 
                 TempData["successMessage"] = "Datos actualizados.";
             }
