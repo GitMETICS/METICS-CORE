@@ -1,0 +1,97 @@
+﻿@model webMetics.Models.ParticipanteModel
+@using webMetics.Controllers
+@using webMetics.Helpers
+@{
+    ViewBag.Title = "Recuperar Contraseña";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+            .input-wrapper input {
+                padding-right: 50px;
+            }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(10%);
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    @if (ViewBag.Id != "")
+    {
+        <div class="contenedor-caja container-fluid">
+
+            @using (Html.BeginForm("RecuperarContrasena", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <h1>@ViewBag.Title</h1>
+                <hr />
+
+                if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.ErrorMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+                        <span>@ViewBag.SuccessMessage</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <div class="row mb-1">
+                    <div class="col">
+                        <div class="container">
+                            <div class="row mt-1">
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Correo electrónico</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo electrónico" })
+                                    @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col input-wrapper">
+                                    <label style="font-size: 22px">Número de identificación</label> <a style="color:red;font-size:22px">*</a>
+                                    @Html.TextBoxFor(model => model.numeroIdentificacion, new { @class = "form-control", @placeholder = "Ingrese su número de identificación" })
+                                    @Html.ValidationMessageFor(model => model.numeroIdentificacion, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center my-4">
+                    <a href="@Url.Action("IniciarSesion", "Usuario", new { })" class="btn btn-primary btn-block">
+                        Regresar
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</body>
+</html>

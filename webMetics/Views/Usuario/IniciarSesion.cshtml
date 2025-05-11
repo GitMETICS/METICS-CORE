@@ -91,6 +91,12 @@
                             <div class="text-center mt-3">
                                 <button type="submit" class="btn btn-primary btn-block">Acceder</button>
                             </div>
+
+                            <div class="text-center mt-2">
+                                <small>
+                                    @Html.ActionLink("¿Olvidó su contraseña?", "FormularioRegistro", "Participante")
+                                </small>
+                            </div>
                         }
                     </div>
                 </div>
@@ -105,6 +111,7 @@
                         ¿Va a llevar un módulo por primera vez?
                         @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline fst-italic", aria_label = "Formulario de registro" })
                     </p>
+
                 </div>
             </div>
         </div>
