@@ -255,7 +255,7 @@
                                                             </td>
 
                                                             <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasMatriculadas ?? 0))
+                                                                @(((inscripcion.horasMatriculadas - inscripcion.horasAprobadas) ?? 0))
                                                             </td>
                                                             <td class="my-2 text-center" style="width: 7.5%">
                                                                 @((inscripcion.horasAprobadas ?? 0))
