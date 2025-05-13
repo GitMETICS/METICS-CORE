@@ -1452,20 +1452,29 @@ namespace webMetics.Controllers
 
             return id;
         }
-        public ActionResult FormularioRegistro()
+        public ActionResult FormularioRecuperarContrasena()
         {
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-            return View("RecuperarContrasena");
+            return View("FormularioRecuperarContrasena");
         }
 
-        private async Task<IActionResult> RecuperarContrasena(string correo, string numeroIdentificacion)
+        [HttpPost]
+        public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
         {
+            var correo = participante.correo;
+            var numeroIdentificacion = participante.numeroIdentificacion;
+            // Eliminar guiones de numero Identificacion
+            if (numeroIdentificacion != null)
+            {
+                numeroIdentificacion = numeroIdentificacion.Replace(" ", "").Trim();
+            }
+
             // Obtener la lista de participantes (solo el correo importa)
-            var participante = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
+            var participanteEncontrado = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
 
             // Si la lista está vacía o el número de identificación no coincide, mostrar un mensaje de error
-            if (participante.IsNullOrEmpty() || participante.First().numeroIdentificacion != numeroIdentificacion)
+            if (participanteEncontrado.IsNullOrEmpty() || participanteEncontrado.First().numeroIdentificacion != numeroIdentificacion)
             {
                 TempData["errorMessage"] = "No existe un usuario con ese correo y número de identificación.";
             }
@@ -1481,6 +1490,8 @@ namespace webMetics.Controllers
                 string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
                     $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
                     $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
+                // Loggear en consola la contraseña generada
+                Console.WriteLine($"Nueva contraseña generada: {nuevaContrasena}");
                 await _emailService.SendEmailAsync(correo, subject, message);
 
                 TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
@@ -1495,7 +1506,7 @@ namespace webMetics.Controllers
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
 
-            return View();
+            return View("FormularioRecuperarContrasena");
         }
     }
 }
