@@ -1454,8 +1454,6 @@ namespace webMetics.Controllers
         }
         public ActionResult FormularioRecuperarContrasena()
         {
-            // Obtener datos necesarios para llenar las opciones del formulario (áreas)
-            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
             return View("FormularioRecuperarContrasena");
         }
 
@@ -1463,38 +1461,40 @@ namespace webMetics.Controllers
         public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
         {
             var correo = participante.correo;
-            var numeroIdentificacion = participante.numeroIdentificacion;
-            // Eliminar guiones de numero Identificacion
-            if (numeroIdentificacion != null)
-            {
-                numeroIdentificacion = numeroIdentificacion.Replace(" ", "").Trim();
-            }
 
             // Obtener la lista de participantes (solo el correo importa)
-            var participanteEncontrado = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
+            var listaParticipantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
+            
+            // Si la lista no esta vacia y si el numero de identificacion encontrado coincide con el proporcionado
+            if (listaParticipantes != null && listaParticipantes.First().numeroIdentificacion == participante.numeroIdentificacion)
+            {
+                // Obtener el participante de la lista
+                var participanteEncontrado = listaParticipantes.First();
 
-            // Si la lista está vacía o el número de identificación no coincide, mostrar un mensaje de error
-            if (participanteEncontrado.IsNullOrEmpty() || participanteEncontrado.First().numeroIdentificacion != numeroIdentificacion)
-            {
-                TempData["errorMessage"] = "No existe un usuario con ese correo y número de identificación.";
-            }
-            else
-            {
                 // Generar una nueva contraseña aleatoria
                 string nuevaContrasena = GenerateRandomPassword();
                 // Actualizar la contraseña del usuario en la base de datos
-                accesoAUsuario.ActualizarContrasena(correo, nuevaContrasena);
+                if (accesoAUsuario.EditarUsuario(correo, 0 ,nuevaContrasena))
+                {
+                    // Enviar un correo electrónico al usuario con la nueva contraseña
+                    string subject = "Recuperación de contraseña SISTEMA DE INSCRIPCIONES METICS";
+                    string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                        $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
+                        $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
+                    // Loggear en consola la contraseña generada
+                    Console.WriteLine($"Nueva contraseña generada: {nuevaContrasena}");
 
-                // Enviar un correo electrónico al usuario con la nueva contraseña
-                string subject = "Recuperación de contraseña SISTEMA DE INSCRIPCIONES METICS";
-                string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                    $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
-                    $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
-                // Loggear en consola la contraseña generada
-                Console.WriteLine($"Nueva contraseña generada: {nuevaContrasena}");
-                await _emailService.SendEmailAsync(correo, subject, message);
-
-                TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
+                    await _emailService.SendEmailAsync(correo, subject, message);
+                    TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al actualizar la contraseña.";
+                }
+            }
+            else
+            {
+                TempData["errorMessage"] = "No existe un usuario con ese correo y número de identificación.";
             }
 
             if (TempData["errorMessage"] != null)
