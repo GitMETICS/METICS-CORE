@@ -1464,7 +1464,7 @@ namespace webMetics.Controllers
 
             // Obtener la lista de participantes (solo el correo importa)
             var listaParticipantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
-            
+
             // Si la lista no esta vacia y si el numero de identificacion encontrado coincide con el proporcionado
             if (listaParticipantes != null && listaParticipantes.First().numeroIdentificacion == participante.numeroIdentificacion)
             {
@@ -1474,7 +1474,7 @@ namespace webMetics.Controllers
                 // Generar una nueva contraseña aleatoria
                 string nuevaContrasena = GenerateRandomPassword();
                 // Actualizar la contraseña del usuario en la base de datos
-                if (accesoAUsuario.EditarUsuario(correo, 0 ,nuevaContrasena))
+                if (!accesoAUsuario.ActualizarContrasena(correo, nuevaContrasena))
                 {
                     // Enviar un correo electrónico al usuario con la nueva contraseña
                     string subject = "Recuperación de contraseña SISTEMA DE INSCRIPCIONES METICS";
