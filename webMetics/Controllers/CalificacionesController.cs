@@ -94,26 +94,17 @@ namespace webMetics.Controllers
 
                 if (horasAprobadas != 0) 
                 {
-                    int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
+                    // int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
-                    if (inscripcion.horasMatriculadas == 0)
-                    {
-                        inscripcion.horasMatriculadas = inscripcion.horasAprobadas;
-                        inscripcion.horasAprobadas = 0;
-                    }
+                    inscripcion.horasAprobadas = horasAprobadas;
+                    // inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                    // inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
 
-                    if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
-                    {
-                        inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                        inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                        inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                        inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                        accesoAInscripcion.EditarInscripcion(inscripcion);
-
-                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
-                        accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                    }
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
                 }
 
                 if (calificacion != 0)

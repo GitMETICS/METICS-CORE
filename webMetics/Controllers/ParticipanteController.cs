@@ -807,55 +807,55 @@ namespace webMetics.Controllers
             return View();
         }
 
-        [HttpPost]
-        public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
-        {
-            if (!idGrupo.HasValue)
-            {
-                TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
-                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-            }
-            else
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
+        //[HttpPost]
+        //public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
+        //{
+        //    if (!idGrupo.HasValue)
+        //    {
+        //        TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
+        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Role = GetRole();
+        //        ViewBag.Id = GetId();
 
-                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                InscripcionModel inscripcion;
+        //        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
+        //        InscripcionModel inscripcion;
 
-                if (grupo != null)
-                {
-                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-                }
-                else
-                {
-                    inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
-                }
+        //        if (grupo != null)
+        //        {
+        //            inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
+        //        }
+        //        else
+        //        {
+        //            inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
+        //        }
 
-                int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
+        //        int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
-                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
-                {
-                    inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                    inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+        //        if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
+        //        {
+        //            inscripcion.horasAprobadas = nuevasHorasAprobadas;
+        //            inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+        //            inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
 
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
+        //            inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+        //            accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+        //            accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+        //            accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
 
-                    TempData["successMessage"] = "Las horas fueron aprobadas.";
-                }
-                else
-                {
-                    TempData["errorMessage"] = "No se pudo aprobar las horas.";
-                }
+        //            TempData["successMessage"] = "Las horas fueron aprobadas.";
+        //        }
+        //        else
+        //        {
+        //            TempData["errorMessage"] = "No se pudo aprobar las horas.";
+        //        }
 
-                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-            }
-        }
+        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        //    }
+        //}
 
         public ActionResult FormularioParticipante()
         {
