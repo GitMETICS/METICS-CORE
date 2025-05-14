@@ -5,14 +5,14 @@ using webMetics.Models;
 namespace webMetics.Handlers
 {
     public class UsuarioHandler : BaseDeDatosHandler
-        
+
     {
         public UsuarioHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
 
         }
 
-        public bool CrearUsuario(string id, string contrasena, int rol=0)
+        public bool CrearUsuario(string id, string contrasena, int rol = 0)
         {
             bool exito = false;
 
@@ -221,5 +221,40 @@ namespace webMetics.Handlers
 
             return exito;
         }
+
+        public bool ActualizarContrasena(string correo, string contrasena)
+        {
+            int rol = 0;
+
+            // Obtener rol_FK de la tabla usuario usando el correo dado de participante
+            string consulta = "SELECT rol_FK FROM usuario WHERE id_usuario_PK = @correo;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@correo", correo);
+
+            using (comandoConsulta)
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        rol = Convert.ToInt32(reader["rol_FK"]);
+                    }
+                    else
+                    {
+                        ConexionMetics.Close();
+                        return false;
+                    }
+                }
+            }
+            ConexionMetics.Close();
+
+            bool exito = EditarUsuario(correo, rol, contrasena);
+            // Usamos el procedimiento ya guardado para actualizar la contraseña
+            return exito;
+        }
+
     }
 }

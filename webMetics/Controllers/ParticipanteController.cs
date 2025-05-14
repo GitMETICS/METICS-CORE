@@ -62,7 +62,7 @@ namespace webMetics.Controllers
 
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
-                
+
 
                 if (TempData["errorMessage"] != null)
                 {
@@ -243,7 +243,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes");
         }
 
-        
+
 
         public IActionResult NotificarLimiteHoras(string idParticipante)
         {
@@ -264,9 +264,9 @@ namespace webMetics.Controllers
                     {
                         TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                     }
-                    
+
                 }
-                catch 
+                catch
                 {
                     TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                 }
@@ -887,7 +887,7 @@ namespace webMetics.Controllers
                 {
                     TempData["errorMessage"] = "Error al agregar al participante.";
                 }
-                
+
                 return RedirectToAction("VerParticipantes");
             }
             else
@@ -927,7 +927,7 @@ namespace webMetics.Controllers
 
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
-                ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area,participante.departamento);
+                ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
 
                 return View(participante);
             }
@@ -1379,7 +1379,7 @@ namespace webMetics.Controllers
             sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Puntarenas", Group = group8 });
-            
+
 
             return sedes;
         }
@@ -1414,15 +1414,15 @@ namespace webMetics.Controllers
 
         // Método para enviar confirmación de registro al usuario
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
-            {
-                string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
-                string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                    $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
-                    $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
+        {
+            string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-                await _emailService.SendEmailAsync(correo, subject, message);
-                return Ok();
-            }
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
+        }
 
         private string GenerateRandomPassword()
         {
@@ -1457,6 +1457,62 @@ namespace webMetics.Controllers
             }
 
             return id;
+        }
+        public ActionResult FormularioRecuperarContrasena()
+        {
+            return View("FormularioRecuperarContrasena");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
+        {
+            var correo = participante.correo;
+
+            // Obtener la lista de participantes (solo el correo importa)
+            var listaParticipantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
+
+            // Si la lista no esta vacia y si el numero de identificacion encontrado coincide con el proporcionado
+            if (listaParticipantes != null && listaParticipantes.First().numeroIdentificacion == participante.numeroIdentificacion)
+            {
+                // Obtener el participante de la lista
+                var participanteEncontrado = listaParticipantes.First();
+
+                // Generar una nueva contraseña aleatoria
+                string nuevaContrasena = GenerateRandomPassword();
+                // Actualizar la contraseña del usuario en la base de datos
+                if (!accesoAUsuario.ActualizarContrasena(correo, nuevaContrasena))
+                {
+                    // Enviar un correo electrónico al usuario con la nueva contraseña
+                    string subject = "Recuperación de contraseña SISTEMA DE INSCRIPCIONES METICS";
+                    string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                        $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
+                        $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
+                    // Loggear en consola la contraseña generada
+                    Console.WriteLine($"Nueva contraseña generada: {nuevaContrasena}");
+
+                    await _emailService.SendEmailAsync(correo, subject, message);
+                    TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al actualizar la contraseña.";
+                }
+            }
+            else
+            {
+                TempData["errorMessage"] = "No existe un usuario con ese correo y número de identificación.";
+            }
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View("FormularioRecuperarContrasena");
         }
     }
 }
