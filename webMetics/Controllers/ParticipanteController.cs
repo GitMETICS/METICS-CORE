@@ -1487,8 +1487,6 @@ namespace webMetics.Controllers
                     string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
                         $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
                         $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
-                    // Loggear en consola la contraseña generada
-                    Console.WriteLine($"Nueva contraseña generada: {nuevaContrasena}");
 
                     await _emailService.SendEmailAsync(correo, subject, message);
                     TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
