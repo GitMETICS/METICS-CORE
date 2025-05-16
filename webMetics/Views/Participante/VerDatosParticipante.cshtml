@@ -38,9 +38,18 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("VerInscripciones", "Inscripcion")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
+                @if (ViewBag.IdGrupo != null)
+                {
+                    <a class="text-dark fs-4" href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })">
+                        <i class="bi bi-arrow-left"> </i>
+                    </a>
+                }
+                else
+                {
+                    <a class="text-dark fs-4" href="@Url.Action("VerInscripciones", "Inscripcion")">
+                        <i class="bi bi-arrow-left"> </i>
+                    </a>
+                }
             </div>
         }
 
