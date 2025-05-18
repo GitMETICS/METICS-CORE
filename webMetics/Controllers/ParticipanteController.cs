@@ -178,6 +178,29 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
+        public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
+        {
+            try
+            {
+                if (participantesSeleccionados != null && participantesSeleccionados.Any() && !string.IsNullOrEmpty(nombreMedalla))
+                {
+                    accesoAParticipante.AsignarMedallaAParticipantes(nombreMedalla, participantesSeleccionados);
+                    TempData["successMessage"] = $"Se asignó la medalla '{nombreMedalla}' a {participantesSeleccionados.Count} participantes.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Seleccione al menos un participante y una medalla.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = $"Ocurrió un error al asignar las medallas: {ex.Message}";
+            }
+
+            return RedirectToAction("ListaMedallas", "Medallas");
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
             if (file == null)

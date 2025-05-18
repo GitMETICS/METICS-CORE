@@ -54,7 +54,8 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewBag.Medallas = accesoAParticipante.ObtenerTodasMedallas();
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+            ViewBag.TodosLosParticipantes = accesoAParticipante.ObtenerListaParticipantes();
 
             ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
             ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();

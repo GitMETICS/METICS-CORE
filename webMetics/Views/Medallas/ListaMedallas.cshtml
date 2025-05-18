@@ -1,7 +1,6 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Lista de Medallas";
-
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
@@ -50,11 +49,66 @@
             </div>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-header" id="asignarMasivaHeader">
+                <h3 class="mb-0">
+                    <button class="bi bi-chevron-down btn text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsignarMasiva" aria-expanded="false" aria-controls="collapseAsignarMasiva">
+                        Asignar Medalla Masivamente
+                    </button>
+                </h3>
+            </div>
+
+            <div id="collapseAsignarMasiva" class="collapse" aria-labelledby="asignarMasivaHeader">
+                <div class="card-body">
+                    <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva">
+                        <div class="mb-3">
+                            <label for="medallaSeleccionada" class="form-label">Seleccionar Medalla:</label>
+                            <select class="form-control" id="medallaSeleccionada" name="nombreMedalla">
+                                <option value="">-- Seleccionar --</option>
+                                @if (ViewBag.TodasLasMedallas != null)
+                                {
+                                    foreach (var medalla in ViewBag.TodasLasMedallas)
+                                    {
+                                        <option value="@medalla">@medalla</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        @if (ViewBag.TodosLosParticipantes != null)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Buscar Participante:</label>
+                                <input type="text" class="form-control" id="participanteSearch" onkeyup="filterParticipantes()" placeholder="Ingrese el nombre del participante">
+                            </div>
+
+                            <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                                @foreach (var participante in ViewBag.TodosLosParticipantes)
+                                {
+                                    <div class="form-check participante-item">
+                                        <input type="checkbox" class="form-check-input" name="participantesSeleccionados" value="@participante.idParticipante" id="participanteMasiva_@participante.idParticipante">
+                                        <label class="form-check-label" for="participanteMasiva_@participante.idParticipante">@participante.nombre @participante.primerApellido @participante.segundoApellido (@participante.idParticipante)</label>
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-secondary">Asignar a Seleccionados</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <p>No hay participantes para seleccionar.</p>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Medallas -->
-        @if (ViewBag.Medallas != null)
+        @if (ViewBag.TodasLasMedallas != null)
         {
             <div class="d-flex justify-content-start my-4 flex-wrap">
-                @foreach (string nombreMedalla in ViewBag.Medallas)
+                @foreach (string nombreMedalla in ViewBag.TodasLasMedallas)
                 {
                     <div class="card m-2" style="height: 420px;">
                         <div class="card-header text-muted">
@@ -118,3 +172,30 @@ else
         document.getElementById("nombreMedalla").value = nombreMedalla;
     }
 </script>
+
+<script type="text/javascript">
+    function filterParticipantes() {
+        var input, filter, container, elements, i, txtValue;
+        input = document.getElementById("participanteSearch");
+        filter = input.value.toUpperCase();
+        container = document.querySelector('#collapseAsignarMasiva .mb-3[style*="max-height"]'); // Selecciona el div con la lista de checkboxes
+        elements = container.getElementsByClassName("form-check");
+        for (i = 0; i < elements.length; i++) {
+            var label = elements[i].querySelector("label");
+            if (label) {
+                txtValue = label.textContent || label.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    .participante-item {
+        display: block; /* Asegura que cada checkbox y label ocupe una línea */
+    }
+</style>

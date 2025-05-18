@@ -4,6 +4,7 @@ using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MailKit.Search;
+using NPOI.HPSF;
 
 
 namespace webMetics.Handlers
@@ -709,6 +710,35 @@ namespace webMetics.Handlers
             ConexionMetics.Close();
 
             return exito;
+        }
+
+        public void AsignarMedallaAParticipantes(string nombreMedalla, List<string> idsParticipantes)
+        {
+            try
+            {
+                foreach (var idParticipante in idsParticipantes)
+                {
+                    string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
+
+                    ConexionMetics.Open();
+
+                    SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+                    comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comandoConsulta.Parameters.AddWithValue("@nombreMedalla", nombreMedalla);
+
+                    bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+                    ConexionMetics.Close();
+
+                    Console.WriteLine($"Asignando medalla '{nombreMedalla}' al participante con ID '{idParticipante}'.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al asignar medallas: {ex.Message}");
+                throw;
+            }
         }
 
         public bool EliminarMedallaParticipante(string idParticipante, string fileName)
