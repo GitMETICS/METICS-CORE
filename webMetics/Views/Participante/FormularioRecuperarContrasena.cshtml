@@ -45,6 +45,15 @@
     @if (ViewBag.Id != "")
     {
         <div class="contenedor-caja container-fluid">
+            @if (urlReferrer != null)
+            {
+                <div class="d-flex justify-content-start mb-3">
+                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
+            }
+
             @using (Html.BeginForm("RecuperarContrasena", "Participante", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
@@ -72,18 +81,18 @@
                             <div class="row mt-1">
                                 <div class="col input-wrapper">
                                     @Html.LabelFor(model => model.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo electrónico" })
+                                    @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo institucional" })
                                     @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="col input-wrapper">
                                     @Html.LabelFor(model => model.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(model => model.numeroIdentificacion, new { @class = "form-control", @placeholder = "Ingrese su número de identificación (Formato: 1-1234-4567)" })
+                                    @Html.TextBoxFor(model => model.numeroIdentificacion, new { @class = "form-control", @placeholder = "Ingrese su número de identificación (Formato: 0-0000-0000)" })
                                     @Html.ValidationMessageFor(model => model.numeroIdentificacion, "", new { @class = "text-danger" })
                                 </div>
                             </div>
                         </div>
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary btn-block">Acceder</button>
+                        <div class="text-center my-4">
+                            <button type="submit" class="btn btn-primary btn-block">Recuperar Contraseña</button>
                         </div>
                     </div>
                 </div>
