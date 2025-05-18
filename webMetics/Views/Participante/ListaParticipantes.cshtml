@@ -149,16 +149,11 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="selectAllParticipantes">
-                                        <label class="form-check-label" for="selectAllParticipantes">Seleccionar Todos</label>
-                                    </div>
-                                    <hr class="my-2" />
+                                <div class="mb-3" id="participantesContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
                                     @foreach (var participante in ViewBag.ListaParticipantes)
                                     {
                                         <div class="form-check participante-item">
-                                            <input type="checkbox" class="form-check-input individual-participante" name="participantesSeleccionados" value="@participante.idParticipante" id="participanteMasiva_@participante.idParticipante">
+                                            <input type="checkbox" class="form-check-input" name="participantesSeleccionados" value="@participante.idParticipante" id="participanteMasiva_@participante.idParticipante">
                                             <label class="form-check-label" for="participanteMasiva_@participante.idParticipante">@participante.nombre @participante.primerApellido @participante.segundoApellido (@participante.idParticipante)</label>
                                         </div>
                                     }
@@ -323,8 +318,8 @@ else
         var input, filter, container, elements, i, txtValue;
         input = document.getElementById("participanteSearch");
         filter = input.value.toUpperCase();
-        container = document.querySelector('#collapseAsignarMasiva .mb-3[style*="max-height"]');
-        elements = container.getElementsByClassName("participante-item");
+        container = document.getElementById("participantesContainer"); // Selecciona el contenedor por su ID
+        elements = container.getElementsByClassName("form-check");
         for (i = 0; i < elements.length; i++) {
             var label = elements[i].querySelector("label");
             if (label) {
