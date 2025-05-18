@@ -62,6 +62,7 @@ namespace webMetics.Controllers
 
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
+                ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
 
 
                 if (TempData["errorMessage"] != null)

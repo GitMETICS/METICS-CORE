@@ -89,6 +89,94 @@
                 </div>
             </div>
 
+            <div class="card mb-3">
+                <div class="card-header" id="asignarMasivaHeader">
+                    <h3 class="mb-0">
+                        <button class="bi bi-chevron-down btn text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsignarMasiva" aria-expanded="false" aria-controls="collapseAsignarMasiva">
+                            Asignar Medalla Masivamente
+                        </button>
+                    </h3>
+                </div>
+
+                <div id="collapseAsignarMasiva" class="collapse" aria-labelledby="asignarMasivaHeader">
+                    <div class="card-body">
+                        <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva">
+
+                            <label class="form-label"><b>Buscar Medalla:</b></label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="medallaSearch" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div>
+
+                            <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                                <div id="medallaList" class="medalla-list-container">
+                                    @if (ViewBag.TodasLasMedallas != null)
+                                    {
+                                        @foreach (var medalla in ViewBag.TodasLasMedallas)
+                                        {
+                                            <div class="d-flex flex-column">
+                                                <div class="medalla-item">
+                                                    <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" />
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
+                                                    <label class="form-check-label" for="medallaSeleccionada">
+                                                        @medalla
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>No hay medallas disponibles.</p>
+                                    }
+                                </div>
+                            </div>
+                            <br />
+
+                            @if (ViewBag.ListaParticipantes != null)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label"><b>Buscar Participante:</b></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="participanteSearch" onkeyup="filterParticipantes()" placeholder="Ingrese el nombre del participante">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="selectAllParticipantes">
+                                        <label class="form-check-label" for="selectAllParticipantes">Seleccionar Todos</label>
+                                    </div>
+                                    <hr class="my-2" />
+                                    @foreach (var participante in ViewBag.ListaParticipantes)
+                                    {
+                                        <div class="form-check participante-item">
+                                            <input type="checkbox" class="form-check-input individual-participante" name="participantesSeleccionados" value="@participante.idParticipante" id="participanteMasiva_@participante.idParticipante">
+                                            <label class="form-check-label" for="participanteMasiva_@participante.idParticipante">@participante.nombre @participante.primerApellido @participante.segundoApellido (@participante.idParticipante)</label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-secondary">Asignar a Seleccionados</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <p>No hay participantes para seleccionar.</p>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <br />
+
             @if (ViewBag.ListaParticipantes == null)
             {
                 <h5 class="text-center">No hay personas inscritas.</h5>
@@ -229,3 +317,66 @@ else
         document.getElementById("idParticipante").value = idParticipante;
     }
 </script>
+
+<script type="text/javascript">
+    function filterParticipantes() {
+        var input, filter, container, elements, i, txtValue;
+        input = document.getElementById("participanteSearch");
+        filter = input.value.toUpperCase();
+        container = document.querySelector('#collapseAsignarMasiva .mb-3[style*="max-height"]');
+        elements = container.getElementsByClassName("participante-item");
+        for (i = 0; i < elements.length; i++) {
+            var label = elements[i].querySelector("label");
+            if (label) {
+                txtValue = label.textContent || label.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('selectAllParticipantes');
+        const individualCheckboxes = document.querySelectorAll('.individual-participante');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            individualCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        individualCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                selectAllCheckbox.checked = individualCheckboxes.length === document.querySelectorAll('.individual-participante:checked').length;
+            });
+        });
+    });
+</script>
+
+<script>
+        function filterMedals() {
+        var input, filter, medallaList, medallas, i, txtValue;
+        input = document.getElementById("medallaSearch");
+        filter = input.value.toUpperCase();
+        medallaList = document.getElementById("medallaList");
+        medallas = medallaList.getElementsByClassName("medalla-item");
+
+        for (i = 0; i < medallas.length; i++) {
+            txtValue = medallas[i].textContent || medallas[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                medallas[i].style.display = "";
+            } else {
+                medallas[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+<style>
+    .participante-item {
+        display: block;
+    }
+</style>

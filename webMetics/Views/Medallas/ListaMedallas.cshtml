@@ -61,25 +61,52 @@
             <div id="collapseAsignarMasiva" class="collapse" aria-labelledby="asignarMasivaHeader">
                 <div class="card-body">
                     <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva">
-                        <div class="mb-3">
-                            <label for="medallaSeleccionada" class="form-label">Seleccionar Medalla:</label>
-                            <select class="form-control" id="medallaSeleccionada" name="nombreMedalla">
-                                <option value="">-- Seleccionar --</option>
+
+                        <label class="form-label"><b>Buscar Medalla:</b></label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="medallaSearch" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+
+                        <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                            <div id="medallaList" class="medalla-list-container">
                                 @if (ViewBag.TodasLasMedallas != null)
                                 {
-                                    foreach (var medalla in ViewBag.TodasLasMedallas)
+                                    @foreach (var medalla in ViewBag.TodasLasMedallas)
                                     {
-                                        <option value="@medalla">@medalla</option>
+                                        <div class="d-flex flex-column">
+                                            <div class="medalla-item">
+                                                <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" />
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
+                                                <label class="form-check-label" for="medallaSeleccionada">
+                                                    @medalla
+                                                </label>
+                                            </div>
+                                        </div>
                                     }
                                 }
-                            </select>
+                                else
+                                {
+                                    <p>No hay medallas disponibles.</p>
+                                }
+                            </div>
                         </div>
+                        <br />
 
                         @if (ViewBag.TodosLosParticipantes != null)
                         {
                             <div class="mb-3">
-                                <label class="form-label">Buscar Participante:</label>
-                                <input type="text" class="form-control" id="participanteSearch" onkeyup="filterParticipantes()" placeholder="Ingrese el nombre del participante">
+                                <label class="form-label"><b>Buscar Participante:</b></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="participanteSearch" onkeyup="filterParticipantes()" placeholder="Ingrese el nombre del participante">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                </div>
                             </div>
 
                             <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
@@ -189,6 +216,25 @@ else
                 } else {
                     elements[i].style.display = "none";
                 }
+            }
+        }
+    }
+</script>
+
+<script>
+        function filterMedals() {
+        var input, filter, medallaList, medallas, i, txtValue;
+        input = document.getElementById("medallaSearch");
+        filter = input.value.toUpperCase();
+        medallaList = document.getElementById("medallaList");
+        medallas = medallaList.getElementsByClassName("medalla-item");
+
+        for (i = 0; i < medallas.length; i++) {
+            txtValue = medallas[i].textContent || medallas[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                medallas[i].style.display = "";
+            } else {
+                medallas[i].style.display = "none";
             }
         }
     }
