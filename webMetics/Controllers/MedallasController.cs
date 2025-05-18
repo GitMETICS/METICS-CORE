@@ -66,30 +66,44 @@ namespace webMetics.Controllers
         [HttpPost]
         public async Task<IActionResult> SubirMedalla(IFormFile imageFile)
         {
-            if (!accesoAParticipante.ExisteMedalla(imageFile.FileName))
+            try
             {
-                if (imageFile != null && imageFile.Length > 0)
+                if (!accesoAParticipante.ExisteMedalla(imageFile.FileName))
                 {
-                    var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    if (imageFile != null && imageFile.Length > 0)
                     {
-                        await imageFile.CopyToAsync(stream);
+                        var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(stream);
+                        }
+
+                        // Guardar la ruta de la medalla en la base de datos
+                        accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
+
+                        TempData["successMessage"] = "Se subió la medalla.";
                     }
-
-                    // Guardar la ruta de la medalla en la base de datos
-                    accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
-
-                    TempData["successMessage"] = "Se subió la medalla.";
+                    else
+                    {
+                        TempData["errorMessage"] = "Elija una imagen válida.";
+                    }
                 }
                 else
                 {
-                    TempData["errorMessage"] = "Elija una imagen válida.";
+                    TempData["errorMessage"] = "Ya existe una medalla con el mismo nombre.";
                 }
             }
-            else
+            catch
             {
-                TempData["errorMessage"] = "Ya existe una medalla con el mismo nombre.";
+                if (imageFile == null)
+                {
+                    TempData["errorMessage"] = "Elija una imagen válida.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al subir la medalla";
+                }
             }
                 
             return RedirectToAction("ListaMedallas");
