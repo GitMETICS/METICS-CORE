@@ -88,24 +88,24 @@
                                     </div>
                                 }
                             }
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-primary btn-block">Acceder</button>
-                            </div>
 
                             <div class="text-center mt-2">
                                 <small>
                                     @Html.ActionLink("¿Olvidó su contraseña?", "FormularioRecuperarContrasena", "Participante")
                                 </small>
                             </div>
+
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary btn-block">Acceder</button>
+                            </div>
                         }
                     </div>
                 </div>
                 <div class="card-footer text-center pt-2 pb-3" style="background-color: #333333; color: #fff; margin-bottom: 30px;">
                     <p class="fw-bold" style="font-size: 1rem;margin-top: 10px;">
-                        ¿Olvidó su contraseña?
-                        @Html.ActionLink("Puede registrarse de nuevo aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline fst-italic", aria_label = "Formulario de registro" })
+                        @Html.ActionLink("Acceda aquí para registrarse.", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline", aria_label = "Formulario de registro" })
                         <br />
-                        o solicitar su contraseña a <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
+                        Si tiene dudas o consultas, por favor envíelas al correo <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
                         <br />
                     </p>
 
