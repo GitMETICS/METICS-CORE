@@ -103,6 +103,9 @@ namespace webMetics.Controllers
                 ViewBag.ListaInscripciones = null;
             }
 
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+
+
             // Manejar los mensajes de TempData
             if (TempData["errorMessage"] != null)
             {
