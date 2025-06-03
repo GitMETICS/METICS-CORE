@@ -155,6 +155,7 @@ namespace webMetics.Controllers
 
 
             ViewBag.ListaInscripciones = inscripciones;
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
 
             return View("VerInscripciones");
         }
