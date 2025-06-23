@@ -58,14 +58,14 @@
 
         @if (ViewBag.ErrorMessage != null)
         {
-            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
                 @ViewBag.ErrorMessage
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
         @if (ViewBag.SuccessMessage != null)
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                 @ViewBag.SuccessMessage
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -93,7 +93,7 @@
 
                         <div id="collapseMedallas" class="collapse show" aria-labelledby="medallasHeader">
                             <div class="card-body">
-                                <form method="post" action="@Url.Action("AsignarMedallas", "Participante")">
+                                <form method="post" asp-controller="Participante" asp-action="AsignarMedallas">
                                     <input type="hidden" name="idParticipante" value="@ViewBag.Participante.idParticipante" />
 
                                     <div class="d-flex justify-content-between mb-3">
@@ -104,7 +104,7 @@
                                             </span>
                                         </div>
                                         <div class="d-flex justify-content-end ms-3">
-                                            <button type="submit" class="btn btn-secondary justify-content-end bi bi-check-lg"></button>
+                                            <button type="submit" class="btn btn-secondary">Asignar</button>
                                         </div>
                                     </div>
 
