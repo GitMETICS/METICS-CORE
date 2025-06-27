@@ -26,7 +26,7 @@ namespace webMetics.Models
         [Display(Name = "Tipo de identificación")]
         public string? tipoIdentificacion { get; set; }
 
-        [RegularExpression(@"^\d-\d{4}-\d{4}$", ErrorMessage = "El número de identificación debe seguir el formato 0-0000-0000.")]
+        [RegularExpression(@"^((\d-\d{4}-\d{4})|(\d{9}))$", ErrorMessage = "Debe seguir alguno de los siguientes formatos: 0-0000-0000 o 123456789.")]
         [Display(Name = "Número de identificación")]
         public string? numeroIdentificacion { get; set; }
 
