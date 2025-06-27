@@ -149,33 +149,32 @@ namespace webMetics.Controllers
         {
             try
             {
-                // 1. Retrieve the participant.
-                var participante = accesoAParticipante.ObtenerParticipante(idParticipante); // Assuming you have a method to get the participant
+                var participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                 if (participante == null)
                 {
                     ViewBag.ErrorMessage = "Participante no encontrado.";
-                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante }); //Or some other error page.
+                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                // 2. Assign the selected medals.
                 if (selectedMedallas != null && selectedMedallas.Any())
                 {
                     foreach (var medalla in selectedMedallas)
                     {
-                        accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla); // Assuming you have a method to assign a single medalla
+                        if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla)) {
+                            accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla);
+                        }
                     }
                 }
 
-                ViewBag.SuccessMessage = "Medallas asignadas correctamente.";
+                TempData["successMessage"] = "Medallas asignadas correctamente.";
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al asignar medallas: {ex.Message}";
-                // Log the exception
+                TempData["errorMessage"] = $"Error al asignar medallas.";
             }
 
-            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante }); // Or some other appropriate redirect.
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
         }
 
         [HttpPost]
