@@ -149,32 +149,33 @@ namespace webMetics.Controllers
         {
             try
             {
-                var participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+                // 1. Retrieve the participant.
+                var participante = accesoAParticipante.ObtenerParticipante(idParticipante); // Assuming you have a method to get the participant
 
                 if (participante == null)
                 {
                     ViewBag.ErrorMessage = "Participante no encontrado.";
-                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante }); //Or some other error page.
                 }
 
+                // 2. Assign the selected medals.
                 if (selectedMedallas != null && selectedMedallas.Any())
                 {
                     foreach (var medalla in selectedMedallas)
                     {
-                        if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla)) {
-                            accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla);
-                        }
+                        accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla); // Assuming you have a method to assign a single medalla
                     }
                 }
 
-                TempData["successMessage"] = "Medallas asignadas correctamente.";
+                ViewBag.SuccessMessage = "Medallas asignadas correctamente.";
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = $"Error al asignar medallas.";
+                ViewBag.ErrorMessage = $"Error al asignar medallas: {ex.Message}";
+                // Log the exception
             }
 
-            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante }); // Or some other appropriate redirect.
         }
 
         [HttpPost]

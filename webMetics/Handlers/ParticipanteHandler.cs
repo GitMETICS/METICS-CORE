@@ -676,33 +676,6 @@ namespace webMetics.Handlers
             }
         }
 
-        public bool ParticipanteTieneMedalla(string idUsuario, string fileName)
-        {
-            string consulta = "SELECT * FROM medallas WHERE nombre_medalla = @nombreMedalla AND id_participante_FK = @idParticipante;";
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@idParticipante", idUsuario);
-            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
-            List<string> listaMedallas = new List<string>();
-
-            foreach (DataRow fila in tablaResultado.Rows)
-            {
-                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
-            }
-
-            if (listaMedallas.Count == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
         public bool AgregarMedalla(string idUsuario, string fileName)
         {
             string consulta = "INSERT INTO medallas VALUES (@idUsuario, @nombreMedalla);";
@@ -745,23 +718,20 @@ namespace webMetics.Handlers
             {
                 foreach (var idParticipante in idsParticipantes)
                 {
-                    if (!ParticipanteTieneMedalla(idParticipante, nombreMedalla))
-                    {
-                        string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
+                    string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
 
-                        ConexionMetics.Open();
+                    ConexionMetics.Open();
 
-                        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                    SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
 
-                        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-                        comandoConsulta.Parameters.AddWithValue("@nombreMedalla", nombreMedalla);
+                    comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comandoConsulta.Parameters.AddWithValue("@nombreMedalla", nombreMedalla);
 
-                        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+                    bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 
-                        ConexionMetics.Close();
+                    ConexionMetics.Close();
 
-                        Console.WriteLine($"Asignando medalla '{nombreMedalla}' al participante con ID '{idParticipante}'.");
-                    }
+                    Console.WriteLine($"Asignando medalla '{nombreMedalla}' al participante con ID '{idParticipante}'.");
                 }
             }
             catch (Exception ex)

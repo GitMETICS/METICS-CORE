@@ -104,20 +104,22 @@
 
                             <label class="form-label"><b>Buscar Medalla:</b></label>
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
+                                <input type="text" class="form-control" id="medallaSearch" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
                                 <span class="input-group-text">
                                     <i class="bi bi-search"></i>
                                 </span>
                             </div>
 
                             <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                                @if (ViewBag.TodasLasMedallas != null)
-                                {
-                                    <div id="medalla-list" class="medalla-list-container d-flex flex-column">
+                                <div id="medallaList" class="medalla-list-container">
+                                    @if (ViewBag.TodasLasMedallas != null)
+                                    {
                                         @foreach (var medalla in ViewBag.TodasLasMedallas)
                                         {
-                                            <div class="medalla-item">
-                                                <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
+                                            <div class="d-flex flex-column">
+                                                <div class="medalla-item">
+                                                    <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
+                                                </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
                                                     <label class="form-check-label" for="medallaSeleccionada">
@@ -126,14 +128,12 @@
                                                 </div>
                                             </div>
                                         }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="medalla-list-container">
+                                    }
+                                    else
+                                    {
                                         <p>No hay medallas disponibles.</p>
-                                    </div>
-                                }
+                                    }
+                                </div>
                             </div>
                             <br />
 
@@ -352,75 +352,21 @@ else
 </script>
 
 <script>
-    function filterMedals() {
+        function filterMedals() {
         var input, filter, medallaList, medallas, i, txtValue;
-
-        // --- Debugging Start ---
-        console.log("--- filterMedals function called ---");
-        // --- Debugging End ---
-
-        input = document.getElementById("medalla-search");
-
-        // --- Debugging Start ---
-        if (!input) {
-            console.error("ERROR: Element with ID 'medalla-search' not found.");
-            return; // Exit function if input element isn't found
-        }
-        // --- Debugging End ---
-
+        input = document.getElementById("medallaSearch");
         filter = input.value.toUpperCase();
-
-        // --- Debugging Start ---
-        console.log("Input value (raw):", input.value);
-        console.log("Filter value (toUpperCase):", filter);
-        // --- Debugging End ---
-
-        medallaList = document.getElementById("medalla-list");
-
-        // --- Debugging Start ---
-        if (!medallaList) {
-            console.error("ERROR: Element with ID 'medalla-list' not found.");
-            return; // Exit function if medallaList element isn't found
-        }
-        console.log("Medal list element found:", medallaList);
-        // --- Debugging End ---
-
+        medallaList = document.getElementById("medallaList");
         medallas = medallaList.getElementsByClassName("medalla-item");
-
-        // --- Debugging Start ---
-        console.log("Number of 'medalla-item' elements found:", medallas.length);
-        if (medallas.length === 0) {
-            console.warn("WARNING: No elements with class 'medalla-item' found inside 'medalla-list'. Check your HTML structure.");
-        }
-        // --- Debugging End ---
 
         for (i = 0; i < medallas.length; i++) {
             txtValue = medallas[i].textContent || medallas[i].innerText;
-
-            // --- Debugging Start ---
-            console.log("--- Processing medal item (index " + i + ") ---");
-            console.log("Original text content of medalla-item:", medallas[i].textContent);
-            console.log("Normalized text value for comparison (txtValue):", txtValue);
-            console.log("txtValue.toUpperCase():", txtValue.toUpperCase());
-            console.log("Does '" + txtValue.toUpperCase() + "' contain '" + filter + "'?", txtValue.toUpperCase().indexOf(filter) > -1);
-            // --- Debugging End ---
-
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 medallas[i].style.display = "";
-
-                // --- Debugging Start ---
-                console.log("  -> Match! Setting display to '' (showing).");
-                // --- Debugging End ---
             } else {
                 medallas[i].style.display = "none";
-                // --- Debugging Start ---
-                console.log("  -> No match. Setting display to 'none' (hiding).");
-                // --- Debugging End ---
             }
         }
-        // --- Debugging Start ---
-        console.log("--- filterMedals function finished ---");
-        // --- Debugging End ---
     }
 </script>
 
