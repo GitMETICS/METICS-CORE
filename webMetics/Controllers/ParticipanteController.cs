@@ -1,23 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using webMetics.Models;
-using webMetics.Handlers;
-using OfficeOpenXml;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using NPOI.XSSF.UserModel;
+﻿using System.Globalization;
+using System.Text;
+using iText.Kernel.Font;
+using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Layout.Element;
-using NPOI.XWPF.UserModel;
-using NPOI.SS.UserModel;
-using iText.Kernel.Font;
 using iText.Layout.Properties;
-using iText.Kernel.Geom;
-using System.Text.RegularExpressions;
-using Microsoft.IdentityModel.Tokens;
-using NPOI.SS.Formula.Functions;
-using System.Globalization;
-using System.Text;
 using MailKit.Search;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.XWPF.UserModel;
+using OfficeOpenXml;
+using webMetics.Handlers;
+using webMetics.Helpers;
+using webMetics.Models;
+using webMetics.Results;
 
 
 namespace webMetics.Controllers
@@ -268,34 +266,73 @@ namespace webMetics.Controllers
 
 
 
+        //public IActionResult NotificarLimiteHoras(string idParticipante)
+        //{
+        //    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+
+        //    if (participante != null && participante.horasAprobadas >= 30)
+        //    {
+        //        try
+        //        {
+        //            EnviarCorreoNotificacion(idParticipante);
+        //            bool exito = accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante);
+
+        //            if (exito)
+        //            {
+        //                TempData["successMessage"] = "Se envió el correo de notificación.";
+        //            }
+        //            else
+        //            {
+        //                TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
+        //            }
+
+        //        }
+        //        catch
+        //        {
+        //            TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
+        //        }
+        //    }
+
+        //    bool enviado = accesoAParticipante.ObtenerCorreoNotificacionEnviadoParticipante(idParticipante);
+
+        //    return RedirectToAction("VerParticipantes");
+        //}
+
         public IActionResult NotificarLimiteHoras(string idParticipante)
         {
-            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+            var resultado = accesoAParticipante.ObtenerParticipante(idParticipante)
+                .ToSimpleResult("Participante no encontrado");
 
-            if (participante != null && participante.horasAprobadas >= 30)
-            {
-                try
-                {
-                    EnviarCorreoNotificacion(idParticipante);
-                    bool exito = accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante);
-
-                    if (exito)
-                    {
-                        TempData["successMessage"] = "Se envió el correo de notificación.";
-                    }
-                    else
-                    {
-                        TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
-                    }
-
-                }
-                catch
-                {
-                    TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
-                }
+            if (!resultado.IsSuccess)
+            {   
+                TempData["errorMessage"] = resultado.Message;
+                return RedirectToAction("VerParticipantes");
             }
 
-            bool enviado = accesoAParticipante.ObtenerCorreoNotificacionEnviadoParticipante(idParticipante);
+            var participante = resultado.Data;
+            if (participante?.horasAprobadas >= 30)
+            {
+                SimpleOperationHelper.Execute(
+                    () => EnviarCorreoNotificacion(idParticipante)
+                    , "Ocurrió un error al enviar el correo de notificación."
+                    , "Se envió el correo de notificación correctamente."
+                );
+
+                var result = SimpleOperationHelper.Execute(
+                    () => accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante)
+                    , "Ocurrió un error al actualizar el estado del correo de notificación."
+                    , "Se actualizó el estado del correo de notificación correctamente."
+                );
+
+                if (result.IsSuccess)
+                {
+                    TempData["successMessage"] = result.Message;
+                }
+                else
+                {
+                    TempData["errorMessage"] = result.Message;
+                }
+            }
 
             return RedirectToAction("VerParticipantes");
         }
