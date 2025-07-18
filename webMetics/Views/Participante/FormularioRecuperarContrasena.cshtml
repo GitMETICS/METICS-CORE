@@ -84,11 +84,6 @@
                                     @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo institucional" })
                                     @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger" })
                                 </div>
-                                <div class="col input-wrapper">
-                                    @Html.LabelFor(model => model.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(model => model.numeroIdentificacion, new { @class = "form-control", @placeholder = "Ingrese su número de identificación (Formato: 0-0000-0000)" })
-                                    @Html.ValidationMessageFor(model => model.numeroIdentificacion, "", new { @class = "text-danger" })
-                                </div>
                             </div>
                         </div>
                         <div class="text-center my-4">

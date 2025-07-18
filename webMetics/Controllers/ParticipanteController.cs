@@ -1494,8 +1494,8 @@ namespace webMetics.Controllers
             // Obtener la lista de participantes (solo el correo importa)
             var listaParticipantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
 
-            // Si la lista no esta vacia y si el numero de identificacion encontrado coincide con el proporcionado
-            if (listaParticipantes != null && listaParticipantes.First().numeroIdentificacion == participante.numeroIdentificacion)
+            // Si la lista de búsqueda no esta vacia
+            if (listaParticipantes != null)
             {
                 // Obtener el participante de la lista
                 var participanteEncontrado = listaParticipantes.First();
