@@ -105,3 +105,21 @@ BEGIN
         AND (@estado_filtro IS NULL OR ba.estado_acceso = @estado_filtro)
     ORDER BY ba.fecha_hora_acceso DESC;
 END
+
+GO
+-- Procedimiento para obtener el último acceso de un usuario
+CREATE OR ALTER PROCEDURE SelectUltimoAccesoUsuario
+    @id_usuario NVARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    SELECT TOP 1
+        ba.id_acceso_PK,
+        ba.id_usuario_FK,
+        ba.fecha_hora_acceso,
+        ba.estado_acceso
+    FROM dbo.bitacora_accesos ba
+    WHERE ba.id_usuario_FK = @id_usuario
+    ORDER BY ba.fecha_hora_acceso DESC;
+END
