@@ -123,3 +123,23 @@ BEGIN
     WHERE ba.id_usuario_FK = @id_usuario
     ORDER BY ba.fecha_hora_acceso DESC;
 END
+
+-- Prueba de inserción de datos
+
+GO
+-- Inserción de un registro de acceso para el usuario 'test_user'
+
+EXEC InsertBitacoraAcceso 
+    @id_usuario = 'admin.admin@ucr.ac.cr', 
+    @estado_acceso = 'SUCCESS';
+
+-- Verificación de los registros insertados
+EXEC SelectBitacoraAccesoUsuario 
+    @id_usuario = 'admin.admin@ucr.ac.cr', 
+    @dias_atras = 30;
+
+-- Verificación de los accesos en un rango de fechas
+EXEC SelectBitacoraAccesosPorFecha 
+    @fecha_desde = '2023-01-01', 
+    @fecha_hasta = '2023-12-31', 
+    @estado_filtro = 'SUCCESS';
