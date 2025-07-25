@@ -20,7 +20,7 @@ BEGIN
             
         -- Constraints para validación
         CONSTRAINT CK_bitacora_estado_acceso 
-            CHECK (estado_acceso IN ('SUCCESS', 'FAILED', 'LOCKED', 'BLOCKED', 'EXPIRED'))
+            CHECK (estado_acceso IN ('SUCCESS', 'FAILED'))
 
         );
 END
@@ -37,7 +37,7 @@ CREATE OR ALTER PROCEDURE InsertBitacoraAcceso
 AS
 BEGIN
     SET NOCOUNT ON
-
+    
     -- Validar que el usuario existe
     IF NOT EXISTS (SELECT 1 FROM dbo.usuario WHERE id_usuario_PK = @id_usuario)
     BEGIN
@@ -54,7 +54,7 @@ BEGIN
 END
 
 GO
--- Procedimiento para obtener accesos de un usuario especÃ­fico segun N dÃ­as atrÃ¡s
+-- Procedimiento para obtener accesos de un usuario N dias atras
 CREATE OR ALTER PROCEDURE SelectBitacoraAccesoUsuario
     @id_usuario NVARCHAR(64),
     @dias_atras INT = 30
@@ -86,7 +86,7 @@ AS
 BEGIN
     SET NOCOUNT ON
     
-    -- Si no se proporciona fecha_desde, usar los Ãºltimos 7 dÃ­as
+    -- Si no se proporciona fecha_desde, usar los últimos 7 días
     IF @fecha_desde IS NULL
         SET @fecha_desde = DATEADD(DAY, -7, GETDATE());
     
@@ -107,7 +107,7 @@ BEGIN
 END
 
 GO
--- Procedimiento para obtener el Ãºltimo acceso de un usuario
+-- Procedimiento para obtener el último acceso de un usuario
 CREATE OR ALTER PROCEDURE SelectUltimoAccesoUsuario
     @id_usuario NVARCHAR(64)
 AS
