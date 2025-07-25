@@ -75,3 +75,33 @@ BEGIN
         AND ba.fecha_hora_acceso >= @fecha_desde
     ORDER BY ba.fecha_hora_acceso DESC;
 END
+
+GO
+-- Procedimiento para obtener todos los accesos en un rango de fechas
+CREATE OR ALTER PROCEDURE SelectBitacoraAccesosPorFecha
+    @fecha_desde DATETIME2 = NULL,
+    @fecha_hasta DATETIME2 = NULL,
+    @estado_filtro NVARCHAR(20) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    -- Si no se proporciona fecha_desde, usar los últimos 7 días
+    IF @fecha_desde IS NULL
+        SET @fecha_desde = DATEADD(DAY, -7, GETDATE());
+    
+    -- Si no se proporciona fecha_hasta, usar la fecha actual
+    IF @fecha_hasta IS NULL
+        SET @fecha_hasta = GETDATE();
+    
+    SELECT 
+        ba.id_acceso_PK,
+        ba.id_usuario_FK,
+        ba.fecha_hora_acceso,
+        ba.estado_acceso
+    FROM dbo.bitacora_accesos ba
+    WHERE 
+        ba.fecha_hora_acceso BETWEEN @fecha_desde AND @fecha_hasta
+        AND (@estado_filtro IS NULL OR ba.estado_acceso = @estado_filtro)
+    ORDER BY ba.fecha_hora_acceso DESC;
+END
