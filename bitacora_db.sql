@@ -25,3 +25,53 @@ BEGIN
         );
 END
 
+-- =====================================================
+-- Procedimientos almacenados para bitacora_accesos
+-- =====================================================
+
+GO
+-- Procedimiento para insertar un registro de acceso
+CREATE OR ALTER PROCEDURE InsertBitacoraAcceso
+    @id_usuario NVARCHAR(64),
+    @estado_acceso NVARCHAR(20) = 'SUCCESS'
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Validar que el usuario existe
+    IF NOT EXISTS (SELECT 1 FROM dbo.usuario WHERE id_usuario_PK = @id_usuario)
+    BEGIN
+        RAISERROR('El usuario especificado no existe: %s', 16, 1, @id_usuario);
+        RETURN -1;
+    END
+    
+    -- Insertar el registro de acceso
+    INSERT INTO dbo.bitacora_accesos (id_usuario_FK, fecha_hora_acceso, estado_acceso)
+    VALUES (@id_usuario, GETDATE(), @estado_acceso);
+    
+    -- Retornar el ID del registro insertado
+    SELECT SCOPE_IDENTITY() AS id_acceso_insertado, @id_usuario AS usuario, GETDATE() AS fecha_registro;
+END
+
+GO
+-- Procedimiento para obtener accesos de un usuario específico segun N días atrás
+CREATE OR ALTER PROCEDURE SelectBitacoraAccesoUsuario
+    @id_usuario NVARCHAR(64),
+    @dias_atras INT = 30
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    DECLARE @fecha_desde DATETIME2 = DATEADD(DAY, -@dias_atras, GETDATE());
+    
+    SELECT 
+        ba.id_acceso_PK,
+        ba.id_usuario_FK,
+        ba.fecha_hora_acceso,
+        ba.estado_acceso
+    FROM dbo.bitacora_accesos ba
+    WHERE 
+        ba.id_usuario_FK = @id_usuario
+        AND ba.fecha_hora_acceso >= @fecha_desde
+    ORDER BY ba.fecha_hora_acceso DESC;
+END
