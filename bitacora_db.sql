@@ -23,6 +23,20 @@ BEGIN
             CHECK (estado_acceso IN ('SUCCESS', 'FAILED'))
 
         );
+
+    -- Creacion de incides.
+    CREATE NONCLUSTERED INDEX IX_bitacora_usuario_fecha
+    ON dbo.bitacora_accesos (id_usuario_FK, fecha_hora_acceso DESC)
+    INCLUDE (estado_acceso);
+
+
+    CREATE NONCLUSTERED INDEX IX_bitacora_fecha
+    ON dbo.bitacora_accesos (fecha_hora_acceso DESC)
+    INCLUDE (id_usuario_FK, estado_acceso);
+
+    CREATE NONCLUSTERED INDEX IX_bitacora_estado
+    ON dbo.bitacora_accesos (estado_acceso, fecha_hora_acceso DESC)
+    WHERE estado_acceso <> 'SUCCESS'; -- Índice filtrado para el estado 'FAILED'
 END
 
 -- =====================================================
