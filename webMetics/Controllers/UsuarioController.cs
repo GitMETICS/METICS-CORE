@@ -64,10 +64,20 @@ namespace webMetics.Controllers
 
                 if (usuarioAutorizado != null)
                 {
+                    // La autenticación fue exitosa.
+                    // 1. Llama al método para insertar el registro de acceso.
+                    // Se usa el ID del usuario autorizado.
+                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "SUCCESS");
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
+                    // La autenticación falló.
+                    // 1. Llama al método para insertar el registro de acceso.
+                    // Se usa el correo proporcionado para identificar al usuario que intentó el acceso.
+                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuario.id, "FAILED");
+
                     TempData["errorMessage"] = "Correo institucional o contraseña inválidos.";
                     return RedirectToAction("IniciarSesion", "Usuario");
                 }
