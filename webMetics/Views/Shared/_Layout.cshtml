@@ -95,9 +95,10 @@
                                         @Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
                                         @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
                                         <hr class="dropdown-divider">
-                                        @Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })
-                                        <hr class="dropdown-divider">
                                         @Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item" })
+                                        <hr class="dropdown-divider">
+                                        @Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })
+                                        @Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item" })
                                     </div>
                                 </li>
                             }

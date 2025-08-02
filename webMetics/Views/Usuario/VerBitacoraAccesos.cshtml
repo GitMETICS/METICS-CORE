@@ -1,0 +1,161 @@
+﻿@using webMetics.Controllers
+@{
+    ViewBag.Title = "Registro de Accesos";
+
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+}
+
+@if (ViewBag.Id != "" && ViewBag.Role == 1)
+{
+    <div class="contenedor-caja container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
+
+        <h1>@ViewBag.Title</h1>
+        <hr />
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+        <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
+            <span>@ViewBag.ErrorMessage</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+        <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
+            <span>@ViewBag.SuccessMessage</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        }
+
+        <div class="bg-light p-4 rounded mb-4">
+            <h2 class="h5 fw-bold mb-3">Seleccionar Tipo de Vista</h2>
+            <ul class="nav nav-tabs mb-3 border-0" id="bitacoraTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-fechas" data-bs-toggle="tab" data-bs-target="#form-fechas-pane" type="button" role="tab" aria-controls="form-fechas-pane" aria-selected="true">Por Fechas</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-usuario" data-bs-toggle="tab" data-bs-target="#form-usuario-pane" type="button" role="tab" aria-controls="form-usuario-pane" aria-selected="false">Por Usuario</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-ultimo-acceso" data-bs-toggle="tab" data-bs-target="#form-ultimo-acceso-pane" type="button" role="tab" aria-controls="form-ultimo-acceso-pane" aria-selected="false">Último Acceso</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="form-fechas-pane" role="tabpanel" aria-labelledby="tab-fechas" tabindex="0">
+                    <form action="@Url.Action("VerBitacoraAccesoPorFecha", "Usuario")" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="fechaDesde" class="form-label">Fecha Desde</label>
+                                <input type="date" id="fechaDesde" name="fechaDesde" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="fechaHasta" class="form-label">Fecha Hasta</label>
+                                <input type="date" id="fechaHasta" name="fechaHasta" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="estadoAcceso" class="form-label">Estado de Acceso</label>
+                                <select id="estadoAcceso" name="estadoAcceso" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="SUCCESS">SUCCESS</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="form-usuario-pane" role="tabpanel" aria-labelledby="tab-usuario" tabindex="0">
+                    <form action="@Url.Action("VerBitacoraAccesoUsuario", "Usuario")" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="idUsuario" class="form-label">ID de Usuario</label>
+                                <input type="text" id="idUsuario" name="idUsuario" class="form-control" placeholder="Escribe el ID del usuario">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="diasAtras" class="form-label">Días Atrás</label>
+                                <input type="number" id="diasAtras" name="diasAtras" value="30" class="form-control">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary">Ver Historial</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="form-ultimo-acceso-pane" role="tabpanel" aria-labelledby="tab-ultimo-acceso" tabindex="0">
+                    <form action="@Url.Action("VerBitacoraUltimoAccesoUsuario", "Usuario")" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="idUsuarioUltimo" class="form-label">ID de Usuario</label>
+                                <input type="text" id="idUsuarioUltimo" name="idUsuario" class="form-control" placeholder="Escriba el ID del usuario">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary">Ver Último Acceso</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @if (ViewBag.BitacoraAccesos != null)
+        {
+            <div class="bg-white rounded overflow-hidden">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="bg-light text-uppercase fw-semibold">
+                        <tr>
+                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">ID de Acceso</th>
+                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">ID de Usuario</th>
+                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">Fecha y Hora</th>
+                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var acceso in ViewBag.BitacoraAccesos)
+                        {
+                            <tr>
+                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
+                                    <p class="text-dark">@acceso.IdAccesoPK</p>
+                                </td>
+                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
+                                    <p class="text-dark">@acceso.IdUsuarioFK</p>
+                                </td>
+                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
+                                    <p class="text-dark">@acceso.FechaHoraAcceso.ToString("yyyy-MM-dd HH:mm:ss")</p>
+                                </td>
+                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
+                                    <span class="badge rounded-pill @(acceso.EstadoAcceso == "SUCCESS" ? "text-bg-success" : "text-bg-danger")">
+                                        @acceso.EstadoAcceso
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted fst-italic">No se encontraron registros de bitácora de accesos.</p>
+        }
+        
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}
