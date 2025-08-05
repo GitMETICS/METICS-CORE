@@ -36,7 +36,7 @@ BEGIN
 
     CREATE NONCLUSTERED INDEX IX_bitacora_estado
     ON dbo.bitacora_accesos (estado_acceso, fecha_hora_acceso DESC)
-    WHERE estado_acceso <> 'ÉXITO'; -- Índice filtrado para el estado 'FAILED'
+    WHERE estado_acceso <> 'ÉXITO'; -- Índice filtrado para el estado 'FRACASO'
 END
 
 -- =====================================================

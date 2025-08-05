@@ -258,7 +258,7 @@ namespace webMetics.Handlers
             return exito;
         }
 
-        public void InsertarAccesoUsuarioBitacora(string idUsuario, string estadoAcceso) // SUCCESS or FAILED
+        public void InsertarAccesoUsuarioBitacora(string idUsuario, string estadoAcceso) // ÉXITO o FRACASO
         {
             try
             {
