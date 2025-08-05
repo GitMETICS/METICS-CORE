@@ -115,12 +115,12 @@ namespace webMetics.Models
 
     public class NewLoginModel
     {
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [RegularExpression(@"[a-zA-Z0-9._%-]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string oldId { get; set; }
 
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [RegularExpression(@"[a-zA-Z0-9._%-]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string id { get; set; }
@@ -171,7 +171,7 @@ public class EmailDomainAttribute : ValidationAttribute
             return new ValidationResult($"El correo electrónico debe terminar con '{_domain}'.");
         }
 
-        var regex = new Regex(@"^[\w\.]+@ucr\.ac\.cr$");
+        var regex = new Regex(@"^[a-zA-Z0-9._%-]+@ucr\.ac\.cr$");
         if (!regex.IsMatch(email))
         {
             return new ValidationResult($"El correo electrónico debe seguir el formato requerido y terminar con '{_domain}'.");
