@@ -20,7 +20,7 @@ BEGIN
             
         -- Constraints para validación
         CONSTRAINT CK_bitacora_estado_acceso 
-            CHECK (estado_acceso IN ('SUCCESS', 'FAILED'))
+            CHECK (estado_acceso IN ('ÉXITO', 'FRACASO'))
 
         );
 
@@ -36,7 +36,7 @@ BEGIN
 
     CREATE NONCLUSTERED INDEX IX_bitacora_estado
     ON dbo.bitacora_accesos (estado_acceso, fecha_hora_acceso DESC)
-    WHERE estado_acceso <> 'SUCCESS'; -- Índice filtrado para el estado 'FAILED'
+    WHERE estado_acceso <> 'ÉXITO'; -- Índice filtrado para el estado 'FAILED'
 END
 
 -- =====================================================
@@ -47,7 +47,7 @@ GO
 -- Procedimiento para insertar un registro de acceso
 CREATE OR ALTER PROCEDURE InsertBitacoraAcceso
     @id_usuario NVARCHAR(64),
-    @estado_acceso NVARCHAR(20) = 'SUCCESS'
+    @estado_acceso NVARCHAR(20) = 'ÉXITO'
 AS
 BEGIN
     SET NOCOUNT ON
@@ -144,8 +144,8 @@ GO
 -- Inserción de un registro de acceso para el usuario 'test_user'
 
 EXEC InsertBitacoraAcceso 
-    @id_usuario = 'admin.admin@ucr.ac.cr', 
-    @estado_acceso = 'SUCCESS';
+    @id_usuario = 'docencia.metics2@ucr.ac.cr', 
+    @estado_acceso = 'ÉXITO';
 
 -- Verificación de los registros insertados
 EXEC SelectBitacoraAccesoUsuario 
@@ -156,4 +156,7 @@ EXEC SelectBitacoraAccesoUsuario
 EXEC SelectBitacoraAccesosPorFecha 
     @fecha_desde = '2023-01-01', 
     @fecha_hasta = '2023-12-31', 
-    @estado_filtro = 'SUCCESS';
+    @estado_filtro = 'ÉXITO';
+
+DROP TABLE IF EXISTS dbo.bitacora_accesos;
+
