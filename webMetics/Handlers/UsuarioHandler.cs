@@ -342,7 +342,7 @@ namespace webMetics.Handlers
             return accesos;
         }
 
-        public List<BitacoraAcceso> SelectBitacoraAccesosPorFecha(string fechaDesde, string fechaHasta, string estadoAcceso)
+        public List<BitacoraAcceso> SelectBitacoraAccesosPorFecha(string? fechaDesde, string? fechaHasta, string? estadoAcceso)
         {
             // Se usa una lista para almacenar todos los objetos de bitácora leídos.
             List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();

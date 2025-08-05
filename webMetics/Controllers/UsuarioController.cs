@@ -687,7 +687,7 @@ namespace webMetics.Controllers
             int role = GetRole();
             string idUsuario = GetId();
 
-            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesoUsuario(idUsuario, 30);
+            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(null, null, null);
 
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
@@ -726,10 +726,11 @@ namespace webMetics.Controllers
         {
             List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
 
-            if (!string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
-            {
-                accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(fechaDesde, fechaHasta, estadoAcceso);
-            }
+            // Si fechaDesde es null se selecciona 1 semana antes
+            // Si fechaHasta es null se selecciona fecha actual
+            // Si estadoAcceso es null no hay filtro
+            accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(fechaDesde, fechaHasta, estadoAcceso);
+            
 
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
