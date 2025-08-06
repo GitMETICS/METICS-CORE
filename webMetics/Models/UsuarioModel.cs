@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 
 namespace webMetics.Models
@@ -178,4 +179,24 @@ public class EmailDomainAttribute : ValidationAttribute
 
         return ValidationResult.Success;
     }
+}
+
+public class BitacoraAcceso
+{
+    // id_acceso_PK (BIGINT IDENTITY)
+    // La propiedad IdAccesoPK se mapea a la columna id_acceso_PK de la tabla.
+    [Column("id_acceso_PK")]
+    public long IdAccesoPK { get; set; }
+
+    // id_usuario_FK (NVARCHAR(64))
+    [Column("id_usuario_FK")]
+    public string IdUsuarioFK { get; set; }
+
+    // fecha_hora_acceso (DATETIME2(3))
+    [Column("fecha_hora_acceso")]
+    public DateTime FechaHoraAcceso { get; set; }
+
+    // estado_acceso (NVARCHAR(20))
+    [Column("estado_acceso")]
+    public string EstadoAcceso { get; set; }
 }

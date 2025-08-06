@@ -64,10 +64,20 @@ namespace webMetics.Controllers
 
                 if (usuarioAutorizado != null)
                 {
+                    // La autenticación fue exitosa.
+                    // 1. Llama al método para insertar el registro de acceso.
+                    // Se usa el ID del usuario autorizado.
+                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "ÉXITO");
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
+                    // La autenticación falló.
+                    // 1. Llama al método para insertar el registro de acceso.
+                    // Se usa el correo proporcionado para identificar al usuario que intentó el acceso.
+                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuario.id, "FRACASO");
+
                     TempData["errorMessage"] = "Correo institucional o contraseña inválidos.";
                     return RedirectToAction("IniciarSesion", "Usuario");
                 }
@@ -670,6 +680,90 @@ namespace webMetics.Controllers
 
             // If not admin, redirect to logout or dashboard
             return RedirectToAction("CerrarSesion");
+        }
+
+        public ActionResult VerBitacoraAccesos()
+        {
+            int role = GetRole();
+            string idUsuario = GetId();
+
+            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(null, null, null);
+
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+            ViewBag.BitacoraAccesos = accesos;
+
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View();
+        }
+
+        // Acción para ver la bitácora completa de un usuario
+        [HttpGet]
+        public ActionResult VerBitacoraAccesoUsuario(string idUsuario, int diasAtras = 30)
+        {
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return View("VerBitacoraAccesos");
+            }
+
+            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesoUsuario(idUsuario, diasAtras);
+
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+            ViewBag.BitacoraAccesos = accesos;
+
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View("VerBitacoraAccesos");
+        }
+
+        // Acción para ver la bitácora filtrada por fecha y estado
+        [HttpGet]
+        public ActionResult VerBitacoraAccesoPorFecha(string fechaDesde, string fechaHasta, string estadoAcceso)
+        {
+            List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
+
+            // Si fechaDesde es null se selecciona 1 semana antes
+            // Si fechaHasta es null se selecciona fecha actual
+            // Si estadoAcceso es null no hay filtro
+            accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(fechaDesde, fechaHasta, estadoAcceso);
+            
+
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+            ViewBag.BitacoraAccesos = accesos;
+
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View("VerBitacoraAccesos");
+        }
+
+        // Acción para ver el último acceso de un usuario
+        [HttpGet]
+        public ActionResult VerBitacoraUltimoAccesoUsuario(string idUsuario)
+        {
+            BitacoraAcceso ultimoAcceso = null;
+            List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
+
+            if (!string.IsNullOrEmpty(idUsuario))
+            {
+                ultimoAcceso = accesoAUsuario.SelectUltimoAccesoUsuario(idUsuario);
+
+                accesos.Add(ultimoAcceso);
+            }
+
+            ViewBag.Id = GetId();
+            ViewBag.Role = GetRole();
+            ViewBag.BitacoraAccesos = accesos;
+
+            ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
+            ViewBag.SuccessMessage = TempData["successMessage"]?.ToString();
+
+            return View("VerBitacoraAccesos");
         }
 
 
