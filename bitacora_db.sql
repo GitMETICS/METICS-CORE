@@ -143,20 +143,20 @@ END
 GO
 -- Inserción de un registro de acceso para el usuario 'test_user'
 
-EXEC InsertBitacoraAcceso 
-    @id_usuario = 'docencia.metics2@ucr.ac.cr', 
-    @estado_acceso = 'ÉXITO';
+--EXEC InsertBitacoraAcceso 
+--    @id_usuario = 'docencia.metics2@ucr.ac.cr', 
+--    @estado_acceso = 'ÉXITO';
 
--- Verificación de los registros insertados
-EXEC SelectBitacoraAccesoUsuario 
-    @id_usuario = 'admin.admin@ucr.ac.cr', 
-    @dias_atras = 30;
+---- Verificación de los registros insertados
+--EXEC SelectBitacoraAccesoUsuario 
+--    @id_usuario = 'admin.admin@ucr.ac.cr', 
+--    @dias_atras = 30;
 
--- Verificación de los accesos en un rango de fechas
-EXEC SelectBitacoraAccesosPorFecha 
-    @fecha_desde = '2023-01-01', 
-    @fecha_hasta = '2023-12-31', 
-    @estado_filtro = 'ÉXITO';
+---- Verificación de los accesos en un rango de fechas
+--EXEC SelectBitacoraAccesosPorFecha 
+--    @fecha_desde = '2023-01-01', 
+--    @fecha_hasta = '2023-12-31', 
+--    @estado_filtro = 'ÉXITO';
 
-DROP TABLE IF EXISTS dbo.bitacora_accesos;
+--DROP TABLE IF EXISTS dbo.bitacora_accesos;
 
