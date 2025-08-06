@@ -188,9 +188,9 @@ public class BitacoraAcceso
     [Column("id_acceso_PK")]
     public long IdAccesoPK { get; set; }
 
-    // id_usuario_FK (NVARCHAR(64))
-    [Column("id_usuario_FK")]
-    public string IdUsuarioFK { get; set; }
+    // id_usuario (NVARCHAR(64))
+    [Column("id_usuario")]
+    public string IdUsuario { get; set; }
 
     // fecha_hora_acceso (DATETIME2(3))
     [Column("fecha_hora_acceso")]

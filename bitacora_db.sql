@@ -5,19 +5,13 @@ BEGIN
 	    -- Creación de la tabla bitacora_accesos
     CREATE TABLE dbo.bitacora_accesos (
         id_acceso_PK BIGINT IDENTITY(1,1) NOT NULL,
-        id_usuario_FK NVARCHAR(64) NOT NULL,
+        id_usuario NVARCHAR(64) NOT NULL,
         fecha_hora_acceso DATETIME2(3) NOT NULL,
         estado_acceso NVARCHAR(20) NOT NULL,
         
         -- Clave primaria
         CONSTRAINT PK_bitacora_accesos PRIMARY KEY CLUSTERED (id_acceso_PK),
         
-        -- Clave foránea hacia la tabla usuario
-        CONSTRAINT FK_bitacora_accesos_usuario 
-            FOREIGN KEY (id_usuario_FK) 
-            REFERENCES dbo.usuario(id_usuario_PK) 
-            ON DELETE CASCADE,
-            
         -- Constraints para validación
         CONSTRAINT CK_bitacora_estado_acceso 
             CHECK (estado_acceso IN ('ÉXITO', 'FRACASO'))
@@ -26,13 +20,13 @@ BEGIN
 
     -- Creacion de incides.
     CREATE NONCLUSTERED INDEX IX_bitacora_usuario_fecha
-    ON dbo.bitacora_accesos (id_usuario_FK, fecha_hora_acceso DESC)
+    ON dbo.bitacora_accesos (id_usuario, fecha_hora_acceso DESC)
     INCLUDE (estado_acceso);
 
 
     CREATE NONCLUSTERED INDEX IX_bitacora_fecha
     ON dbo.bitacora_accesos (fecha_hora_acceso DESC)
-    INCLUDE (id_usuario_FK, estado_acceso);
+    INCLUDE (id_usuario, estado_acceso);
 
     CREATE NONCLUSTERED INDEX IX_bitacora_estado
     ON dbo.bitacora_accesos (estado_acceso, fecha_hora_acceso DESC)
@@ -52,15 +46,8 @@ AS
 BEGIN
     SET NOCOUNT ON
     
-    -- Validar que el usuario existe
-    IF NOT EXISTS (SELECT 1 FROM dbo.usuario WHERE id_usuario_PK = @id_usuario)
-    BEGIN
-        RAISERROR('El usuario especificado no existe: %s', 16, 1, @id_usuario);
-        RETURN -1;
-    END
-    
     -- Insertar el registro de acceso
-    INSERT INTO dbo.bitacora_accesos (id_usuario_FK, fecha_hora_acceso, estado_acceso)
+    INSERT INTO dbo.bitacora_accesos (id_usuario, fecha_hora_acceso, estado_acceso)
     VALUES (@id_usuario, GETDATE(), @estado_acceso);
     
     -- Retornar el ID del registro insertado
@@ -80,12 +67,12 @@ BEGIN
     
     SELECT 
         ba.id_acceso_PK,
-        ba.id_usuario_FK,
+        ba.id_usuario,
         ba.fecha_hora_acceso,
         ba.estado_acceso
     FROM dbo.bitacora_accesos ba
     WHERE 
-        ba.id_usuario_FK = @id_usuario
+        ba.id_usuario = @id_usuario
         AND ba.fecha_hora_acceso >= @fecha_desde
     ORDER BY ba.fecha_hora_acceso DESC;
 END
@@ -110,7 +97,7 @@ BEGIN
     
     SELECT 
         ba.id_acceso_PK,
-        ba.id_usuario_FK,
+        ba.id_usuario,
         ba.fecha_hora_acceso,
         ba.estado_acceso
     FROM dbo.bitacora_accesos ba
@@ -130,33 +117,10 @@ BEGIN
     
     SELECT TOP 1
         ba.id_acceso_PK,
-        ba.id_usuario_FK,
+        ba.id_usuario,
         ba.fecha_hora_acceso,
         ba.estado_acceso
     FROM dbo.bitacora_accesos ba
-    WHERE ba.id_usuario_FK = @id_usuario
+    WHERE ba.id_usuario = @id_usuario
     ORDER BY ba.fecha_hora_acceso DESC;
 END
-
--- Prueba de inserción de datos
-
-GO
--- Inserción de un registro de acceso para el usuario 'test_user'
-
---EXEC InsertBitacoraAcceso 
---    @id_usuario = 'docencia.metics2@ucr.ac.cr', 
---    @estado_acceso = 'ÉXITO';
-
----- Verificación de los registros insertados
---EXEC SelectBitacoraAccesoUsuario 
---    @id_usuario = 'admin.admin@ucr.ac.cr', 
---    @dias_atras = 30;
-
----- Verificación de los accesos en un rango de fechas
---EXEC SelectBitacoraAccesosPorFecha 
---    @fecha_desde = '2023-01-01', 
---    @fecha_hasta = '2023-12-31', 
---    @estado_filtro = 'ÉXITO';
-
---DROP TABLE IF EXISTS dbo.bitacora_accesos;
-

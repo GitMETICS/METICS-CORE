@@ -317,7 +317,7 @@ namespace webMetics.Handlers
                             var bitacoraAcceso = new BitacoraAcceso
                             {
                                 IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
-                                IdUsuarioFK = reader.IsDBNull(reader.GetOrdinal("id_usuario_FK")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario_FK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
                                 FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
                                 EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
                             };
@@ -371,7 +371,7 @@ namespace webMetics.Handlers
                             var bitacoraAcceso = new BitacoraAcceso
                             {
                                 IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
-                                IdUsuarioFK = reader.IsDBNull(reader.GetOrdinal("id_usuario_FK")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario_FK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
                                 FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
                                 EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
                             };
@@ -430,7 +430,7 @@ namespace webMetics.Handlers
                             ultimoAcceso = new BitacoraAcceso
                             {
                                 IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
-                                IdUsuarioFK = reader.IsDBNull(reader.GetOrdinal("id_usuario_FK")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario_FK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
                                 FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
                                 EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
                             };
