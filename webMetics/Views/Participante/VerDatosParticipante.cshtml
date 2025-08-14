@@ -259,7 +259,7 @@
                                                         <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
                                                         <td class="">@inscripcion.estado</td>
 
-                                                        <td class="text-center">@(((inscripcion.horasMatriculadas - inscripcion.horasAprobadas) ?? 0))</td>
+                                                        <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
                                                         <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
                                                         @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
                                                         {

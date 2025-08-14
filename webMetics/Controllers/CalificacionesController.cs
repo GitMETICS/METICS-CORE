@@ -92,13 +92,13 @@ namespace webMetics.Controllers
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
 
-                if (horasAprobadas != 0) 
+                if (horasAprobadas > 0) 
                 {
                     // int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
                     inscripcion.horasAprobadas = horasAprobadas;
-                    // inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                    // inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                    inscripcion.horasMatriculadas = (inscripcion.horasMatriculadas < 0) ? 0 : inscripcion.horasMatriculadas;
 
                     inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
