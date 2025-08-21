@@ -158,9 +158,16 @@ else
 <script type="text/javascript">
         $(document).ready(function () {
 
+        var currentAreaRequest = null;
         // AREA -> DEPARTAMENTO
         $('#areaDropdown').change(function () {
             var areaName = $(this).val();
+
+            // Cancelar petición anterior si existe
+            if (currentAreaRequest) {
+                currentAreaRequest.abort();
+            }
+
             // Clear departamento and unidad dropdowns
             $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
             $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
@@ -169,7 +176,11 @@ else
                 $.ajax({
                     url: '/Participante/GetDepartamentosByArea',
                     type: 'GET',
-                    data: { areaName: areaName },
+                    data: {
+                        areaName: areaName,
+                        _: new Date().getTime() // Evita cache
+                    },
+                    cache: false, // Evita cache
                     dataType: 'json',
                     success: function (data) {
                         $.each(data, function (index, value) {
