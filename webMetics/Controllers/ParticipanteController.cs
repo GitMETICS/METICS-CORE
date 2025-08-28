@@ -1084,6 +1084,38 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
+        public JsonResult GetAllAreasData()
+        {
+            var allAreas = GetAreas().Select(x => x.Text).ToList();
+            var departamentosByArea = new Dictionary<string, List<string>>();
+            var seccionesByDepartamento = new Dictionary<string, List<string>>();
+
+            // Iterar por todas las areas para obtener departamentos y secciones
+            foreach (var areaName in allAreas)
+            {
+                var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                departamentosByArea[areaName] = departamentos;
+
+                // Para cada departamento, obtener las secciones
+                foreach (var departamentoName in departamentos)
+                {
+                    var key = $"{areaName}|{departamentoName}";
+                    var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                    seccionesByDepartamento[key] = secciones;
+                }
+            }
+
+            var allData = new
+            {
+                areas = allAreas,
+                departamentosByArea,
+                seccionesByDepartamento
+            };
+
+            return Json(allData);
+        }
+
+        [HttpGet]
         public JsonResult GetDepartamentoJSON(string areaName)
         {
             return Json(GetDepartamento(areaName));
