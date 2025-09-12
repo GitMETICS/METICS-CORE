@@ -1,5 +1,10 @@
-ALTER TABLE dbo.bitacora_accesos DROP CONSTRAINT IF EXISTS CK_bitacora_estado_acceso;
-DROP TABLE IF EXISTS dbo.bitacora_accesos;
+-- Eliminar el constraint solo si existe
+ALTER TABLE dbo.bitacora_accesos DROP CONSTRAINT CK_bitacora_estado_acceso;
+
+-- Agregar el constraint con los valores correctos
+ALTER TABLE dbo.bitacora_accesos
+    ADD CONSTRAINT CK_bitacora_estado_acceso 
+        CHECK (estado_acceso IN ('EXITO', 'FRACASO'));
 
 -- Antes de crear la nueva tabla, verificamos si existe
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'bitacora_accesos')
