@@ -65,7 +65,7 @@
                                 <label for="estadoAcceso" class="form-label">Estado de Acceso</label>
                                 <select id="estadoAcceso" name="estadoAcceso" class="form-select">
                                     <option value="">Todos</option>
-                                    <option value="ÉXITO">ÉXITO</option>
+                                    <option value="EXITO">EXITO</option>
                                     <option value="FRACASO">FRACASO</option>
                                 </select>
                             </div>
@@ -136,7 +136,7 @@
                                     <p class="text-dark">@acceso.FechaHoraAcceso.ToString("yyyy-MM-dd HH:mm:ss")</p>
                                 </td>
                                 <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
-                                    <span class="badge rounded-pill @(acceso.EstadoAcceso == "ÉXITO" ? "text-bg-success" : "text-bg-danger")">
+                                    <span class="badge rounded-pill @(acceso.EstadoAcceso == "EXITO" ? "text-bg-success" : "text-bg-danger")">
                                         @acceso.EstadoAcceso
                                     </span>
                                 </td>

@@ -67,7 +67,7 @@ namespace webMetics.Controllers
                     // La autenticación fue exitosa.
                     // 1. Llama al método para insertar el registro de acceso.
                     // Se usa el ID del usuario autorizado.
-                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "ÉXITO");
+                    accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }

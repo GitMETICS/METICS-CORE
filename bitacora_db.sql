@@ -1,7 +1,9 @@
+ALTER TABLE dbo.bitacora_accesos DROP CONSTRAINT IF EXISTS CK_bitacora_estado_acceso;
+DROP TABLE IF EXISTS dbo.bitacora_accesos;
+
 -- Antes de crear la nueva tabla, verificamos si existe
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'bitacora_accesos')
 BEGIN
-
 	    -- Creación de la tabla bitacora_accesos
     CREATE TABLE dbo.bitacora_accesos (
         id_acceso_PK BIGINT IDENTITY(1,1) NOT NULL,
@@ -14,7 +16,7 @@ BEGIN
         
         -- Constraints para validación
         CONSTRAINT CK_bitacora_estado_acceso 
-            CHECK (estado_acceso IN ('ÉXITO', 'FRACASO'))
+            CHECK (estado_acceso IN ('EXITO', 'FRACASO'))
 
         );
 
@@ -30,7 +32,7 @@ BEGIN
 
     CREATE NONCLUSTERED INDEX IX_bitacora_estado
     ON dbo.bitacora_accesos (estado_acceso, fecha_hora_acceso DESC)
-    WHERE estado_acceso <> 'ÉXITO'; -- Índice filtrado para el estado 'FRACASO'
+    WHERE estado_acceso <> 'EXITO'; -- Índice filtrado para el estado 'FRACASO'
 END
 
 -- =====================================================
@@ -41,7 +43,7 @@ GO
 -- Procedimiento para insertar un registro de acceso
 CREATE OR ALTER PROCEDURE InsertBitacoraAcceso
     @id_usuario NVARCHAR(64),
-    @estado_acceso NVARCHAR(20) = 'ÉXITO'
+    @estado_acceso NVARCHAR(20) = 'EXITO'
 AS
 BEGIN
     SET NOCOUNT ON
