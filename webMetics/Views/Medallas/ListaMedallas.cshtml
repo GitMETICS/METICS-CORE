@@ -1,13 +1,12 @@
 ﻿@using webMetics.Controllers
 @{
     ViewBag.Title = "Lista de Medallas";
-
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-tipos-actividades container-fluid">
+    <div class="contenedor-caja container-fluid">
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
@@ -44,17 +43,17 @@
                 <form method="post" enctype="multipart/form-data" asp-controller="Medallas" asp-action="SubirMedalla">
                     <div class="d-flex justify-content-between">
                         <input type="file" name="imageFile" class="form-control" />
-                        <button type="submit" class="btn btn-secondary ms-2 w-25"><i class="bi bi-plus-lg me-2"></i>Agregar</button>
+                        <button type="submit" class="btn btn-secondary ms-2"><i class="bi bi-upload"></i></button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Medallas -->
-        @if (ViewBag.Medallas != null)
+        @if (ViewBag.TodasLasMedallas != null)
         {
             <div class="d-flex justify-content-start my-4 flex-wrap">
-                @foreach (string nombreMedalla in ViewBag.Medallas)
+                @foreach (string nombreMedalla in ViewBag.TodasLasMedallas)
                 {
                     <div class="card m-2" style="height: 420px;">
                         <div class="card-header text-muted">
@@ -118,3 +117,49 @@ else
         document.getElementById("nombreMedalla").value = nombreMedalla;
     }
 </script>
+
+<script type="text/javascript">
+    function filterParticipantes() {
+        var input, filter, container, elements, i, txtValue;
+        input = document.getElementById("participanteSearch");
+        filter = input.value.toUpperCase();
+        container = document.getElementById("participantesContainer"); // Selecciona el contenedor por su ID
+        elements = container.getElementsByClassName("form-check");
+        for (i = 0; i < elements.length; i++) {
+            var label = elements[i].querySelector("label");
+            if (label) {
+                txtValue = label.textContent || label.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+
+<script>
+    function filterMedals() {
+        var input, filter, medallaList, medallas, i, txtValue;
+        input = document.getElementById("medallaSearch");
+        filter = input.value.toUpperCase();
+        medallaList = document.getElementById("medallaList");
+        medallas = medallaList.getElementsByClassName("medalla-item");
+
+        for (i = 0; i < medallas.length; i++) {
+            txtValue = medallas[i].textContent || medallas[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                medallas[i].style.display = "";
+            } else {
+                medallas[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+<style>
+    .participante-item {
+        display: block; /* Asegura que cada checkbox y label ocupe una línea */
+    }
+</style>

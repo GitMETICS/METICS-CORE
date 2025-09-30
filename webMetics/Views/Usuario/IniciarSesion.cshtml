@@ -88,6 +88,11 @@
                                     </div>
                                 }
                             }
+                            <div class="text-center mb-1" style="font-size: 0.9rem;">
+								<b>Importante:</b> El SIMETICS <u>no</u> utiliza la misma contraseña del correo institucional.
+
+                            </div>
+
                             <div class="text-center mt-3">
                                 <button type="submit" class="btn btn-primary btn-block">Acceder</button>
                             </div>
@@ -100,15 +105,16 @@
                 </div>
                 <div class="card-footer text-center pt-2 pb-3" style="background-color: #333333; color: #fff; margin-bottom: 30px;">
                     <p class="fw-bold" style="font-size: 1rem;margin-top: 10px;">
-                        ¿Aprobó algún módulo antes del 1 de enero de 2025?
+                        Si nunca se ha registrado puede
+                        @Html.ActionLink("registrarse aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline", aria_label = "Formulario de registro" }).
+                        Si ya lo ha hecho antes, puede enviarse una
+                        @Html.ActionLink("nueva contraseña aquí", "FormularioRecuperarContrasena", "Participante", null, new { @class = "text-white fw-bold text-decoration-underline", aria_label = "Recuperar contraseña" }).
+                        
                         <br />
-                        Solicite su contraseña a
-                        <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
+                        Si tiene dudas o consultas, por favor envíelas al correo <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
+                        <br />
                     </p>
-                    <p class="fw-bold" style="font-size: 1rem;  margin-bottom: 10px;">
-                        ¿Va a llevar un módulo por primera vez?
-                        @Html.ActionLink("Regístrese aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline fst-italic", aria_label = "Formulario de registro" })
-                    </p>
+
                 </div>
             </div>
         </div>

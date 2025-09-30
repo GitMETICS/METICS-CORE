@@ -85,6 +85,53 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
+        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
+
+                if (horasAprobadas > 0) 
+                {
+                    // int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
+
+                    inscripcion.horasAprobadas = horasAprobadas;
+                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+                    inscripcion.horasMatriculadas = (inscripcion.horasMatriculadas < 0) ? 0 : inscripcion.horasMatriculadas;
+
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                    accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                }
+
+                if (calificacion != 0)
+                {
+                    accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                }
+
+                TempData["successMessage"] = "Datos actualizados.";
+            }
+            catch
+            {
+                TempData["errorMessage"] = "No se pudo actualizar los datos.";
+            }
+
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        }
+
+        [HttpPost]
         public ActionResult SubirCalificacion(int idGrupo, string idParticipante, int calificacion)
         {
             try
@@ -481,17 +528,18 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
-        public ActionResult EnviarCalificaciones(int idGrupo, List<string> participantesSeleccionados)
+        public ActionResult EnviarCalificacionesAlCorreo(int idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<CalificacionModel> calificaciones = new List<CalificacionModel>();
 
-            foreach (string idParticipante in participantesSeleccionados)
+            foreach (ParticipanteModel participante in participantes)
             {
-                CalificacionModel calificacion = accesoACalificaciones.ObtenerCalificacion(idGrupo, idParticipante);
+                CalificacionModel calificacion = accesoACalificaciones.ObtenerCalificacion(idGrupo, participante.idParticipante);
                 calificaciones.Add(calificacion);
             }
 
@@ -500,7 +548,7 @@ namespace webMetics.Controllers
                 foreach (CalificacionModel calificacion in calificaciones)
                 {
                     string mensaje = ConstructorDelMensajeCorreoEnviarCalificacion(grupo, calificacion);
-                    EnviarCalificacion(grupo.nombre, mensaje, calificacion.participante.correo);
+                    EnviarCalificacion(grupo.nombre, mensaje, calificacion.participante.idParticipante);
                 }
 
                 TempData["successMessage"] = "Calificaciones enviadas.";

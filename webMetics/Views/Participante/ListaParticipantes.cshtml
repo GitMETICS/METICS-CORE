@@ -7,7 +7,7 @@
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
-    <div class="contenedor-tipos-actividades container-fluid">
+    <div class="contenedor-caja container-fluid">
         @if (urlReferrer != null)
         {
             @if (ViewBag.Role == 1)
@@ -84,10 +84,93 @@
                         @Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
                     </div>
                     <div class="mx-1">
-                        <button class="btn btn-outline-primary" id="sendEmailButton"><i class="bi bi-send me-2"></i>Enviar por correo</button>
+                        @Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-primary bi bi-envelope" })
                     </div>
                 </div>
             </div>
+
+            <div class="card mb-3">
+                <div class="card-header" id="asignarMasivaHeader">
+                    <h3 class="mb-0">
+                        <button class="bi bi-chevron-down btn text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsignarMasiva" aria-expanded="false" aria-controls="collapseAsignarMasiva">
+                            Asignar Medalla Masivamente
+                        </button>
+                    </h3>
+                </div>
+
+                <div id="collapseAsignarMasiva" class="collapse" aria-labelledby="asignarMasivaHeader">
+                    <div class="card-body">
+                        <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva">
+
+                            <label class="form-label"><b>Buscar Medalla:</b></label>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div>
+
+                            <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                                @if (ViewBag.TodasLasMedallas != null)
+                                {
+                                    <div id="medalla-list" class="medalla-list-container d-flex flex-column">
+                                        @foreach (var medalla in ViewBag.TodasLasMedallas)
+                                        {
+                                            <div class="medalla-item">
+                                                <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
+                                                    <label class="form-check-label" for="medallaSeleccionada">
+                                                        @medalla
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="medalla-list-container">
+                                        <p>No hay medallas disponibles.</p>
+                                    </div>
+                                }
+                            </div>
+                            <br />
+
+                            @if (ViewBag.ListaParticipantes != null)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label"><b>Buscar Participante:</b></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="participanteSearch" onkeyup="filterParticipantes()" placeholder="Ingrese el nombre del participante">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3" id="participantesContainer" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                                    @foreach (var participante in ViewBag.ListaParticipantes)
+                                    {
+                                        <div class="form-check participante-item">
+                                            <input type="checkbox" class="form-check-input" name="participantesSeleccionados" value="@participante.idParticipante" id="participanteMasiva_@participante.idParticipante">
+                                            <label class="form-check-label" for="participanteMasiva_@participante.idParticipante">@participante.nombre @participante.primerApellido @participante.segundoApellido (@participante.idParticipante)</label>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-secondary">Asignar a Seleccionados</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <p>No hay participantes para seleccionar.</p>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <br />
 
             @if (ViewBag.ListaParticipantes == null)
             {
@@ -98,7 +181,6 @@
                 <table class="table table-striped" id="tblCustomers">
                     <thead>
                         <tr>
-                            <th scope="col"></th>
                             <th scope="col">Unidad Académica</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Primer<br>Apellido</th>
@@ -124,9 +206,6 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                <td>
-                                    <input type="checkbox" class="participante-checkbox" value="@participante.idParticipante" />
-                                </td>
                                 <td>@participante.unidadAcademica</td>
                                 <td>@participante.nombre</td>
                                 <td>@participante.primerApellido</td>
@@ -161,7 +240,7 @@
                                     <td class="text-center">@calificacion</td>
                                 }
                                 <td>
-                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
+                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "text-secondary bi bi-search" })
                                 </td>
                                 @if (ViewBag.Role == 1)
                                 {                                    
@@ -234,20 +313,119 @@ else
     }
 </script>
 
-<script>
-    document.getElementById('sendEmailButton').onclick = function () {
-        var selectedParticipants = [];
-        // Gather selected checkboxes
-        document.querySelectorAll('.participante-checkbox:checked').forEach(function (checkbox) {
-            selectedParticipants.push(checkbox.value);
+<script type="text/javascript">
+    function filterParticipantes() {
+        var input, filter, container, elements, i, txtValue;
+        input = document.getElementById("participanteSearch");
+        filter = input.value.toUpperCase();
+        container = document.getElementById("participantesContainer"); // Selecciona el contenedor por su ID
+        elements = container.getElementsByClassName("form-check");
+        for (i = 0; i < elements.length; i++) {
+            var label = elements[i].querySelector("label");
+            if (label) {
+                txtValue = label.textContent || label.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('selectAllParticipantes');
+        const individualCheckboxes = document.querySelectorAll('.individual-participante');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            individualCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
         });
 
-        // Create a comma-separated string
-        var participantesSeleccionados = selectedParticipants.join(',');
-
-        // Redirect to the ActionLink with the parameters
-        window.location.href = '@Url.Action("EnviarCalificaciones", "Calificaciones", new { idGrupo = "__idGrupo__", participantesSeleccionados = "__participantesSeleccionados__" })'
-            .replace('__idGrupo__', '@ViewBag.IdGrupo')
-            .replace('__participantesSeleccionados__', participantesSeleccionados);
-    };
+        individualCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                selectAllCheckbox.checked = individualCheckboxes.length === document.querySelectorAll('.individual-participante:checked').length;
+            });
+        });
+    });
 </script>
+
+<script>
+    function filterMedals() {
+        var input, filter, medallaList, medallas, i, txtValue;
+
+        // --- Debugging Start ---
+        console.log("--- filterMedals function called ---");
+        // --- Debugging End ---
+
+        input = document.getElementById("medalla-search");
+
+        // --- Debugging Start ---
+        if (!input) {
+            console.error("ERROR: Element with ID 'medalla-search' not found.");
+            return; // Exit function if input element isn't found
+        }
+        // --- Debugging End ---
+
+        filter = input.value.toUpperCase();
+
+        // --- Debugging Start ---
+        console.log("Input value (raw):", input.value);
+        console.log("Filter value (toUpperCase):", filter);
+        // --- Debugging End ---
+
+        medallaList = document.getElementById("medalla-list");
+
+        // --- Debugging Start ---
+        if (!medallaList) {
+            console.error("ERROR: Element with ID 'medalla-list' not found.");
+            return; // Exit function if medallaList element isn't found
+        }
+        console.log("Medal list element found:", medallaList);
+        // --- Debugging End ---
+
+        medallas = medallaList.getElementsByClassName("medalla-item");
+
+        // --- Debugging Start ---
+        console.log("Number of 'medalla-item' elements found:", medallas.length);
+        if (medallas.length === 0) {
+            console.warn("WARNING: No elements with class 'medalla-item' found inside 'medalla-list'. Check your HTML structure.");
+        }
+        // --- Debugging End ---
+
+        for (i = 0; i < medallas.length; i++) {
+            txtValue = medallas[i].textContent || medallas[i].innerText;
+
+            // --- Debugging Start ---
+            console.log("--- Processing medal item (index " + i + ") ---");
+            console.log("Original text content of medalla-item:", medallas[i].textContent);
+            console.log("Normalized text value for comparison (txtValue):", txtValue);
+            console.log("txtValue.toUpperCase():", txtValue.toUpperCase());
+            console.log("Does '" + txtValue.toUpperCase() + "' contain '" + filter + "'?", txtValue.toUpperCase().indexOf(filter) > -1);
+            // --- Debugging End ---
+
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                medallas[i].style.display = "";
+
+                // --- Debugging Start ---
+                console.log("  -> Match! Setting display to '' (showing).");
+                // --- Debugging End ---
+            } else {
+                medallas[i].style.display = "none";
+                // --- Debugging Start ---
+                console.log("  -> No match. Setting display to 'none' (hiding).");
+                // --- Debugging End ---
+            }
+        }
+        // --- Debugging Start ---
+        console.log("--- filterMedals function finished ---");
+        // --- Debugging End ---
+    }
+</script>
+
+<style>
+    .participante-item {
+        display: block;
+    }
+</style>

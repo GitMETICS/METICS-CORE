@@ -779,5 +779,54 @@ namespace webMetics.Controllers
             }
         }
 
+        public ActionResult CopiarGrupo(int idGrupo)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                // Obtener los temas asociados al grupo
+                List<TemaModel> temasAsociados = accesoAGrupoTema.ObtenerTemasDelGrupo(idGrupo);
+
+                int[] temasArray = new int[temasAsociados.Count];
+
+                // Convertir temas a valor asociado
+                for (int i = 0; i < temasAsociados.Count; i++)
+                {
+                    temasArray[i] = temasAsociados[i].idTema;
+                }
+
+                // Cambiar el nombre del grupo para saber que es una copia
+                if (grupo.nombre.Length > 220)
+                {
+                    // Si el nombre es mayor a 220 caracteres, truncar y añadir "..."
+                    grupo.nombre = grupo.nombre.Substring(0, 220) + "...";
+                }
+                grupo.nombre = "Copia de " + grupo.nombre;
+
+                // Set de archivos en null
+                grupo.nombreArchivo = null;
+                grupo.archivoAdjunto = null;
+
+                // Copiar atributos del grupo y añadirlo a la lista de grupos como copia
+                if (accesoAGrupo.CrearGrupo(grupo, temasArray))
+                {
+                    TempData["successMessage"] = "Se guardó la copia del módulo.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "No se pudo copiar el módulo.";
+                }
+
+            } catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Ocurrió un error al copiar el módulo: " + ex.Message;
+            }
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
+        }
     }
 }

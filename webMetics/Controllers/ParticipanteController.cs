@@ -65,7 +65,8 @@ namespace webMetics.Controllers
 
                 ViewBag.ListaParticipantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
                 ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
-                
+                ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+
 
                 if (TempData["errorMessage"] != null)
                 {
@@ -151,33 +152,55 @@ namespace webMetics.Controllers
         {
             try
             {
-                // 1. Retrieve the participant.
-                var participante = accesoAParticipante.ObtenerParticipante(idParticipante); // Assuming you have a method to get the participant
+                var participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
                 if (participante == null)
                 {
                     ViewBag.ErrorMessage = "Participante no encontrado.";
-                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante }); //Or some other error page.
+                    return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                // 2. Assign the selected medals.
                 if (selectedMedallas != null && selectedMedallas.Any())
                 {
                     foreach (var medalla in selectedMedallas)
                     {
-                        accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla); // Assuming you have a method to assign a single medalla
+                        if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla)) {
+                            accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla);
+                        }
                     }
                 }
 
-                ViewBag.SuccessMessage = "Medallas asignadas correctamente.";
+                TempData["successMessage"] = "Medallas asignadas correctamente.";
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al asignar medallas: {ex.Message}";
-                // Log the exception
+                TempData["errorMessage"] = $"Error al asignar medallas.";
             }
 
-            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante }); // Or some other appropriate redirect.
+            return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
+        }
+
+        [HttpPost]
+        public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
+        {
+            try
+            {
+                if (participantesSeleccionados != null && participantesSeleccionados.Any() && !string.IsNullOrEmpty(nombreMedalla))
+                {
+                    accesoAParticipante.AsignarMedallaAParticipantes(nombreMedalla, participantesSeleccionados);
+                    TempData["successMessage"] = $"Se asignó la medalla '{nombreMedalla}' a {participantesSeleccionados.Count} participantes.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Seleccione al menos un participante y una medalla.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = $"Ocurrió un error al asignar las medallas: {ex.Message}";
+            }
+
+            return RedirectToAction("ListaMedallas", "Medallas");
         }
 
         [HttpPost]
@@ -246,7 +269,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes");
         }
 
-        
+
 
         public IActionResult NotificarLimiteHoras(string idParticipante)
         {
@@ -267,9 +290,9 @@ namespace webMetics.Controllers
                     {
                         TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                     }
-                    
+
                 }
-                catch 
+                catch
                 {
                     TempData["errorMessage"] = "Ocurrió un error al enviar el correo de notificación.";
                 }
@@ -645,101 +668,96 @@ namespace webMetics.Controllers
 
         public ActionResult ExportarParticipantesExcel2(string? searchTerm)
         {
-            // Obtener la lista de participantes e inscripciones
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
+            try
             {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            // Creamos el archivo de Excel
-            XSSFWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet("Lista_de_Participantes_Módulos");
-
-            // Crear estilos para el encabezado
-            ICellStyle headerStyle = workbook.CreateCellStyle();
-            headerStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
-            headerStyle.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
-
-            // Añadir borde y fondo al encabezado
-            headerStyle.BorderBottom = BorderStyle.Thin;
-            headerStyle.BorderTop = BorderStyle.Thin;
-            headerStyle.BorderLeft = BorderStyle.Thin;
-            headerStyle.BorderRight = BorderStyle.Thin;
-
-            // Crear fuente en negrita para el encabezado
-            IFont font = workbook.CreateFont();
-            headerStyle.SetFont(font);
-
-            // Crear estilos para las celdas del cuerpo
-            ICellStyle bodyStyle = workbook.CreateCellStyle();
-            bodyStyle.BorderBottom = BorderStyle.Thin;
-            bodyStyle.BorderTop = BorderStyle.Thin;
-            bodyStyle.BorderLeft = BorderStyle.Thin;
-            bodyStyle.BorderRight = BorderStyle.Thin;
-
-            // Crear el encabezado de la tabla
-            IRow rowHeaders = sheet.CreateRow(3);
-            string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
-
-            for (int i = 0; i < headers.Length; i++)
-            {
-                NPOI.SS.UserModel.ICell cell = rowHeaders.CreateCell(i);
-                cell.SetCellValue(headers[i]);
-                cell.CellStyle = headerStyle;  // Aplicar estilo de encabezado
-            }
-
-            int rowN = 4;
-            foreach (var participante in participantes)
-            {
-                IRow row = sheet.CreateRow(rowN);
-
-                // Completar los datos del participante en cada fila
-                row.CreateCell(0).SetCellValue(participante.unidadAcademica);
-                row.CreateCell(1).SetCellValue(participante.nombre);
-                row.CreateCell(2).SetCellValue(participante.primerApellido);
-                row.CreateCell(3).SetCellValue(participante.segundoApellido);
-                row.CreateCell(4).SetCellValue(participante.idParticipante);
-                row.CreateCell(5).SetCellValue(participante.horasMatriculadas);
-                row.CreateCell(6).SetCellValue(participante.horasAprobadas);
-
-                // Aplicar estilo al cuerpo
-                for (int i = 0; i < 7; i++)
+                // Optimized Database Query (if possible)
+                List<ParticipanteModel> participantes;
+                if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    row.GetCell(i).CellStyle = bodyStyle;
+                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm); // Assuming this method exists
+                }
+                else
+                {
+                    participantes = accesoAParticipante.ObtenerListaParticipantes();
                 }
 
-                rowN++; // Incrementar para la siguiente fila
+                // Optimized Inscripciones retrieval if needed.
+                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
 
+                // Excel Workbook Setup
+                XSSFWorkbook workbook = new XSSFWorkbook();
+                var sheet = workbook.CreateSheet("Lista_de_Participantes_Módulos");
 
-                // Ajustar automáticamente el ancho de las columnas
+                // Header Style
+                ICellStyle headerStyle = workbook.CreateCellStyle();
+                headerStyle.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+                headerStyle.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Center;
+                headerStyle.BorderBottom = BorderStyle.Thin;
+                headerStyle.BorderTop = BorderStyle.Thin;
+                headerStyle.BorderLeft = BorderStyle.Thin;
+                headerStyle.BorderRight = BorderStyle.Thin;
+                IFont headerFont = workbook.CreateFont();
+                headerStyle.SetFont(headerFont);
+
+                // Body Style
+                ICellStyle bodyStyle = workbook.CreateCellStyle();
+                bodyStyle.BorderBottom = BorderStyle.Thin;
+                bodyStyle.BorderTop = BorderStyle.Thin;
+                bodyStyle.BorderLeft = BorderStyle.Thin;
+                bodyStyle.BorderRight = BorderStyle.Thin;
+
+                // Headers
+                string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+                IRow headerRow = sheet.CreateRow(3);
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    NPOI.SS.UserModel.ICell cell = headerRow.CreateCell(i);
+                    cell.SetCellValue(headers[i]);
+                    cell.CellStyle = headerStyle;
+                }
+
+                // Populate Data
+                int rowNumber = 4;
+                foreach (var participante in participantes)
+                {
+                    IRow dataRow = sheet.CreateRow(rowNumber++);
+                    dataRow.CreateCell(0).SetCellValue(participante.unidadAcademica);
+                    dataRow.CreateCell(1).SetCellValue(participante.nombre);
+                    dataRow.CreateCell(2).SetCellValue(participante.primerApellido);
+                    dataRow.CreateCell(3).SetCellValue(participante.segundoApellido);
+                    dataRow.CreateCell(4).SetCellValue(participante.correo); // changed from idParticipante to correo
+                    dataRow.CreateCell(5).SetCellValue(participante.horasMatriculadas);
+                    dataRow.CreateCell(6).SetCellValue(participante.horasAprobadas);
+
+                    for (int i = 0; i < headers.Length; i++)
+                    {
+                        dataRow.GetCell(i).CellStyle = bodyStyle;
+                    }
+                }
+
+                // Auto-size columns after all rows are added
                 for (int i = 0; i < headers.Length; i++)
                 {
                     sheet.AutoSizeColumn(i);
                 }
-            }
 
-            // Crear el archivo de Excel y devolverlo como respuesta
-            string fileName = "Lista_de_Participantes_Módulos.xlsx";
-            using (var stream = new MemoryStream())
+                // Create and return the Excel file
+                string fileName = "Lista_de_Participantes_Módulos.xlsx";
+                using (var stream = new MemoryStream())
+                {
+                    workbook.Write(stream);
+                    var file = stream.ToArray();
+                    return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                }
+            }
+            catch (Exception ex)
             {
-                workbook.Write(stream);
-                var file = stream.ToArray();
-                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                // Basic error handling (log or return an error view)
+                Console.WriteLine($"Error exporting Excel: {ex.Message}");
+                return Content("An error occurred while exporting the Excel file.");
             }
         }
-
 
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
@@ -774,7 +792,7 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        public ActionResult VerDatosParticipante(string idParticipante)
+        public ActionResult VerDatosParticipante(string idParticipante, int? idGrupo)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
@@ -806,58 +824,64 @@ namespace webMetics.Controllers
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
 
+            // Si se pasa un idGrupo, se guarda en ViewBag para usarlo en la vista cuando se regresa al grupo
+            if (idGrupo != null)
+            {
+                ViewBag.IdGrupo = idGrupo;
+            }
+
             return View();
         }
 
-        [HttpPost]
-        public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
-        {
-            if (!idGrupo.HasValue)
-            {
-                TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
-                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-            }
-            else
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
+        //[HttpPost]
+        //public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
+        //{
+        //    if (!idGrupo.HasValue)
+        //    {
+        //        TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
+        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Role = GetRole();
+        //        ViewBag.Id = GetId();
 
-                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-                InscripcionModel inscripcion;
+        //        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
+        //        InscripcionModel inscripcion;
 
-                if (grupo != null)
-                {
-                    inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-                }
-                else
-                {
-                    inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
-                }
+        //        if (grupo != null)
+        //        {
+        //            inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
+        //        }
+        //        else
+        //        {
+        //            inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
+        //        }
 
-                int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
+        //        int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
 
-                if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
-                {
-                    inscripcion.horasAprobadas = nuevasHorasAprobadas;
-                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                    inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
+        //        if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
+        //        {
+        //            inscripcion.horasAprobadas = nuevasHorasAprobadas;
+        //            inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
+        //            inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
 
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
+        //            inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+        //            accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+        //            accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+        //            accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
 
-                    TempData["successMessage"] = "Las horas fueron aprobadas.";
-                }
-                else
-                {
-                    TempData["errorMessage"] = "No se pudo aprobar las horas.";
-                }
+        //            TempData["successMessage"] = "Las horas fueron aprobadas.";
+        //        }
+        //        else
+        //        {
+        //            TempData["errorMessage"] = "No se pudo aprobar las horas.";
+        //        }
 
-                return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-            }
-        }
+        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        //    }
+        //}
 
         public ActionResult FormularioParticipante()
         {
@@ -889,7 +913,7 @@ namespace webMetics.Controllers
                 {
                     TempData["errorMessage"] = "Error al agregar al participante.";
                 }
-                
+
                 return RedirectToAction("VerParticipantes");
             }
             else
@@ -929,7 +953,7 @@ namespace webMetics.Controllers
 
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
-                ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area,participante.departamento);
+                ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
 
                 return View(participante);
             }
@@ -1060,6 +1084,38 @@ namespace webMetics.Controllers
                 new SelectListItem { Text = "Sede Regional" },
                 new SelectListItem { Text = "Otros" }
             };
+        }
+
+        [HttpGet]
+        public JsonResult GetAllAreasData()
+        {
+            var allAreas = GetAreas().Select(x => x.Text).ToList();
+            var departamentosByArea = new Dictionary<string, List<string>>();
+            var seccionesByDepartamento = new Dictionary<string, List<string>>();
+
+            // Iterar por todas las areas para obtener departamentos y secciones
+            foreach (var areaName in allAreas)
+            {
+                var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                departamentosByArea[areaName] = departamentos;
+
+                // Para cada departamento, obtener las secciones
+                foreach (var departamentoName in departamentos)
+                {
+                    var key = $"{areaName}|{departamentoName}";
+                    var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                    seccionesByDepartamento[key] = secciones;
+                }
+            }
+
+            var allData = new
+            {
+                areas = allAreas,
+                departamentosByArea,
+                seccionesByDepartamento
+            };
+
+            return Json(allData);
         }
 
         [HttpGet]
@@ -1381,7 +1437,7 @@ namespace webMetics.Controllers
             sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Puntarenas", Group = group8 });
-            
+
 
             return sedes;
         }
@@ -1416,20 +1472,20 @@ namespace webMetics.Controllers
 
         // Método para enviar confirmación de registro al usuario
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
-            {
-                string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
-                string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
-                    $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
-                    $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
+        {
+            string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
+            string message = $"<p>Se ha creado al usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                $"</p>Su contraseña temporal es <strong>{contrasena}</strong></p>" +
+                $"<p>Recuerde que puede cambiar la contraseña al iniciar sesión en el sistema desde el ícono de usuario.</p>";
 
-                await _emailService.SendEmailAsync(correo, subject, message);
-                return Ok();
-            }
+            await _emailService.SendEmailAsync(correo, subject, message);
+            return Ok();
+        }
 
         private string GenerateRandomPassword()
         {
             int length = 10;
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             var random = new Random();
             string password = new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
@@ -1466,6 +1522,60 @@ namespace webMetics.Controllers
             }
 
             return id;
+        }
+        public ActionResult FormularioRecuperarContrasena()
+        {
+            return View("FormularioRecuperarContrasena");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
+        {
+            var correo = participante.correo;
+
+            // Obtener la lista de participantes (solo el correo importa)
+            var listaParticipantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(correo);
+
+            // Si la lista de búsqueda no esta vacia
+            if (listaParticipantes != null)
+            {
+                // Obtener el participante de la lista
+                var participanteEncontrado = listaParticipantes.First();
+
+                // Generar una nueva contraseña aleatoria
+                string nuevaContrasena = GenerateRandomPassword();
+                // Actualizar la contraseña del usuario en la base de datos
+                if (!accesoAUsuario.ActualizarContrasena(correo, nuevaContrasena))
+                {
+                    // Enviar un correo electrónico al usuario con la nueva contraseña
+                    string subject = "Recuperación de contraseña SISTEMA DE INSCRIPCIONES METICS";
+                    string message = $"<p>Se ha solicitado la recuperación de la contraseña para el usuario con correo institucional {correo} en el Sistema de Competencias Digitales para la Docencia - METICS.</p>" +
+                        $"</p>Su contraseña temporal es <strong>{nuevaContrasena}</strong></p>" +
+                        $"<p>Si no ha solicitado este cambio, ignore este mensaje.</p>";
+
+                    await _emailService.SendEmailAsync(correo, subject, message);
+                    TempData["successMessage"] = "Se ha enviado un correo con su nueva contraseña.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al actualizar la contraseña.";
+                }
+            }
+            else
+            {
+                TempData["errorMessage"] = "No existe un usuario con ese correo y número de identificación.";
+            }
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View("FormularioRecuperarContrasena");
         }
     }
 }

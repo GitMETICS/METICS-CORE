@@ -1,18 +1,20 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
+using NPOI.SS.Formula.Functions;
+using NPOI.Util;
 using webMetics.Models;
 
 namespace webMetics.Handlers
 {
     public class UsuarioHandler : BaseDeDatosHandler
-        
+
     {
         public UsuarioHandler(IWebHostEnvironment environment, IConfiguration configuration) : base(environment, configuration)
         {
 
         }
 
-        public bool CrearUsuario(string id, string contrasena, int rol=0)
+        public bool CrearUsuario(string id, string contrasena, int rol = 0)
         {
             bool exito = false;
 
@@ -220,6 +222,239 @@ namespace webMetics.Handlers
             ConexionMetics.Close();
 
             return exito;
+        }
+
+        public bool ActualizarContrasena(string correo, string contrasena)
+        {
+            int rol = 0;
+
+            // Obtener rol_FK de la tabla usuario usando el correo dado de participante
+            string consulta = "SELECT rol_FK FROM usuario WHERE id_usuario_PK = @correo;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@correo", correo);
+
+            using (comandoConsulta)
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        rol = Convert.ToInt32(reader["rol_FK"]);
+                    }
+                    else
+                    {
+                        ConexionMetics.Close();
+                        return false;
+                    }
+                }
+            }
+            ConexionMetics.Close();
+
+            bool exito = EditarUsuario(correo, rol, contrasena);
+            // Usamos el procedimiento ya guardado para actualizar la contraseña
+            return exito;
+        }
+
+        public void InsertarAccesoUsuarioBitacora(string idUsuario, string estadoAcceso) // EXITO o FRACASO
+        {
+            try
+            {
+                using (SqlCommand command = new SqlCommand("InsertBitacoraAcceso", ConexionMetics))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    ConexionMetics.Open();
+
+                    command.Parameters.AddWithValue("@id_usuario", idUsuario);
+                    command.Parameters.AddWithValue("@estado_acceso", estadoAcceso);
+
+                    command.ExecuteNonQuery();
+
+                    // Console.WriteLine("Procedimiento almacenado 'InsertBitacoraAcceso' ejecutado correctamente.");
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error al ejecutar el procedimiento almacenado 'InsertBitacoraAcceso': {ex.Message}");
+            }
+            finally
+            {
+                if (ConexionMetics.State == ConnectionState.Open)
+                {
+                    ConexionMetics.Close();
+                }
+            }
+        }
+
+        public List<BitacoraAcceso> SelectBitacoraAccesoUsuario(string idUsuario, int diasAtras)
+        {
+            // Se usa una lista para almacenar todos los objetos de bitácora leídos.
+            List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
+
+            try
+            {
+                // Se usa un bloque 'using' para asegurar que los recursos se liberen.
+                using (SqlCommand command = new SqlCommand("SelectBitacoraAccesoUsuario", ConexionMetics))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Agregamos los parámetros necesarios para el procedimiento almacenado.
+                    command.Parameters.AddWithValue("@id_usuario", idUsuario);
+                    command.Parameters.AddWithValue("@dias_atras", diasAtras);
+
+                    ConexionMetics.Open();
+
+                    // Usamos SqlDataReader para leer los datos del resultado.
+                    using (var reader = command.ExecuteReader())
+                    {
+                        // Se itera a través de cada fila del resultado.
+                        while (reader.Read())
+                        {
+                            // Se crea una instancia del modelo BitacoraAcceso para cada registro.
+                            var bitacoraAcceso = new BitacoraAcceso
+                            {
+                                IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
+                                FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
+                                EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
+                            };
+                            // Se añade el objeto a la lista.
+                            accesos.Add(bitacoraAcceso);
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error al ejecutar el procedimiento almacenado 'SelectBitacoraAccesoUsuario': {ex.Message}");
+            }
+            finally
+            {
+                if (ConexionMetics.State == ConnectionState.Open)
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return accesos;
+        }
+
+        public List<BitacoraAcceso> SelectBitacoraAccesosPorFecha(string? fechaDesde, string? fechaHasta, string? estadoAcceso)
+        {
+            // Se usa una lista para almacenar todos los objetos de bitácora leídos.
+            List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
+
+            try
+            {
+                // Se usa un bloque 'using' para asegurar que los recursos se liberen.
+                using (SqlCommand command = new SqlCommand("SelectBitacoraAccesosPorFecha", ConexionMetics))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Agregamos los parámetros necesarios para el procedimiento almacenado.
+                    command.Parameters.AddWithValue("@fecha_desde", fechaDesde);
+                    command.Parameters.AddWithValue("@fecha_hasta", fechaHasta);
+                    command.Parameters.AddWithValue("@estado_filtro", estadoAcceso);
+
+                    ConexionMetics.Open();
+
+                    // Usamos SqlDataReader para leer los datos del resultado.
+                    using (var reader = command.ExecuteReader())
+                    {
+                        // Se itera a través de cada fila del resultado.
+                        while (reader.Read())
+                        {
+                            // Se crea una instancia del modelo BitacoraAcceso para cada registro.
+                            var bitacoraAcceso = new BitacoraAcceso
+                            {
+                                IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
+                                FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
+                                EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
+                            };
+                            // Se añade el objeto a la lista.
+                            accesos.Add(bitacoraAcceso);
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error al ejecutar el procedimiento almacenado 'SelectBitacoraAccesosPorFecha': {ex.Message}");
+                // En caso de error, devuelve una lista vacía para evitar fallos.
+                return new List<BitacoraAcceso>();
+            }
+            finally
+            {
+                if (ConexionMetics.State == ConnectionState.Open)
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            // Devuelve la lista de objetos de bitácora encontrados.
+            return accesos;
+        }
+
+
+        public BitacoraAcceso SelectUltimoAccesoUsuario(string idUsuario)
+        {
+            // Declara una variable para almacenar el resultado. La inicializamos en null.
+            BitacoraAcceso ultimoAcceso = null;
+
+            try
+            {
+                // Se usa un bloque 'using' para asegurar que el comando se libere correctamente.
+                using (SqlCommand command = new SqlCommand("SelectUltimoAccesoUsuario", ConexionMetics))
+                {
+                    // Especifica que el tipo de comando es un procedimiento almacenado.
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Agrega el parámetro para el ID de usuario.
+                    command.Parameters.AddWithValue("@id_usuario", idUsuario);
+
+                    // Asegúrate de que la conexión esté abierta antes de ejecutar el comando.
+                    ConexionMetics.Open();
+
+                    // Usa SqlDataReader para leer los datos del resultado, ya que el SP devuelve una fila.
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        // Solo lee la primera fila del resultado (ya que el SP usa TOP 1).
+                        if (reader.Read())
+                        {
+                            // Crea una nueva instancia del objeto BitacoraAcceso y mapea los datos del lector.
+                            // Usamos reader.IsDBNull para manejar valores nulos de forma segura.
+                            ultimoAcceso = new BitacoraAcceso
+                            {
+                                IdAccesoPK = reader.IsDBNull(reader.GetOrdinal("id_acceso_PK")) ? 0 : reader.GetInt64(reader.GetOrdinal("id_acceso_PK")),
+                                IdUsuario = reader.IsDBNull(reader.GetOrdinal("id_usuario")) ? "" : reader.GetString(reader.GetOrdinal("id_usuario")),
+                                FechaHoraAcceso = reader.IsDBNull(reader.GetOrdinal("fecha_hora_acceso")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("fecha_hora_acceso")),
+                                EstadoAcceso = reader.IsDBNull(reader.GetOrdinal("estado_acceso")) ? "" : reader.GetString(reader.GetOrdinal("estado_acceso"))
+                            };
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error al ejecutar el procedimiento almacenado 'SelectUltimoAccesoUsuario': {ex.Message}");
+                // En caso de error, devuelve null para indicar que la operación falló.
+                return null;
+            }
+            finally
+            {
+                // Se asegura de que la conexión se cierre, incluso si ocurre un error.
+                if (ConexionMetics.State == ConnectionState.Open)
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            // Devuelve el objeto de bitácora encontrado, o null si no se encontró ninguno.
+            return ultimoAcceso;
         }
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using webMetics.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using MailKit.Search;
+using NPOI.HPSF;
 
 
 namespace webMetics.Handlers
@@ -471,6 +473,34 @@ namespace webMetics.Handlers
             return listaParticipantes;
         }
 
+        public List<ParticipanteModel> ObtenerListaParticipantesFiltrada(string searchTerm)
+        {
+            // Obtener la lista de participantes
+            List<ParticipanteModel> participantes = ObtenerListaParticipantes();
+
+            // Filtrar la lista si se ha ingresado un término de búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            // Si la lista está vacía, devolver null
+            if (participantes.Count == 0)
+            {
+                return null;
+            }
+
+            return participantes;
+        }
+
         // Método para obtener una lista de participantes asociados a un grupo específico
         public List<ParticipanteModel> ObtenerParticipantesDelGrupo(int idGrupo)
         {
@@ -646,6 +676,33 @@ namespace webMetics.Handlers
             }
         }
 
+        public bool ParticipanteTieneMedalla(string idUsuario, string fileName)
+        {
+            string consulta = "SELECT * FROM medallas WHERE nombre_medalla = @nombreMedalla AND id_participante_FK = @idParticipante;";
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
+
+            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
+            List<string> listaMedallas = new List<string>();
+
+            foreach (DataRow fila in tablaResultado.Rows)
+            {
+                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
+            }
+
+            if (listaMedallas.Count == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public bool AgregarMedalla(string idUsuario, string fileName)
         {
             string consulta = "INSERT INTO medallas VALUES (@idUsuario, @nombreMedalla);";
@@ -680,6 +737,38 @@ namespace webMetics.Handlers
             ConexionMetics.Close();
 
             return exito;
+        }
+
+        public void AsignarMedallaAParticipantes(string nombreMedalla, List<string> idsParticipantes)
+        {
+            try
+            {
+                foreach (var idParticipante in idsParticipantes)
+                {
+                    if (!ParticipanteTieneMedalla(idParticipante, nombreMedalla))
+                    {
+                        string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
+
+                        ConexionMetics.Open();
+
+                        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+
+                        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+                        comandoConsulta.Parameters.AddWithValue("@nombreMedalla", nombreMedalla);
+
+                        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+                        ConexionMetics.Close();
+
+                        Console.WriteLine($"Asignando medalla '{nombreMedalla}' al participante con ID '{idParticipante}'.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al asignar medallas: {ex.Message}");
+                throw;
+            }
         }
 
         public bool EliminarMedallaParticipante(string idParticipante, string fileName)

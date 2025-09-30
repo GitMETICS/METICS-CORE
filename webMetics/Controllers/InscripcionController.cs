@@ -103,6 +103,9 @@ namespace webMetics.Controllers
                 ViewBag.ListaInscripciones = null;
             }
 
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+
+
             // Manejar los mensajes de TempData
             if (TempData["errorMessage"] != null)
             {
@@ -152,6 +155,7 @@ namespace webMetics.Controllers
 
 
             ViewBag.ListaInscripciones = inscripciones;
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
 
             return View("VerInscripciones");
         }
@@ -1431,7 +1435,7 @@ namespace webMetics.Controllers
                     row.CreateCell(7).SetCellValue("N/A");
 
                     // Aplicar estilo al cuerpo
-                    for (int i = 0; i < 9; i++)
+                    for (int i = 0; i < 8; i++)
                     {
                         row.GetCell(i).CellStyle = bodyStyle;
                     }

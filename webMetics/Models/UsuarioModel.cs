@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 
 namespace webMetics.Models
@@ -114,12 +115,12 @@ namespace webMetics.Models
 
     public class NewLoginModel
     {
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [RegularExpression(@"[a-zA-Z0-9._%-]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string oldId { get; set; }
 
-        [RegularExpression(@"[\w\.]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
+        [RegularExpression(@"[a-zA-Z0-9._%-]+@ucr\.ac\.cr", ErrorMessage = "El correo electrónico debe terminar con '@ucr.ac.cr'.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo institucional.")]
         [Display(Name = "Correo institucional")]
         public string id { get; set; }
@@ -170,7 +171,7 @@ public class EmailDomainAttribute : ValidationAttribute
             return new ValidationResult($"El correo electrónico debe terminar con '{_domain}'.");
         }
 
-        var regex = new Regex(@"^[\w\.]+@ucr\.ac\.cr$");
+        var regex = new Regex(@"^[a-zA-Z0-9._%-]+@ucr\.ac\.cr$");
         if (!regex.IsMatch(email))
         {
             return new ValidationResult($"El correo electrónico debe seguir el formato requerido y terminar con '{_domain}'.");
@@ -178,4 +179,24 @@ public class EmailDomainAttribute : ValidationAttribute
 
         return ValidationResult.Success;
     }
+}
+
+public class BitacoraAcceso
+{
+    // id_acceso_PK (BIGINT IDENTITY)
+    // La propiedad IdAccesoPK se mapea a la columna id_acceso_PK de la tabla.
+    [Column("id_acceso_PK")]
+    public long IdAccesoPK { get; set; }
+
+    // id_usuario (NVARCHAR(64))
+    [Column("id_usuario")]
+    public string IdUsuario { get; set; }
+
+    // fecha_hora_acceso (DATETIME2(3))
+    [Column("fecha_hora_acceso")]
+    public DateTime FechaHoraAcceso { get; set; }
+
+    // estado_acceso (NVARCHAR(20))
+    [Column("estado_acceso")]
+    public string EstadoAcceso { get; set; }
 }
