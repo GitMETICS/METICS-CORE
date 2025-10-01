@@ -23,8 +23,8 @@ namespace webMetics.Controllers
 
         public ActionResult Index()
         {
-            //La página de inicio es la lista de los grupos disponibles
-            return Redirect("~/Grupo/ListaGruposDisponibles");
+            //La página de inicio es el inicio de sesion
+            return Redirect("~/Usuario/IniciarSesion");
         }
 
         public IActionResult Error(string errorId)

@@ -17,7 +17,7 @@ using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace webMetics.Controllers
 {
-    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class GrupoController : Controller
     {
         private protected ParticipanteHandler accesoAParticipante;
