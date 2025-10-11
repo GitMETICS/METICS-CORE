@@ -159,11 +159,18 @@ namespace webMetics.Controllers
             if (file == null)
             {
                 TempData["errorMessage"] = "Seleccione un archivo de Excel válido.";
+                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
             }
 
             try
             {
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                List<ParticipanteModel> participantesDelGrupo = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+                
+                int participantesProcesados = 0;
+                int participantesIgnorados = 0;
+                List<string> erroresDetallados = new List<string>();
+                List<string> participantesExcluidos = new List<string>();
 
                 using (var stream = new MemoryStream())
                 {
@@ -174,65 +181,124 @@ namespace webMetics.Controllers
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    // Iterar sobre las filas con datos (ignorando la primera fila de encabezados)
+                    // Iterar sobre las filas con datos (ignorando las primeras filas de encabezados)
                     for (int row = 5; row <= worksheet.Dimension.End.Row; row++)
                     {
-                        string idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text;
-                        int horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadasAux) ? horasAprobadasAux : 0;
-                        int calificacion = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text, out var calificacionAux) ? calificacionAux : 0;
-
-                        InscripcionModel inscripcion = null;
-
                         try
                         {
-                            inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(grupo.nombre, grupo.numeroGrupo, idParticipante);
+                            string idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text?.Trim();
+                            
+                            // Validar que el correo no esté vacío
+                            if (string.IsNullOrEmpty(idParticipante))
+                            {
+                                participantesIgnorados++;
+                                continue;
+                            }
+
+                            // Verificar si el participante está inscrito en el grupo
+                            bool participanteEnGrupo = participantesDelGrupo.Any(p => p.idParticipante.Equals(idParticipante, StringComparison.OrdinalIgnoreCase));
+                            
+                            if (!participanteEnGrupo)
+                            {
+                                participantesExcluidos.Add(idParticipante);
+                                participantesIgnorados++;
+                                continue;
+                            }
+
+                            int horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas Aprobadas")].Text, out var horasAprobadasAux) ? horasAprobadasAux : 0;
+                            int calificacion = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text, out var calificacionAux) ? calificacionAux : 0;
+
+                            // Validar rangos de datos
+                            if (horasAprobadas < 0 || horasAprobadas > grupo.cantidadHoras)
+                            {
+                                participantesExcluidos.Add(idParticipante);
+                                participantesIgnorados++;
+                                continue;
+                            }
+
+                            if (calificacion < 0 || calificacion > 100)
+                            {
+                                participantesExcluidos.Add(idParticipante);
+                                participantesIgnorados++;
+                                continue;
+                            }
+
+                            // Obtener la inscripción existente
+                            InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo, idParticipante);
 
                             if (inscripcion != null)
                             {
-                                inscripcion.horasAprobadas = horasAprobadas;
-                                inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                                inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
-                                inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                                accesoAInscripcion.EditarInscripcion(inscripcion);
+                                // Actualizar horas aprobadas solo si es mayor a 0
+                                if (horasAprobadas > 0)
+                                {
+                                    inscripcion.horasAprobadas = horasAprobadas;
+                                    inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
+                                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+                                    accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                                accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                                accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                                }
+
+                                // Actualizar calificación solo si es mayor a 0
+                                if (calificacion > 0)
+                                {
+                                    accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                                }
+
+                                participantesProcesados++;
+                            }
+                            else
+                            {
+                                participantesExcluidos.Add(idParticipante);
+                                participantesIgnorados++;
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            int horasMatriculadas = grupo.cantidadHoras;
-                            horasMatriculadas -= horasAprobadas;
-                            horasMatriculadas = Math.Max(0, grupo.cantidadHoras);
-
-                            InscripcionModel nuevaInscripcion = new InscripcionModel
-                            {
-                                idParticipante = idParticipante,
-                                idGrupo = idGrupo,
-                                nombreGrupo = grupo.nombre,
-                                numeroGrupo = grupo.numeroGrupo,
-                                horasAprobadas = horasAprobadas,
-                                horasMatriculadas = horasMatriculadas,
-                                estado = "Inscrito"
-                            };
-
-                            accesoAInscripcion.InsertarInscripcion(nuevaInscripcion);
-                            nuevaInscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(nuevaInscripcion);
-                            accesoAInscripcion.EditarInscripcion(nuevaInscripcion);
-
-                            accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                            accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                            erroresDetallados.Add($"Error procesando fila {row}: {ex.Message}");
+                            participantesIgnorados++;
                         }
-
-                        bool calificaciones = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
                     }
 
-                    TempData["successMessage"] = "El archivo fue subido éxitosamente.";
+                    // Construir mensaje de resultado
+                    string mensaje = $"Proceso completado. Participantes procesados: {participantesProcesados}";
+
+                    if (erroresDetallados.Any())
+                    {
+                        mensaje += $". Errores: {string.Join("; ", erroresDetallados.Take(5))}";
+                        if (erroresDetallados.Count > 5)
+                        {
+                            mensaje += $" y {erroresDetallados.Count - 5} más.";
+                        }
+                    }
+
+                    if (participantesExcluidos.Any())
+                    {
+                        mensaje += $". Participantes ignorados: {string.Join("; ", participantesExcluidos.Take(5))}";
+                        if (participantesExcluidos.Count > 3)
+                        {
+                            mensaje += $" y {participantesExcluidos.Count - 3} más.";
+                        }
+                    }
+                    else
+                    {
+                        mensaje += ". No hubo participantes ignorados.";
+                    }
+
+                    if (participantesProcesados > 0)
+                    {
+                        TempData["successMessage"] = mensaje;
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "No se procesó ningún participante. " + mensaje;
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["errorMessage"] = "Error al cargar los datos.";
+                TempData["errorMessage"] = $"Error al cargar los datos: {ex.Message}";
             }
 
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
