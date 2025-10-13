@@ -121,7 +121,11 @@ namespace webMetics.Handlers
             return exito;
         }
 
-        // Método para editar un grupo en la base de datos
+        /// <summary>
+        /// Se editan los datos de un grupo en la base de datos.
+        /// </summary>
+        /// <param name="grupo">Modelo del grupo con los datos actualizados.</param>
+        /// <returns> True si la operación fue exitosa, de lo contrario false.</returns>
         public bool EditarGrupo(GrupoModel grupo)
         {
             bool exito = false;
