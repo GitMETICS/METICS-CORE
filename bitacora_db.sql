@@ -1,3 +1,6 @@
+-- Script para la creación y gestión de la tabla bitacora_accesos
+-- 25/07/2025
+
 -- Eliminar el constraint solo si existe
 ALTER TABLE dbo.bitacora_accesos DROP CONSTRAINT CK_bitacora_estado_acceso;
 
