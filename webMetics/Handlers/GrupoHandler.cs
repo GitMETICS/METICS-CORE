@@ -125,7 +125,7 @@ namespace webMetics.Handlers
         /// Se editan los datos de un grupo en la base de datos.
         /// </summary>
         /// <param name="grupo">Modelo del grupo con los datos actualizados.</param>
-        /// <returns> True si la operación fue exitosa, de lo contrario false.</returns>
+        /// <returns>True si la operación fue exitosa, de lo contrario false.</returns>
         public bool EditarGrupo(GrupoModel grupo)
         {
             bool exito = false;
@@ -171,13 +171,73 @@ namespace webMetics.Handlers
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    // Usar ExecuteScalar para obtener el valor retornado
+                    object resultado = command.ExecuteScalar();
+                    int filasAfectadas = resultado != null ? Convert.ToInt32(resultado) : 0;
+                    exito = filasAfectadas >= 1;
+
+                    // Si la actualización del grupo fue exitosa, actualizar las inscripciones asociadas
+                    if (exito)
+                    {
+                        ConexionMetics.Close();
+                        bool exitoInscripciones = ActualizarInscripcionesDelGrupo(grupo);
+                        Console.WriteLine($"Actualización de inscripciones: {exitoInscripciones}");
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error in EditarGrupo: {ex.Message}");
                 }
                 finally
+                {
+                    if (ConexionMetics.State == ConnectionState.Open)
+                    {
+                        ConexionMetics.Close();
+                    }
+                }
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Actualiza las inscripciones asociadas a un grupo cuando se editan los datos del grupo.
+        /// </summary>
+        /// <param name="grupo">Modelo del grupo con los datos actualizados.</param>
+        /// <returns>True si la operación fue exitosa, de lo contrario false.</returns>
+        private bool ActualizarInscripcionesDelGrupo(GrupoModel grupo)
+        {
+            bool exito = false;
+
+            try
+            {
+                // Consulta SQL para actualizar las inscripciones con los nuevos datos del grupo
+                string consulta = @"
+                    UPDATE inscripcion
+                    SET numero_grupo = @numeroGrupo, 
+                        nombre_grupo = @nombreGrupo,
+                        horas_matriculadas = @cantidadHoras
+                    WHERE id_grupo_FK = @idGrupo";
+
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@numeroGrupo", grupo.numeroGrupo);
+                    comando.Parameters.AddWithValue("@nombreGrupo", grupo.nombre);
+                    comando.Parameters.AddWithValue("@cantidadHoras", grupo.cantidadHoras);
+                    comando.Parameters.AddWithValue("@idGrupo", grupo.idGrupo);
+
+                    ConexionMetics.Open();
+                    int filasAfectadas = comando.ExecuteNonQuery();
+                    exito = filasAfectadas >= 0; // >= 0 porque puede que no haya inscripciones
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar inscripciones del grupo: {ex.Message}");
+            }
+            finally
+            {
+                if (ConexionMetics.State == System.Data.ConnectionState.Open)
                 {
                     ConexionMetics.Close();
                 }
