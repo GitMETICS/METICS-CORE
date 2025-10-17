@@ -596,8 +596,10 @@ namespace webMetics.Controllers
             }
             
             mensaje += "</ul>" +
-                "<p>Si necesita desinscribirse de este módulo, puede ingresar al sistema y realizarlo desde la plataforma.</p>";
-
+                "<p>Si necesita desinscribirse de este módulo, puede ingresar al sistema y realizarlo desde la plataforma.</p>" +
+                "<p> </p>" +
+                "<p><b>> Por favor no compartir enlace y contraseña de este curso con ningún otro docente.</b></p>";
+                
             return mensaje;
         }
 
