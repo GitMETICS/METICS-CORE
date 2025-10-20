@@ -1,10 +1,8 @@
 -- Script para arreglar el procedimiento almacenado UpdateGrupo
 -- 13/10/2025
 
-USE Local
-
 GO
--- Creación de procedimiento para editar un grupo
+-- CreaciÃ³n de procedimiento para editar un grupo
 CREATE OR ALTER PROCEDURE UpdateGrupo
     @idGrupo INT,
 	@idCategoria INT,
@@ -64,6 +62,6 @@ BEGIN
     
     SET @RowsAffected = @RowsAffected + @@ROWCOUNT;
     
-    -- Retornar el número de filas afectadas
+    -- Retornar el nÃºmero de filas afectadas
     SELECT @RowsAffected AS FilasAfectadas;
 END
