@@ -17,6 +17,7 @@ using NPOI.SS.Formula.Functions;
 using System.Globalization;
 using System.Text;
 using MailKit.Search;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace webMetics.Controllers
 {
@@ -92,19 +93,15 @@ namespace webMetics.Controllers
                 GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
                 InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
 
-                if (horasAprobadas > 0) 
+                if (horasAprobadas > 0 && horasAprobadas <= grupo.cantidadHoras)
                 {
-                    // int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
-
                     inscripcion.horasAprobadas = horasAprobadas;
-                    inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-                    inscripcion.horasMatriculadas = (inscripcion.horasMatriculadas < 0) ? 0 : inscripcion.horasMatriculadas;
-
+                    inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
                     inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
                     accesoAInscripcion.EditarInscripcion(inscripcion);
 
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
                     accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
+                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
                 }
 
                 if (calificacion != 0)
@@ -181,13 +178,13 @@ namespace webMetics.Controllers
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    // Iterar sobre las filas con datos (ignorando las primeras filas de encabezados)
-                    for (int row = 5; row <= worksheet.Dimension.End.Row; row++)
+                    // Iterar sobre las filas con datos (ignorando la primera fila de encabezados)
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
                         try
                         {
                             string idParticipante = worksheet.Cells[row, GetColumnIndex(worksheet, "Correo Institucional")].Text?.Trim();
-                            
+
                             // Validar que el correo no esté vacío
                             if (string.IsNullOrEmpty(idParticipante))
                             {
@@ -229,7 +226,7 @@ namespace webMetics.Controllers
                             if (inscripcion != null)
                             {
                                 // Actualizar horas aprobadas solo si es mayor a 0
-                                if (horasAprobadas > 0)
+                                if (horasAprobadas > 0 && horasAprobadas <= grupo.cantidadHoras)
                                 {
                                     inscripcion.horasAprobadas = horasAprobadas;
                                     inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
@@ -313,7 +310,7 @@ namespace webMetics.Controllers
             for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
             {
                 // Get the header, normalize it, and remove accents
-                string header = RemoveAccents(worksheet.Cells[4, col].Text.Trim().ToLower());
+                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
 
                 // Compare normalized header with the normalized column name
                 if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
@@ -338,19 +335,19 @@ namespace webMetics.Controllers
             XSSFWorkbook workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Plantilla_Lista_Calificaciones");
 
-            NPOI.SS.UserModel.IRow row0 = sheet.CreateRow(0);
-            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(1);
-            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(2);
-            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+            //NPOI.SS.UserModel.IRow row0 = sheet.CreateRow(0);
+            //NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(1);
+            //NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(2);
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(0);
 
-            NPOI.SS.UserModel.ICell cell01 = row0.CreateCell(0);
-            cell01.SetCellValue("   ");
+            //NPOI.SS.UserModel.ICell cell01 = row0.CreateCell(0);
+            //cell01.SetCellValue("   ");
 
-            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
-            cell11.SetCellValue("   ");
+            //NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
+            //cell11.SetCellValue("   ");
 
-            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
-            cell21.SetCellValue("   ");
+            //NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
+            //cell21.SetCellValue("   ");
 
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Nombre");
@@ -370,7 +367,7 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
             cell36.SetCellValue("Calificación");
 
-            string fileName = "Plantilla_Lista_Calificaciones.xlsx";
+            string fileName = "Plantilla_Lista_Participantes_Modulo.xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();

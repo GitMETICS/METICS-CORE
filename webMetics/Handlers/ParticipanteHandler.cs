@@ -326,7 +326,7 @@ namespace webMetics.Handlers
             {
                 if (inscripcion.estado == "Aprobado")
                 {
-                    total += inscripcion.horasAprobadas;
+                    total += inscripcion.horasAprobadas; // Contempla el caso de que el modulo haya estado incompleto.
                 }
             }
             return total;
