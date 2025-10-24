@@ -179,7 +179,7 @@ namespace webMetics.Controllers
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                     // Iterar sobre las filas con datos (ignorando la primera fila de encabezados)
-                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    for (int row = 5; row <= worksheet.Dimension.End.Row; row++) // TODO: Al cambiar la plantilla de subir horas y calificaciones, cambiar esto también (int row = 5)
                     {
                         try
                         {
@@ -310,7 +310,7 @@ namespace webMetics.Controllers
             for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
             {
                 // Get the header, normalize it, and remove accents
-                string header = RemoveAccents(worksheet.Cells[1, col].Text.Trim().ToLower());
+                string header = RemoveAccents(worksheet.Cells[4, col].Text.Trim().ToLower()); // TODO: Al cambiar la plantilla de subir horas y calificaciones, cambiar esto también
 
                 // Compare normalized header with the normalized column name
                 if (string.Equals(header, normalizedColumnName, StringComparison.InvariantCultureIgnoreCase))
@@ -333,21 +333,21 @@ namespace webMetics.Controllers
         {
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet("Plantilla_Lista_Calificaciones");
+            var sheet = workbook.CreateSheet("Lista_Horas_Calificaciones");
 
-            //NPOI.SS.UserModel.IRow row0 = sheet.CreateRow(0);
-            //NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(1);
-            //NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(2);
-            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(0);
+            NPOI.SS.UserModel.IRow row0 = sheet.CreateRow(0); // TODO: Eventualmente eliminar estas filas sin usar
+            NPOI.SS.UserModel.IRow row1 = sheet.CreateRow(1);
+            NPOI.SS.UserModel.IRow row2 = sheet.CreateRow(2);
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
 
-            //NPOI.SS.UserModel.ICell cell01 = row0.CreateCell(0);
-            //cell01.SetCellValue("   ");
+            NPOI.SS.UserModel.ICell cell01 = row0.CreateCell(0);
+            cell01.SetCellValue("   ");
 
-            //NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
-            //cell11.SetCellValue("   ");
+            NPOI.SS.UserModel.ICell cell11 = row1.CreateCell(0);
+            cell11.SetCellValue("   ");
 
-            //NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
-            //cell21.SetCellValue("   ");
+            NPOI.SS.UserModel.ICell cell21 = row2.CreateCell(0);
+            cell21.SetCellValue("   ");
 
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Nombre");
@@ -367,7 +367,7 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell36 = row3.CreateCell(5);
             cell36.SetCellValue("Calificación");
 
-            string fileName = "Plantilla_Lista_Participantes_Modulo.xlsx";
+            string fileName = "Plantilla_Lista_Horas_Calificaciones.xlsx";
             var stream = new MemoryStream();
             workbook.Write(stream);
             var file = stream.ToArray();
