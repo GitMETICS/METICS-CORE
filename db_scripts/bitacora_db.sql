@@ -12,7 +12,7 @@ ALTER TABLE dbo.bitacora_accesos
 -- Antes de crear la nueva tabla, verificamos si existe
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'bitacora_accesos')
 BEGIN
-	    -- Creación de la tabla bitacora_accesos
+	-- Creación de la tabla bitacora_accesos
     CREATE TABLE dbo.bitacora_accesos (
         id_acceso_PK BIGINT IDENTITY(1,1) NOT NULL,
         id_usuario NVARCHAR(64) NOT NULL,
@@ -26,9 +26,9 @@ BEGIN
         CONSTRAINT CK_bitacora_estado_acceso 
             CHECK (estado_acceso IN ('EXITO', 'FRACASO'))
 
-        );
+    );
 
-    -- Creacion de incides.
+    -- Creacion de indices.
     CREATE NONCLUSTERED INDEX IX_bitacora_usuario_fecha
     ON dbo.bitacora_accesos (id_usuario, fecha_hora_acceso DESC)
     INCLUDE (estado_acceso);
