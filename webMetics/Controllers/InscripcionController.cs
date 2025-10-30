@@ -578,6 +578,12 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = $"Ocurrió un error al eliminar las inscripciones: {ex.Message}";
             }
 
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = numeroGrupo });
         }
 
