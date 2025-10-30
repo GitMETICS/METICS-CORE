@@ -503,7 +503,18 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell22 = row2.CreateCell(1);
             cell22.SetCellValue(grupo.nombreAsesor);
 
-            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(3);
+            // Fila con número de grupo
+            NPOI.SS.UserModel.IRow rowNumGrupo = sheet.CreateRow(2);
+            NPOI.SS.UserModel.ICell cellNumGrupo1 = rowNumGrupo.CreateCell(0);
+            cellNumGrupo1.SetCellValue("Número de grupo:");
+
+            NPOI.SS.UserModel.ICell cellNumGrupo2 = rowNumGrupo.CreateCell(1);
+            cellNumGrupo2.SetCellValue(grupo.numeroGrupo);
+
+            // Fila en blanco
+            NPOI.SS.UserModel.IRow rowBlank = sheet.CreateRow(3);
+
+            NPOI.SS.UserModel.IRow row3 = sheet.CreateRow(4);
             NPOI.SS.UserModel.ICell cell31 = row3.CreateCell(0);
             cell31.SetCellValue("Correo Institucional");
 
@@ -519,7 +530,7 @@ namespace webMetics.Controllers
             NPOI.SS.UserModel.ICell cell35 = row3.CreateCell(4);
             cell35.SetCellValue("Calificación");
 
-            int rowN = 4;
+            int rowN = 5;
             foreach (var calificacion in calificaciones)
             {
                 NPOI.SS.UserModel.IRow row = sheet.CreateRow(rowN);
