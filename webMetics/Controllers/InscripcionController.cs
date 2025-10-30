@@ -1456,7 +1456,7 @@ namespace webMetics.Controllers
 
             // Crear el encabezado de la tabla
             IRow rowHeaders = sheet.CreateRow(3);
-            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Número de Grupo" , "Horas aprobadas", "Calificación del módulo" };
 
             for (int i = 0; i < headers.Length; i++)
             {
@@ -1487,11 +1487,12 @@ namespace webMetics.Controllers
 
                         // Completar los datos del módulo
                         row.CreateCell(5).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
+                        row.CreateCell(7).SetCellValue(inscripcion.numeroGrupo); // Número de grupos
                         row.CreateCell(6).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
-                        row.CreateCell(7).SetCellValue(inscripcion.calificacion); // Nota del módulo
+                        row.CreateCell(8).SetCellValue(inscripcion.calificacion); // Nota del módulo
 
                         // Aplicar estilo al cuerpo
-                        for (int i = 0; i < 8; i++)
+                        for (int i = 0; i < headers.Length; i++)
                         {
                             row.GetCell(i).CellStyle = bodyStyle;
                         }
@@ -1512,9 +1513,10 @@ namespace webMetics.Controllers
                     row.CreateCell(5).SetCellValue("N/A");
                     row.CreateCell(6).SetCellValue("N/A");
                     row.CreateCell(7).SetCellValue("N/A");
+                    row.CreateCell(8).SetCellValue("N/A");
 
                     // Aplicar estilo al cuerpo
-                    for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < headers.Length; i++)
                     {
                         row.GetCell(i).CellStyle = bodyStyle;
                     }
