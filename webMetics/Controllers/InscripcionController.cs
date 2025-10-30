@@ -511,6 +511,77 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
+
+        /// <summary>
+        /// Método para eliminar varios participantes seleccionados en la vista de participantes
+        /// </summary>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes seleccionados</param>
+        /// <param name="nombreGrupo">Nombre del grupo del cual se eliminarán las inscripciones</param>
+        /// <param name="numeroGrupo">Número del grupo del cual se eliminarán las inscripciones</param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EliminarInscripcionesMasivo(List<string> participantesSeleccionados, string nombreGrupo, int numeroGrupo)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            try
+            {
+                if (participantesSeleccionados == null || !participantesSeleccionados.Any())
+                {
+                    TempData["errorMessage"] = "Debe seleccionar al menos un participante.";
+                    return RedirectToAction("VerParticipantes", "Participante", new { idGrupo = numeroGrupo });
+                }
+
+                int eliminados = 0;
+                int errores = 0;
+
+                foreach (var idParticipante in participantesSeleccionados)
+                {
+                    try
+                    {
+                        bool exito = accesoAInscripcion.EliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante);
+
+                        ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
+
+                        accesoAParticipante.ActualizarHorasMatriculadasParticipante(participante.idParticipante);
+                        accesoAParticipante.ActualizarHorasAprobadasParticipante(participante.idParticipante);
+
+                        if (exito)
+                        {
+                            eliminados++;
+                        }
+                        else
+                        {
+                            errores++;
+                        }
+                    }
+                    catch
+                    {
+                        errores++;
+                    }
+                }
+
+                if (eliminados > 0)
+                {
+                    TempData["successMessage"] = $"Se eliminaron {eliminados} inscripción(es) correctamente.";
+                }
+
+                if (errores > 0)
+                {
+                    TempData["errorMessage"] = $"No se pudieron eliminar {errores} inscripción(es).";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = $"Ocurrió un error al eliminar las inscripciones: {ex.Message}";
+            }
+
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = numeroGrupo });
+        }
+
+
         // TODO: Eliminar esto porque está repetido
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
