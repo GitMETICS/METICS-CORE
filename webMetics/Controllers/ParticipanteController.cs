@@ -144,9 +144,22 @@ namespace webMetics.Controllers
             return View("VerParticipantes");
         }
 
+
+        /// <summary>
+        /// Asigna medallas a un participante específico.
+        /// </summary>
+        /// <param name="idParticipante">Identificador del participante.</param>
+        /// <param name="selectedMedallas">Medallas seleccionadas para asignar.</param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
         {
+            // Validar que solo administradores puedan asignar medallas
+            if (GetRole() != 1)  // Si no es administrador
+            {
+                TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
+                return RedirectToAction("VerDatosParticipante", new { idParticipante });
+            }
             try
             {
                 var participante = accesoAParticipante.ObtenerParticipante(idParticipante);
@@ -180,6 +193,11 @@ namespace webMetics.Controllers
         [HttpPost]
         public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
         {
+            // Validar que solo administradores puedan asignar medallas
+            if (GetRole() != 1)  // Si no es administrador
+            {
+                TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
+            }
             try
             {
                 if (participantesSeleccionados != null && participantesSeleccionados.Any() && !string.IsNullOrEmpty(nombreMedalla))
