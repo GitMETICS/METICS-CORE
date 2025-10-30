@@ -1410,6 +1410,11 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
+        /// <summary>
+        /// Método para exportar la lista de todoslos participantes a un archivo Excel con información de sus inscripciones
+        /// </summary>
+        /// <param name="searchTerm">Termino de búsqueda para filtrar participantes</param>
+        /// <returns></returns>
         public ActionResult ExportarTodosParticipantesExcel(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
