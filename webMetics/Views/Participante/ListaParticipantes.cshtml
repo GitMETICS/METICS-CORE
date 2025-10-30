@@ -9,287 +9,308 @@
 	<div class="contenedor-caja container-fluid">
 		@if (urlReferrer != null)
 		{
-			@if (ViewBag.Role == 1)
-			{
-				<div class="d-flex justify-content-start mb-3">
+			<div class="d-flex justify-content-start mb-2">
+				@if (ViewBag.Role == 1)
+				{
 					<a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
 						<i class="bi bi-arrow-left"></i>
 					</a>
-				</div>
-			}
-			else if (ViewBag.Role == 2)
-			{
-				<div class="d-flex justify-content-start mb-3">
+				}
+				else if (ViewBag.Role == 2)
+				{
 					<a class="text-dark fs-4" href="@Url.Action("MisModulos", "Asesor")">
 						<i class="bi bi-arrow-left"></i>
 					</a>
-				</div>
-			}
+				}
+			</div>
 		}
 
-		<h1>@ViewBag.NombreGrupo</h1>
-		<h2>@ViewBag.Title</h2>
-		<hr />
+		<div class="mb-3">
+			<h1 class="mb-1">@ViewBag.NombreGrupo</h1>
+			<h2 class="mb-0">@ViewBag.Title</h2>
+		</div>
+		<hr class="my-2" />
 
 		@if (ViewBag.ErrorMessage != null)
 		{
-			<div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+			<div class="alert alert-dark alert-dismissible fade show mb-2" role="alert">
 				@ViewBag.ErrorMessage
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
 			</div>
 		}
 		@if (ViewBag.SuccessMessage != null)
 		{
-			<div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+			<div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
 				@ViewBag.SuccessMessage
 				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
 			</div>
 		}
 
 		<div class="table-responsive">
-			<div class="d-flex justify-content-between mb-4">
-				<div>
-					@using (Html.BeginForm("SubirExcelCalificaciones", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
-					{
-						<form>
-							<div class="mb-2 d-flex align-items-center">
-								<input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="max-width: 500px;" required>
-								<input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-								<input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
+			<!-- SECCIÓN: Carga de Archivo y Exportación -->
+			<div class="card border-0 shadow-sm mb-3">
+				<div class="card-body p-3">
+					<div class="row g-3 align-items-stretch">
+						<!-- Columna Izquierda: Upload -->
+						<div class="col-lg-8 d-flex flex-column">
+							@using (Html.BeginForm("SubirExcelCalificaciones", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
+							{
+								<div class="mb-2 flex-shrink-0">
+									<label class="form-label fw-bold mb-2">Subir Calificaciones</label>
+									<div class="input-group mb-2">
+										<input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
+										<input class="btn btn-secondary" type="submit" value="Subir">
+										<input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
+									</div>
+								</div>
+
+								<div class="alert alert-light border border-secondary p-2 mb-0 flex-grow-1 d-flex flex-column justify-content-center" role="alert">
+									<small class="text-muted">
+										<i class="bi bi-info-circle me-1"></i>
+										Formato <strong>XLS</strong> o <strong>XLSX</strong>: Correo Institucional, Horas Aprobadas, Calificación
+										<br />
+										@Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-sm btn-outline-secondary mt-2" })
+									</small>
+								</div>
+							}
+						</div>
+
+						<!-- Columna Derecha: Exportación -->
+						<div class="col-lg-4 d-flex flex-column">
+							<label class="form-label fw-bold mb-2">Exportar Datos</label>
+							<div class="d-grid gap-2 flex-grow-1" style="grid-template-columns: 1fr 1fr;">
+								@Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-primary bi bi-envelope d-flex align-items-center justify-content-center" })
 							</div>
-						</form>
-					}
-
-					<div class="mb-4 bg-light p-3 rounded d-flex">
-						<h4><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h4>
-						<small class="text-muted">
-							Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
-							<br />
-							Correo Institucional, Horas Aprobadas, Calificación
-							<br />
-							@Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
-						</small>
-					</div>
-				</div>
-
-				<div class="d-flex justify-content-end">
-					<div class="mx-1">
-						@Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-					<div class="mx-1">
-						@Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-					<div class="mx-1">
-						@Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-					<div class="mx-1">
-						@Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-primary bi bi-envelope" })
+						</div>
 					</div>
 				</div>
 			</div>
 
 			@if (ViewBag.ListaParticipantes == null)
 			{
-				<h5 class="text-center">No hay personas inscritas.</h5>
+				<h5 class="text-center text-muted my-5">No hay personas inscritas.</h5>
 			}
 			else
 			{
-				<!-- Sección de Acciones Masivas -->
-				<div class="mb-4">
-					<div class="card border-0 shadow-sm">
-						<div class="card-body">
-							<h5 class="card-title mb-3">
-								<i class="bi bi-gear me-2"></i>Acciones Masivas
-							</h5>
+				<!-- SECCIÓN: Acciones Masivas -->
+				<div class="card border-0 shadow-sm mb-3">
+					<div class="card-body p-3">
+						<h5 class="card-title mb-3">
+							<i class="bi bi-gear me-2"></i>Acciones Masivas
+						</h5>
 
-							<div class="row">
-								<!-- Asignación de Medallas -->
-								<div class="col-sm-8">
-									<form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
-										<label class="form-label"><b>Asignar Medalla:</b></label>
-										<div class="input-group mb-3">
-											<input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Buscar medalla...">
-											<span class="input-group-text">
-												<i class="bi bi-search"></i>
-											</span>
-										</div>
+						<div class="row g-3">
+							<!-- Asignación de Medallas -->
+							<div class="col-lg-8">
+								<form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
+									<label class="form-label fw-bold mb-2">Asignar Medalla</label>
 
-										<div class="mb-3" style="max-height: 150px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 8px; background-color: #f8f9fa;">
-											@if (ViewBag.TodasLasMedallas != null)
+									<div class="input-group mb-2">
+										<input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Buscar medalla...">
+										<span class="input-group-text">
+											<i class="bi bi-search"></i>
+										</span>
+									</div>
+
+									<div id="medalla-list" class="d-flex flex-column gap-2 mb-2 p-2 border rounded" style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa;">
+										@if (ViewBag.TodasLasMedallas != null)
+										{
+											@foreach (var medalla in ViewBag.TodasLasMedallas)
 											{
-												<div id="medalla-list" class="d-flex flex-column gap-2">
-													@foreach (var medalla in ViewBag.TodasLasMedallas)
-													{
-														<div class="medalla-item d-flex align-items-center gap-2">
-															<img src="~/images/medallas/@medalla" alt="@medalla" style="width: 200px; height: 200px; object-fit: contain;" />
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" id="medalla_@medalla">
-																<label class="form-check-label" for="medalla_@medalla">
-																	@medalla
-																</label>
-															</div>
-														</div>
-													}
+												<div class="medalla-item d-flex align-items-center gap-3 p-2 border-bottom">
+													<div style="flex-shrink: 0;">
+														<img src="~/images/medallas/@medalla" alt="@medalla" style="width: 250px; height: 250px; object-fit: contain;" />
+													</div>
+													<div class="form-check mb-0 flex-grow-1">
+														<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" id="medalla_@medalla">
+														<label class="form-check-label fw-500" for="medalla_@medalla" style="cursor: pointer; flex-grow: 1;">
+															@medalla
+														</label>
+													</div>
 												</div>
 											}
-											else
-											{
-												<p class="text-muted">No hay medallas disponibles.</p>
-											}
-										</div>
+										}
+										else
+										{
+											<p class="text-muted mb-0">No hay medallas disponibles.</p>
+										}
+									</div>
 
-										<button type="submit" class="btn btn-success w-100" id="btnAsignarMedallas">
-											<i class="bi bi-award me-1"></i>Asignar a Seleccionados
+									<button type="submit" class="btn btn-success w-100" id="btnAsignarMedallas">
+										<i class="bi bi-award me-1"></i>Asignar a Seleccionados
+									</button>
+								</form>
+							</div>
+
+							<!-- Eliminación Masiva -->
+							@if (ViewBag.Role == 1)
+							{
+								<div class="col-lg-4 d-flex flex-column justify-content-end">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="nombreGrupo" value="@ViewBag.NombreGrupo">
+									<input type="hidden" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
+
+									<div class="bg-light p-2 mb-2 rounded border border-secondary">
+										<div class="d-flex justify-content-between align-items-center">
+											<label class="form-label fw-bold mb-0">Seleccionados</label>
+											<span class="badge bg-secondary">
+												<span id="selectedCount">0</span>
+											</span>
+										</div>
+									</div>
+
+									<div class="d-grid gap-2 mb-2">
+										<button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
+											<i class="bi bi-check-all me-1"></i>Seleccionar Todo
+										</button>
+										<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
+											<i class="bi bi-x-circle me-1"></i>Limpiar
+										</button>
+									</div>
+
+									<form method="post" asp-controller="Inscripcion" asp-action="EliminarInscripcionMasivo" id="formEliminarInscripciones">
+										<button type="button" class="btn btn-danger w-100 btn-sm" id="btnEliminarInscripciones" onclick="actualizarModalEliminarMasivo()">
+											<i class="bi bi-trash me-1"></i>Eliminar Inscripciones
 										</button>
 									</form>
 								</div>
-
-								<!-- Eliminación Masiva -->
-								@if (ViewBag.Role == 1)
-								{
-									<div class="col-sm-4">
-										@Html.AntiForgeryToken()
-										<input type="hidden" name="nombreGrupo" value="@ViewBag.NombreGrupo">
-										<input type="hidden" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
-
-										<div class="bg-light p-3 mb-3 rounded border border-secondary">
-											<div class="d-flex justify-content-between align-items-center">
-												<label class="form-label mb-0"><b>Participantes Seleccionados:</b></label>
-												<small class="text-muted">
-													<span id="selectedCount">0</span> seleccionados
-												</small>
-											</div>
-										</div>
-
-										<div class="d-flex gap-2 mb-3 " style="width:100%;">
-											<button type="button" class="btn flex-fill btn-outline-primary" onclick="selectAllParticipants()">
-												<i class="bi bi-check-all me-1"></i>Seleccionar Todo
-											</button>
-										<button type="button" class="btn flex-fill btn-outline-secondary" onclick="clearAllParticipants()">
-												<i class="bi bi-x-circle me-1"></i>Limpiar
-											</button>
-										</div>
-
-										<form method="post" asp-controller="Inscripcion" asp-action="EliminarInscripcionMasivo" id="formEliminarInscripciones">
-											<button type="button" class="btn btn-danger w-100" id="btnEliminarInscripciones" onclick="actualizarModalEliminarMasivo()">
-												<i class="bi bi-trash me-1"></i>Eliminar Inscripciones
-											</button>
-										</form>
-									</div>
-								}
-							</div>
+							}
 						</div>
 					</div>
 				</div>
 
-				<table class="table table-striped" id="tblCustomers">
-					<thead>
-						<tr>
-							<th class="text-center" scope="col" style="width:50px;">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
-								</div>
-							</th>
-							<th scope="col">Unidad Académica</th>
-							<th scope="col">Nombre</th>
-							<th scope="col">Primer<br>Apellido</th>
-							<th scope="col">Segundo<br>Apellido</th>
-							<th scope="col">Correo Institucional</th>
-							<th scope="col" style="width:10%" class="text-center">Horas<br />Aprobadas</th>
-							<th scope="col" style="width:10%" class="text-center">Calificación</th>
-							<th scope="col" style="width:3.33%"></th>
-							@if (ViewBag.Role == 1)
-							{
-								<th scope="col" style="width:3.33%"></th>
-							}
-						</tr>
-					</thead>
+				<!-- SECCIÓN: Tabla de Participantes -->
+				<div class="card border-0 shadow-sm mb-3">
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-striped mb-0" id="tblCustomers">
+								<thead>
+									<tr>
+										<th class="text-center p-2" style="width:40px;">
+											<div class="form-check">
+												<input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
+											</div>
+										</th>
+										<th class="p-2">Unidad Académica</th>
+										<th class="p-2">Nombre</th>
+										<th class="p-2">Primer Apellido</th>
+										<th class="p-2">Segundo Apellido</th>
+										<th class="p-2">Correo Institucional</th>
+										<th class="text-center p-2" style="width:80px;">Horas</th>
+										<th class="text-center p-2" style="width:80px;">Calificación</th>
+										<th class="text-center p-2" style="width:40px;"></th>
+										@if (ViewBag.Role == 1)
+										{
+											<th class="text-center p-2" style="width:40px;"></th>
+										}
+									</tr>
+								</thead>
 
-					<tbody>
-						@foreach (var participante in ViewBag.ListaParticipantes)
+								<tbody>
+									@foreach (var participante in ViewBag.ListaParticipantes)
+									{
+										var nombreCompleto = participante.nombre;
+										nombreCompleto += " " + participante.primerApellido;
+										if (participante.segundoApellido != "-")
+										{
+											nombreCompleto += " " + participante.segundoApellido;
+										}
+										<tr>
+											<td class="text-center p-2">
+												<div class="form-check">
+													<input type="checkbox" class="form-check-input participant-checkbox"
+														   name="participantesSeleccionados"
+														   value="@participante.idParticipante"
+														   id="participante_@participante.idParticipante"
+														   form="formAsignarMedallas formEliminarInscripciones"
+														   onchange="updateSelectedCount()">
+												</div>
+											</td>
+											<td class="p-2">@participante.unidadAcademica</td>
+											<td class="p-2">@participante.nombre</td>
+											<td class="p-2">@participante.primerApellido</td>
+											<td class="p-2">@participante.segundoApellido</td>
+											<td class="p-2">@participante.correo</td>
+											@{
+												int horasAprobadas = 0;
+
+												List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
+
+												if (inscripciones != null)
+												{
+													horasAprobadas = inscripciones
+													.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+													.Select(i => i.horasAprobadas)
+													.FirstOrDefault();
+												}
+
+												<td class="text-center p-2">@horasAprobadas</td>
+											}
+											@{
+												double calificacion = 0;
+
+												if (inscripciones != null)
+												{
+													calificacion = inscripciones
+													.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+													.Select(i => i.calificacion)
+													.FirstOrDefault();
+												}
+
+												<td class="text-center p-2">@calificacion</td>
+											}
+											<td class="text-center p-2">
+												@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "text-secondary bi bi-search" })
+											</td>
+											@if (ViewBag.Role == 1)
+											{
+												<td class="text-center p-2">
+													<a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
+														<i class="bi bi-trash"></i>
+													</a>
+												</td>
+											}
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-- Controles de Paginación -->
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<label class="me-2">Mostrar</label>
+						<select id="tblCustomers_length" class="form-select" style="width: auto; display: inline-block;">
+							<option value="10">10</option>
+							<option value="25">25</option>
+							<option value="50">50</option>
+							<option value="-1">Todos</option>
+						</select>
+						<span class="ms-2">registros</span>
+					</div>
+					<div>
+						@if (ViewBag.Role == 1)
 						{
-							var nombreCompleto = participante.nombre;
-							nombreCompleto += " " + participante.primerApellido;
-							if (participante.segundoApellido != "-")
-							{
-								nombreCompleto += " " + participante.segundoApellido;
-							}
-							<tr>
-								<td class="text-center">
-									<div class="form-check">
-										<input type="checkbox" class="form-check-input participant-checkbox"
-											   name="participantesSeleccionados"
-											   value="@participante.idParticipante"
-											   id="participante_@participante.idParticipante"
-											   form="formAsignarMedallas formEliminarInscripciones"
-											   onchange="updateSelectedCount()">
-									</div>
-								</td>
-								<td>@participante.unidadAcademica</td>
-								<td>@participante.nombre</td>
-								<td>@participante.primerApellido</td>
-								<td>@participante.segundoApellido</td>
-								<td>@participante.correo</td>
-								@{
-									int horasAprobadas = 0;
-
-									List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
-
-									if (inscripciones != null)
-									{
-										horasAprobadas = inscripciones
-										.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-										.Select(i => i.horasAprobadas)
-										.FirstOrDefault();
-									}
-
-									<td class="text-center">@horasAprobadas</td>
-								}
-								@{
-									double calificacion = 0;
-
-									if (inscripciones != null)
-									{
-										calificacion = inscripciones
-										.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-										.Select(i => i.calificacion)
-										.FirstOrDefault();
-									}
-
-									<td class="text-center">@calificacion</td>
-								}
-								<td>
-									@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "text-secondary bi bi-search" })
-								</td>
-								@if (ViewBag.Role == 1)
-								{
-									<td>
-										<a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
-											<i class="bi bi-trash"></i>
-										</a>
-									</td>
-								}
-							</tr>
+							<a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-sm">Regresar</a>
 						}
-					</tbody>
-				</table>
+						else if (ViewBag.Role == 2)
+						{
+							<a href="@Url.Action("MisModulos", "Asesor")" class="btn btn-secondary btn-sm">Regresar</a>
+						}
+					</div>
+				</div>
 			}
-			<div class="d-flex justify-content-center my-4">
-				@if (ViewBag.Role == 1)
-				{
-					<a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">Regresar</a>
-				}
-				else if (ViewBag.Role == 2)
-				{
-					<a href="@Url.Action("MisModulos", "Asesor")" class="btn btn-secondary btn-block">Regresar</a>
-				}
-			</div>
 		</div>
 	</div>
 
 	<!-- Modal para Eliminación Individual -->
 	<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
@@ -307,8 +328,8 @@
 							<input type="hidden" id="numeroGrupo" name="numeroGrupo">
 							<input type="hidden" id="idParticipante" name="idParticipante">
 
-							<input type="submit" class="btn btn-danger" value="Aceptar" />
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+							<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+							<input type="submit" class="btn btn-danger btn-sm" value="Aceptar" />
 						</div>
 					}
 				</div>
@@ -318,46 +339,44 @@
 
 	<!-- Modal para Eliminación Masiva -->
 	<div class="modal fade" id="modalEliminarMasivo" tabindex="-1" aria-labelledby="modalEliminarMasivoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="modalEliminarMasivoLabel">Eliminar inscripciones</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					¿Está seguro de que desea eliminar <span id="cantidadParticipantes">0</span> inscripción(es)?
-					<br />
-					@using (Html.BeginForm("EliminarInscripcionesMasivo", "Inscripcion"))
-					{
-						@Html.AntiForgeryToken()
-
-						<input type="hidden" id="nombreGrupoMasivo" name="nombreGrupo" value="@ViewBag.NombreGrupo">
-						<input type="hidden" id="numeroGrupoMasivo" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
-
-						<div class="modal-footer">
-							<input type="submit" class="btn btn-danger" value="Aceptar" />
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-						</div>
-					}
+					¿Está seguro de que desea eliminar <strong><span id="cantidadParticipantes">0</span></strong> inscripción(es)?
 				</div>
+				@using (Html.BeginForm("EliminarInscripcionesMasivo", "Inscripcion"))
+				{
+					@Html.AntiForgeryToken()
+
+					<input type="hidden" id="nombreGrupoMasivo" name="nombreGrupo" value="@ViewBag.NombreGrupo">
+					<input type="hidden" id="numeroGrupoMasivo" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+						<input type="submit" class="btn btn-danger btn-sm" value="Aceptar" />
+					</div>
+				}
 			</div>
 		</div>
 	</div>
 
 	<!-- Modal para Eliminación Fallida -->
-	<div class="modal fade" id="modalEliminarMasivoInvalido" tabindex="-1" aria-labelledby="modalEliminarMasivoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
+	<div class="modal fade" id="modalEliminarMasivoInvalido" tabindex="-1" aria-labelledby="modalEliminarMasivoInvalidoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="modalEliminarMasivoInvalidoLabel">Eliminar inscripciones</h5>
+					<h5 class="modal-title" id="modalEliminarMasivoInvalidoLabel">Aviso</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
 					Debe seleccionar al menos un participante para eliminar inscripciones.
-					<br />
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Aceptar</button>
-					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Aceptar</button>
 				</div>
 			</div>
 		</div>
@@ -377,7 +396,6 @@ else
 		document.getElementById("idParticipante").value = idParticipante;
 	}
 
-	// Función para actualizar el contador de participantes seleccionados
 	function updateSelectedCount() {
 		const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
 		document.getElementById('selectedCount').textContent = checkboxes.length;
@@ -396,7 +414,6 @@ else
 		}
 	}
 
-	// Función para seleccionar/deseleccionar todos los participantes
 	function toggleAllParticipants() {
 		const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
@@ -408,7 +425,6 @@ else
 		updateSelectedCount();
 	}
 
-	// Función para seleccionar todos los participantes
 	function selectAllParticipants() {
 		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 		participantCheckboxes.forEach(checkbox => {
@@ -417,7 +433,6 @@ else
 		updateSelectedCount();
 	}
 
-	// Función para limpiar selección
 	function clearAllParticipants() {
 		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 		participantCheckboxes.forEach(checkbox => {
@@ -426,11 +441,9 @@ else
 		updateSelectedCount();
 	}
 
-	 // Función para actualizar el modal de eliminación masiva
 	function actualizarModalEliminarMasivo() {
 		const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
 		if (checkboxes.length === 0) {
-			// modal solo si no hay participantes seleccionados
 			const modal = new bootstrap.Modal(document.getElementById('modalEliminarMasivoInvalido'));
 			modal.show();
 			return;
@@ -438,7 +451,6 @@ else
 
 		document.getElementById('cantidadParticipantes').textContent = checkboxes.length;
 
-		// Agregar los IDs de participantes seleccionados al formulario del modal
 		const form = document.querySelector('#modalEliminarMasivo form');
 		const existingInputs = form.querySelectorAll('input[name="participantesSeleccionados"]');
 		existingInputs.forEach(input => input.remove());
@@ -450,12 +462,11 @@ else
 			input.value = checkbox.value;
 			form.appendChild(input);
 		});
-		// modal si hay participantes seleccionados
+
 		const modal = new bootstrap.Modal(document.getElementById('modalEliminarMasivo'));
 		modal.show();
 	}
 
-	// Función para filtrar medallas
 	function filterMedals() {
 		var input = document.getElementById("medalla-search");
 		if (!input) return;
@@ -476,7 +487,6 @@ else
 		}
 	}
 
-	// Inicializar contador al cargar la página
 	document.addEventListener('DOMContentLoaded', function () {
 		updateSelectedCount();
 	});
@@ -491,6 +501,7 @@ else
 		language: {
 			url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
 		},
-		"searching": false
+		"searching": false,
+		"pageLength": 10
 	});
 </script>
