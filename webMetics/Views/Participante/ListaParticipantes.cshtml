@@ -396,10 +396,10 @@ else
 	}
 
 	function updateSelectedCount() {
-		const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+		const checkboxes = document.querySelectorAll('.participante-checkbox:checked');
 		document.getElementById('selectedCount').textContent = checkboxes.length;
 
-		const allCheckboxes = document.querySelectorAll('.participant-checkbox');
+		const allCheckboxes = document.querySelectorAll('.participante-checkbox');
 		const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
 		if (checkboxes.length === 0) {
@@ -415,7 +415,7 @@ else
 
 	function toggleAllParticipants() {
 		const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+		const participantCheckboxes = document.querySelectorAll('.participante-checkbox');
 
 		participantCheckboxes.forEach(checkbox => {
 			checkbox.checked = selectAllCheckbox.checked;
@@ -425,7 +425,7 @@ else
 	}
 
 	function selectAllParticipants() {
-		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+		const participantCheckboxes = document.querySelectorAll('.participante-checkbox');
 		participantCheckboxes.forEach(checkbox => {
 			checkbox.checked = true;
 		});
@@ -433,7 +433,7 @@ else
 	}
 
 	function clearAllParticipants() {
-		const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+		const participantCheckboxes = document.querySelectorAll('.participante-checkbox');
 		participantCheckboxes.forEach(checkbox => {
 			checkbox.checked = false;
 		});
@@ -441,7 +441,7 @@ else
 	}
 
 	function actualizarModalEliminarMasivo() {
-		const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+		const checkboxes = document.querySelectorAll('.participante-checkbox:checked');
 		if (checkboxes.length === 0) {
 			const modal = new bootstrap.Modal(document.getElementById('modalEliminarMasivoInvalido'));
 			modal.show();
