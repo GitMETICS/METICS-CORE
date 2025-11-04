@@ -531,7 +531,6 @@ namespace webMetics.Controllers
                 if (participantesSeleccionados == null || !participantesSeleccionados.Any())
                 {
                     TempData["errorMessage"] = "Debe seleccionar al menos un participante.";
-                    return RedirectToAction("VerParticipantes", "Participante", new { idGrupo = numeroGrupo });
                 }
 
                 int eliminados = 0;
@@ -584,7 +583,7 @@ namespace webMetics.Controllers
                 return Redirect(refererUrl);
             }
 
-            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = numeroGrupo });
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
 
