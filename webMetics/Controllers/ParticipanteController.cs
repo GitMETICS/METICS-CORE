@@ -215,7 +215,13 @@ namespace webMetics.Controllers
                 TempData["errorMessage"] = $"Ocurrió un error al asignar las medallas: {ex.Message}";
             }
 
-            return RedirectToAction("ListaMedallas", "Medallas");
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
         [HttpPost]
