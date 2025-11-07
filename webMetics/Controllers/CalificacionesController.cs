@@ -400,8 +400,12 @@ namespace webMetics.Controllers
             }
             return resultado;
         }
+        public ActionResult ExportarCalificacionesPDF(int idGrupo, string? searchTerm)
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            if (!string.IsNullOrEmpty(searchTerm))
+                calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
+
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Calificaciones.docx");
@@ -451,9 +455,13 @@ namespace webMetics.Controllers
         }
 
         public ActionResult ExportarCalificacionesWord(int idGrupo)
+        public ActionResult ExportarCalificacionesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            if (!string.IsNullOrEmpty(searchTerm))
+                calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
+
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             var fileName = "Lista_de_Calificaciones_" + grupo.nombre + ".docx";
@@ -500,9 +508,13 @@ namespace webMetics.Controllers
         }
 
         public ActionResult ExportarCalificacionesExcel(int idGrupo)
+        public ActionResult ExportarCalificacionesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            if (!string.IsNullOrEmpty(searchTerm))
+                calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
+
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
 
             // Creamos el archivo de Excel
