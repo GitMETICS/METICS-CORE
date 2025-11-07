@@ -375,8 +375,31 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
-        public ActionResult ExportarCalificacionesPDF(int idGrupo)
+
+        /// <summary>
+        /// Método privado para filtrar calificaciones basado en términos de búsqueda y participantes seleccionados
+        /// </summary>
+        /// <param name="calificaciones">Colección de calificaciones a filtrar</param>
+        /// <param name="searchTerm">Término de búsqueda para filtrar por nombre, apellidos, etc</param>
+        /// <returns></returns>
+        private List<CalificacionModel> FiltrarCalificaciones(List<CalificacionModel> calificaciones, string searchTerm)
+        {
+            var resultado = calificaciones;
+
+            // Aplicar búsqueda
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var searchLower = searchTerm.ToLower();
+                resultado = resultado.Where(c =>
+                    c.participante.nombre.ToLower().Contains(searchLower) ||
+                    c.participante.primerApellido.ToLower().Contains(searchLower) ||
+                    c.participante.segundoApellido.ToLower().Contains(searchLower) ||
+                    c.participante.idParticipante.ToLower().Contains(searchLower) ||
+                    c.estado.ToLower().Contains(searchLower)
+                ).ToList();
+            }
+            return resultado;
+        }
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
