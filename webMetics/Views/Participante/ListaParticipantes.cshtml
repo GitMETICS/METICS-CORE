@@ -79,10 +79,10 @@
 						<div class="col-lg-4 d-flex flex-column">
 							<label class="form-label fw-bold mb-2">Exportar Datos</label>
 							<div class="d-grid gap-2 flex-grow-1" style="grid-template-columns: 1fr 1fr;">
-								@Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-outline-primary bi bi-envelope d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
+								@Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-primary bi bi-envelope d-flex align-items-center justify-content-center" })
 							</div>
 						</div>
 					</div>
@@ -179,6 +179,17 @@
 								</div>
 							}
 						</div>
+					</div>
+				</div>
+
+				<!-- Barra de búsqueda-->
+				<div class="d-flex justify-content-between align-items-center mt-2 mb-4">
+					<div class="w-100">
+						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="input-group" id="formBuscarParticipantesDelGrupo">
+							<input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
+							<button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
+						</form>
+						<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" form="formBuscarParticipantesDelGrupo">
 					</div>
 				</div>
 
