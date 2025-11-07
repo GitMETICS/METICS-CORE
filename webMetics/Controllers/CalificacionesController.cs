@@ -400,6 +400,13 @@ namespace webMetics.Controllers
             }
             return resultado;
         }
+
+        /// <summary>
+        /// Método para exportar las calificaciones de un grupo en formato PDF
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
+        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
+        /// <returns></returns>
         public ActionResult ExportarCalificacionesPDF(int idGrupo, string? searchTerm)
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
@@ -454,7 +461,12 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
-        public ActionResult ExportarCalificacionesWord(int idGrupo)
+        /// <summary>
+        /// Método para exportar las calificaciones de un grupo en formato Word
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
+        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
+        /// <returns></returns>
         public ActionResult ExportarCalificacionesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -507,7 +519,12 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
-        public ActionResult ExportarCalificacionesExcel(int idGrupo)
+        /// <summary>
+        /// Método para exportar las calificaciones de un grupo en formato Excel
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
+        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
+        /// <returns></returns>
         public ActionResult ExportarCalificacionesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
