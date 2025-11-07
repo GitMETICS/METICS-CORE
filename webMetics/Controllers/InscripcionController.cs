@@ -1216,12 +1216,6 @@ namespace webMetics.Controllers
             }
         }
 
-
-        /*
-         
-         
-         */
-
         // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
         public ActionResult ExportarTodosParticipantesPDF(string? searchTerm)
         {
@@ -1460,13 +1454,13 @@ namespace webMetics.Controllers
 
             // Crear el encabezado de la tabla
             IRow rowHeaders = sheet.CreateRow(3);
-            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Número de Grupo" , "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Número de Grupo", "Horas aprobadas", "Calificación del módulo" };
 
             for (int i = 0; i < headers.Length; i++)
             {
                 NPOI.SS.UserModel.ICell cell = rowHeaders.CreateCell(i);
                 cell.SetCellValue(headers[i]);
-                cell.CellStyle = headerStyle;  // Aplicar estilo de encabezado
+                cell.CellStyle = headerStyle;
             }
 
             int rowN = 4;
@@ -1483,17 +1477,17 @@ namespace webMetics.Controllers
                         IRow row = sheet.CreateRow(rowN);
 
                         // Completar los datos del participante en cada fila
-                        row.CreateCell(0).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
+                        row.CreateCell(0).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido ?? ""}");
                         row.CreateCell(1).SetCellValue(participante.idParticipante);
-                        row.CreateCell(2).SetCellValue(participante.condicion);
-                        row.CreateCell(3).SetCellValue(participante.unidadAcademica);
-                        row.CreateCell(4).SetCellValue(participante.telefono);
+                        row.CreateCell(2).SetCellValue(participante.condicion ?? "N/A");
+                        row.CreateCell(3).SetCellValue(participante.unidadAcademica ?? "N/A");
+                        row.CreateCell(4).SetCellValue(participante.telefono ?? "N/A");
 
                         // Completar los datos del módulo
-                        row.CreateCell(5).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
-                        row.CreateCell(7).SetCellValue(inscripcion.numeroGrupo); // Número de grupos
-                        row.CreateCell(6).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
-                        row.CreateCell(8).SetCellValue(inscripcion.calificacion); // Nota del módulo
+                        row.CreateCell(5).SetCellValue(inscripcion.nombreGrupo ?? "N/A");
+                        row.CreateCell(6).SetCellValue(inscripcion.numeroGrupo);
+                        row.CreateCell(7).SetCellValue(inscripcion.horasAprobadas);
+                        row.CreateCell(8).SetCellValue(inscripcion.calificacion.ToString() ?? "N/A");
 
                         // Aplicar estilo al cuerpo
                         for (int i = 0; i < headers.Length; i++)
@@ -1501,7 +1495,7 @@ namespace webMetics.Controllers
                             row.GetCell(i).CellStyle = bodyStyle;
                         }
 
-                        rowN++; // Incrementar para la siguiente fila
+                        rowN++;
                     }
                 }
                 else
@@ -1509,11 +1503,11 @@ namespace webMetics.Controllers
                     // Si no tiene inscripciones, dejar una sola fila para el participante con "N/A"
                     IRow row = sheet.CreateRow(rowN);
 
-                    row.CreateCell(0).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
+                    row.CreateCell(0).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido ?? ""}");
                     row.CreateCell(1).SetCellValue(participante.idParticipante);
-                    row.CreateCell(2).SetCellValue(participante.condicion);
-                    row.CreateCell(3).SetCellValue(participante.unidadAcademica);
-                    row.CreateCell(4).SetCellValue(participante.telefono);
+                    row.CreateCell(2).SetCellValue(participante.condicion ?? "N/A");
+                    row.CreateCell(3).SetCellValue(participante.unidadAcademica ?? "N/A");
+                    row.CreateCell(4).SetCellValue(participante.telefono ?? "N/A");
                     row.CreateCell(5).SetCellValue("N/A");
                     row.CreateCell(6).SetCellValue("N/A");
                     row.CreateCell(7).SetCellValue("N/A");
@@ -1525,7 +1519,7 @@ namespace webMetics.Controllers
                         row.GetCell(i).CellStyle = bodyStyle;
                     }
 
-                    rowN++; // Incrementar para la siguiente fila
+                    rowN++;
                 }
             }
 
