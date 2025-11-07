@@ -144,6 +144,60 @@ namespace webMetics.Controllers
             return View("VerParticipantes");
         }
 
+        /// <summary>
+        /// Método para buscar participantes inscritos en un grupo específico
+        /// </summary>
+        /// <param name="idGrupo"></param>
+        /// <param name="searchTerm"></param>
+        /// <returns></returns>
+        public IActionResult BuscarParticipantesDelGrupo(int idGrupo, string searchTerm)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            try
+            {
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                ViewBag.IdGrupo = idGrupo;
+                ViewBag.NombreGrupo = grupo.nombre;
+                ViewBag.NumeroGrupo = grupo.numeroGrupo;
+
+                List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
+                ViewBag.Inscripciones = accesoAInscripcion.ObtenerInscripcionesDelGrupo(idGrupo);
+                ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+
+                // Filtrar por término de búsqueda
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    participantes = participantes.Where(p =>
+                        p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
+
+                ViewBag.ListaParticipantes = participantes;
+
+                if (TempData["errorMessage"] != null)
+                {
+                    ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+                }
+                if (TempData["successMessage"] != null)
+                {
+                    ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+                }
+
+                return View("ListaParticipantes");
+            }
+            catch
+            {
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            }
+        }
+
 
         /// <summary>
         /// Asigna medallas a un participante específico.
