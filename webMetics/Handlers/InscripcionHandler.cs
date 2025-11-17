@@ -426,17 +426,13 @@ public class InscripcionHandler : BaseDeDatosHandler
     {
         string estado;
 
-        if (inscripcion.horasAprobadas >= inscripcion.horasMatriculadas && inscripcion.horasAprobadas > 0)
-
-        //if (inscripcion.horasAprobadas >= (inscripcion.horasMatriculadas + inscripcion.horasAprobadas) && inscripcion.horasAprobadas > 0)
+        if (inscripcion.horasMatriculadas <= 0 && inscripcion.horasAprobadas > 0)
         {
             estado = "Aprobado";
         }
         else
         {
-            if (inscripcion.horasAprobadas < inscripcion.horasMatriculadas && inscripcion.horasAprobadas > 0)
-
-            //if (inscripcion.horasAprobadas < (inscripcion.horasMatriculadas + inscripcion.horasAprobadas) && inscripcion.horasAprobadas > 0)
+            if (inscripcion.horasAprobadas > 0)
             {
                 estado = "Incompleto";
             }
