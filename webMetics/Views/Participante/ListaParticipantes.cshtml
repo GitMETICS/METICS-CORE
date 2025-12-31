@@ -4,6 +4,28 @@
 	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
+<style>
+	/* Estilos para formularios de edición inline */
+	.edit-form-container {
+		min-width: 180px;
+		white-space: nowrap;
+	}
+	
+	.edit-input {
+		width: 80px !important;
+		min-width: 80px !important;
+	}
+	
+	.btn-edit-action {
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+</style>
+
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
 	<div class="contenedor-caja container-fluid">
@@ -262,34 +284,42 @@
 											<td class="p-2">@participante.primerApellido</td>
 											<td class="p-2">@participante.segundoApellido</td>
 											<td class="p-2">@participante.correo</td>
-											@{
-												int horasAprobadas = 0;
-
-												List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
-
+											<td class="text-center p-2">
+												<div class="horas-display" id="horas-display-@participante.idParticipante">
+													<span>@horasAprobadas</span>
+												</div>
+												@using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "horas-form d-none edit-form-container", id = $"form-horas-{participante.idParticipante}" }))
 												if (inscripciones != null)
 												{
-													horasAprobadas = inscripciones
-													.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-													.Select(i => i.horasAprobadas)
-													.FirstOrDefault();
+													<div class="d-flex align-items-center gap-1 justify-content-center">
+														<input type="number" min="0" class="form-control form-control-sm edit-input" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante">
+														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
+															<i class="bi bi-check-lg"></i>
+														</button>
+														<button type="button" class="btn btn-sm btn-secondary btn-edit-action" title="Cancelar" onclick="cancelarEdicionHoras('@participante.idParticipante')">
+															<i class="bi bi-x-lg"></i>
+														</button>
+													</div>
 												}
-
-												<td class="text-center p-2">@horasAprobadas</td>
-											}
-											@{
-												double calificacion = 0;
-
+											</td>
+											<td class="text-center p-2">
+												<div class="calificacion-display" id="calificacion-display-@participante.idParticipante">
+													<span>@calificacion</span>
+												</div>
+												@using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "calificacion-form d-none edit-form-container", id = $"form-calificacion-{participante.idParticipante}" }))
 												if (inscripciones != null)
 												{
-													calificacion = inscripciones
-													.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-													.Select(i => i.calificacion)
-													.FirstOrDefault();
-												}
-
-												<td class="text-center p-2">@calificacion</td>
+													<div class="d-flex align-items-center gap-1 justify-content-center">
+														<input type="number" min="0" max="100" class="form-control form-control-sm edit-input" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante">
+														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
+															<i class="bi bi-check-lg"></i>
+														</button>
+														<button type="button" class="btn btn-sm btn-secondary btn-edit-action" title="Cancelar" onclick="cancelarEdicionCalificacion('@participante.idParticipante')">
+															<i class="bi bi-x-lg"></i>
+														</button>
+													</div>
 											}
+											</td>
 											<td class="text-center p-2">
 												<div class="d-flex gap-1 justify-content-center flex-wrap">
 													<button type="button" class="btn btn-sm btn-outline-primary" title="Editar Horas" onclick="editarHoras('@participante.idParticipante')">
@@ -536,6 +566,32 @@ else
 			this.appendChild(input);
 		});
 	});
+
+	// Funciones para edición rápida de horas
+	function editarHoras(idParticipante) {
+		document.getElementById('horas-display-' + idParticipante).classList.add('d-none');
+		document.getElementById('form-horas-' + idParticipante).classList.remove('d-none');
+		document.getElementById('input-horas-' + idParticipante).focus();
+		document.getElementById('input-horas-' + idParticipante).select();
+	}
+
+	function cancelarEdicionHoras(idParticipante) {
+		document.getElementById('horas-display-' + idParticipante).classList.remove('d-none');
+		document.getElementById('form-horas-' + idParticipante).classList.add('d-none');
+	}
+
+	// Funciones para edición rápida de calificaciones
+	function editarCalificacion(idParticipante) {
+		document.getElementById('calificacion-display-' + idParticipante).classList.add('d-none');
+		document.getElementById('form-calificacion-' + idParticipante).classList.remove('d-none');
+		document.getElementById('input-calificacion-' + idParticipante).focus();
+		document.getElementById('input-calificacion-' + idParticipante).select();
+	}
+
+	function cancelarEdicionCalificacion(idParticipante) {
+		document.getElementById('calificacion-display-' + idParticipante).classList.remove('d-none');
+		document.getElementById('form-calificacion-' + idParticipante).classList.add('d-none');
+	}
 
 	document.addEventListener('DOMContentLoaded', function () {
 		updateSelectedCount();
