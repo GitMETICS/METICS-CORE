@@ -1404,7 +1404,7 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para exportar la lista de todoslos participantes a un archivo Excel con información de sus inscripciones
+        /// Método para exportar la lista de todos los participantes a un archivo Excel con información de sus inscripciones
         /// </summary>
         /// <param name="searchTerm">Termino de búsqueda para filtrar participantes</param>
         /// <returns></returns>

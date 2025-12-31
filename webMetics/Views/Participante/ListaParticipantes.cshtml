@@ -210,9 +210,9 @@
 										<th class="p-2">Primer Apellido</th>
 										<th class="p-2">Segundo Apellido</th>
 										<th class="p-2">Correo Institucional</th>
-										<th class="text-center p-2" style="width:80px;">Horas</th>
-										<th class="text-center p-2" style="width:80px;">Calificación</th>
-										<th class="text-center p-2" style="width:40px;"></th>
+										<th class="text-center p-2" style="width:140px;">Horas</th>
+										<th class="text-center p-2" style="width:140px;">Calificación</th>
+										<th class="text-center p-2" style="width:120px;">Acciones</th>
 										@if (ViewBag.Role == 1)
 										{
 											<th class="text-center p-2" style="width:40px;"></th>
@@ -229,6 +229,24 @@
 										{
 											nombreCompleto += " " + participante.segundoApellido;
 										}
+										
+										List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
+										int horasAprobadas = 0;
+										double calificacion = 0;
+
+										if (inscripciones != null)
+										{
+											horasAprobadas = inscripciones
+												.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+												.Select(i => i.horasAprobadas)
+												.FirstOrDefault();
+
+											calificacion = inscripciones
+												.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+												.Select(i => i.calificacion)
+												.FirstOrDefault();
+										}
+
 										<tr>
 											<td class="text-center p-2">
 												<div class="form-check">
@@ -273,7 +291,15 @@
 												<td class="text-center p-2">@calificacion</td>
 											}
 											<td class="text-center p-2">
-												@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "text-secondary bi bi-search" })
+												<div class="d-flex gap-1 justify-content-center flex-wrap">
+													<button type="button" class="btn btn-sm btn-outline-primary" title="Editar Horas" onclick="editarHoras('@participante.idParticipante')">
+														<i class="bi bi-pencil"></i>
+													</button>
+													<button type="button" class="btn btn-sm btn-outline-primary" title="Editar Calificación" onclick="editarCalificacion('@participante.idParticipante')">
+														<i class="bi bi-pencil-square"></i>
+													</button>
+													@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-sm btn-outline-secondary bi bi-search", title = "Ver Detalles" })
+												</div>
 											</td>
 											@if (ViewBag.Role == 1)
 											{
