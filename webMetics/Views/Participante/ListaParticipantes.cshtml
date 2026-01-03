@@ -462,6 +462,90 @@ else
 }
 
 <script type="text/javascript">
+
+	function guardarHoras(idParticipante) {
+		const form = document.getElementById('form-horas-' + idParticipante);
+		const input = document.getElementById('input-horas-' + idParticipante);
+		const displayElement = document.getElementById('horas-display-' + idParticipante).querySelector('span');
+
+		const formData = new FormData(form);
+
+		input.disabled = true;
+
+		fetch('@Url.Action("SubirHorasAprobadasYCalificacionAjax", "Calificaciones")', {
+			method: 'POST',
+			body: formData
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				displayElement.textContent = data.data.horasAprobadas;
+				cancelarEdicionHoras(idParticipante);
+				mostrarNotificacion(data.message, 'success');
+			} else {
+				mostrarNotificacion(data.message, 'danger');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			mostrarNotificacion('Error al guardar los cambios', 'danger');
+		})
+		.finally(() => {
+			input.disabled = false;
+		});
+	}
+
+	function guardarCalificacion(idParticipante) {
+		const form = document.getElementById('form-calificacion-' + idParticipante);
+		const input = document.getElementById('input-calificacion-' + idParticipante);
+		const displayElement = document.getElementById('calificacion-display-' + idParticipante).querySelector('span');
+
+		const formData = new FormData(form);
+
+		input.disabled = true;
+
+		fetch('@Url.Action("SubirHorasAprobadasYCalificacionAjax", "Calificaciones")', {
+			method: 'POST',
+			body: formData
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				if (data.data.calificacion !== null) {
+					displayElement.textContent = data.data.calificacion;
+				}
+				cancelarEdicionCalificacion(idParticipante);
+				mostrarNotificacion(data.message, 'success');
+			} else {
+				mostrarNotificacion(data.message, 'danger');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+			mostrarNotificacion('Error al guardar los cambios', 'danger');
+		})
+		.finally(() => {
+			input.disabled = false;
+		});
+	}
+
+	function mostrarNotificacion(mensaje, tipo) {
+		const alertDiv = document.createElement('div');
+		alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+		alertDiv.style.zIndex = '9999';
+		alertDiv.style.maxWidth = '500px';
+		alertDiv.innerHTML = `
+			${mensaje}
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		`;
+		document.body.appendChild(alertDiv);
+
+		// Auto-ocultar después de 4 segundos
+		setTimeout(() => {
+			alertDiv.remove();
+		}, 4000);
+	}
+
 	function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
 		document.getElementById("nombreGrupo").value = nombreGrupo;
 		document.getElementById("numeroGrupo").value = numeroGrupo;
@@ -601,6 +685,24 @@ else
 
 	document.addEventListener('DOMContentLoaded', function () {
 		updateSelectedCount();
+
+		// Prevenir submit tradicional y usar AJAX para formularios de horas
+		document.querySelectorAll('.horas-form').forEach(form => {
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const idParticipante = this.id.replace('form-horas-', '');
+				guardarHoras(idParticipante);
+			});
+		});
+
+		// Prevenir submit tradicional y usar AJAX para formularios de calificación
+		document.querySelectorAll('.calificacion-form').forEach(form => {
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const idParticipante = this.id.replace('form-calificacion-', '');
+				guardarCalificacion(idParticipante);
+			});
+		});
 	});
 </script>
 
