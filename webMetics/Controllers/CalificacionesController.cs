@@ -82,6 +82,14 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Método para subir las horas aprobadas y la calificación de un participante en un grupo
+        /// </summary>
+        /// <param name="idGrupo">Id del grupo</param>
+        /// <param name="idParticipante">Id del participante</param>
+        /// <param name="horasAprobadas">Cantidad de horas aprobadas</param>
+        /// <param name="calificacion">Calificación obtenida del participante</param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
         {
@@ -104,7 +112,7 @@ namespace webMetics.Controllers
                     accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
                 }
 
-                if (calificacion != 0)
+                if (calificacion > 0 && calificacion <= 100)
                 {
                     accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
                 }
@@ -123,6 +131,110 @@ namespace webMetics.Controllers
             }
 
             return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubirHorasAprobadasYCalificacionAjax(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
+
+                if (inscripcion == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "No se encontró la inscripción del participante."
+                    });
+                }
+
+                bool horasActualizadas = false;
+                bool calificacionActualizada = false;
+
+                // Actualizar horas aprobadas
+                if (horasAprobadas > 0)
+                {
+                    if (horasAprobadas > grupo.cantidadHoras)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = $"Las horas aprobadas no pueden ser mayores a {grupo.cantidadHoras}."
+                        });
+                    }
+
+                    inscripcion.horasAprobadas = horasAprobadas;
+                    inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
+                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
+
+                    horasActualizadas = accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                    if (horasActualizadas)
+                    {
+                        await accesoAParticipante.ActualizarHorasAprobadasParticipanteAsync(idParticipante);
+                        await accesoAParticipante.ActualizarHorasMatriculadasParticipanteAsync(idParticipante);
+                    }
+                }
+
+                // Actualizar calificación
+                if (calificacion > 0)
+                {
+                    if (calificacion > 100)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "La calificación no puede ser mayor a 100."
+                        });
+                    }
+
+                    calificacionActualizada = accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
+                }
+
+                // Determinar mensaje de respuesta
+                string mensaje = "";
+                if (horasActualizadas && calificacionActualizada)
+                {
+                    mensaje = "Horas y calificación actualizadas correctamente.";
+                }
+                else if (horasActualizadas)
+                {
+                    mensaje = "Horas actualizadas correctamente.";
+                }
+                else if (calificacionActualizada)
+                {
+                    mensaje = "Calificación actualizada correctamente.";
+                }
+                else
+                {
+                    mensaje = "No se realizaron cambios.";
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = mensaje,
+                    data = new
+                    {
+                        horasAprobadas = inscripcion.horasAprobadas,
+                        calificacion = calificacion > 0 ? calificacion : (int?)null,
+                        estado = inscripcion.estado
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error al actualizar los datos: " + ex.Message
+                });
+            }
         }
 
         [HttpPost]
