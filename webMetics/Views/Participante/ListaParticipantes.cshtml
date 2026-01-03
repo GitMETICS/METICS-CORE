@@ -288,9 +288,12 @@
 												<div class="horas-display" id="horas-display-@participante.idParticipante">
 													<span>@horasAprobadas</span>
 												</div>
-												@using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "horas-form d-none edit-form-container", id = $"form-horas-{participante.idParticipante}" }))
+												@using (Html.BeginForm("SubirHorasAprobadasYCalificacionAjax", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "horas-form d-none edit-form-container", id = $"form-horas-{participante.idParticipante}" }))
 												if (inscripciones != null)
 												{
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
+													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
 													<div class="d-flex align-items-center gap-1 justify-content-center">
 														<input type="number" min="0" class="form-control form-control-sm edit-input" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante">
 														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
@@ -306,9 +309,12 @@
 												<div class="calificacion-display" id="calificacion-display-@participante.idParticipante">
 													<span>@calificacion</span>
 												</div>
-												@using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "calificacion-form d-none edit-form-container", id = $"form-calificacion-{participante.idParticipante}" }))
+												@using (Html.BeginForm("SubirHorasAprobadasYCalificacionAjax", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "calificacion-form d-none edit-form-container", id = $"form-calificacion-{participante.idParticipante}" }))
 												if (inscripciones != null)
 												{
+													@Html.AntiForgeryToken()
+													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
+													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
 													<div class="d-flex align-items-center gap-1 justify-content-center">
 														<input type="number" min="0" max="100" class="form-control form-control-sm edit-input" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante">
 														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
