@@ -133,8 +133,17 @@ namespace webMetics.Controllers
             return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
         }
 
+        /// <summary>
+        /// Método para subir las horas aprobadas y la calificación de un participante en un grupo vía AJAX
+        /// TODO: Bug visual al ingresar calificación en 0, se muestra el valor anterior en la tabla hasta recargar la página
+        /// </summary>
+        /// <param name="idGrupo">Id del grupo</param>
+        /// <param name="idParticipante">Id del participante</param>
+        /// <param name="horasAprobadas">Horas aprobadas, inicializado en -1 para no actualizar (no se pueden enviar negativos desde UI)</param>
+        /// <param name="calificacion">Calificación, inicializado en -1 para no actualizar (no se pueden enviar negativos desde UI)</param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> SubirHorasAprobadasYCalificacionAjax(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
+        public async Task<IActionResult> SubirHorasAprobadasYCalificacionAjax(int idGrupo, string idParticipante, int horasAprobadas = -1, int calificacion = -1)
         {
             try
             {
@@ -157,7 +166,7 @@ namespace webMetics.Controllers
                 bool calificacionActualizada = false;
 
                 // Actualizar horas aprobadas
-                if (horasAprobadas > 0)
+                if (horasAprobadas >= 0)
                 {
                     if (horasAprobadas > grupo.cantidadHoras)
                     {
@@ -182,7 +191,7 @@ namespace webMetics.Controllers
                 }
 
                 // Actualizar calificación
-                if (calificacion > 0)
+                if (calificacion >= 0)
                 {
                     if (calificacion > 100)
                     {
