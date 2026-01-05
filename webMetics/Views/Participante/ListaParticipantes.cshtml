@@ -268,14 +268,12 @@
 												</div>
 												<form class="horas-form d-none" id="form-horas-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
 													@Html.AntiForgeryToken()
-													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
-													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
-													<div class="d-flex align-items-center gap-1 justify-content-center">
-														<input type="number" min="0" class="form-control form-control-sm edit-input" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante">
-														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
+													<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
+														<input type="number" min="0" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante">
+														<button type="submit" class="btn btn-sm btn-success p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Guardar">
 															<i class="bi bi-check-lg"></i>
 														</button>
-														<button type="button" class="btn btn-sm btn-secondary btn-edit-action" title="Cancelar" onclick="cancelarEdicionHoras('@participante.idParticipante')">
+														<button type="button" class="btn btn-sm btn-secondary p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cancelar" onclick="cancelarEdicionHoras('@participante.idParticipante')">
 															<i class="bi bi-x-lg"></i>
 														</button>
 													</div>
@@ -287,14 +285,12 @@
 												</div>
 												<form class="calificacion-form d-none" id="form-calificacion-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
 													@Html.AntiForgeryToken()
-													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
-													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
-													<div class="d-flex align-items-center gap-1 justify-content-center">
-														<input type="number" min="0" max="100" class="form-control form-control-sm edit-input" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante">
-														<button type="submit" class="btn btn-sm btn-success btn-edit-action" title="Guardar">
+													<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
+														<input type="number" min="0" max="100" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante">
+														<button type="submit" class="btn btn-sm btn-success p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Guardar">
 															<i class="bi bi-check-lg"></i>
 														</button>
-														<button type="button" class="btn btn-sm btn-secondary btn-edit-action" title="Cancelar" onclick="cancelarEdicionCalificacion('@participante.idParticipante')">
+														<button type="button" class="btn btn-sm btn-secondary p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cancelar" onclick="cancelarEdicionCalificacion('@participante.idParticipante')">
 															<i class="bi bi-x-lg"></i>
 														</button>
 													</div>
@@ -444,6 +440,9 @@ else
 
 		const formData = new FormData(form);
 
+		formData.append('idGrupo', form.dataset.idGrupo);
+		formData.append('idParticipante', form.dataset.idParticipante);
+
 		input.disabled = true;
 
 		fetch('@Url.Action("SubirHorasAprobadasYCalificacionAjax", "Calificaciones")', {
@@ -475,6 +474,9 @@ else
 		const displayElement = document.getElementById('calificacion-display-' + idParticipante).querySelector('span');
 
 		const formData = new FormData(form);
+
+		formData.append('idGrupo', form.dataset.idGrupo);
+		formData.append('idParticipante', form.dataset.idParticipante);
 
 		input.disabled = true;
 
