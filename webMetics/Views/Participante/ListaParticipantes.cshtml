@@ -4,28 +4,6 @@
 	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<style>
-	/* Estilos para formularios de edición inline */
-	.edit-form-container {
-		min-width: 180px;
-		white-space: nowrap;
-	}
-	
-	.edit-input {
-		width: 80px !important;
-		min-width: 80px !important;
-	}
-	
-	.btn-edit-action {
-		width: 32px;
-		height: 32px;
-		padding: 0;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-	}
-</style>
-
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
 	<div class="contenedor-caja container-fluid">
@@ -284,12 +262,11 @@
 											<td class="p-2">@participante.primerApellido</td>
 											<td class="p-2">@participante.segundoApellido</td>
 											<td class="p-2">@participante.correo</td>
-											<td class="text-center p-2">
+											<td class="text-center p-2" style="min-width: 180px;">
 												<div class="horas-display" id="horas-display-@participante.idParticipante">
 													<span>@horasAprobadas</span>
 												</div>
-												@using (Html.BeginForm("SubirHorasAprobadasYCalificacionAjax", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "horas-form d-none edit-form-container", id = $"form-horas-{participante.idParticipante}" }))
-												{
+												<form class="horas-form d-none" id="form-horas-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
 													@Html.AntiForgeryToken()
 													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
 													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
@@ -302,14 +279,13 @@
 															<i class="bi bi-x-lg"></i>
 														</button>
 													</div>
-												}
+												</form>
 											</td>
-											<td class="text-center p-2">
+											<td class="text-center p-2" style="min-width: 180px;">
 												<div class="calificacion-display" id="calificacion-display-@participante.idParticipante">
 													<span>@calificacion</span>
 												</div>
-												@using (Html.BeginForm("SubirHorasAprobadasYCalificacionAjax", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, idParticipante = participante.idParticipante }, FormMethod.Post, true, new { @class = "calificacion-form d-none edit-form-container", id = $"form-calificacion-{participante.idParticipante}" }))
-												{
+												<form class="calificacion-form d-none" id="form-calificacion-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
 													@Html.AntiForgeryToken()
 													<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" />
 													<input type="hidden" name="idParticipante" value="@participante.idParticipante" />
@@ -322,7 +298,7 @@
 															<i class="bi bi-x-lg"></i>
 														</button>
 													</div>
-												}
+												</form>
 											</td>
 											<td class="text-center p-2">
 												<div class="d-flex gap-1 justify-content-center flex-wrap">
