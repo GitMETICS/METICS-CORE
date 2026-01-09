@@ -685,7 +685,7 @@ namespace webMetics.Controllers
             var sheet = workbook.CreateSheet("Plantilla_Inscripciones");
 
             string[] columnNames = {
-                "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas"
+                "Correo Institucional", "Módulo", "Grupo", "Horas", "Estado", "Horas Completadas", "Calificación"
             };
 
             NPOI.SS.UserModel.IRow row = sheet.CreateRow(0);
