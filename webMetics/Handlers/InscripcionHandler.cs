@@ -293,7 +293,8 @@ public class InscripcionHandler : BaseDeDatosHandler
     {
         string consulta = "UPDATE inscripcion SET id_grupo_FK = @idGrupo, numero_grupo = @numeroGrupo, nombre_grupo = @nombreGrupo, " +
                           "id_participante_FK = @idParticipante, estado = @estado, observaciones = @observaciones, " +
-                          "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas " +
+                          "horas_aprobadas = @horasAprobadas, horas_matriculadas = @horasMatriculadas, " +
+                          "calificacion = @calificacion " +
                           "WHERE id_inscripcion_PK = @idInscripcion";
 
         using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
@@ -306,6 +307,7 @@ public class InscripcionHandler : BaseDeDatosHandler
             comandoConsulta.Parameters.AddWithValue("@horasAprobadas", inscripcion.horasAprobadas);
             comandoConsulta.Parameters.AddWithValue("@horasMatriculadas", inscripcion.horasMatriculadas);
             comandoConsulta.Parameters.AddWithValue("@estado", inscripcion.estado);
+            comandoConsulta.Parameters.AddWithValue("@calificacion", inscripcion.calificacion);
             comandoConsulta.Parameters.AddWithValue("@observaciones", "");
 
             try

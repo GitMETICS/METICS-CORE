@@ -744,7 +744,8 @@ namespace webMetics.Controllers
                             nombreGrupo = grupo.nombre,
                             horasMatriculadas = grupo.cantidadHoras,
                             horasAprobadas = int.TryParse(worksheet.Cells[row, GetColumnIndex(worksheet, "Horas completadas")].Text, out var horasCompletadas) ? horasCompletadas : 0,
-                            estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text
+                            estado = worksheet.Cells[row, GetColumnIndex(worksheet, "Estado")].Text,
+                            calificacion = worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text != "" ? double.Parse(worksheet.Cells[row, GetColumnIndex(worksheet, "Calificación")].Text) : 0
                         };
 
                         ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
