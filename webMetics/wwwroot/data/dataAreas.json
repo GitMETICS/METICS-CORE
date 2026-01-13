@@ -270,16 +270,36 @@
       ]
     },
     {
-      "name": "Sistema de Estudios Generales",
+      "name": "Oficinas Administrativas",
       "departamentos": [
         {
-          "name": "Estudios Generales",
+          "name": "Vicerrectoría",
           "secciones": [
             {
-              "name": "Escuela de Estudios Generales"
+              "name": "Vicerrectoría de Acción Social"
             },
             {
-              "name": "Escuela de Seminarios de Realidad Nacional"
+              "name": "Vicerrectoría de Administración"
+            },
+            {
+              "name": "Vicerrectoría de Docencia"
+            },
+            {
+              "name": "Vicerrectoría de Vida Social"
+            },
+            {
+              "name": "Vicerrectoría de Investigación"
+            },
+            {
+              "name": "Fundación UCR"
+            }
+          ]
+        },
+        {
+          "name": "Otro",
+          "secciones": [
+            {
+              "name": "Fundación UCR"
             }
           ]
         }
@@ -288,43 +308,6 @@
     {
       "name": "Sistema de Estudios de Posgrado",
       "departamentos": [
-        {
-          "name": "Especialidades de Posgrado",
-          "secciones": [
-            {
-              "name": "Especialidades de Posgrado en Microbiología"
-            },
-            {
-              "name": "Especialidades de Posgrado en Odontología General Avanzada"
-            }
-          ]
-        },
-        {
-          "name": "Programa de Doctorado",
-          "secciones": [
-            {
-              "name": "Programa de Doctorado en Ciencias"
-            },
-            {
-              "name": "Programa de Doctorado en Ciencias Sociales sobre América Central"
-            },
-            {
-              "name": "Programa de Doctorado en Educación"
-            },
-            {
-              "name": "Programa de Doctorado en Estudios de la Sociedad y la Cultura"
-            },
-            {
-              "name": "Programa de Doctorado en Filosofía"
-            },
-            {
-              "name": "Programa de Doctorado en Ingeniería"
-            },
-            {
-              "name": "Programa de Doctorado en Sistemas de Producción Agrícola Tropical Sostenible"
-            }
-          ]
-        },
         {
           "name": "Programa de Estudios de Posgrado",
           "secciones": [
