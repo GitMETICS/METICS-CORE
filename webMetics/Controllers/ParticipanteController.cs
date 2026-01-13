@@ -1156,7 +1156,8 @@ namespace webMetics.Controllers
                 new SelectListItem { Text = "Área de Salud" },
                 new SelectListItem { Text = "Sistema de Educación General" },
                 new SelectListItem { Text = "Sistema de Estudios de Posgrado" },
-                new SelectListItem { Text = "Sede Regional" },
+                new SelectListItem { Text = "Sedes Regionales" },
+                new SelectListItem { Text = "Oficinas Administrativas" },
                 new SelectListItem { Text = "Otros" }
             };
         }
@@ -1237,13 +1238,11 @@ namespace webMetics.Controllers
                     departamentos.Add(new SelectListItem() { Text = "Estudios Generales" });
                     break;
                 case "Sistema de Estudios de Posgrado":
-                    departamentos.Add(new SelectListItem() { Text = "Especialidad de Posgrado" });
-                    departamentos.Add(new SelectListItem() { Text = "Programa de Doctorado" });
                     departamentos.Add(new SelectListItem() { Text = "Programa de Estudios de Posgrado" });
                     break;
-                case "Sede Regional":
+                case "Sedes Regionales":
                     departamentos.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio" });
-                    departamentos.Add(new SelectListItem() { Text = "Sede de Alajuela-CONARE" });
+                    departamentos.Add(new SelectListItem() { Text = "Sede Interuniversitaria de Alajuela" });
                     departamentos.Add(new SelectListItem() { Text = "Sede Regional de Guanacaste" });
                     departamentos.Add(new SelectListItem() { Text = "Sede Regional de Occidente" });
                     departamentos.Add(new SelectListItem() { Text = "Sede Regional del Atlántico" });
@@ -1252,8 +1251,11 @@ namespace webMetics.Controllers
                     departamentos.Add(new SelectListItem() { Text = "Sede Regional del Sur" });
                     break;
                 case "Otros":
-                    departamentos.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
                     departamentos.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    departamentos.Add(new SelectListItem() { Text = "Otro" });
+                    break;
+                case "Oficinas Administrativas":
+                    departamentos.Add(new SelectListItem() { Text = "Vicerrectoría" });
                     departamentos.Add(new SelectListItem() { Text = "Otro" });
                     break;
             }
@@ -1465,19 +1467,19 @@ namespace webMetics.Controllers
                 case "Sede Regional del Sur":
                     unidades.Add(new SelectListItem() { Text = "Recinto de Golfito" });
                     break;
-                case "Vicerrectoría de Docencia":
+                case "Vicerrectoría":
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Acción Social" });
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Administración" });
                     unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
-                    unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Vida Estudiantil" });
+                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Investigación" });
                     unidades.Add(new SelectListItem() { Text = "Otro" });
                     break;
                 case "Centros de Investigación":
-                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
                     unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
                     unidades.Add(new SelectListItem() { Text = "Otro" });
                     break;
                 case "Otro":
-                    unidades.Add(new SelectListItem() { Text = "Vicerrectoría de Docencia" });
-                    unidades.Add(new SelectListItem() { Text = "Centros de Investigación" });
                     unidades.Add(new SelectListItem() { Text = "Otro" });
                     break;
             }
