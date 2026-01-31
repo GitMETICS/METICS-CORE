@@ -359,6 +359,58 @@
 			}
 		</div>
 	</div>
+	<!-- Modal para Cambio de Estado -->
+	<div class="modal fade" id="modalCambiarEstado" tabindex="-1" aria-labelledby="modalCambiarEstadoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalCambiarEstadoLabel">Cambiar estado de inscripciones</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					¿Está seguro de que desea cambiar el estado de <strong><span id="cantidadParticipantesEstado">0</span></strong> inscripción(es)?
+
+					<hr />
+
+					<small class="text-muted">
+						<i class="bi bi-info-circle me-1"></i>
+						Cambiará solo las inscripciones con estado <strong>"Inscrito"</strong> a <strong>"Incompleto"</strong>
+					</small>
+				</div>
+
+				
+				@using (Html.BeginForm("CambiarEstadoInscritoAIncompleto", "Inscripcion"))
+				{
+					@Html.AntiForgeryToken()
+
+					<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo">
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+						<input type="submit" class="btn btn-warning btn-sm" value="Aceptar" />
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal para Cambio de Estado Inválido -->
+	<div class="modal fade" id="modalCambiarEstadoInvalido" tabindex="-1" aria-labelledby="modalCambiarEstadoInvalidoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalCambiarEstadoInvalidoLabel">Aviso</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					Debe seleccionar al menos un participante para cambiar el estado de inscripciones.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- Modal para Eliminación Individual -->
 	<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
