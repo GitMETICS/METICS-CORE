@@ -185,7 +185,7 @@
 											<i class="bi bi-trash me-1"></i>Eliminar Inscripciones
 										</button>
 									</form>
-								</div>
+									</div>
 								</div>
 							}
 						</div>
@@ -742,6 +742,31 @@ else
 			});
 		});
 	});
+		function actualizarModalCambiarEstado() {
+		const checkboxes = document.querySelectorAll('.participante-checkbox:checked');
+		if (checkboxes.length === 0) {
+			const modal = new bootstrap.Modal(document.getElementById('modalCambiarEstadoInvalido'));
+			modal.show();
+			return;
+		}
+
+		document.getElementById('cantidadParticipantesEstado').textContent = checkboxes.length;
+
+		const form = document.querySelector('#modalCambiarEstado form');
+		const existingInputs = form.querySelectorAll('input[name="participantesSeleccionados"]');
+		existingInputs.forEach(input => input.remove());
+
+		checkboxes.forEach(checkbox => {
+			const input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = 'participantesSeleccionados';
+			input.value = checkbox.value;
+			form.appendChild(input);
+		});
+
+		const modal = new bootstrap.Modal(document.getElementById('modalCambiarEstado'));
+		modal.show();
+	}
 </script>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
