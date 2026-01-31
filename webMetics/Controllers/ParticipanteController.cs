@@ -908,56 +908,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //public ActionResult SubirHorasAprobadas(int? idGrupo, string nombreGrupo, int numeroGrupo, string idParticipante, int horasAprobadas)
-        //{
-        //    if (!idGrupo.HasValue)
-        //    {
-        //        TempData["errorMessage"] = "Debe seleccionar un módulo antes de aprobar horas.";
-        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Role = GetRole();
-        //        ViewBag.Id = GetId();
-
-        //        GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo.Value);
-        //        InscripcionModel inscripcion;
-
-        //        if (grupo != null)
-        //        {
-        //            inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-        //        }
-        //        else
-        //        {
-        //            inscripcion = accesoAInscripcion.ObtenerInscripcionDeGrupoInexistenteParticipante(nombreGrupo, numeroGrupo, idParticipante);
-        //        }
-
-        //        int nuevasHorasAprobadas = horasAprobadas; // inscripcion.horasAprobadas + horasAprobadas;
-
-        //        if (nuevasHorasAprobadas <= inscripcion.horasMatriculadas)
-        //        {
-        //            inscripcion.horasAprobadas = nuevasHorasAprobadas;
-        //            inscripcion.horasMatriculadas -= inscripcion.horasAprobadas;
-        //            inscripcion.horasMatriculadas = Math.Max(0, inscripcion.horasMatriculadas);
-
-        //            inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-        //            accesoAInscripcion.EditarInscripcion(inscripcion);
-
-        //            accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
-        //            accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-
-        //            TempData["successMessage"] = "Las horas fueron aprobadas.";
-        //        }
-        //        else
-        //        {
-        //            TempData["errorMessage"] = "No se pudo aprobar las horas.";
-        //        }
-
-        //        return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
-        //    }
-        //}
-
         public ActionResult FormularioParticipante()
         {
             ViewBag.Id = GetId();
@@ -975,9 +925,7 @@ namespace webMetics.Controllers
 
             if (ModelState.IsValid)
             {
-                // Aquí se define que el identificador del usuario es el correo.
                 participante.idParticipante = participante.correo;
-
                 try
                 {
                     IngresarParticipante(participante);
@@ -1074,6 +1022,9 @@ namespace webMetics.Controllers
                 else
                 {
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                    ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
+                    ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
+
                     return View("EditarParticipante", participante);
                 }
             }
