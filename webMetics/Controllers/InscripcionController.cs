@@ -1563,5 +1563,83 @@ namespace webMetics.Controllers
 
             return id;
         }
+
+        /// <summary>
+        /// Método para cambiar el estado de inscripciones masivas de "Inscrito" a "Incompleto"
+        /// </summary>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes seleccionados</param>
+        /// <param name="idGrupo">ID del grupo</param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CambiarEstadoInscritoAIncompleto(List<string> participantesSeleccionados, int idGrupo)
+        {
+            ViewBag.Role = GetRole();
+            ViewBag.Id = GetId();
+
+            try
+            {
+                if (participantesSeleccionados == null || !participantesSeleccionados.Any())
+                {
+                    TempData["errorMessage"] = "Debe seleccionar al menos un participante.";
+                    return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+                }
+
+                int actualizados = 0;
+                int errores = 0;
+
+                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+
+                foreach (var idParticipante in participantesSeleccionados)
+                {
+                    try
+                    {
+                        InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(idGrupo, idParticipante);
+
+                        // Solo cambiar si el estado actual es "Inscrito"
+                        if (inscripcion != null && inscripcion.estado == "Inscrito")
+                        {
+                            inscripcion.estado = "Incompleto";
+                            bool exito = accesoAInscripcion.EditarInscripcion(inscripcion);
+
+                            if (exito)
+                            {
+                                actualizados++;
+                            }
+                            else
+                            {
+                                errores++;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        errores++;
+                    }
+                }
+
+                if (actualizados > 0)
+                {
+                    TempData["successMessage"] = $"Se actualizaron {actualizados} inscripción(es) a estado 'Incompleto'.";
+                }
+
+                if (errores > 0)
+                {
+                    TempData["errorMessage"] = $"No se pudieron actualizar {errores} inscripción(es).";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = $"Ocurrió un error al cambiar los estados: {ex.Message}";
+            }
+
+            var refererUrl = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(refererUrl))
+            {
+                return Redirect(refererUrl);
+            }
+
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
+        }
     }
 }
