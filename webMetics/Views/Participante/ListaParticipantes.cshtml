@@ -148,6 +148,7 @@
 							<!-- Eliminación Masiva -->
 							@if (ViewBag.Role == 1)
 							{
+                                <!-- Columna para eliminación masiva -->
 								<div class="col-lg-4 d-flex flex-column justify-content-end">
 									@Html.AntiForgeryToken()
 									<input type="hidden" name="nombreGrupo" value="@ViewBag.NombreGrupo">
@@ -169,13 +170,22 @@
 										<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
 											<i class="bi bi-x-circle me-1"></i>Limpiar
 										</button>
-									</div>
+									
+
+									<form method="post" asp-controller="Inscripcion" asp-action="CambiarEstadoInscritoAIncompleto" id="formCambiarEstado">
+										@Html.AntiForgeryToken()
+										<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo">
+										<button type="button" class="btn btn-warning w-100" id="btnCambiarEstado" onclick="actualizarModalCambiarEstado()">
+											<i class="bi bi-arrow-repeat me-1"></i>Cambiar Estado
+										</button>
+									</form>
 
 									<form method="post" asp-controller="Inscripcion" asp-action="EliminarInscripcionMasivo" id="formEliminarInscripciones">
 										<button type="button" class="btn btn-danger w-100 btn-sm" id="btnEliminarInscripciones" onclick="actualizarModalEliminarMasivo()">
 											<i class="bi bi-trash me-1"></i>Eliminar Inscripciones
 										</button>
 									</form>
+								</div>
 								</div>
 							}
 						</div>
