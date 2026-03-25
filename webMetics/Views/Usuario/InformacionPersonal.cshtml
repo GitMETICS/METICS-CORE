@@ -60,7 +60,8 @@
                                 }
                                 
                                 <th scope="col">Correo Institucional</th>
-                                
+                                <th scope="col">Correo Alternativo</th>
+
                                 @if (ViewBag.Participante != null)
                                 {
                                     <th scope="col">Condición</th>
@@ -95,6 +96,15 @@
                                 @if (ViewBag.Usuario.correo != null)
                                 {
                                     <td class="">@ViewBag.Usuario.correo</td>
+                                }
+
+                                @if (ViewBag.Usuario.correoAlternativo != null)
+                                {
+                                    <td class="">@ViewBag.Usuario.correoAlternativo</td>
+                                }
+                                else
+                                {
+                                    <td class="text-muted">-</td>
                                 }
 
                                 @if (ViewBag.Participante != null && ViewBag.Participante.condicion != null)
