@@ -22,6 +22,10 @@ namespace webMetics.Models
         [Display(Name = "Correo institucional")]
         public required string correo { get; set; }
 
+        [EmailAddress(ErrorMessage = "El correo alternativo debe ser válido.")]
+        [Display(Name = "Correo alternativo")]
+        public string? correoAlternativo { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
         [Display(Name = "Tipo de identificación")]
         public string? tipoIdentificacion { get; set; }
