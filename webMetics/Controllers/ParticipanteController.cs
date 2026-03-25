@@ -1119,14 +1119,13 @@ namespace webMetics.Controllers
             var allAreas = GetAreas().Select(x => x.Text).ToList();
             var departamentosByArea = new Dictionary<string, List<string>>();
             var seccionesByDepartamento = new Dictionary<string, List<string>>();
+            var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
 
-            // Iterar por todas las areas para obtener departamentos y secciones
             foreach (var areaName in allAreas)
             {
                 var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
                 departamentosByArea[areaName] = departamentos;
 
-                // Para cada departamento, obtener las secciones
                 foreach (var departamentoName in departamentos)
                 {
                     var key = $"{areaName}|{departamentoName}";
@@ -1139,10 +1138,21 @@ namespace webMetics.Controllers
             {
                 areas = allAreas,
                 departamentosByArea,
-                seccionesByDepartamento
+                seccionesByDepartamento,
+                carrerasBySeccionAndSede
             };
 
             return Json(allData);
+        }
+
+        [HttpGet]
+        public JsonResult GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
+        {
+            if (string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
+                return Json(new List<string>());
+
+            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(unidadAcademica, sede);
+            return Json(carreras);
         }
 
         [HttpGet]
@@ -1454,7 +1464,7 @@ namespace webMetics.Controllers
 
             sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Limón", Group = group3 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
@@ -1463,7 +1473,7 @@ namespace webMetics.Controllers
             sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
             sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Alajuela", Group = group7 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Puntarenas", Group = group8 });
 
 
