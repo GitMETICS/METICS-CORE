@@ -30,6 +30,7 @@ namespace webMetics.Models
         private string _correo = string.Empty;
 
         [EmailAddress(ErrorMessage = "El correo alternativo debe ser válido.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo alternativo.")]
         [Display(Name = "Correo Alternativo")]
         public string? correoAlternativo { get; set; }
 

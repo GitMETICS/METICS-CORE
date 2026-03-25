@@ -72,12 +72,9 @@
                             </div>
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.correoAlternativo, new { Style = "font-size:22px" })
+                            @Html.LabelFor(usuarioModel => usuarioModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(usuarioModel => usuarioModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.correoAlternativo, "", new { @class = "text-danger" })
-                            <small class="form-text text-muted">
-                                Ej: correo.alternativo@example.com (opcional)
-                            </small>
                         </div>
                         <div class="row mt-1">
                             <div class="col">

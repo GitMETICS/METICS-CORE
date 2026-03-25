@@ -69,12 +69,9 @@
                             @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.correoAlternativo, new { Style = "font-size:22px" })
+                            @Html.LabelFor(participanteModel => participanteModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(participanteModel => participanteModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.correoAlternativo, "", new { @class = "text-danger" })
-                            <small class="form-text text-muted">
-                                Ej: correo.alternativo@example.com (opcional)
-                            </small>
                         </div>
                         <div class="row mt-1">
                             <div class="col">
