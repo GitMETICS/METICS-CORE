@@ -206,6 +206,14 @@
                   "Bachillerato en Estadística"
                 ]
               }
+            },
+            {
+              "name": "Escuela de Archivística",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Archivística"
+                ]
+              }
             }
           ]
         },
@@ -288,7 +296,12 @@
           "name": "Facultad de Derecho",
           "secciones": [
             {
-              "name": "Escuela de Derecho"
+              "name": "Escuela de Derecho",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Derecho"
+                ]
+              }
             }
           ]
         },
@@ -324,7 +337,15 @@
               }
             },
             {
-              "name": "Escuela de Orientación y Educación Especial"
+              "name": "Escuela de Orientación y Educacíón Especial",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ciencias de la Educación con énfasis en Orientación",
+                  "Licenciatura en Educación Especial con énfasis en Educación de las personas con Trastornos Emocionales y de Conducta",
+                  "Licenciatura en Educación Especial con énfasis en Aprendizaje Diverso",
+                  "Bachillerato en Ciencias de la Educación: Educación Especial"
+                ]
+              }
             },
             {
               "name": "Escuela de Bibliotecología"
@@ -334,6 +355,17 @@
               "carreras": {
                 "Ciudad Universitaria Rodrigo Facio": [
                   "Bachillerato y Licenciatura en Ciencias del Movimiento Humano"
+                ]
+              }
+            },
+            {
+              "name": "Escuela de Bibliotecología y Ciencias de la Información",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Bibliotecología con énfasis en Ciencias de la Información",
+                  "Bachillerato en Bibliotecología con énfasis en Bibliotecas Educativas",
+                  "Licenciatura en Bibliotecología y Ciencias de la Información",
+                  "Licenciatura en Bibliotecología con énfasis en Bibliotecas Educativas"
                 ]
               }
             }
@@ -391,7 +423,12 @@
               }
             },
             {
-              "name": "Escuela de Ingeniería de Biosistemas"
+              "name": "Escuela de Ingeniería de Biosistemas",
+                "carreras": {
+                  "Ciudad Universitaria Rodrigo Facio": [
+                    "Licenciatura en Ingeniería Agrícola y de Biosistemas"
+                  ]
+                }
             },
             {
               "name": "Escuela de Ingeniería Civil",
@@ -928,25 +965,6 @@
           "name": "Carreras no relacionadas",
           "secciones": [
             {
-              "name": "Archivística",
-              "carreras": {
-                "Ciudad Universitaria Rodrigo Facio": [
-                  "Bachillerato y Licenciatura en Archivística"
-                ]
-              }
-            },
-            {
-              "name": "Bibliotecología y Ciencias de la Información",
-              "carreras": {
-                "Ciudad Universitaria Rodrigo Facio": [
-                  "Bachillerato en Bibliotecología con énfasis en Ciencias de la Información",
-                  "Bachillerato en Bibliotecología con énfasis en Bibliotecas Educativas",
-                  "Licenciatura en Bibliotecología y Ciencias de la Información",
-                  "Licenciatura en Bibliotecología con énfasis en Bibliotecas Educativas"
-                ]
-              }
-            },
-            {
               "name": "Centroamericana de Geología",
               "carreras": {
                 "Ciudad Universitaria Rodrigo Facio": [
@@ -955,26 +973,7 @@
               }
             },
             {
-              "name": "Ingeniería en Biosistemas",
-              "carreras": {
-                "Ciudad Universitaria Rodrigo Facio": [
-                  "Licenciatura en Ingeniería Agrícola y de Biosistemas"
-                ]
-              }
-            },
-            {
-              "name": "Orientación y Educacíón Especial",
-              "carreras": {
-                "Ciudad Universitaria Rodrigo Facio": [
-                  "Bachillerato y Licenciatura en Ciencias de la Educación con énfasis en Orientación",
-                  "Licenciatura en Educación Especial con énfasis en Educación de las personas con Trastornos Emocionales y de Conducta",
-                  "Licenciatura en Educación Especial con énfasis en Aprendizaje Diverso",
-                  "Bachillerato en Ciencias de la Educación: Educación Especial"
-                ]
-              }
-            },
-            {
-              "name": "Sin escuela o facultad (CSV)",
+              "name": "Sin escuela o facultad",
               "carreras": {
                 "Recinto de San Ramón": [
                   "Bachillerato y Licenciatura en Diseño Plástico, énfasis en Diseño Pictórico, Diseño Escultórico, Diseño Cerámico o de Diseño de Estampa (Desconcentrados I y II año)",
@@ -1055,9 +1054,6 @@
                   "Bachillerato en Educación Primaria en Inglés (Desconcentrada)",
                   "Bachillerato en Turismo Sostenible con énfasis en ecoturismo (Bachillerato descentralizado)",
                   "Bachillerato y Licenciatura en Gestión y Logística Empresarial"
-                ],
-                "Ciudad Universitaria Rodrigo Facio": [
-                  "Bachillerato y Licenciatura en Derecho"
                 ],
                 "Recinto de Puntarenas": [
                   "Bachillerato en la Enseñanza del Inglés (salida lateral profesorado) (Descentralizada)",
