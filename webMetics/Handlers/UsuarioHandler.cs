@@ -224,6 +224,57 @@ namespace webMetics.Handlers
             return exito;
         }
 
+        public string ObtenerCorreoAlternativo(string idUsuario)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                            ? reader["correo_alternativo"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        public bool ActualizarCorreoAlternativo(string idUsuario, string correoAlternativo)
+        {
+            string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         public bool ActualizarContrasena(string correo, string contrasena)
         {
             int rol = 0;

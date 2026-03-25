@@ -69,6 +69,15 @@ namespace webMetics.Controllers
                     // Se usa el ID del usuario autorizado.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
+                    // 2. Validar si el usuario tiene correoAlternativo
+                    string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(usuarioAutorizado.id);
+                    if (string.IsNullOrWhiteSpace(correoAlternativo))
+                    {
+                        // Usuario no tiene correoAlternativo: redirigir a completarlo
+                        TempData["usuarioSinCorreoAlternativo"] = true;
+                        return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
+                    }
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
@@ -388,6 +397,98 @@ namespace webMetics.Controllers
             Response.Cookies.Delete("idUsuario");
 
             return RedirectToAction("IniciarSesion");
+        }
+
+        // Método para mostrar el formulario de completar correo alternativo
+        public ActionResult CompletarCorreoAlternativo()
+        {
+            // Validar que el usuario esté logueado
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Obtener datos del participante o asesor para llenar nombre y apellido
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
+            // Crear modelo para la vista
+            UsuarioModel usuario = new UsuarioModel()
+            {
+                id = idUsuario,
+                nombre = participante?.nombre ?? asesor?.nombre ?? "Usuario",
+                primerApellido = participante?.primerApellido ?? asesor?.primerApellido ?? "",
+                correo = idUsuario // El correo es el ID del usuario
+            };
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View(usuario);
+        }
+
+        // Método para guardar el correo alternativo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarCorreoAlternativo(UsuarioModel usuario)
+        {
+            string idUsuario = GetId();
+
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Validar que el campo correoAlternativo no esté vacío
+            if (string.IsNullOrWhiteSpace(usuario.correoAlternativo))
+            {
+                TempData["errorMessage"] = "Es necesario ingresar un correo alternativo.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            try
+            {
+                // Actualizar solo el correoAlternativo en la BD
+                bool exito = accesoAUsuario.ActualizarCorreoAlternativo(idUsuario, usuario.correoAlternativo);
+
+                if (exito)
+                {
+                    // También actualizar en los modelos relacionados (Participante y Asesor)
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    if (participante != null)
+                    {
+                        participante.correoAlternativo = usuario.correoAlternativo;
+                        accesoAParticipante.EditarParticipante(participante);
+                    }
+
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    if (asesor != null)
+                    {
+                        asesor.correoAlternativo = usuario.correoAlternativo;
+                        accesoAAsesor.EditarAsesor(asesor);
+                    }
+
+                    TempData["successMessage"] = "Correo alternativo guardado correctamente.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al guardar el correo alternativo. Intente nuevamente.";
+                    return RedirectToAction("CompletarCorreoAlternativo");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
         }
 
         public ActionResult CambiarCredencialesUsuario(string idUsuario, string nombreCompleto)
