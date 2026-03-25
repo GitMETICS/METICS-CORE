@@ -149,6 +149,7 @@ namespace webMetics.Controllers
                     tipoIdentificacion = usuario.tipoIdentificacion,
                     numeroIdentificacion = usuario.numeroIdentificacion,
                     correo = usuario.correo,
+                    correoAlternativo = usuario.correoAlternativo,
                     tipoParticipante = usuario.tipoParticipante,
                     condicion = usuario.condicion,
                     telefono = usuario.telefono,
@@ -177,6 +178,7 @@ namespace webMetics.Controllers
                         asesor.tipoIdentificacion = usuario.tipoIdentificacion;
                         asesor.numeroIdentificacion = usuario.numeroIdentificacion;
                         asesor.correo = usuario.correo;
+                        asesor.correoAlternativo = usuario.correoAlternativo;
                         asesor.telefono = usuario.telefono;
 
                         rolUsuario = 2;
@@ -315,6 +317,7 @@ namespace webMetics.Controllers
                         tipoIdentificacion = participante.tipoIdentificacion,
                         numeroIdentificacion = participante.numeroIdentificacion,
                         correo = participante.correo,
+                        correoAlternativo = participante.correoAlternativo,
                         tipoParticipante = participante.tipoParticipante,
                         condicion = participante.condicion,
                         telefono = participante.telefono,
@@ -345,6 +348,7 @@ namespace webMetics.Controllers
                         tipoIdentificacion = asesor.tipoIdentificacion,
                         numeroIdentificacion = asesor.numeroIdentificacion,
                         correo = asesor.correo,
+                        correoAlternativo = asesor.correoAlternativo,
                         telefono = asesor.telefono,
                     };
 
