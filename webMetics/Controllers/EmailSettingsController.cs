@@ -2,8 +2,12 @@
 using NETCore.MailKit.Core;
 using Newtonsoft.Json.Linq;
 using System;
+using Microsoft.AspNetCore.Mvc;
+using webMetics.Handlers;
 
-public class EmailSettingsController : Controller
+namespace webMetics.Controllers
+{
+    public class EmailSettingsController : Controller
 {
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
@@ -125,4 +129,5 @@ public class EmailSettingsController : Controller
 
         return RedirectToAction("Index", "EmailSettings");
     }
+}
 }
