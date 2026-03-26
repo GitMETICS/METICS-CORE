@@ -70,7 +70,47 @@ namespace webMetics.Handlers
                 ConexionMetics.Close();
             }
 
+            // Obtener correoAlternativo desde tabla usuario
+            if (asesor != null)
+            {
+                asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(idAsesor);
+            }
+
             return asesor;
+        }
+
+        private string ObtenerCorreoAlternativoUsuario(string idUsuario)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                            ? reader["correo_alternativo"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
         }
 
         public List<SelectListItem> ObtenerListaSeleccionAsesores()
