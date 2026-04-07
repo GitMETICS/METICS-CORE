@@ -111,6 +111,7 @@
                             <th scope="col">Primer<br>Apellido</th>
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
+                            <th scope="col">Correo Alternativo</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Inscritas</th>
                             <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -158,6 +159,7 @@
                                 <td>@participante.primerApellido</td>
                                 <td>@participante.segundoApellido</td>
                                 <td>@participante.correo</td>
+                                <td>@(string.IsNullOrWhiteSpace(participante.correoAlternativo) ? "-" : participante.correoAlternativo)</td>
                                 <td class="text-center">
                                     <span>@participante.horasMatriculadas</span>
                                 </td>

@@ -487,6 +487,9 @@ namespace webMetics.Handlers
                 gruposInscritos = new List<GrupoModel>()
             };
 
+            // Obtener correoAlternativo desde tabla usuario
+            info.correoAlternativo = ObtenerCorreoAlternativoUsuario(info.idParticipante);
+
             return info;
         }
 

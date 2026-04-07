@@ -65,6 +65,7 @@
                             <th scope="col">Primer<br>Apellido</th>
                             <th scope="col">Segundo<br>Apellido</th>
                             <th scope="col">Correo Institucional</th>
+                            <th scope="col">Correo Alternativo</th>
                             <th scope="col">Descripción</th>
                             <th scope="col" style="width:10%;">Teléfono</th>
                             <th class="text-center" scope="col" style="width:3.33%;"></th>
@@ -87,6 +88,7 @@
                                 <td>@asesor.primerApellido</td>
                                 <td>@asesor.segundoApellido</td>
                                 <td>@asesor.correo</td>
+                                <td>@(string.IsNullOrWhiteSpace(asesor.correoAlternativo) ? "-" : asesor.correoAlternativo)</td>
                                 <td>@asesor.descripcion</td>
                                 <td>@asesor.telefono</td>
                                 <td>

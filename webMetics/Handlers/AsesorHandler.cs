@@ -33,6 +33,9 @@ namespace webMetics.Handlers
                     telefono = Convert.ToString(fila["telefono"])
                 };
 
+                // Obtener correoAlternativo desde tabla usuario
+                asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(asesor.idAsesor);
+
                 asesores.Add(asesor);
             }
             return asesores;
