@@ -74,6 +74,10 @@ namespace webMetics.Models
         public int correoNotificacionEnviado { get; set; }
 
         public List<GrupoModel>? gruposInscritos { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una Carrera.")]
+        [Display(Name = "Carrera")]
+        public string? carrera { get; set; }
     }
     public enum TipoIdentificacion
     {

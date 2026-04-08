@@ -1,5 +1,4 @@
-// En este archivo se encuentran las areas y facultades a las que pueden pertenecer los participantes de la aplicacion
-{ // Las Áreas contienen Facultades y las Facultades contienen Escuelas
+{
   "areas": [
     {
       "name": "Área de Artes y Letras",
@@ -8,13 +7,38 @@
           "name": "Facultad de Artes",
           "secciones": [
             {
-              "name": "Escuela de Artes Dramáticas"
+              "name": "Escuela de Artes Dramáticas",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Artes Teatrales"
+                ]
+              }
             },
             {
-              "name": "Escuela de Artes Musicales"
+              "name": "Escuela de Artes Musicales",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Música con énfasis en Composición",
+                  "Bachillerato y Licenciatura en Música con énfasis en Piano",
+                  "Bachillerato y Licenciatura en Música con énfasis en Guitarra",
+                  "Bachillerato y Licenciatura en Música con énfasis en Canto",
+                  "Bachillerato y Licenciatura en Música con énfasis en Instrumentos de Cuerdas",
+                  "Bachillerato y Licenciatura en Música con énfasis en Instrumentos de Viento o Percusión",
+                  "Bachillerato en Música con énfasis en Dirección",
+                  "Licenciatura en Música con énfasis en Dirección Orquestal",
+                  "Licenciatura en Música con énfasis en Enseñanza Instrumental o Vocal"
+                ]
+              }
             },
             {
-              "name": "Escuela de Artes Plásticas"
+              "name": "Escuela de Artes Plásticas",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Historia del Arte",
+                  "Bachillerato y Licenciatura en Diseño Plástico con énfasis en Diseño Pictórico, Diseño Escultórico, Diseño Cerámico o Diseño de la Estampa",
+                  "Bachillerato y Licenciatura en Diseño Gráfico"
+                ]
+              }
             }
           ]
         },
@@ -22,13 +46,30 @@
           "name": "Facultad de Letras",
           "secciones": [
             {
-              "name": "Escuela de Filología, Lingüística y Literatura"
+              "name": "Escuela de Filología, Lingüística y Literatura",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Filología Española",
+                  "Bachillerato y Licenciatura en Filología Clásica"
+                ]
+              }
             },
             {
-              "name": "Escuela de Filosofía"
+              "name": "Escuela de Filosofía",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Filosofía"
+                ]
+              }
             },
             {
-              "name": "Escuela de Lenguas Modernas"
+              "name": "Escuela de Lenguas Modernas",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Inglés",
+                  "Bachillerato en Francés"
+                ]
+              }
             }
           ]
         }
@@ -41,16 +82,37 @@
           "name": "Facultad de Ciencias Agroalimentarias",
           "secciones": [
             {
-              "name": "Escuela de Agronomía"
+              "name": "Escuela de Agronomía",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Agronomía"
+                ]
+              }
             },
             {
-              "name": "Escuela de Economía Agrícola y Agronegocios"
+              "name": "Escuela de Economía Agrícola y Agronegocios",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Economía Agrícola y Agronegocios",
+                  "Licenciatura en Bioeconomía Aplicada a la Economía Agrícola y Agronegocios"
+                ]
+              }
             },
             {
-              "name": "Escuela de Tecnología de Alimentos"
+              "name": "Escuela de Tecnología de Alimentos",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Ingeniería de Alimentos"
+                ]
+              }
             },
             {
-              "name": "Escuela de Zootecnia"
+              "name": "Escuela de Zootecnia",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ingeniería Agronómica en Zootecnia"
+                ]
+              }
             }
           ]
         }
@@ -63,19 +125,42 @@
           "name": "Facultad de Ciencias",
           "secciones": [
             {
-              "name": "Escuela de Biología"
+              "name": "Escuela de Biología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Biología (varios énfasis)"
+                ]
+              }
             },
             {
-              "name": "Escuela de Física"
+              "name": "Escuela de Física",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Física",
+                  "Bachillerato y Licenciatura en Meteorología"
+                ]
+              }
             },
             {
               "name": "Escuela de Geología"
             },
             {
-              "name": "Escuela de Matemática"
+              "name": "Escuela de Matemática",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Matemáticas",
+                  "Bachillerato y Licenciatura en Ciencias Actuariales",
+                  "Bachillerato y Licenciatura en Educación Matemática"
+                ]
+              }
             },
             {
-              "name": "Escuela de Química"
+              "name": "Escuela de Química",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Química"
+                ]
+              }
             }
           ]
         }
@@ -88,16 +173,47 @@
           "name": "Facultad de Ciencias Económicas",
           "secciones": [
             {
-              "name": "Escuela de Administración de Negocios"
+              "name": "Escuela de Administración de Negocios",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Dirección de Empresas",
+                  "Bachillerato y Licenciatura en Contaduría Pública"
+                ]
+              }
             },
             {
-              "name": "Escuela de Administración Pública"
+              "name": "Escuela de Administración Pública",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Diplomado en Administración Aduanera y Bachillerato y Licenciatura en Administración Aduanera y Comercio Exterior con énfasis en Comercio Internacional, Gestión de Organizaciones de comercio exterior, logística y cadena de abastecimiento y gestión aduanera",
+                  "Diplomado y Bachillerato en Administración Pública y Licenciatura en Administración Pública con énfasis en Gestión del Desarrollo, Gestión de Banca y Finanzas Públicas y Contratación Pública",
+                  "Licenciatura de Administración Pública en Alianzas Público - Privadas"
+                ]
+              }
             },
             {
-              "name": "Escuela de Economía"
+              "name": "Escuela de Economía",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Economía"
+                ]
+              }
             },
             {
-              "name": "Escuela de Estadística"
+              "name": "Escuela de Estadística",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Estadística"
+                ]
+              }
+            },
+            {
+              "name": "Escuela de Archivística",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Archivística"
+                ]
+              }
             }
           ]
         },
@@ -105,34 +221,74 @@
           "name": "Facultad de Ciencias Sociales",
           "secciones": [
             {
-              "name": "Escuela de Ciencias de la Comunicación Colectiva"
+              "name": "Escuela de Ciencias de la Comunicación Colectiva",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Ciencias de la Comunicación Colectiva con énfasis en Comunicación Social, Comunicación Audiovisual y Multimedial, Periodismo, Publicidad y Relaciones Públicas. Licenciatura en Ciencias de la Comunicación Colectiva con énfasis en Publicidad, Relaciones Públicas, Periodismo, Comunicación Audiovisual y Multimedial, Diseño y Producción de contenidos Transmedia, y Comunicación Estratégica"
+                ]
+              }
             },
             {
-              "name": "Escuela de Psicología"
+              "name": "Escuela de Psicología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Psicología"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ciencias Políticas"
+              "name": "Escuela de Ciencias Políticas",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ciencias Políticas"
+                ]
+              }
             },
             {
               "name": "Escuela de Historia y Geografía"
             },
             {
-              "name": "Escuela de Trabajo Social"
+              "name": "Escuela de Trabajo Social",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Trabajo Social"
+                ]
+              }
             },
             {
               "name": "Escuela de Antropología y Sociología"
             },
             {
-              "name": "Escuela de Historia"
+              "name": "Escuela de Historia",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Historia"
+                ]
+              }
             },
             {
-              "name": "Escuela de Geografía"
+              "name": "Escuela de Geografía",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Geografía"
+                ]
+              }
             },
             {
-              "name": "Escuela de Antropología"
+              "name": "Escuela de Antropología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Antropología"
+                ]
+              }
             },
             {
-              "name": "Escuela de Sociología"
+              "name": "Escuela de Sociología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Sociología"
+                ]
+              }
             }
           ]
         },
@@ -140,7 +296,12 @@
           "name": "Facultad de Derecho",
           "secciones": [
             {
-              "name": "Escuela de Derecho"
+              "name": "Escuela de Derecho",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Derecho"
+                ]
+              }
             }
           ]
         },
@@ -148,19 +309,65 @@
           "name": "Facultad de Educación",
           "secciones": [
             {
-              "name": "Escuela de Administración Educativa"
+              "name": "Escuela de Administración Educativa",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Administración de la Educación",
+                  "Licenciatura en Administración de la Educación no Formal"
+                ]
+              }
             },
             {
-              "name": "Escuela de Formación Docente"
+              "name": "Escuela de Formación Docente",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en la Enseñanza del Inglés",
+                  "Bachillerato en la Enseñanza del Francés",
+                  "Bachillerato en la Enseñanza de la Psicología",
+                  "Bachillerato en la Enseñanza de la Filosofía",
+                  "Bachillerato y Licenciatura en Educación Primaria",
+                  "Licenciatura en Enseñanza Bilingüe de la Matemática",
+                  "Bachillerato en la Enseñanza de los Estudios Sociales y Licenciatura en la Enseñanza de los Estudios Sociales y la Educación Cívica",
+                  "Bachillerato y Licenciatura en la Enseñanza de la Música",
+                  "Bachillerato y Licenciatura en la Enseñanza del Castellano y Literatura",
+                  "Licenciatura en Docencia Universitaria",
+                  "Bachillerato en la Educación Preescolar y Licenciatura en Educación Preescolar con énfasis en Gestión de proyectos educativos para la primera infancia y en la atención a la niñez temprana",
+                  "Bachillerato y Licenciatura en la Enseñanza de las Ciencias Naturales"
+                ]
+              }
             },
             {
-              "name": "Escuela de Orientación y Educación Especial"
+              "name": "Escuela de Orientación y Educacíón Especial",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ciencias de la Educación con énfasis en Orientación",
+                  "Licenciatura en Educación Especial con énfasis en Educación de las personas con Trastornos Emocionales y de Conducta",
+                  "Licenciatura en Educación Especial con énfasis en Aprendizaje Diverso",
+                  "Bachillerato en Ciencias de la Educación: Educación Especial"
+                ]
+              }
             },
             {
               "name": "Escuela de Bibliotecología"
             },
             {
-              "name": "Escuela de Educación Física y Deportes"
+              "name": "Escuela de Educación Física y Deportes",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ciencias del Movimiento Humano"
+                ]
+              }
+            },
+            {
+              "name": "Escuela de Bibliotecología y Ciencias de la Información",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Bibliotecología con énfasis en Ciencias de la Información",
+                  "Bachillerato en Bibliotecología con énfasis en Bibliotecas Educativas",
+                  "Licenciatura en Bibliotecología y Ciencias de la Información",
+                  "Licenciatura en Bibliotecología con énfasis en Bibliotecas Educativas"
+                ]
+              }
             }
           ]
         }
@@ -179,10 +386,20 @@
               "name": "Escuela de Fitotecnia"
             },
             {
-              "name": "Escuela de Tecnología de Alimentos"
+              "name": "Escuela de Tecnología de Alimentos",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Ingeniería de Alimentos"
+                ]
+              }
             },
             {
-              "name": "Escuela de Zootecnia"
+              "name": "Escuela de Zootecnia",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ingeniería Agronómica en Zootecnia"
+                ]
+              }
             }
           ]
         },
@@ -190,31 +407,76 @@
           "name": "Facultad de Ingeniería",
           "secciones": [
             {
-              "name": "Escuela de Arquitectura"
+              "name": "Escuela de Arquitectura",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Arquitectura"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ciencias de la Computación e Informática"
+              "name": "Escuela de Ciencias de la Computación e Informática",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Computación con varios énfasis"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería de Biosistemas"
+              "name": "Escuela de Ingeniería de Biosistemas",
+                "carreras": {
+                  "Ciudad Universitaria Rodrigo Facio": [
+                    "Licenciatura en Ingeniería Agrícola y de Biosistemas"
+                  ]
+                }
             },
             {
-              "name": "Escuela de Ingeniería Civil"
+              "name": "Escuela de Ingeniería Civil",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Ingeniería Civil"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería Eléctrica"
+              "name": "Escuela de Ingeniería Eléctrica",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ingeniería Eléctrica (Varios énfasis)"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería Industrial"
+              "name": "Escuela de Ingeniería Industrial",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Ingeniería Industrial"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería Mecánica"
+              "name": "Escuela de Ingeniería Mecánica",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ingeniería Mecánica"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería Química"
+              "name": "Escuela de Ingeniería Química",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Ingeniería Química"
+                ]
+              }
             },
             {
-              "name": "Escuela de Ingeniería Topográfica"
+              "name": "Escuela de Ingeniería Topográfica",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Ingeniería Topográfica"
+                ]
+              }
             }
           ]
         }
@@ -227,7 +489,12 @@
           "name": "Facultad de Farmacia",
           "secciones": [
             {
-              "name": "Escuela de Farmacia"
+              "name": "Escuela de Farmacia",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Farmacia"
+                ]
+              }
             }
           ]
         },
@@ -235,19 +502,48 @@
           "name": "Facultad de Medicina",
           "secciones": [
             {
-              "name": "Escuela de Enfermería"
+              "name": "Escuela de Enfermería",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Enfermería"
+                ]
+              }
             },
             {
-              "name": "Escuela de Medicina"
+              "name": "Escuela de Medicina",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato en Ciencias Médicas y Licenciatura en Medicina y Cirugía"
+                ]
+              }
             },
             {
-              "name": "Escuela de Nutrición"
+              "name": "Escuela de Nutrición",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Nutrición"
+                ]
+              }
             },
             {
-              "name": "Escuela de Salud Pública"
+              "name": "Escuela de Salud Pública",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Promoción de la Salud"
+                ]
+              }
             },
             {
-              "name": "Escuela de Tecnologías en Salud"
+              "name": "Escuela de Tecnologías en Salud",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Fisioterapia",
+                  "Bachillerato y Licenciatura en Salud Ambiental",
+                  "Licenciatura en Audiología",
+                  "Bachillerato y Licenciatura en Ortoprótesis y Ortopedia",
+                  "Bachillerato y Licenciatura en Imagenología Diagnóstica y Terapéutica"
+                ]
+              }
             }
           ]
         },
@@ -255,7 +551,13 @@
           "name": "Facultad de Microbiología",
           "secciones": [
             {
-              "name": "Escuela de Microbiología"
+              "name": "Escuela de Microbiología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Microbiología y Química Clínica",
+                  "Diplomado en Asistente de Laboratorio"
+                ]
+              }
             }
           ]
         },
@@ -263,7 +565,12 @@
           "name": "Facultad de Odontología",
           "secciones": [
             {
-              "name": "Escuela de Odontología"
+              "name": "Escuela de Odontología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Licenciatura en Odontología"
+                ]
+              }
             }
           ]
         }
@@ -526,131 +833,142 @@
       ]
     },
     {
-      "name": "Sede Regional",
-      "departamentos": [
-        {
-          "name": "Ciudad Universitaria Rodrigo Facio",
-          "secciones": [
-            {
-              "name": "Ciudad Universitaria Rodrigo Facio"
-            }
-          ]
-        },
-        {
-          "name": "Sede de Alajuela-CONARE",
-          "secciones": [
-            {
-              "name": "Recinto de Alajuela"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional de Guanacaste",
-          "secciones": [
-            {
-              "name": "Recinto de Liberia"
-            },
-            {
-              "name": "Recinto de Santa Cruz"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional de Occidente",
-          "secciones": [
-            {
-              "name": "Recinto de San Ramón"
-            },
-            {
-              "name": "Recinto de Tacares"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional del Atlántico",
-          "secciones": [
-            {
-              "name": "Recinto de Turrialba"
-            },
-            {
-              "name": "Recinto de Paraíso"
-            },
-            {
-              "name": "Recinto de Guápiles"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional del Caribe",
-          "secciones": [
-            {
-              "name": "Recinto de Limón"
-            },
-            {
-              "name": "Recinto de Siquirres"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional del Pacífico",
-          "secciones": [
-            {
-              "name": "Recinto de Puntarenas"
-            }
-          ]
-        },
-        {
-          "name": "Sede Regional del Sur",
-          "secciones": [
-            {
-              "name": "Recinto de Golfito"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "Otros",
       "departamentos": [
         {
-          "name": "Vicerrectoría de Docencia",
+          "name": "Carreras no relacionadas",
           "secciones": [
             {
-              "name": "Vicerrectoría de Docencia"
+              "name": "Centroamericana de Geología",
+              "carreras": {
+                "Ciudad Universitaria Rodrigo Facio": [
+                  "Bachillerato y Licenciatura en Geología"
+                ]
+              }
             },
             {
-              "name": "Centros de Investigación"
-            },
-            {
-              "name": "Otro"
-            }
-          ]
-        },
-        {
-          "name": "Centros de Investigación",
-          "secciones": [
-            {
-              "name": "Vicerrectoría de Docencia"
-            },
-            {
-              "name": "Centros de Investigación"
-            },
-            {
-              "name": "Otro"
-            }
-          ]
-        },
-        {
-          "name": "Otro",
-          "secciones": [
-            {
-              "name": "Vicerrectoría de Docencia"
-            },
-            {
-              "name": "Centros de Investigación"
-            },
-            {
-              "name": "Otro"
+              "name": "Sin escuela o facultad",
+              "carreras": {
+                "Recinto de San Ramón": [
+                  "Bachillerato y Licenciatura en Diseño Plástico, énfasis en Diseño Pictórico, Diseño Escultórico, Diseño Cerámico o de Diseño de Estampa (Desconcentrados I y II año)",
+                  "Bachillerato y Licenciatura en Diseño Gráfico (Descentralizada)",
+                  "Bachillerato y Licenciatura en Derecho (Descentralizada)",
+                  "Licenciatura en Enseñanza Bilingüe de la Matemática",
+                  "Bachillerato y Licenciatura en la Enseñanza de la Música  (Bachillerato Desconcentrado)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Descentralizada)",
+                  "Bachillerato y Licenciatura en Psicología (Descentralizada)",
+                  "Licenciatura en Ingeniería Industrial (Descentralizada)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato en la Enseñanza del Castellano y Literatura",
+                  "Bachillerato y Licenciatura en la Enseñanza del Inglés",
+                  "Bachillerato y Licenciatura en Trabajo Social",
+                  "Bachillerato en Gestión de los Recursos Naturales",
+                  "Bachillerato en la Enseñanza de los Estudios Sociales y la Educación Cívica",
+                  "Bachillerato en Educación Primaria",
+                  "Bachillerato en Educación Primaria en Inglés",
+                  "Bachillerato en Educación Inicial en Inglés",
+                  "Bachillerato y Licenciatura en Educación Inicial",
+                  "Bachillerato y Licenciatura en Educación de las Ciencias del Movimiento Humano para la salud y la calidad de vida"
+                ],
+                "Recinto de Turrialba": [
+                  "Bachillerato y Licenciatura en Diseño Gráfico \n(Bachillerato Descentralizado)",
+                  "Licenciatura en Enseñanza Bilingüe de la Matemática",
+                  "Bachillerato y Licenciatura en la Enseñanza de la Música (Descentralizada)",
+                  "Bachillerato y Licenciatura en Ciencias del Movimiento Humano (Bachillerato Descentralizado)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Descentralizada)",
+                  "Bachillerato y Licenciatura en Contaduría Pública (Descentralizada)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato y Licenciatura en la Enseñanza del Inglés (Descentralizada)",
+                  "Licenciatura en la Enseñanza del Inglés (Desconcentrada)",
+                  "Licenciatura en Ingeniería en Desarrollo Sostenible",
+                  "Bachillerato y Licenciatura en Agronomía (Descentralizada)"
+                ],
+                "Recinto de Alajuela": [
+                  "Bachillerato y Licenciatura en Diseño Gráfico (Desconcentrada)",
+                  "Licenciatura en Ingeniería Industrial (Desconcentrada)",
+                  "Licenciatura en Ingeniería Mecánica con énfasis en Protección contra Incendios"
+                ],
+                "Recinto de Limón": [
+                  "Bachillerato en Inglés (Descentralizada)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Descentralizada)",
+                  "Bachillerato y Licenciatura en Contaduría Pública (Descentralizada)",
+                  "Diplomado en Administración Aduanera y Bachillerato y Licenciatura en Administración Aduanera y Comercio Exterior con énfasis en Comercio Internacional, Gestión de Organizaciones de Comercio Exterior, Logística y Cadena de Abastecimiento, y Gestión Aduanera (Diplomado y Bachillerato descentralizados)",
+                  "Licenciatura en Ingeniería Química",
+                  "Bachillerato en Informática Empresarial",
+                  "Licenciatura en Ingeniería Marítima con énfasis en Náutica y Transporte Marítimo y Máquinas Marinas",
+                  "Bachillerato y Licenciatura en la Enseñanza del Inglés (Descentralizada)",
+                  "Licenciatura en la Enseñanza del Inglés (Desconcentrada)",
+                  "Bachillerato en Educación Inicial en Inglés (Descentralizada)",
+                  "Bachillerato en Turismo Sostenible con énfasis en ecoturismo (Descentralizado)",
+                  "Licenciatura en Gestión Ecoturística (Desconcentrada)"
+                ],
+                "Recinto de Liberia": [
+                  "Bachillerato en Inglés (Descentralizada)",
+                  "Bachillerato y Licenciatura en Derecho (Descentralizada)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Descentralizada)",
+                  "Diplomado en Administración Aduanera y Bachillerato y Licenciatura en Administración Aduanera y Comercio Exterior con énfasis en Comercio Internacional, Gestión de Organizaciones de Comercio Exterior, Logística y Cadena de Abastecimiento, y Gestión Aduanera (Diplomado y Bachillerato descentralizados)",
+                  "Bachillerato y Licenciatura en Psicología (Descentralizada)",
+                  "Licenciatura en Ingeniería Civil (Desconcentrado I y II año)",
+                  "Bachillerato y Licenciatura en Ingeniería Eléctrica (Varios énfasis) (Desconcentrado I y II año)",
+                  "Bachillerato y Licenciatura en Salud Ambiental (Desconcentrada)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato en Educación Primaria (Descentralizada)",
+                  "Bachillerato en Educación Primaria en Inglés (Descentralizada)",
+                  "Bachillerato en Turismo Sostenible con énfasis en ecoturismo",
+                  "Licenciatura en Gestión Ecoturística",
+                  "Bachillerato y Licenciatura en Educación de la Primera Infancia con énfasis en Inglés",
+                  "Licenciatura en Educación de Persona Jóvenes y Adultas",
+                  "Bachillerato y Licenciatura en Agronomía (Desconcentrada)",
+                  "Licenciatura en Ingeniería de Alimentos (Desconcentrada)"
+                ],
+                "Recinto de Golfito": [
+                  "Bachillerato y Licenciatura en Educación Matemática (Desconcentrada)",
+                  "Bachillerato y Licenciatura en la Enseñanza de las Ciencias Naturales (Desconcentrada)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato en Educación Primaria en Inglés (Desconcentrada)",
+                  "Bachillerato en Turismo Sostenible con énfasis en ecoturismo (Bachillerato descentralizado)",
+                  "Bachillerato y Licenciatura en Gestión y Logística Empresarial"
+                ],
+                "Recinto de Puntarenas": [
+                  "Bachillerato en la Enseñanza del Inglés (salida lateral profesorado) (Descentralizada)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Descentralizada)",
+                  "Bachillerato y Licenciatura en Ingeniería Eléctrica (Varios énfasis) (Desconcentrado I y II año)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato y Licenciatura en Informática y Tecnología Multimedia",
+                  "Bachillerato y Licenciatura en Inglés con Formación en Gestión Empresarial",
+                  "Licenciatura en Electromecánica Industrial",
+                  "Bachillerato en Gestión Cultural"
+                ],
+                "Recinto de Grecia": [
+                  "Bachillerato y Licenciatura en la Enseñanza de las Ciencias Naturales (Desconcentrada)",
+                  "Bachillerato y Licenciatura en Dirección de Empresas (Desconcentrado el bachillerato)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato y Licenciatura en Trabajo Social",
+                  "Bachillerato y Licenciatura en Laboratorista Químico",
+                  "Bachillerato en Gestión Integral del Recurso Hídrico",
+                  "Bachillerato en Modelación Matemática",
+                  "Bachillerato en Turismo Ecológico con énfasis en Ecoturismo (Bachillerato descentralizado)",
+                  "Licenciatura en Gestión de Empresas Turísticas Sostenibles"
+                ],
+                "Recinto de Guápiles": [
+                  "Bachillerato y Licenciatura en Contaduría Pública (Descentralizada)",
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato en Educación Primaria en Inglés (Descentralizada)",
+                  "Bachillerato en Economía Agrícola y Agronegocios (Desconcentrada)"
+                ],
+                "Recinto de Paraíso": [
+                  "Bachillerato en Informática Empresarial",
+                  "Bachillerato y Licenciatura en la Enseñanza del Inglés (Descentralizada)",
+                  "Licenciatura en la Enseñanza del Inglés (Desconcentrada)",
+                  "Bachillerato en Turismo Sostenible con énfasis en ecoturismo (Descentralizado)"
+                ],
+                "Recinto de Siquirres": [
+                  "Bachillerato en Informática Empresarial"
+                ],
+                "Recinto de Santa Cruz": [
+                  "Bachillerato en Economía Agrícola y Agronegocios (Desconcentrada)"
+                ]
+              }
             }
           ]
         }

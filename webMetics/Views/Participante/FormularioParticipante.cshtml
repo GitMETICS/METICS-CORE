@@ -111,13 +111,18 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.sede, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control" })
+                    @Html.DropDownListFor(participanteModel => participanteModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control", id = "sedeDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.sede, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(participanteModel => participanteModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.telefono, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.carrera, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una carrera...", new { @class = "form-control", id = "carreraDropdown" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.carrera, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br />
@@ -215,4 +220,57 @@ else
             }
         }
     });
+
+    // SECCION -> CARRERA (cuando cambia unidad académica o sede)
+    $('#seccionDropdown, #sedeDropdown').change(function () {
+        actualizarCarreras();
+    });
+
+    function actualizarCarreras() {
+        var seccion = $('#seccionDropdown').val();
+        var sede = $('#sedeDropdown').val();
+
+        $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
+
+        if (seccion !== '' && sede !== '') {
+            //Intentar obtener de datos pre-cargados
+            if (areasData &&
+                areasData.carrerasBySeccionAndSede &&
+                areasData.carrerasBySeccionAndSede[seccion] &&
+                areasData.carrerasBySeccionAndSede[seccion][sede]) {
+
+                var carreras = areasData.carrerasBySeccionAndSede[seccion][sede];
+                if (carreras && carreras.length > 0) {
+                    $.each(carreras, function (index, value) {
+                        $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    });
+                    return; //Salir si ya hay datos
+                }
+            }
+
+            //Si no están pre-cargados, hacer AJAX
+            $.ajax({
+                url: '/Participante/GetCarrerasBySeccionAndSede',
+                type: 'GET',
+                data: { unidadAcademica: seccion, sede: sede },
+                dataType: 'json',
+                success: function (carreras) {
+                    if (carreras && carreras.length > 0) {
+                        $.each(carreras, function (index, value) {
+                            $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    } else {
+                        $('#carreraDropdown').append('<option value="">No hay carreras disponibles para esta combinación</option>');
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al cargar las carreras'
+                    });
+                }
+            });
+        }
+    }
 </script>

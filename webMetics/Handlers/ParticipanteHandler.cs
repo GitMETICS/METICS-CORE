@@ -968,5 +968,41 @@ namespace webMetics.Handlers
             }
             return seccionesList;
         }
+        public List<string> GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
+        {
+            JObject jsonObject = (JObject)GetJsonFile();
+            JArray areasArray = (JArray)jsonObject["areas"];
+            List<string> carrerasList = new List<string>();
+
+            foreach (JObject areaObject in areasArray)
+            {
+                JArray departamentosArray = (JArray)areaObject["departamentos"];
+                foreach (JObject departamentoObject in departamentosArray)
+                {
+                    JArray seccionesArray = (JArray)departamentoObject["secciones"];
+                    if (seccionesArray != null)
+                    {
+                        foreach (JObject seccionObject in seccionesArray)
+                        {
+                            string currentSeccionName = (string)seccionObject["name"];
+                            if (currentSeccionName.Equals(unidadAcademica))
+                            {
+                                JObject carrerasObj = (JObject)seccionObject["carreras"];
+                                if (carrerasObj != null && carrerasObj[sede] != null)
+                                {
+                                    JArray carrerasArray = (JArray)carrerasObj[sede];
+                                    foreach (var carrera in carrerasArray)
+                                    {
+                                        carrerasList.Add((string)carrera);
+                                    }
+                                }
+                                return carrerasList;
+                            }
+                        }
+                    }
+                }
+            }
+            return carrerasList;
+        }
     }
 }
