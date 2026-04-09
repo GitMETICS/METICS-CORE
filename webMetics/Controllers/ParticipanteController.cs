@@ -1196,7 +1196,7 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
 
-            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(unidadAcademica, sede);
+            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(areaName, departamentoName, unidadAcademica, sede);
             return Json(carreras);
         }
 

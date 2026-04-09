@@ -229,6 +229,7 @@ else
 		// Limpiar dropdowns de seccion y departamento
         $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
         $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
+        $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
 
         if (areaName !== '' && areasData && areasData.departamentosByArea[areaName]) {
             var departamentos = areasData.departamentosByArea[areaName];
@@ -259,6 +260,7 @@ else
         var areaName = $('#areaDropdown').val();
 
         $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
+        $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
 
         if (departamentoName !== '' && areaName !== '' && areasData) {
             var key = areaName + '|' + departamentoName;
@@ -331,4 +333,6 @@ else
             });
         }
     }
+
+    $('#areaDropdown').trigger('change');
 </script>

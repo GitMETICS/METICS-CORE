@@ -194,6 +194,7 @@ namespace webMetics.Handlers
                                 departamento = reader["departamento"].ToString(),
                                 unidadAcademica = reader["unidad_academica"].ToString(),
                                 sede = reader["sede"].ToString(),
+                                carrera = reader["carrera"].ToString(),
                                 horasAprobadas = reader.GetInt32(reader.GetOrdinal("total_horas_aprobadas")),
                                 horasMatriculadas = reader.GetInt32(reader.GetOrdinal("total_horas_matriculadas")),
                                 correoNotificacionEnviado = reader.GetInt32(reader.GetOrdinal("correo_notificacion_enviado")),
@@ -528,6 +529,7 @@ namespace webMetics.Handlers
                 departamento = Convert.ToString(filaParticipante["departamento"]),
                 unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
                 sede = Convert.ToString(filaParticipante["sede"]),
+                carrera = filaParticipante.Table.Columns.Contains("carrera") ? Convert.ToString(filaParticipante["carrera"]) : string.Empty,
                 horasMatriculadas = Convert.ToInt32(filaParticipante["total_horas_matriculadas"]),
                 horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
                 correoNotificacionEnviado = Convert.ToInt32(filaParticipante["correo_notificacion_enviado"]),
@@ -1015,7 +1017,7 @@ namespace webMetics.Handlers
             }
             return seccionesList;
         }
-        public List<string> GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
+        public List<string> GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
         {
             JObject jsonObject = (JObject)GetJsonFile();
             JArray areasArray = (JArray)jsonObject["areas"];
