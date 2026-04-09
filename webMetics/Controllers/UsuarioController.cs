@@ -217,7 +217,7 @@ namespace webMetics.Controllers
                 {
                     if (!accesoAUsuario.ExisteUsuario(usuario.id))
                     {
-                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena, 0, usuario.correoAlternativo);
 
                         if (!accesoAParticipante.ExisteParticipante(usuario.id))
                         {

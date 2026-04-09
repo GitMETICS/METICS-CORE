@@ -952,7 +952,12 @@ namespace webMetics.Controllers
             {
                 string contrasena = GenerateRandomPassword();
 
-                accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                accesoAUsuario.CrearUsuario(
+                    participante.idParticipante,
+                    contrasena,
+                    0,
+                    participante.correoAlternativo);
+
                 EnviarContrasenaPorCorreo(participante.idParticipante, contrasena);
             }
 
