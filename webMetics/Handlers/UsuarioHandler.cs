@@ -14,7 +14,15 @@ namespace webMetics.Handlers
 
         }
 
-        public bool CrearUsuario(string id, string contrasena, int rol = 0)
+        /// <summary>
+        /// Crea un nuevo usuario en la base de datos utilizando el procedimiento almacenado "InsertUsuario".
+        /// </summary>
+        /// <param name="id">Correo institucional del usuario, que también se usará como su identificador único.</param>
+        /// <param name="contrasena">Contraseña del usuario, que se almacenará en la base de datos.</param>
+        /// <param name="rol">Rol del usuario, representado como un entero (0 para participante, 1 para administrador). Por defecto es 0.</param>
+        /// <param name="correoAlternativo">Correo alternativo del usuario, que es opcional y puede ser null.</param>
+        /// <returns></returns>
+        public bool CrearUsuario(string id, string contrasena, int rol = 0, string correoAlternativo = null)
         {
             bool exito = false;
 
@@ -24,14 +32,16 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
+                command.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
 
                 try
                 {
                     ConexionMetics.Open();
                     exito = command.ExecuteNonQuery() >= 1;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine($"Error in CrearUsuario: {ex.Message}");
                     exito = false;
                 }
                 finally
