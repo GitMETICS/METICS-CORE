@@ -22,6 +22,7 @@ CREATE TABLE correo_notificacion (
 --Creación de la tabla usuario
 CREATE TABLE usuario (
 	id_usuario_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
+	correo_alternativo NVARCHAR(64) NULL,
 	rol_FK INT FOREIGN KEY REFERENCES rol(rol_PK) ON DELETE NO ACTION DEFAULT 0,
 	hash_contrasena BINARY(64) NOT NULL,
 	salt UNIQUEIDENTIFIER,
@@ -255,13 +256,14 @@ GO
 CREATE OR ALTER PROCEDURE InsertUsuario
     @id NVARCHAR(64),
 	@rol INT = 0,
-    @contrasena NVARCHAR(64)
+    @contrasena NVARCHAR(64),
+	@correoAlternativo NVARCHAR(64) = NULL
 AS
 BEGIN
 	DECLARE @salt UNIQUEIDENTIFIER=NEWID()
 
-    INSERT INTO usuario (id_usuario_PK, rol_FK, hash_contrasena, salt)
-    VALUES(@id, @rol, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
+    INSERT INTO usuario (id_usuario_PK, correo_alternativo, rol_FK, hash_contrasena, salt)
+    VALUES(@id, @correoAlternativo, @rol, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
 END
 
 GO
