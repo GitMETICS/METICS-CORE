@@ -60,24 +60,27 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
-                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@telefono", participante.telefono);
-                command.Parameters.AddWithValue("@area", participante.area);
-                command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", participante.sede);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
+                command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@area", participante.area ?? string.Empty);
+                command.Parameters.AddWithValue("@departamento", participante.departamento ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica ?? string.Empty);
+                command.Parameters.AddWithValue("@sede", participante.sede ?? string.Empty);
+                command.Parameters.AddWithValue("@carrera", participante.carrera ?? string.Empty);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    object? resultado = command.ExecuteScalar();
+                    int filasAfectadas = resultado != null ? Convert.ToInt32(resultado) : 0;
+                    exito = filasAfectadas >= 1;
                 }
                 catch (Exception ex)
                 {
@@ -124,17 +127,18 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
-                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@telefono", participante.telefono);
-                command.Parameters.AddWithValue("@area", participante.area);
-                command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", participante.sede);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
+                command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@area", participante.area ?? string.Empty);
+                command.Parameters.AddWithValue("@departamento", participante.departamento ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica ?? string.Empty);
+                command.Parameters.AddWithValue("@sede", participante.sede ?? string.Empty);
+                command.Parameters.AddWithValue("@carrera", participante.carrera ?? string.Empty);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
@@ -248,6 +252,49 @@ namespace webMetics.Handlers
             }
 
             return correoAlternativo;
+        }
+
+        public bool GuardarAreasExtraParticipante(string idParticipante, List<string> areasExtra)
+        {
+            if (string.IsNullOrWhiteSpace(idParticipante))
+            {
+                return false;
+            }
+
+            bool exito = true;
+
+            using (var commandDelete = new SqlCommand("DELETE FROM participante_area_extra WHERE id_participante_FK = @idParticipante", ConexionMetics))
+            {
+                commandDelete.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+                try
+                {
+                    ConexionMetics.Open();
+                    commandDelete.ExecuteNonQuery();
+
+                    foreach (string areaExtra in areasExtra)
+                    {
+                        using var commandInsert = new SqlCommand(
+                            "INSERT INTO participante_area_extra (id_participante_FK, area_extra) VALUES (@idParticipante, @areaExtra)",
+                            ConexionMetics);
+
+                        commandInsert.Parameters.AddWithValue("@idParticipante", idParticipante);
+                        commandInsert.Parameters.AddWithValue("@areaExtra", areaExtra);
+                        commandInsert.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in GuardarAreasExtraParticipante: {ex.Message}");
+                    exito = false;
+                }
+                finally
+                {
+                    ConexionMetics.Close();
+                }
+            }
+
+            return exito;
         }
 
 
@@ -976,16 +1023,28 @@ namespace webMetics.Handlers
 
             foreach (JObject areaObject in areasArray)
             {
+                string currentAreaName = (string)areaObject["name"];
+                if (!string.Equals(currentAreaName, areaName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 JArray departamentosArray = (JArray)areaObject["departamentos"];
                 foreach (JObject departamentoObject in departamentosArray)
                 {
+                    string currentDepartamentoName = (string)departamentoObject["name"];
+                    if (!string.Equals(currentDepartamentoName, departamentoName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     JArray seccionesArray = (JArray)departamentoObject["secciones"];
                     if (seccionesArray != null)
                     {
                         foreach (JObject seccionObject in seccionesArray)
                         {
                             string currentSeccionName = (string)seccionObject["name"];
-                            if (currentSeccionName.Equals(unidadAcademica))
+                            if (string.Equals(currentSeccionName, unidadAcademica, StringComparison.OrdinalIgnoreCase))
                             {
                                 JObject carrerasObj = (JObject)seccionObject["carreras"];
                                 if (carrerasObj != null && carrerasObj[sede] != null)
