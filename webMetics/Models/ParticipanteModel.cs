@@ -35,9 +35,12 @@ namespace webMetics.Models
         [Display(Name = "Número de identificación")]
         public string? numeroIdentificacion { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar el Área Académica.")]
-        [Display(Name = "Área")]
+        [Required(ErrorMessage = "Es necesario ingresar el Área Académica principal.")]
+        [Display(Name = "Área principal")]
         public string? area { get; set; }
+
+        [Display(Name = "Áreas extra")]
+        public List<string> areasExtra { get; set; } = new List<string>();
 
         [Required(ErrorMessage = "Es necesario ingresar una Facultad o Departamento.")]
         [Display(Name = "Facultad o Departamento")]
