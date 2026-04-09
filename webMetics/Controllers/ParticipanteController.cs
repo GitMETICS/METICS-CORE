@@ -946,6 +946,12 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Registra un nuevo participante en el sistema.
+        /// Si el usuario no existe, se crea una cuenta de usuario con una contraseña generada aleatoriamente
+        /// y se envía por correo electrónico.
+        /// </summary>
+        /// <param name="participante"></param>
         private void IngresarParticipante(ParticipanteModel participante)
         {
             if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))

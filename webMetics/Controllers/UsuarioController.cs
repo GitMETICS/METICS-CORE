@@ -138,7 +138,15 @@ namespace webMetics.Controllers
             return View(usuario);
         }
 
-        // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos.
+        /// <summary>
+        /// Crea un usuario, revisa si existe en la base de datos un participante con el mismo correo institucional, número
+        /// de identificación o correo alternativo. Si existe, se actualizan los datos del participante y se asigna el rol
+        /// de asesor si el usuario ya había sido ingresado por el admin como asesor.
+        /// Si no existe, se crea un nuevo participante con los datos ingresados.
+        /// </summary>
+        /// <param name="usuario">Modelo con los datos del usuario a crear</param>
+        /// <param name="contrasena">Contraseña generada para el usuario</param>
+        /// <returns></returns>
         private bool CrearUsuario(UsuarioModel usuario, string contrasena)
         {
             bool exito = false;
