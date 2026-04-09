@@ -73,6 +73,17 @@ CREATE TABLE participante (
         ON UPDATE CASCADE
 );
 
+--Creación de la tabla para áreas extra de participantes
+CREATE TABLE participante_area_extra (
+    id_participante_FK NVARCHAR(64) NOT NULL,
+    area_extra NVARCHAR(256) NOT NULL,
+
+    PRIMARY KEY (id_participante_FK, area_extra),
+    FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
 --Creación de la tabla de medallas
 CREATE TABLE medallas (
 	id_participante_FK NVARCHAR(64) NOT NULL,
@@ -505,6 +516,8 @@ BEGIN
 		@horasMatriculadas,
 		@horasAprobadas
     );
+
+    SELECT @@ROWCOUNT AS FilasAfectadas;
 END
 
 GO
