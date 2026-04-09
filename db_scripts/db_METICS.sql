@@ -64,6 +64,7 @@ CREATE TABLE participante (
     departamento NVARCHAR(512) NOT NULL,
     unidad_academica NVARCHAR(512) NOT NULL,
     sede NVARCHAR(512),
+    carrera NVARCHAR(512),
     total_horas_matriculadas INT DEFAULT 0,
     total_horas_aprobadas INT DEFAULT 0,
 	correo_notificacion_enviado INT DEFAULT 0,
@@ -360,7 +361,6 @@ CREATE OR ALTER PROCEDURE InsertAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(512) = ''
 AS
 BEGIN
@@ -407,7 +407,6 @@ CREATE OR ALTER PROCEDURE UpdateAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(64) = ''
 AS
 BEGIN
@@ -470,6 +469,7 @@ CREATE OR ALTER PROCEDURE InsertParticipante
     @departamento NVARCHAR(512) = '',
     @unidadAcademica NVARCHAR(512) = '',
     @sede NVARCHAR(512) = '',
+	@carrera NVARCHAR(512) = '',
 	@horasMatriculadas INT = 0,
 	@horasAprobadas INT = 0
 AS
@@ -493,6 +493,7 @@ BEGIN
         departamento,
 		unidad_academica,
 		sede,
+		carrera,
 		total_horas_matriculadas,
 		total_horas_aprobadas
     )
@@ -513,6 +514,7 @@ BEGIN
         @departamento,
 		@unidadAcademica,
 		@sede,
+		@carrera,
 		@horasMatriculadas,
 		@horasAprobadas
     );
@@ -538,6 +540,7 @@ CREATE OR ALTER PROCEDURE UpdateParticipante
     @departamento NVARCHAR(512) = '',
     @unidadAcademica NVARCHAR(512) = '',
     @sede NVARCHAR(512) = '',
+    @carrera NVARCHAR(512) = '',
     @horasMatriculadas INT = 0,
     @horasAprobadas INT = 0
 AS
@@ -559,6 +562,7 @@ BEGIN
         departamento = @departamento,
         unidad_academica = @unidadAcademica,
         sede = @sede,
+        carrera = @carrera,
         total_horas_matriculadas = @horasMatriculadas,
         total_horas_aprobadas = @horasAprobadas
     WHERE
@@ -990,7 +994,6 @@ EXEC InsertAsesor
     @nombre = N'María Ileana', 
     @apellido1 = N'Enriquez', 
     @apellido2 = N'Barrantes',
-	@unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Asesora docente en METICS.'
 
@@ -1008,7 +1011,6 @@ EXEC InsertAsesor
     @nombre = N'Jose Antonio', 
     @apellido1 = N'Elizondo', 
     @apellido2 = N'Salas',
-	@unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productor audiovisual y asesor docente en METICS.'
 
@@ -1026,7 +1028,6 @@ EXEC InsertAsesor
     @nombre = N'Orlando Daniel', 
     @apellido1 = N'Gómez', 
     @apellido2 = N'Arias',
-	@unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Gestor de Tecnologías de Información en METICS.'
 
@@ -1044,7 +1045,6 @@ EXEC InsertAsesor
     @nombre = N'Aarón Elí', 
     @apellido1 = N'Mena', 
     @apellido2 = N'Araya',
-	@unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Director de METICS, Profesor Catedrático de la Escuela de Ciencias de la Comunicación Colectiva.'
 
@@ -1062,7 +1062,6 @@ EXEC InsertAsesor
     @nombre = N'Brenda Lidis', 
     @apellido1 = N'Alfaro', 
     @apellido2 = N'González',
-	@unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productora audiovisual y asesora docente en METICS.'
 
