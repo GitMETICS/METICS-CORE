@@ -5,6 +5,10 @@
     ViewBag.Title = "Formulario de Participante";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(a => a)
+        .ToList();
 }
 
 @if (ViewBag.Title == "Formulario de Participante")
@@ -132,6 +136,31 @@
                             @Html.ValidationMessageFor(participanteModel => participanteModel.carrera, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
+                            <fieldset class="border rounded p-3">
+                                <legend class="float-none w-auto px-2" style="font-size:22px">Áreas extra</legend>
+                                <small class="form-text text-muted d-block mb-2">
+                                    Opcional. Solo se permiten áreas válidas del catálogo en `dataAreas.json`.
+                                </small>
+
+                                @foreach (var areaExtra in areasDisponibles)
+                                {
+                                    var checkboxId = $"areaExtra_{areaExtra.GetHashCode()}";
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input area-extra-checkbox"
+                                            type="checkbox"
+                                            name="areasExtra"
+                                            id="@checkboxId"
+                                            value="@areaExtra"
+                                            @(Model?.areasExtra?.Contains(areaExtra) == true ? "checked" : null) />
+                                        <label class="form-check-label" for="@checkboxId">@areaExtra</label>
+                                    </div>
+                                }
+
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.areasExtra, "", new { @class = "text-danger" })
+                            </fieldset>
+                        </div>
+                        <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br />
                             
                             @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Interino(a)") @Html.Label("Profesor(a) Interino(a)")<br />
@@ -207,7 +236,22 @@ else
                 $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
             });
         }
+
+        actualizarAreasExtraDisponibles();
     });
+
+    function actualizarAreasExtraDisponibles() {
+        var areaPrincipal = $('#areaDropdown').val();
+
+        $('.area-extra-checkbox').each(function () {
+            var esAreaPrincipal = $(this).val() === areaPrincipal;
+            $(this).prop('disabled', esAreaPrincipal);
+
+            if (esAreaPrincipal) {
+                $(this).prop('checked', false);
+            }
+    });
+    }
 
     // DEPARTAMENTO -> SECCION
     $('#departamentoDropdown').change(function () {
@@ -234,12 +278,14 @@ else
     });
 
     function actualizarCarreras() {
+        var area = $('#areaDropdown').val();
+        var departamento = $('#departamentoDropdown').val();
         var seccion = $('#seccionDropdown').val();
         var sede = $('#sedeDropdown').val();
 
         $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
 
-        if (seccion !== '' && sede !== '') {
+        if (area !== '' && departamento !== '' && seccion !== '' && sede !== '') {
             //Intentar obtener de datos pre-cargados
             if (areasData &&
                 areasData.carrerasBySeccionAndSede &&
@@ -259,7 +305,12 @@ else
             $.ajax({
                 url: '/Participante/GetCarrerasBySeccionAndSede',
                 type: 'GET',
-                data: { unidadAcademica: seccion, sede: sede },
+                data: {
+                    areaName: area,
+                    departamentoName: departamento,
+                    unidadAcademica: seccion,
+                    sede: sede
+                },
                 dataType: 'json',
                 success: function (carreras) {
                     if (carreras && carreras.length > 0) {
