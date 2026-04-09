@@ -923,6 +923,8 @@ namespace webMetics.Controllers
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
 
+            ValidarAreasExtra(participante);
+
             if (ModelState.IsValid)
             {
                 participante.idParticipante = participante.correo;
@@ -969,8 +971,49 @@ namespace webMetics.Controllers
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
             {
-                accesoAParticipante.CrearParticipante(participante);
+                bool participanteCreado = accesoAParticipante.CrearParticipante(participante);
+
+                if (participanteCreado)
+                {
+                    List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                    accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+                }
             }
+        }
+
+        private void ValidarAreasExtra(ParticipanteModel participante)
+        {
+            if (participante.areasExtra == null || participante.areasExtra.Count == 0)
+            {
+                return;
+            }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            bool contieneInvalida = participante.areasExtra
+                .Any(area => !areasValidas.Contains(area));
+
+            if (contieneInvalida)
+            {
+                ModelState.AddModelError(nameof(ParticipanteModel.areasExtra), "Se detectaron áreas extra inválidas.");
+            }
+            }
+
+        private List<string> FiltrarAreasExtraValidas(List<string>? areasExtraSeleccionadas, string? areaPrincipal)
+        {
+            if (areasExtraSeleccionadas == null || areasExtraSeleccionadas.Count == 0)
+            {
+                return new List<string>();
+        }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            return areasExtraSeleccionadas
+                .Where(area => !string.IsNullOrWhiteSpace(area))
+                .Where(area => areasValidas.Contains(area))
+                .Where(area => !string.Equals(area, areaPrincipal, StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
 
 
@@ -1107,28 +1150,18 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        public static List<SelectListItem> GetAreas()
+        public List<SelectListItem> GetAreas()
         {
-            return new List<SelectListItem>
-            {
-                new SelectListItem { Text = "Área de Artes y Letras" },
-                new SelectListItem { Text = "Área de Ciencias Agroalimentarias" },
-                new SelectListItem { Text = "Área de Ciencias Básicas" },
-                new SelectListItem { Text = "Área de Ciencias Sociales" },
-                new SelectListItem { Text = "Área de Ingeniería" },
-                new SelectListItem { Text = "Área de Salud" },
-                new SelectListItem { Text = "Sistema de Educación General" },
-                new SelectListItem { Text = "Sistema de Estudios de Posgrado" },
-                new SelectListItem { Text = "Sedes Regionales" },
-                new SelectListItem { Text = "Oficinas Administrativas" },
-                new SelectListItem { Text = "Otros" }
-            };
+            return accesoAParticipante
+                .GetAllAreas()
+                .Select(area => new SelectListItem { Text = area, Value = area })
+                .ToList();
         }
 
         [HttpGet]
         public JsonResult GetAllAreasData()
         {
-            var allAreas = GetAreas().Select(x => x.Text).ToList();
+            var allAreas = accesoAParticipante.GetAllAreas();
             var departamentosByArea = new Dictionary<string, List<string>>();
             var seccionesByDepartamento = new Dictionary<string, List<string>>();
             var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
@@ -1158,9 +1191,9 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
+        public JsonResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
         {
-            if (string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
+            if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
 
             var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(unidadAcademica, sede);
