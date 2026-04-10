@@ -1010,6 +1010,16 @@ namespace webMetics.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    // Validar que correo alternativo sea diferente del correo institucional
+                    if (participante.correo.Equals(participante.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError("correoAlternativo", "El correo alternativo debe ser diferente del correo institucional.");
+                        ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                        ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
+                        ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
+                        return View("EditarParticipante", participante);
+                    }
+
                     participante.idParticipante = participante.correo;
                     accesoAParticipante.EditarParticipante(participante);
 

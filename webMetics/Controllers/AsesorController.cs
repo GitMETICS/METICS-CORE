@@ -265,6 +265,14 @@ namespace webMetics.Controllers
                         nuevaContrasena = asesor.contrasena
                     };
 
+                    // Validar que correo alternativo sea diferente del correo institucional
+                    if (asesor.correo.Equals(asesor.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ViewBag.ErrorMessage = "El correo alternativo debe ser diferente del correo institucional.";
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        return View("EditarAsesor", asesor);
+                    }
+
                     if (GetRole() == 1)
                     {
                         if (asesor.contrasena == asesor.confirmarContrasena)
@@ -273,7 +281,7 @@ namespace webMetics.Controllers
 
                             if (asesor.idAsesor != asesor.correo)
                             {
-                                EditarIdUsuario(usuario);
+                                CrearUsuario(usuario);
                             }
 
                             accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
@@ -301,6 +309,7 @@ namespace webMetics.Controllers
                         participante.primerApellido = asesorActualizado.primerApellido;
                         participante.segundoApellido = asesorActualizado.segundoApellido;
                         participante.correo = asesorActualizado.correo;
+                        participante.correoAlternativo = asesorActualizado.correoAlternativo;
                         participante.tipoIdentificacion = asesorActualizado.tipoIdentificacion;
                         participante.numeroIdentificacion = asesorActualizado.numeroIdentificacion;
                         participante.telefono = asesorActualizado.telefono;
@@ -328,7 +337,7 @@ namespace webMetics.Controllers
             }
         }
 
-        private bool EditarIdUsuario(NewLoginModel usuario)
+        private bool CrearUsuario(NewLoginModel usuario)
         {
             bool exito = accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
 

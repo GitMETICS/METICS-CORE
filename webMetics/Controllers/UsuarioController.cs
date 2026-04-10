@@ -460,6 +460,13 @@ namespace webMetics.Controllers
                 return RedirectToAction("CompletarCorreoAlternativo");
             }
 
+            // Validar que correo alternativo sea diferente del correo institucional
+            if (idUsuario.Equals(usuario.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["errorMessage"] = "El correo alternativo debe ser diferente del correo institucional.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
             try
             {
                 // Actualizar solo el correoAlternativo en la BD
