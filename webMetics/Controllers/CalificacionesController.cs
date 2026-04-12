@@ -21,6 +21,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Gestiona la visualización y actualización de calificaciones y horas aprobadas por grupo.
+    /// Permite subir datos de forma individual, masiva (vía Excel) o mediante AJAX, exportar
+    /// listados en PDF, Word y Excel, y enviar las calificaciones finales por correo electrónico.
+    /// </summary>
     public class CalificacionesController : Controller
     {
         private InscripcionHandler accesoAInscripcion;
@@ -44,6 +49,19 @@ namespace webMetics.Controllers
             accesoACalificaciones = new CalificacionesHandler(environment, configuration);
         }
 
+        /// <summary>
+        /// Muestra la lista de calificaciones de todos los participantes inscritos en un grupo.
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se muestran.</param>
+        /// <returns>
+        /// View: VerCalificaciones —
+        /// ViewBag.ListaCalificaciones, ViewBag.IdGrupo, ViewBag.Title, ViewBag.NombreGrupo,
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler, GrupoHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult VerCalificaciones(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -67,6 +85,19 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Muestra el formulario de edición de calificación para un participante específico de un grupo.
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <param name="idParticipante">Correo/ID del participante.</param>
+        /// <returns>
+        /// View: EditarCalificacion —
+        /// ViewBag.Calificacion (CalificacionModel), ViewBag.NombreGrupo, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler, GrupoHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult EditarCalificacion(int idGrupo, string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -83,13 +114,21 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para subir las horas aprobadas y la calificación de un participante en un grupo
+        /// Actualiza las horas aprobadas y/o la calificación de un participante en un grupo mediante
+        /// un formulario POST (no-AJAX). Actualiza también el acumulado de horas del participante.
         /// </summary>
-        /// <param name="idGrupo">Id del grupo</param>
-        /// <param name="idParticipante">Id del participante</param>
-        /// <param name="horasAprobadas">Cantidad de horas aprobadas</param>
-        /// <param name="calificacion">Calificación obtenida del participante</param>
-        /// <returns></returns>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <param name="idParticipante">Correo/ID del participante.</param>
+        /// <param name="horasAprobadas">Horas aprobadas (0 = no actualizar); debe ser ≤ cantidadHoras del grupo.</param>
+        /// <param name="calificacion">Calificación (0 = no actualizar); debe estar entre 1 y 100.</param>
+        /// <returns>
+        /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
+        /// Participante/VerDatosParticipante. Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler, ParticipanteHandler, CalificacionesHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
         {
@@ -134,14 +173,21 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para subir las horas aprobadas y la calificación de un participante en un grupo vía AJAX
-        /// TODO: Bug visual al ingresar calificación en 0, se muestra el valor anterior en la tabla hasta recargar la página
+        /// Actualiza las horas aprobadas y/o la calificación de un participante en un grupo vía AJAX.
+        /// Pasar -1 en un campo indica que ese campo no debe actualizarse.
+        /// TODO: Bug visual al ingresar calificación en 0, se muestra el valor anterior en la tabla hasta recargar la página.
         /// </summary>
-        /// <param name="idGrupo">Id del grupo</param>
-        /// <param name="idParticipante">Id del participante</param>
-        /// <param name="horasAprobadas">Horas aprobadas, inicializado en -1 para no actualizar (no se pueden enviar negativos desde UI)</param>
-        /// <param name="calificacion">Calificación, inicializado en -1 para no actualizar (no se pueden enviar negativos desde UI)</param>
-        /// <returns></returns>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <param name="idParticipante">Correo/ID del participante.</param>
+        /// <param name="horasAprobadas">Horas aprobadas (-1 = no actualizar); debe ser ≤ cantidadHoras del grupo.</param>
+        /// <param name="calificacion">Calificación (-1 = no actualizar); debe estar entre 0 y 100.</param>
+        /// <returns>
+        /// JSON { success: bool, message: string, data: { horasAprobadas, calificacion, estado } }.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler, ParticipanteHandler, CalificacionesHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> SubirHorasAprobadasYCalificacionAjax(int idGrupo, string idParticipante, int horasAprobadas = -1, int calificacion = -1)
         {
@@ -246,6 +292,20 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Registra o actualiza únicamente la calificación de un participante en un grupo.
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <param name="idParticipante">Correo/ID del participante.</param>
+        /// <param name="calificacion">Calificación a registrar (0–100).</param>
+        /// <returns>
+        /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
+        /// Calificaciones/VerCalificaciones. Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult SubirCalificacion(int idGrupo, string idParticipante, int calificacion)
         {
@@ -271,6 +331,22 @@ namespace webMetics.Controllers
             return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
         }
 
+        /// <summary>
+        /// Importa horas aprobadas y calificaciones desde un archivo Excel (.xlsx) para todos los
+        /// participantes de un grupo. Valida que cada participante esté inscrito y que los valores
+        /// estén dentro del rango permitido antes de actualizar.
+        /// </summary>
+        /// <param name="file">Archivo Excel con la plantilla de calificaciones (columnas: Correo Institucional, Horas Aprobadas, Calificación; datos desde fila 5).</param>
+        /// <param name="idGrupo">ID del grupo al que pertenecen las calificaciones.</param>
+        /// <returns>
+        /// Redirects to Participante/ListaParticipantes. Sets TempData["successMessage"] con el
+        /// resumen del proceso o TempData["errorMessage"] si no se procesó ningún participante o
+        /// ocurrió un error general.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler, CalificacionesHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> SubirExcelCalificaciones(IFormFile file, int idGrupo)
         {
@@ -422,6 +498,7 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo = idGrupo });
         }
 
+        /// <summary>Busca el índice de columna en la fila de encabezado (fila 4) de la hoja, comparando sin acentos ni mayúsculas.</summary>
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
         {
             // Normalize and remove accents from the input column name
@@ -442,7 +519,7 @@ namespace webMetics.Controllers
             throw new Exception($"Column '{columnName}' not found");
         }
 
-        // Helper method to remove accents (diacritics)
+        /// <summary>Elimina los diacríticos (tildes, diéresis) de una cadena de texto.</summary>
         private string RemoveAccents(string text)
         {
             return string.Concat(text.Normalize(NormalizationForm.FormD)
@@ -450,6 +527,13 @@ namespace webMetics.Controllers
                 .Normalize(NormalizationForm.FormC);
         }
 
+        /// <summary>
+        /// Genera y descarga la plantilla Excel vacía para importar horas aprobadas y calificaciones.
+        /// </summary>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Plantilla_Lista_Horas_Calificaciones.xlsx".</returns>
+        /// <remarks>
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult DescargarPlantillaSubirCalificaciones()
         {
             // Creamos el archivo de Excel
@@ -498,11 +582,11 @@ namespace webMetics.Controllers
 
 
         /// <summary>
-        /// Método privado para filtrar calificaciones basado en términos de búsqueda y participantes seleccionados
+        /// Filtra una colección de calificaciones por término de búsqueda (nombre, apellidos, correo o estado del participante).
         /// </summary>
-        /// <param name="calificaciones">Colección de calificaciones a filtrar</param>
-        /// <param name="searchTerm">Término de búsqueda para filtrar por nombre, apellidos, etc</param>
-        /// <returns></returns>
+        /// <param name="calificaciones">Colección de calificaciones a filtrar.</param>
+        /// <param name="searchTerm">Texto para filtrar por nombre, apellidos, correo o estado.</param>
+        /// <returns>Lista de <see cref="CalificacionModel"/> que coinciden con el término de búsqueda.</returns>
         private List<CalificacionModel> FiltrarCalificaciones(List<CalificacionModel> calificaciones, string searchTerm)
         {
             var resultado = calificaciones;
@@ -523,11 +607,15 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para exportar las calificaciones de un grupo en formato PDF
+        /// Genera y descarga un PDF con la lista de calificaciones del grupo, opcionalmente filtrada.
         /// </summary>
-        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
-        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
-        /// <returns></returns>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se exportan.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar las calificaciones.</param>
+        /// <returns>FileResult (application/pdf) — "Lista_de_Calificaciones_&lt;nombre&gt;.pdf".</returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler, GrupoHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult ExportarCalificacionesPDF(int idGrupo, string? searchTerm)
         {
             List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
@@ -583,11 +671,15 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para exportar las calificaciones de un grupo en formato Word
+        /// Genera y descarga un Word (.docx) con la lista de calificaciones del grupo, opcionalmente filtrada.
         /// </summary>
-        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
-        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
-        /// <returns></returns>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se exportan.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar las calificaciones.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.wordprocessingml.document) — "Lista_de_Calificaciones_&lt;nombre&gt;.docx".</returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler, GrupoHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult ExportarCalificacionesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -641,11 +733,15 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para exportar las calificaciones de un grupo en formato Excel
+        /// Genera y descarga un Excel (.xlsx) con la lista de calificaciones del grupo, opcionalmente filtrada.
         /// </summary>
-        /// <param name="idGrupo">ID del grupo cuyas calificaciones se desean exportar</param>
-        /// <param name="searchTerm">Término de búsqueda para filtrar las calificaciones</param>
-        /// <returns></returns>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se exportan.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar las calificaciones.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Calificaciones_&lt;nombre&gt;.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: CalificacionesHandler, GrupoHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult ExportarCalificacionesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -733,7 +829,7 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        // Método para enviar calificación a un participante
+        /// <summary>Envía por correo electrónico la calificación final de un participante para el módulo indicado.</summary>
         private async Task<IActionResult> EnviarCalificacion(string grupo, string mensaje, string correoParticipante)
         {
             string subject = "Informe de Calificación Final - Módulo " + grupo;
@@ -742,7 +838,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
-        // Método del constructor del mensaje del correo que será enviado al usuario con la calificación
+        /// <summary>Construye el cuerpo HTML del correo de calificación final con los datos del grupo y del participante.</summary>
         private string ConstructorDelMensajeCorreoEnviarCalificacion(GrupoModel grupo, CalificacionModel calificacion)
         {
             // Construir el contenido del mensaje que se enviará por correo electrónico al usuario
@@ -772,6 +868,18 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
+        /// <summary>
+        /// Envía por correo electrónico las calificaciones finales a todos los participantes del grupo.
+        /// </summary>
+        /// <param name="idGrupo">ID del grupo cuyas calificaciones se envían.</param>
+        /// <returns>
+        /// Redirects to Participante/ListaParticipantes. Sets TempData["successMessage"] on success
+        /// or TempData["errorMessage"] si ocurre un error.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, CalificacionesHandler.
+        /// Role required: Asesor (2) o Admin (1).
+        /// </remarks>
         public ActionResult EnviarCalificacionesAlCorreo(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -805,6 +913,7 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -817,6 +926,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
