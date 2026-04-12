@@ -4,6 +4,10 @@ using webMetics.Handlers;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Gestiona las medallas del sistema: permite subir nuevas imágenes de medallas, editarlas,
+    /// eliminarlas y desasociarlas de participantes específicos.
+    /// </summary>
     public class MedallasController : Controller
     {
         private protected UsuarioHandler accesoAUsuario;
@@ -25,6 +29,7 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -37,6 +42,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -49,6 +55,13 @@ namespace webMetics.Controllers
             return id;
         }
 
+        /// <summary>Muestra el catálogo de medallas y la lista de participantes del sistema.</summary>
+        /// <returns>
+        /// View: ListaMedallas —
+        /// ViewBag.TodasLasMedallas, ViewBag.TodosLosParticipantes,
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         public ActionResult ListaMedallas()
         {
             ViewBag.Role = GetRole();
@@ -63,6 +76,16 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Sube una nueva imagen de medalla al servidor y la registra en la base de datos,
+        /// siempre que no exista ya una medalla con el mismo nombre de archivo.
+        /// </summary>
+        /// <param name="imageFile">Archivo de imagen a subir (JPEG/PNG). El nombre del archivo se usa como identificador.</param>
+        /// <returns>
+        /// Redirects to ListaMedallas. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] si el archivo es inválido o ya existe.
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public async Task<IActionResult> SubirMedalla(IFormFile imageFile)
         {
@@ -109,6 +132,12 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaMedallas");
         }
 
+        /// <summary>Muestra el formulario para reemplazar la imagen de una medalla existente.</summary>
+        /// <param name="nombreMedalla">Nombre de archivo de la medalla a editar.</param>
+        /// <returns>
+        /// View: EditarMedalla — ViewBag.NombreMedalla, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>Role required: Admin (1).</remarks>
         public ActionResult EditarMedalla(string nombreMedalla)
         {
             ViewBag.Role = GetRole();
@@ -119,6 +148,16 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Reemplaza la imagen de una medalla: elimina la antigua del sistema y registra la nueva.
+        /// </summary>
+        /// <param name="nombreMedalla">Nombre de la medalla a reemplazar.</param>
+        /// <param name="imageFile">Nueva imagen de la medalla.</param>
+        /// <returns>
+        /// Redirects to ListaMedallas. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] si el archivo es inválido.
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public async Task<IActionResult> EditarMedalla(string nombreMedalla, IFormFile imageFile)
         {
@@ -147,6 +186,13 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaMedallas");
         }
 
+        /// <summary>Elimina una medalla del sistema (registro en BD e imagen en servidor).</summary>
+        /// <param name="nombreMedalla">Nombre de archivo de la medalla a eliminar.</param>
+        /// <returns>
+        /// Redirects to ListaMedallas. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] on failure.
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         public ActionResult EliminarMedalla(string nombreMedalla)
         {
             try
@@ -172,6 +218,14 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaMedallas");
         }
 
+        /// <summary>Desasigna una medalla de un participante específico sin eliminarla del catálogo.</summary>
+        /// <param name="idParticipante">Correo/ID del participante.</param>
+        /// <param name="nombreMedalla">Nombre de archivo de la medalla a desasignar.</param>
+        /// <returns>
+        /// Redirects to Participante/VerDatosParticipante. Sets TempData["successMessage"] on
+        /// success or TempData["errorMessage"] on failure.
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public IActionResult EliminarMedallaParticipante(string idParticipante, string nombreMedalla)
         {
