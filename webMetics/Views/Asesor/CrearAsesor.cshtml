@@ -64,10 +64,15 @@
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mt-1">
                             @Html.LabelFor(asesorModel => asesorModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                             @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(asesorModel => asesorModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.TextBoxFor(asesorModel => asesorModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
+                            @Html.ValidationMessageFor(asesorModel => asesorModel.correoAlternativo, "", new { @class = "text-danger" })
                         </div>
                         <div class="row mt-1">
                             <div class="col">
