@@ -106,14 +106,15 @@
                     <thead>
                         <tr>
                             <th class="text-center" scope="col" style="width:2%;"></th>
-                            <th scope="col" style="width:12%;">Unidad Académica</th>
-                            <th scope="col" style="width:8%;">Nombre</th>
-                            <th scope="col" style="width:8%;">Primer<br>Apellido</th>
-                            <th scope="col" style="width:8%;">Segundo<br>Apellido</th>
-                            <th scope="col" style="width:15%;">Correo Institucional</th>
-                            <th scope="col" style="width:15%;">Correo Alternativo</th>
-                            <th class="text-center" scope="col" style="width:8%;">Total Horas<br>Inscritas</th>
-                            <th class="text-center" scope="col" style="width:8%;">Total Horas<br>Aprobadas</th>
+                            <th scope="col" style="width:11%;">Unidad Académica</th>
+                            <th scope="col" style="width:7%;">Nombre</th>
+                            <th scope="col" style="width:7%;">Primer<br>Apellido</th>
+                            <th scope="col" style="width:7%;">Segundo<br>Apellido</th>
+                            <th scope="col" style="width:12%;">Correo Institucional</th>
+                            <th scope="col" style="width:12%;">Correo Alternativo</th>
+                            <th scope="col" style="width:11%;">Grado Académico</th>
+                            <th class="text-center" scope="col" style="width:7%;">Total Horas<br>Inscritas</th>
+                            <th class="text-center" scope="col" style="width:7%;">Total Horas<br>Aprobadas</th>
                             <th class="text-center" scope="col" style="width:2%;"></th>
                             <th class="text-center" scope="col" style="width:2%;"></th>
                             <th class="text-center" scope="col" style="width:2%;"></th>
@@ -160,6 +161,7 @@
                                 <td>@participante.segundoApellido</td>
                                 <td>@participante.correo</td>
                                 <td>@(string.IsNullOrWhiteSpace(participante.correoAlternativo) ? "-" : participante.correoAlternativo)</td>
+                                <td>@(string.IsNullOrWhiteSpace(participante.gradoAcademico) ? "-" : participante.gradoAcademico)</td>
                                 <td class="text-center">
                                     <span>@participante.horasMatriculadas</span>
                                 </td>
