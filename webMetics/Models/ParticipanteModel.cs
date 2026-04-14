@@ -29,6 +29,10 @@ namespace webMetics.Models
         [Display(Name = "Correo alternativo")]
         public string? correoAlternativo { get; set; }
 
+        [Required(ErrorMessage = "Es necesario ingresar un grado académico.")]
+        [Display(Name = "Grado Académico")]
+        public string? gradoAcademico { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
         [Display(Name = "Tipo de identificación")]
         public string? tipoIdentificacion { get; set; }
