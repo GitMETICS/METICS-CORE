@@ -272,6 +272,40 @@ namespace webMetics.Handlers
             return correoAlternativo;
         }
 
+        public string ObtenerGradoAcademico(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
         public bool ActualizarCorreoAlternativo(string idUsuario, string correoAlternativo)
         {
             string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo WHERE id_usuario_PK = @idUsuario;";
@@ -281,6 +315,23 @@ namespace webMetics.Handlers
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
             comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public bool ActualizarGradoAcademico(string idUsuario, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico);
 
             bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 
