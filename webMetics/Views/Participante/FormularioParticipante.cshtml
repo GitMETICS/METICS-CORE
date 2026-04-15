@@ -153,7 +153,7 @@
                                             name="areasExtra"
                                             id="@checkboxId"
                                             value="@areaExtra"
-                                            @(Model?.areasExtra?.Contains(areaExtra) == true ? "checked" : null) />
+                                            @(Model?.areasExtra?.Contains(areaExtra, StringComparer.OrdinalIgnoreCase) == true ? "checked" : null) />
                                         <label class="form-check-label" for="@checkboxId">@areaExtra</label>
                                     </div>
                                 }
