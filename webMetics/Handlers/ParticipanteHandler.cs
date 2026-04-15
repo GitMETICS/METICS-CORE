@@ -9,7 +9,7 @@ using NPOI.HPSF;
 
 namespace webMetics.Handlers
 {
-    public class ParticipanteHandler : BaseDeDatosHandler
+    public class ParticipanteHandler : BaseDeDatosHandler, IParticipanteHandler
     {
         private protected InscripcionHandler accesoAInscripcion;
 
