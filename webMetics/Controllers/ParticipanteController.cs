@@ -34,6 +34,9 @@ namespace webMetics.Controllers
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
 
+        // Injected only in unit tests via the internal constructor below.
+        private readonly Handlers.IParticipanteHandler? _participanteHandlerForTesting;
+
         public ParticipanteController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
@@ -46,6 +49,21 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
+
+        /// <summary>
+        /// Constructor for unit tests. Allows injecting a mock IParticipanteHandler
+        /// without replacing every handler in the class.
+        /// </summary>
+#pragma warning disable CS8618 // handler-dependent fields are null by design in test paths
+        internal ParticipanteController(Handlers.IParticipanteHandler participanteHandler)
+        {
+            _participanteHandlerForTesting = participanteHandler;
+        }
+#pragma warning restore CS8618
+
+        // Returns the real handler in production; falls back to the injected mock in tests.
+        private IEnumerable<string> GetAllAreasInternal() =>
+            _participanteHandlerForTesting?.GetAllAreas() ?? accesoAParticipante.GetAllAreas();
 
         public ActionResult ListaParticipantes(int idGrupo)
         {
@@ -943,7 +961,7 @@ namespace webMetics.Controllers
             }
             else
             {
-                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                ViewData["jsonDataAreas"] = GetAllAreasInternal();
                 return View("FormularioParticipante", participante);
             }
         }
@@ -984,36 +1002,16 @@ namespace webMetics.Controllers
         private void ValidarAreasExtra(ParticipanteModel participante)
         {
             if (participante.areasExtra == null || participante.areasExtra.Count == 0)
-            {
                 return;
-            }
 
-            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
-
-            bool contieneInvalida = participante.areasExtra
-                .Any(area => !areasValidas.Contains(area));
-
-            if (contieneInvalida)
-            {
+            if (!Helpers.ParticipanteValidator.AreasExtraSonValidas(participante.areasExtra, GetAllAreasInternal()))
                 ModelState.AddModelError(nameof(ParticipanteModel.areasExtra), "Se detectaron áreas extra inválidas.");
-            }
-            }
+        }
 
         private List<string> FiltrarAreasExtraValidas(List<string>? areasExtraSeleccionadas, string? areaPrincipal)
         {
-            if (areasExtraSeleccionadas == null || areasExtraSeleccionadas.Count == 0)
-            {
-                return new List<string>();
-        }
-
-            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
-
-            return areasExtraSeleccionadas
-                .Where(area => !string.IsNullOrWhiteSpace(area))
-                .Where(area => areasValidas.Contains(area))
-                .Where(area => !string.Equals(area, areaPrincipal, StringComparison.OrdinalIgnoreCase))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            return Helpers.ParticipanteValidator.FiltrarAreasExtraValidas(
+                areasExtraSeleccionadas, areaPrincipal, GetAllAreasInternal());
         }
 
 
@@ -1545,13 +1543,7 @@ namespace webMetics.Controllers
             throw new Exception($"Column '{columnName}' not found");
         }
 
-        // Helper method to remove accents (diacritics)
-        private string RemoveAccents(string text)
-        {
-            return string.Concat(text.Normalize(NormalizationForm.FormD)
-                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
-                .Normalize(NormalizationForm.FormC);
-        }
+        private static string RemoveAccents(string text) => Helpers.StringHelper.RemoveAccents(text);
 
         // Método para enviar confirmación de registro al usuario
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
