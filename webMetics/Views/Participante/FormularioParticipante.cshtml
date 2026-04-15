@@ -139,12 +139,13 @@
                             <fieldset class="border rounded p-3">
                                 <legend class="float-none w-auto px-2" style="font-size:22px">Áreas extra</legend>
                                 <small class="form-text text-muted d-block mb-2">
-                                    Opcional. Solo se permiten áreas válidas del catálogo en `dataAreas.json`.
+                                    Opcional. Debe ser diferente al área principal.
                                 </small>
 
+                                @{ int areaIndex = 0; }
                                 @foreach (var areaExtra in areasDisponibles)
                                 {
-                                    var checkboxId = $"areaExtra_{areaExtra.GetHashCode()}";
+                                    var checkboxId = $"areaExtra_{areaIndex++}";
                                     <div class="form-check">
                                         <input
                                             class="form-check-input area-extra-checkbox"
