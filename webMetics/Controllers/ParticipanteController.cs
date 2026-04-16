@@ -1031,6 +1031,7 @@ namespace webMetics.Controllers
                         asesorAsociado.segundoApellido = participante.segundoApellido;
                         asesorAsociado.correo = participante.correo;
                         asesorAsociado.correoAlternativo = participante.correoAlternativo;
+                        asesorAsociado.gradoAcademico = participante.gradoAcademico;
                         asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
                         asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
                         asesorAsociado.telefono = participante.telefono;

@@ -137,6 +137,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@sede", participante.sede);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
+                command.Parameters.AddWithValue("@gradoAcademico", participante.gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {
