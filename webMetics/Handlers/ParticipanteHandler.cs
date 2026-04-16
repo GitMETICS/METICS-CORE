@@ -264,35 +264,44 @@ namespace webMetics.Handlers
 
             bool exito = true;
 
-            using (var commandDelete = new SqlCommand("DELETE FROM participante_area_extra WHERE id_participante_FK = @idParticipante", ConexionMetics))
+            try
             {
-                commandDelete.Parameters.AddWithValue("@idParticipante", idParticipante);
+                ConexionMetics.Open();
+                using SqlTransaction transaction = ConexionMetics.BeginTransaction();
 
                 try
                 {
-                    ConexionMetics.Open();
-                    commandDelete.ExecuteNonQuery();
+                    using (var commandDelete = new SqlCommand(
+                        "DELETE FROM participante_area_extra WHERE id_participante_FK = @idParticipante",
+                        ConexionMetics, transaction))
+                    {
+                        commandDelete.Parameters.AddWithValue("@idParticipante", idParticipante);
+                        commandDelete.ExecuteNonQuery();
+                    }
 
                     foreach (string areaExtra in areasExtra)
                     {
                         using var commandInsert = new SqlCommand(
                             "INSERT INTO participante_area_extra (id_participante_FK, area_extra) VALUES (@idParticipante, @areaExtra)",
-                            ConexionMetics);
+                            ConexionMetics, transaction);
 
                         commandInsert.Parameters.AddWithValue("@idParticipante", idParticipante);
                         commandInsert.Parameters.AddWithValue("@areaExtra", areaExtra);
                         commandInsert.ExecuteNonQuery();
                     }
+
+                    transaction.Commit();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error in GuardarAreasExtraParticipante: {ex.Message}");
+                    transaction.Rollback();
                     exito = false;
                 }
-                finally
-                {
-                    ConexionMetics.Close();
-                }
+            }
+            finally
+            {
+                ConexionMetics.Close();
             }
 
             return exito;

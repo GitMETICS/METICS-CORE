@@ -930,9 +930,16 @@ namespace webMetics.Controllers
                 participante.idParticipante = participante.correo;
                 try
                 {
-                    IngresarParticipante(participante);
+                    bool exito = IngresarParticipante(participante);
 
-                    TempData["successMessage"] = "Participante agregado.";
+                    if (exito)
+                    {
+                        TempData["successMessage"] = "Participante agregado.";
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "Participante creado, pero ocurrió un error al guardar las áreas extra.";
+                    }
                 }
                 catch
                 {
@@ -954,7 +961,7 @@ namespace webMetics.Controllers
         /// y se envía por correo electrónico.
         /// </summary>
         /// <param name="participante"></param>
-        private void IngresarParticipante(ParticipanteModel participante)
+        private bool IngresarParticipante(ParticipanteModel participante)
         {
             if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
             {
@@ -976,9 +983,13 @@ namespace webMetics.Controllers
                 if (participanteCreado)
                 {
                     List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
-                    accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+                    return accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
                 }
+
+                return false;
             }
+
+            return true;
         }
 
         private void ValidarAreasExtra(ParticipanteModel participante)
