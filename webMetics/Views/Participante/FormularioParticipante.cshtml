@@ -200,6 +200,10 @@ else
 <script type="text/javascript">
 
     var areasData = null;
+    var preselectedDepartamento = '@Html.Raw(Model?.departamento ?? "")';
+    var preselectedSeccion = '@Html.Raw(Model?.unidadAcademica ?? "")';
+    var preselectedCarrera = '@Html.Raw(Model?.carrera ?? "")';
+
     // Cargar datos de áreas, departamentos y secciones al iniciar la página
     $(document).ready(function() {
         $.ajax({
@@ -211,6 +215,18 @@ else
                 areasData = data;
 				// Habilitar los dropdowns después de cargar los datos
                 $('#areaDropdown, #departamentoDropdown').prop('disabled', false);
+
+                // Si hay un área pre-seleccionada (re-render tras error de validación), repoblar la cascada
+                if ($('#areaDropdown').val()) {
+                    $('#areaDropdown').trigger('change');
+                    if (preselectedDepartamento) {
+                        $('#departamentoDropdown').val(preselectedDepartamento).trigger('change');
+                        if (preselectedSeccion) {
+                            $('#seccionDropdown').val(preselectedSeccion);
+                            actualizarCarreras(preselectedCarrera || '');
+                        }
+                    }
+                }
             },
             error: function (xhr, status, error) {
                 $('#areaDropdown, #departamentoDropdown').prop('disabled', false);
@@ -280,7 +296,7 @@ else
         actualizarCarreras();
     });
 
-    function actualizarCarreras() {
+    function actualizarCarreras(preselectedValue) {
         var area = $('#areaDropdown').val();
         var departamento = $('#departamentoDropdown').val();
         var seccion = $('#seccionDropdown').val();
@@ -300,6 +316,9 @@ else
                     $.each(carreras, function (index, value) {
                         $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
                     });
+                    if (preselectedValue) {
+                        $('#carreraDropdown').val(preselectedValue);
+                    }
                     return; //Salir si ya hay datos
                 }
             }
@@ -320,6 +339,9 @@ else
                         $.each(carreras, function (index, value) {
                             $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
                         });
+                        if (preselectedValue) {
+                            $('#carreraDropdown').val(preselectedValue);
+                        }
                     } else {
                         $('#carreraDropdown').append('<option value="">No hay carreras disponibles para esta combinación</option>');
                     }
@@ -334,6 +356,4 @@ else
             });
         }
     }
-
-    $('#areaDropdown').trigger('change');
 </script>
