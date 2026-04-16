@@ -1160,14 +1160,6 @@ namespace webMetics.Controllers
             return Json(secciones);
         }
 
-        [HttpGet]
-        public List<SelectListItem> GetAreas()
-        {
-            return accesoAParticipante
-                .GetAllAreas()
-                .Select(area => new SelectListItem { Text = area, Value = area })
-                .ToList();
-        }
 
         [HttpGet]
         public JsonResult GetAllAreasData()
