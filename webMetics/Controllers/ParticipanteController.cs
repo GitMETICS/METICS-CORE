@@ -918,41 +918,74 @@ namespace webMetics.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
+            bool isAjaxRequest = IsAjaxRequest();
 
             ValidarAreasExtra(participante);
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                participante.idParticipante = participante.correo;
-                try
+                if (isAjaxRequest)
                 {
-                    bool exito = IngresarParticipante(participante);
-
-                    if (exito)
-                    {
-                        TempData["successMessage"] = "Participante agregado.";
-                    }
-                    else
-                    {
-                        TempData["errorMessage"] = "Participante creado, pero ocurrió un error al guardar las áreas extra.";
-                    }
-                }
-                catch
-                {
-                    TempData["errorMessage"] = "Error al agregar al participante.";
+                    return BadRequest(BuildAjaxValidationErrorResponse());
                 }
 
-                return RedirectToAction("VerParticipantes");
-            }
-            else
-            {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 return View("FormularioParticipante", participante);
             }
+
+            participante.idParticipante = participante.correo;
+
+            try
+            {
+                bool exito = IngresarParticipante(participante);
+
+                if (isAjaxRequest)
+                {
+                    if (exito)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = Url.Action("VerParticipantes", "Participante")
+                        });
+                    }
+
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Participante creado, pero ocurrió un error al guardar las áreas extra."
+                    });
+                }
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Participante agregado.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Participante creado, pero ocurrió un error al guardar las áreas extra.";
+                }
+            }
+            catch
+            {
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Error al agregar al participante."
+                    });
+                }
+
+                TempData["errorMessage"] = "Error al agregar al participante.";
+            }
+
+            return RedirectToAction("VerParticipantes");
         }
 
         /// <summary>
@@ -1059,46 +1092,125 @@ namespace webMetics.Controllers
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
+            bool isAjaxRequest = IsAjaxRequest();
+
+            ValidarAreasExtra(participante);
 
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    participante.idParticipante = participante.correo;
-                    accesoAParticipante.EditarParticipante(participante);
-
-                    AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
-                    if (asesorAsociado != null)
+                    if (isAjaxRequest)
                     {
-                        asesorAsociado.nombre = participante.nombre;
-                        asesorAsociado.primerApellido = participante.primerApellido;
-                        asesorAsociado.segundoApellido = participante.segundoApellido;
-                        asesorAsociado.correo = participante.correo;
-                        asesorAsociado.correoAlternativo = participante.correoAlternativo;
-                        asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
-                        asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
-                        asesorAsociado.telefono = participante.telefono;
-
-                        accesoAAsesor.EditarAsesor(asesorAsociado);
+                        return BadRequest(BuildAjaxValidationErrorResponse());
                     }
 
-                    TempData["successMessage"] = "Los datos fueron guardados.";
-                    return RedirectToAction("VerParticipantes", "Participante");
-                }
-                else
-                {
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                     ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
                     ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
 
                     return View("EditarParticipante", participante);
                 }
+
+                participante.idParticipante = participante.correo;
+                bool participanteEditado = accesoAParticipante.EditarParticipante(participante);
+                if (!participanteEditado)
+                {
+                    throw new Exception("No se pudo actualizar la información del participante.");
+                }
+
+                List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+
+                AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
+                if (asesorAsociado != null)
+                {
+                    asesorAsociado.nombre = participante.nombre;
+                    asesorAsociado.primerApellido = participante.primerApellido;
+                    asesorAsociado.segundoApellido = participante.segundoApellido;
+                    asesorAsociado.correo = participante.correo;
+                    asesorAsociado.correoAlternativo = participante.correoAlternativo;
+                    asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
+                    asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
+                    asesorAsociado.telefono = participante.telefono;
+
+                    accesoAAsesor.EditarAsesor(asesorAsociado);
+                }
+
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                    {
+                        return StatusCode(500, new
+                        {
+                            success = false,
+                            message = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra."
+                        });
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl = Url.Action("VerParticipantes", "Participante")
+                    });
+                }
+
+                if (areasExtraGuardadas)
+                {
+                    TempData["successMessage"] = "Los datos fueron guardados.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra.";
+                }
+
+                return RedirectToAction("VerParticipantes", "Participante");
             }
             catch
             {
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Ocurrió un error al editar los datos."
+                    });
+                }
+
                 TempData["Message"] = "Ocurrió un error al editar los datos.";
                 return RedirectToAction("VerParticipantes", "Participante");
             }
+        }
+
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new
+            {
+                success = false,
+                fieldErrors,
+                globalErrors
+            };
         }
 
         /* Método para que un administrador elimine un participante */
