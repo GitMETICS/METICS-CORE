@@ -476,8 +476,9 @@ else
                 },
                 error: function (xhr) {
                     var response = xhr.responseJSON || {};
+                    var tieneErroresCampo = response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
 
-                    if (response.fieldErrors) {
+                    if (tieneErroresCampo) {
                         mostrarMensajesValidacion(response.fieldErrors);
                     }
 
@@ -485,7 +486,7 @@ else
                         mostrarErrorGlobal(response.globalErrors.join(' '));
                     } else if (response.message) {
                         mostrarErrorGlobal(response.message);
-                    } else {
+                    } else if (!tieneErroresCampo) {
                         mostrarErrorGlobal('Ocurrió un error inesperado al guardar los cambios.');
                     }
                 },
