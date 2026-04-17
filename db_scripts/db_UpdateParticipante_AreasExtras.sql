@@ -1,5 +1,5 @@
--- Script de actualizaci�n para soportar �rea principal + �reas extra (m�ltiples)
--- Incluye ajuste de carrera y correcci�n de par�metros del SP InsertParticipante.
+-- Script de actualización para soportar Área principal + Áreas extra (múltiples)
+-- Incluye ajuste de carrera y corrección de parámetros del SP InsertParticipante.
 
 --GO
 --DELETE FROM dbo.participante_area_extra;
