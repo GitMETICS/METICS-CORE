@@ -1347,7 +1347,7 @@ namespace webMetics.Controllers
             return Json(secciones);
         }
 
-        /// <summary>Devuelve la lista de áreas UCR como SelectListItem (datos estáticos, predatos de dataAreas.json).</summary>
+        /// <summary>Devuelve la lista de áreas UCR como SelectListItem (datos estáticos/predefinidos de dataAreas.json).</summary>
         [HttpGet]
         public static List<SelectListItem> GetAreas()
         {
