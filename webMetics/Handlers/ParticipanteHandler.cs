@@ -216,9 +216,47 @@ namespace webMetics.Handlers
             if (participante != null)
             {
                 participante.correoAlternativo = ObtenerCorreoAlternativoUsuario(idParticipante);
+                participante.areasExtra = GetAreasExtraByParticipante(idParticipante);
             }
 
             return participante;
+        }
+
+        public List<string> GetAreasExtraByParticipante(string idParticipante)
+        {
+            var areasExtra = new List<string>();
+            var areasExtraSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            const string consulta = "SELECT area_extra FROM participante_area_extra WHERE id_participante_FK = @idParticipante;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string? areaExtra = reader["area_extra"]?.ToString();
+                        if (!string.IsNullOrWhiteSpace(areaExtra) && areasExtraSet.Add(areaExtra))
+                        {
+                            areasExtra.Add(areaExtra);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener áreas extra: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return areasExtra;
         }
 
         private string ObtenerCorreoAlternativoUsuario(string idUsuario)
