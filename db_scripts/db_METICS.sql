@@ -568,6 +568,8 @@ BEGIN
     WHERE
         id_usuario_FK = @idUsuario
         AND id_participante_PK = @idParticipante;
+
+    SELECT @@ROWCOUNT;
 END
 
 GO

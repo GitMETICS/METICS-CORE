@@ -1,5 +1,5 @@
--- Script de actualización para soportar área principal + áreas extra (múltiples)
--- Incluye ajuste de carrera y corrección de parámetros del SP InsertParticipante.
+-- Script de actualizaciï¿½n para soportar ï¿½rea principal + ï¿½reas extra (mï¿½ltiples)
+-- Incluye ajuste de carrera y correcciï¿½n de parï¿½metros del SP InsertParticipante.
 
 --GO
 --DELETE FROM dbo.participante_area_extra;
@@ -140,4 +140,6 @@ BEGIN
     WHERE
         id_usuario_FK = @idUsuario
         AND id_participante_PK = @idParticipante;
+
+    SELECT @@ROWCOUNT;
 END
