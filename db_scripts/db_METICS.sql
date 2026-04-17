@@ -361,6 +361,7 @@ CREATE OR ALTER PROCEDURE InsertAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
+    @unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(512) = ''
 AS
 BEGIN
@@ -407,6 +408,7 @@ CREATE OR ALTER PROCEDURE UpdateAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
+    @unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(64) = ''
 AS
 BEGIN
@@ -988,7 +990,7 @@ EXEC InsertUsuario
 	@contrasena = N'4fG7hJ2kL9';
 
 EXEC InsertAsesor 
-    @idUsuario = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
+    @idUsuario = N'MARIA.ENRIQUEZ@ucr.ac.cr',
     @idAsesor = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
     @tipoIdentificacion = N'Cédula', 
     @numeroIdentificacion = N'1-1070-0400', 
@@ -996,6 +998,7 @@ EXEC InsertAsesor
     @nombre = N'María Ileana', 
     @apellido1 = N'Enriquez', 
     @apellido2 = N'Barrantes',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Asesora docente en METICS.'
 
@@ -1011,8 +1014,9 @@ EXEC InsertAsesor
     @numeroIdentificacion = N'1-1520-0692', 
     @correo = N'jose.elizondosalas@ucr.ac.cr', 
     @nombre = N'Jose Antonio', 
-    @apellido1 = N'Elizondo', 
+    @apellido1 = N'Elizondo',
     @apellido2 = N'Salas',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productor audiovisual y asesor docente en METICS.'
 
@@ -1030,6 +1034,7 @@ EXEC InsertAsesor
     @nombre = N'Orlando Daniel', 
     @apellido1 = N'Gómez', 
     @apellido2 = N'Arias',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Gestor de Tecnologías de Información en METICS.'
 
@@ -1047,6 +1052,7 @@ EXEC InsertAsesor
     @nombre = N'Aarón Elí', 
     @apellido1 = N'Mena', 
     @apellido2 = N'Araya',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Director de METICS, Profesor Catedrático de la Escuela de Ciencias de la Comunicación Colectiva.'
 
@@ -1064,6 +1070,7 @@ EXEC InsertAsesor
     @nombre = N'Brenda Lidis', 
     @apellido1 = N'Alfaro', 
     @apellido2 = N'González',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productora audiovisual y asesora docente en METICS.'
 
