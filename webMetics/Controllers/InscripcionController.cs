@@ -19,12 +19,14 @@ using System.Text;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
-/* 
- * Controlador para el proceso de inscripción de los grupos
- */
-
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador para la gestión de inscripciones de participantes en grupos.
+    /// Cubre alta/baja individual y masiva, importación desde Excel, exportaciones en PDF/Word/Excel,
+    /// notificaciones por correo y cambios de estado de inscripción.
+    /// Usa IMemoryCache para almacenar la lista de inscripciones durante 30 minutos.
+    /// </summary>
     public class InscripcionController : Controller
     {
         private InscripcionHandler accesoAInscripcion;
@@ -55,7 +57,16 @@ namespace webMetics.Controllers
             _memoryCache = memoryCache;
         }
 
-        /* Método para mostrar la lista de participantes inscritos en un grupo */
+        /// <summary>Muestra la lista de inscripciones de un grupo específico.</summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: ListaDeParticipantesInscritos —
+        /// ViewBag.InscritosEnGrupo (List&lt;InscripcionModel&gt;), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ListaDeParticipantesInscritos(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -67,6 +78,21 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Muestra todas las inscripciones del sistema. Usa caché de 30 minutos;
+        /// si <paramref name="reload"/> es <c>true</c>, fuerza la recarga desde la base de datos.
+        /// </summary>
+        /// <param name="reload">Si <c>true</c>, invalida la caché y recarga desde BD.</param>
+        /// <returns>
+        /// View: VerInscripciones —
+        /// ViewBag.ListaInscripciones (List&lt;InscripcionModel&gt; con participante cargado),
+        /// ViewBag.TodasLasMedallas, ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult VerInscripciones(bool reload = false)
         {
             ViewBag.Role = GetRole();
@@ -119,6 +145,19 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Filtra inscripciones por nombre, apellidos, correo, unidad académica, nombre de grupo, horas o estado.
+        /// Reutiliza la vista VerInscripciones.
+        /// </summary>
+        /// <param name="searchTerm">Texto libre para filtrar.</param>
+        /// <returns>
+        /// View: VerInscripciones —
+        /// ViewBag.ListaInscripciones (filtrada), ViewBag.TodasLasMedallas, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public IActionResult BuscarInscripciones(string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -160,6 +199,17 @@ namespace webMetics.Controllers
             return View("VerInscripciones");
         }
 
+        /// <summary>
+        /// Muestra el formulario para inscribir manualmente a un participante en cualquier grupo (por nombre y número).
+        /// </summary>
+        /// <returns>
+        /// View: FormularioInscripcion —
+        /// ViewBag.ListaNombresGrupos, ViewBag.ListaNumerosGrupos, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult FormularioInscripcion()
         {
             ViewBag.Role = GetRole();
@@ -173,6 +223,19 @@ namespace webMetics.Controllers
             return View("FormularioInscripcion");
         }
 
+        /// <summary>
+        /// Procesa el formulario de inscripción manual por nombre y número de grupo.
+        /// Invalida la caché de inscripciones al redirigir.
+        /// </summary>
+        /// <param name="inscripcion">Modelo con nombreGrupo, numeroGrupo e idParticipante.</param>
+        /// <returns>
+        /// Redirects to VerInscripciones (reload=true) on success; sets TempData["successMessage"] o TempData["errorMessage"].
+        /// View: FormularioInscripcion con errores si ModelState es inválido.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler (vía Inscribir).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult FormularioInscripcion(InscripcionModel inscripcion)
         {
@@ -202,6 +265,19 @@ namespace webMetics.Controllers
                 return View("FormularioInscripcion", inscripcion);
             }
         }
+        /// <summary>
+        /// Muestra el formulario para inscribir manualmente a un participante en un grupo específico,
+        /// con los datos del grupo precargados.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo en el que se inscribirá el participante.</param>
+        /// <returns>
+        /// View: FormularioInscripcionManual —
+        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult FormularioInscripcionManual(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -216,6 +292,20 @@ namespace webMetics.Controllers
             return View("FormularioInscripcionManual");
         }
 
+        /// <summary>
+        /// Procesa la inscripción manual de un participante existente en un grupo.
+        /// Redirige al asesor a MisModulos; al admin a ListaGruposDisponibles.
+        /// </summary>
+        /// <param name="inscripcion">Modelo con idGrupo e idParticipante.</param>
+        /// <returns>
+        /// Redirects to Asesor/MisModulos (rol 2) o Grupo/ListaGruposDisponibles (rol 1) on success.
+        /// View: FormularioInscripcionManual con errores si ModelState es inválido.
+        /// Sets TempData["errorMessage"] si el participante no existe.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler (vía InscribirManualmente).
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> FormularioInscripcionManual(InscripcionModel inscripcion)
         {
@@ -255,7 +345,21 @@ namespace webMetics.Controllers
                 return View("FormularioInscripcionManual", inscripcion);
             }
         }
-        /* Método para inscribir a un usuario a un grupo */
+        /// <summary>
+        /// Inscribe al usuario sesionado en un grupo. Si el usuario es asesor sin registro de participante,
+        /// crea automáticamente el participante a partir de los datos del asesor.
+        /// Envía un correo de comprobante de inscripción.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="idParticipante">Correo institucional del participante a inscribir.</param>
+        /// <returns>
+        /// View: Inscribir —
+        /// ViewBag.Titulo, ViewBag.Message, ViewBag.Participante, ViewBag.Grupo, ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, AsesorHandler, InscripcionHandler.
+        /// Role required: Participante (0) o Asesor (2).
+        /// </remarks>
         public ActionResult Inscribir(int idGrupo, string idParticipante)
         {
             try
@@ -372,6 +476,21 @@ namespace webMetics.Controllers
         }
 
 
+        /// <summary>
+        /// Inscribe manualmente a un participante existente en un grupo (por admin o asesor).
+        /// A diferencia de Inscribir, requiere que el participante ya exista en el sistema.
+        /// Envía un correo de comprobante de inscripción.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="idParticipante">Correo institucional del participante a inscribir.</param>
+        /// <returns>
+        /// View con ViewBag.Titulo y ViewBag.Message indicando resultado.
+        /// Sets TempData["errorMessage"] si el participante no existe o ya está inscrito.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public async Task<IActionResult> InscribirManualmente(int idGrupo, string idParticipante)
         {
             try
@@ -472,7 +591,21 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Método para que un administrador elimine una inscripción de un usuario */
+        /// <summary>
+        /// Elimina la inscripción de un participante en un grupo y recalcula sus horas matriculadas y aprobadas.
+        /// Redirige a la URL referente si está disponible; de lo contrario a ListaGruposDisponibles.
+        /// </summary>
+        /// <param name="nombreGrupo">Nombre del grupo.</param>
+        /// <param name="numeroGrupo">Número del grupo.</param>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <returns>
+        /// Redirects a Referer o Grupo/ListaGruposDisponibles.
+        /// Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -513,12 +646,19 @@ namespace webMetics.Controllers
 
 
         /// <summary>
-        /// Método para eliminar varios participantes seleccionados en la vista de participantes
+        /// Elimina las inscripciones de una lista de participantes en un grupo y recalcula sus horas.
         /// </summary>
-        /// <param name="participantesSeleccionados">Lista de IDs de participantes seleccionados</param>
-        /// <param name="nombreGrupo">Nombre del grupo del cual se eliminarán las inscripciones</param>
-        /// <param name="numeroGrupo">Número del grupo del cual se eliminarán las inscripciones</param>
-        /// <returns></returns>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes a desinscribir.</param>
+        /// <param name="nombreGrupo">Nombre del grupo.</param>
+        /// <param name="numeroGrupo">Número del grupo.</param>
+        /// <returns>
+        /// Redirects a Referer o Grupo/ListaGruposDisponibles.
+        /// Sets TempData["successMessage"] con el conteo de eliminados y/o TempData["errorMessage"] con los fallidos.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarInscripcionesMasivo(List<string> participantesSeleccionados, string nombreGrupo, int numeroGrupo)
@@ -587,7 +727,19 @@ namespace webMetics.Controllers
         }
 
 
-        // TODO: Eliminar esto porque está repetido
+        /// <summary>
+        /// Elimina la inscripción de un participante en un grupo por su idGrupo.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// Redirects to Grupo/ListaGruposDisponibles. Sets TempData["errorMessage"] si falla.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler, ParticipanteHandler.
+        /// Role required: Any (autenticado).
+        /// TODO: Eliminar esto porque está repetido (ver EliminarInscripcion).
+        /// </remarks>
         public ActionResult DesinscribirParticipante(string idParticipante, int idGrupo)
         {
             try
@@ -620,7 +772,9 @@ namespace webMetics.Controllers
             }
         }
 
-        // Método para enviar confirmación de inscripción al usuario
+        /// <summary>
+        /// Envía al participante el comprobante de inscripción por correo, adjuntando el programa del grupo si existe.
+        /// </summary>
         private async Task<IActionResult> EnviarCorreoInscripcion(GrupoModel grupo, string mensaje, string correoParticipante)
         {
             string subject = "Comprobante de Inscripción a Módulo - SISTEMA DE INSCRIPCIONES METICS";
@@ -639,7 +793,12 @@ namespace webMetics.Controllers
             return Ok();
         }
 
-        // Método del constructor del mensaje del correo que será enviado al usuario con los datos de la inscripción
+        /// <summary>
+        /// Construye el cuerpo HTML del correo de comprobante de inscripción con los datos del grupo y el participante.
+        /// </summary>
+        /// <param name="grupo">Grupo en el que se inscribió el participante.</param>
+        /// <param name="participante">Participante inscrito.</param>
+        /// <returns>Cadena HTML con el cuerpo del correo de comprobante.</returns>
         public string ConstructorDelMensajeNotificacionInscripcion(GrupoModel grupo, ParticipanteModel participante)
         {
             // Construir el contenido del mensaje que se enviará por correo electrónico al usuario
@@ -679,6 +838,12 @@ namespace webMetics.Controllers
             return mensaje;
         }
 
+        /// <summary>
+        /// Genera y descarga la plantilla Excel para la importación masiva de inscripciones.
+        /// Columnas: Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas, Calificación.
+        /// </summary>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Plantilla_Inscripciones.xlsx".</returns>
+        /// <remarks>Role required: Admin (1).</remarks>
         public ActionResult DescargarPlantillaSubirInscripciones()
         {
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -705,6 +870,19 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
+        /// <summary>
+        /// Importa inscripciones desde un archivo Excel. Actualiza inscripciones existentes
+        /// o crea nuevas, y recalcula las horas del participante.
+        /// </summary>
+        /// <param name="file">Archivo Excel con columnas: Correo institucional, Módulo, Grupo, Horas,
+        /// Estado, Horas completadas, Calificación.</param>
+        /// <returns>
+        /// Redirects to VerInscripciones (reload=true). Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcelInscripciones(IFormFile file)
         {
@@ -767,6 +945,10 @@ namespace webMetics.Controllers
             return RedirectToAction("VerInscripciones", "Inscripcion", new { reload = true });
         }
 
+        /// <summary>
+        /// Inserta o actualiza una inscripción en la BD y recalcula las horas del participante.
+        /// Si ya existe una inscripción con el mismo grupo y participante, la actualiza; de lo contrario la inserta.
+        /// </summary>
         private async Task<List<InscripcionModel>> IngresarInscripcionAsync(List<InscripcionModel> inscripciones, InscripcionModel inscripcion, GrupoModel grupo, ParticipanteModel participante)
         {
             if (grupo != null && participante != null)
@@ -800,6 +982,7 @@ namespace webMetics.Controllers
             return inscripciones;
         }
 
+        /// <summary>Busca el índice (base-1) de una columna en la primera fila del worksheet, ignorando acentos y mayúsculas.</summary>
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
         {
             // Normalize and remove accents from the input column name
@@ -820,7 +1003,7 @@ namespace webMetics.Controllers
             throw new Exception($"Column '{columnName}' not found");
         }
 
-        // Helper method to remove accents (diacritics)
+        /// <summary>Elimina diacríticos (acentos) de un texto normalizando a Unicode FormD.</summary>
         private string RemoveAccents(string text)
         {
             return string.Concat(text.Normalize(NormalizationForm.FormD)
@@ -828,7 +1011,16 @@ namespace webMetics.Controllers
                 .Normalize(NormalizationForm.FormC);
         }
 
-        // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
+        /// <summary>
+        /// Genera y descarga un PDF (A2) con la lista de participantes e inscripciones de un grupo específico.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes.</param>
+        /// <returns>FileResult (application/pdf) — "Lista_de_Participantes_{nombre}.pdf".</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ExportarParticipantesPDF(int idGrupo, string? searchTerm)
         {
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
@@ -947,6 +1139,16 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un Word (.docx) con la lista de participantes e inscripciones de un grupo específico.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.wordprocessingml.document) — "Lista_de_Participantes_{nombre}.docx".</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ExportarParticipantesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -1058,6 +1260,16 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un Excel (.xlsx) con la lista de participantes e inscripciones de un grupo específico.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Participantes_{nombre}.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ExportarParticipantesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
@@ -1217,7 +1429,15 @@ namespace webMetics.Controllers
             }
         }
 
-        // Método optimizado para exportar la lista de los participantes de un grupo a un archivo PDF
+        /// <summary>
+        /// Genera y descarga un PDF (A2) con todos los participantes del sistema y sus inscripciones.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes.</param>
+        /// <returns>FileResult (application/pdf) — "Lista_de_Inscripciones.pdf".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarTodosParticipantesPDF(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
@@ -1311,6 +1531,15 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un Word (.docx) con todos los participantes del sistema y sus inscripciones.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.wordprocessingml.document) — "Lista_de_Inscripciones.docx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarTodosParticipantesWord(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
@@ -1405,10 +1634,14 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para exportar la lista de todos los participantes a un archivo Excel con información de sus inscripciones
+        /// Genera y descarga un Excel (.xlsx) con todos los participantes del sistema y sus inscripciones.
         /// </summary>
-        /// <param name="searchTerm">Termino de búsqueda para filtrar participantes</param>
-        /// <returns></returns>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes por nombre, correo o unidad académica.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Inscripciones.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarTodosParticipantesExcel(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
@@ -1540,6 +1773,7 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -1552,6 +1786,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -1565,11 +1800,20 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para cambiar el estado de inscripciones masivas de "Inscrito" a "Incompleto"
+        /// Cambia de forma masiva el estado de inscripciones de "Inscrito" a "Incompleto" para
+        /// los participantes seleccionados dentro de un grupo.
         /// </summary>
-        /// <param name="participantesSeleccionados">Lista de IDs de participantes seleccionados</param>
-        /// <param name="idGrupo">ID del grupo</param>
-        /// <returns></returns>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes cuyas inscripciones se actualizarán.</param>
+        /// <param name="idGrupo">ID del grupo al que pertenecen las inscripciones.</param>
+        /// <returns>
+        /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
+        /// Participante/ListaParticipantes con el idGrupo. Sets TempData["successMessage"] con el
+        /// conteo de actualizaciones exitosas y/o TempData["errorMessage"] con el conteo de errores.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: InscripcionHandler, GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult CambiarEstadoInscritoAIncompleto(List<string> participantesSeleccionados, int idGrupo)

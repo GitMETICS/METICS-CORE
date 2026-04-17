@@ -7,13 +7,13 @@ using webMetics.Handlers;
 using webMetics.Models;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
-/* 
- * Controlador de la entidad Grupo
- * En esta clase se puede retornar todos los grupos, editar, agregar y eliminar algun grupo 
- */
-
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador para la entidad Grupo (módulo/taller).
+    /// Gestiona la visualización, creación, edición, eliminación y copia de grupos,
+    /// así como la administración de archivos adjuntos y temas asociados.
+    /// </summary>
     public class GrupoController : Controller
     {
         private protected ParticipanteHandler accesoAParticipante;
@@ -41,6 +41,7 @@ namespace webMetics.Controllers
             accesoAGrupoTema = new GrupoTemaHandler(environment, configuration,accesoATema); // Añadir el GrupoTemaHandler
         }
 
+        /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -53,6 +54,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario actual desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -65,16 +67,23 @@ namespace webMetics.Controllers
             return id;
         }
 
-        /*
-         * Método de la vista ListaGruposDisponibles que recupera y muestra todos los grupos disponibles para inscripción.
-         * Un grupo se considera disponible si:
-         * - La fecha de inscripción no ha expirado.
-         * - La fecha de inicio aún no ha pasado.
-         * - El estado del grupo es "visible".
-         *
-         * Este método también gestiona la lógica de roles de usuario, permitiendo que los participantes, inscriptores y asesores vean
-         * grupos según su rol. Además, se proporciona información sobre grupos a los que el usuario ya está inscrito.
-         */
+        /// <summary>
+        /// Muestra la lista de grupos disponibles para inscripción, filtrada según el rol del usuario.
+        /// Un grupo es visible si su período de inscripción está activo y su estado es visible.
+        /// Para participantes y asesores se excluyen los grupos en los que ya están inscritos.
+        /// </summary>
+        /// <returns>
+        /// View: ListaGruposDisponibles —
+        /// ViewBag.ListaGrupos (lista ordenada de GrupoModel),
+        /// ViewBag.ParticipantesEnGrupos (todas las inscripciones activas),
+        /// ViewBag.GruposInscritos (grupos del usuario, solo roles 0 y 2),
+        /// ViewBag.IdParticipante, ViewBag.Role, ViewBag.Id, ViewBag.DateNow,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler.
+        /// Role required: Any (comportamiento varía según rol 0 = Participante, 1 = Admin, 2 = Asesor).
+        /// </remarks>
         public ActionResult ListaGruposDisponibles()
         {
             const int RolUsuarioParticipante = 0;
@@ -176,6 +185,23 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Filtra y muestra grupos cuyo nombre, descripción, asesor, categoría, modalidad, lugar o temas
+        /// contengan el término de búsqueda. Reutiliza la vista ListaGruposDisponibles.
+        /// </summary>
+        /// <param name="searchTerm">Texto libre para filtrar grupos.</param>
+        /// <param name="userRole">Rol del usuario (0 = Participante, 1 = Admin, 2 = Asesor).</param>
+        /// <param name="userId">Identificador del usuario, usado para excluir grupos ya inscritos.</param>
+        /// <returns>
+        /// View: ListaGruposDisponibles —
+        /// ViewBag.ListaGrupos, ViewBag.ParticipantesEnGrupos, ViewBag.GruposInscritos (roles 0/2),
+        /// ViewBag.IdParticipante, ViewBag.Role, ViewBag.Id, ViewBag.DateNow,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler.
+        /// Role required: Any.
+        /// </remarks>
         public IActionResult BuscarGrupos(string searchTerm, int userRole, string userId)
         {
             const int RolUsuarioParticipante = 0;
@@ -280,7 +306,15 @@ namespace webMetics.Controllers
             return View("ListaGruposDisponibles");
         }
 
-        /* Método para descargar el programa del grupo */
+        /// <summary>
+        /// Devuelve el archivo de programa del grupo como descarga directa.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>FileResult (application/octet-stream) con el nombre original del archivo.</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Any.
+        /// </remarks>
         public ActionResult DescargarArchivo(int idGrupo)
         {
             // Obtener el archivo y devolverlo para su descarga
@@ -290,7 +324,20 @@ namespace webMetics.Controllers
             return File(archivo, "application/octet-stream", grupo.nombreArchivo);
         }
 
-        /* Vista del formulario para crear un grupo */
+        /// <summary>
+        /// Muestra el formulario vacío para crear un nuevo grupo.
+        /// Redirige a ListaGruposDisponibles si no hay asesores o temas disponibles.
+        /// </summary>
+        /// <returns>
+        /// View: CrearGrupo —
+        /// ViewData["Temas"], ViewData["Categorias"], ViewData["Asesores"],
+        /// ViewBag.Role, ViewBag.Id.
+        /// Redirects to ListaGruposDisponibles si no hay asesores o temas; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: AsesorHandler, TemaHandler, CategoriaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult CrearGrupo()
         {
             ViewBag.Role = GetRole();
@@ -316,9 +363,22 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Vista del formulario para editar un grupo con los datos ingresados del modelo */
+        /// <summary>
+        /// Procesa el formulario de creación de un nuevo grupo, validando fechas, tamaño del adjunto
+        /// y selección de temas antes de persistir.
+        /// </summary>
+        /// <param name="grupo">Modelo con los datos del nuevo grupo, incluido el archivo adjunto.</param>
+        /// <param name="temasSeleccionados">Arreglo de IDs de temas (competencias) seleccionados.</param>
+        /// <returns>
+        /// Redirects to ListaGruposDisponibles on success; sets TempData["successMessage"].
+        /// View: CrearGrupo con errores de validación si los datos son inválidos.
+        /// Redirects to ListaGruposDisponibles on exception; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, TemaHandler, CategoriaHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
-        // [ValidateAntiForgeryToken]
         public ActionResult CrearGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
             ViewBag.Role = GetRole();
@@ -410,7 +470,18 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para eliminar un grupo */
+        /// <summary>
+        /// Elimina el grupo indicado y redirige a la lista de grupos.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo a eliminar.</param>
+        /// <returns>
+        /// Redirects to ListaGruposDisponibles on success or failure.
+        /// Sets TempData["Message"] si no se pudo eliminar o hubo excepción.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EliminarGrupo(int? idGrupo)
         {
             ViewBag.ExitoAlCrear = false;
@@ -437,7 +508,17 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Cambiar estado de visibilidad de un grupo */
+        /// <summary>
+        /// Alterna el estado de visibilidad (visible/oculto) del grupo indicado.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// Redirects to ListaGruposDisponibles. Sets TempData["Message"] si ocurre un error.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult CambiarEstadoVisible(int idGrupo)
         {
             ViewBag.ExitoAlCrear = false;
@@ -464,7 +545,22 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Vista del formulario para editar un grupo */
+        /// <summary>
+        /// Muestra el formulario de edición del grupo, precargado con sus datos actuales,
+        /// el archivo adjunto en Base64 y los temas seleccionados.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo a editar.</param>
+        /// <returns>
+        /// View: EditarGrupo con el modelo GrupoModel —
+        /// ViewBag.Adjunto (Base64), ViewData["Temas"], ViewData["Categorias"], ViewData["Asesores"],
+        /// ViewData["TemasSeleccionadosCheckList"], ViewData["TemasDisponiblesCheckList"], ViewData["TemasId"],
+        /// ViewBag.Role, ViewBag.Id.
+        /// Redirects to ListaGruposDisponibles on error; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, GrupoTemaHandler, TemaHandler, CategoriaHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EditarGrupo(int idGrupo)
         {
             try
@@ -507,6 +603,21 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles");
         }
 
+        /// <summary>
+        /// Procesa el formulario de edición de un grupo, validando fechas, tamaño del adjunto y temas,
+        /// luego persiste los cambios y actualiza los temas asociados.
+        /// </summary>
+        /// <param name="grupo">Modelo con los datos actualizados del grupo.</param>
+        /// <param name="temasSeleccionados">Arreglo de IDs de temas seleccionados.</param>
+        /// <returns>
+        /// Redirects to ListaGruposDisponibles on success; sets TempData["successMessage"].
+        /// View: EditarGrupo con errores de validación si los datos son inválidos.
+        /// Redirects to ListaGruposDisponibles on exception; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, GrupoTemaHandler, TemaHandler, CategoriaHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult EditarGrupo(GrupoModel grupo, int[] temasSeleccionados)
@@ -608,6 +719,20 @@ namespace webMetics.Controllers
         }
 
 
+        /// <summary>
+        /// Muestra la vista de visualización del archivo adjunto (programa) de un grupo en Base64.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: VerAdjunto con el modelo GrupoModel —
+        /// ViewBag.Adjunto (Base64), ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to ListaGruposDisponibles on error; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Any.
+        /// </remarks>
         public ActionResult VerAdjunto(int idGrupo)
         {
             try
@@ -637,6 +762,20 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles");
         }
 
+        /// <summary>
+        /// Muestra el formulario para reemplazar el archivo adjunto de un grupo, con vista previa en Base64.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: EditarAdjunto con el modelo GrupoModel —
+        /// ViewBag.Adjunto (Base64), ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to ListaGruposDisponibles on error; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EditarAdjunto(int idGrupo)
         {
             try
@@ -667,7 +806,18 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles");
         }
 
-        /* Método para añadir un archivo de programa del grupo */
+        /// <summary>
+        /// Procesa la subida de un nuevo archivo adjunto para el grupo. Límite de 5 MB.
+        /// </summary>
+        /// <param name="grupo">Modelo que contiene el archivo adjunto (<c>archivoAdjunto</c>) y el <c>idGrupo</c>.</param>
+        /// <returns>
+        /// Redirects to EditarAdjunto on success or validation failure; sets TempData["successMessage"] or TempData["errorMessage"].
+        /// Redirects to ListaGruposDisponibles on exception; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestFormLimits(MultipartBodyLengthLimit = 5 * 1024 * 1024)]
@@ -702,6 +852,21 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Muestra el formulario para gestionar los temas (competencias) asociados a un grupo,
+        /// marcando los ya seleccionados.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: EditarTemas con el modelo GrupoModel —
+        /// ViewBag.TemasAsociados (List&lt;TemaModel&gt;), ViewBag.ListaTemas (con Selected marcado),
+        /// ViewBag.Role, ViewBag.Id.
+        /// Redirects to ListaGruposDisponibles si el grupo no existe o no hay temas; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, GrupoTemaHandler, TemaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EditarTemas(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -739,6 +904,19 @@ namespace webMetics.Controllers
 
 
 
+        /// <summary>
+        /// Persiste la actualización de los temas asociados a un grupo y redirige a la edición del grupo.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="TemasSeleccionados">Arreglo de IDs de temas seleccionados.</param>
+        /// <returns>
+        /// Redirects to EditarGrupo on success or failure; sets TempData["successMessage"] or TempData["errorMessage"].
+        /// Redirects to EditarTemas on exception; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoTemaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult GuardarTemasAsociados(int idGrupo, int[] TemasSeleccionados)
@@ -766,6 +944,18 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Crea una copia del grupo indicado con el nombre prefijado "Copia de …" y sin archivo adjunto.
+        /// Los temas asociados se replican en la copia.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo original a copiar.</param>
+        /// <returns>
+        /// Redirects to ListaGruposDisponibles. Sets TempData["successMessage"] on success or TempData["errorMessage"] on failure.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, GrupoTemaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult CopiarGrupo(int idGrupo)
         {
             try

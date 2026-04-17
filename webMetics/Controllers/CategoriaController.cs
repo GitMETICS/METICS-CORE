@@ -4,6 +4,9 @@ using webMetics.Models;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Gestiona las operaciones CRUD sobre la entidad Categoría (niveles de clasificación de grupos).
+    /// </summary>
     public class CategoriaController : Controller
     {
         public CategoriaHandler accesoACategoria;
@@ -19,6 +22,7 @@ namespace webMetics.Controllers
             accesoACategoria = new CategoriaHandler(environment, configuration);
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -31,6 +35,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -43,6 +48,12 @@ namespace webMetics.Controllers
             return id;
         }
 
+        /// <summary>Muestra el listado de todas las categorías (niveles) registradas.</summary>
+        /// <returns>
+        /// View: ListaCategorias —
+        /// ViewBag.Categorias, ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult ListaCategorias()
         {
             ViewBag.Role = GetRole();
@@ -56,6 +67,11 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>Muestra el formulario para registrar una nueva categoría.</summary>
+        /// <returns>
+        /// View: CrearCategoria — ViewData["Categorias"] (SelectListItem), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult CrearCategoria()
         {
             ViewBag.Role = GetRole();
@@ -66,6 +82,13 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>Procesa el formulario de creación de categoría.</summary>
+        /// <param name="categoria">Datos de la categoría a crear.</param>
+        /// <returns>
+        /// Redirects to ListaCategorias on success. Sets TempData["successMessage"] or
+        /// TempData["errorMessage"]. Returns View CrearCategoria with model on failure.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public ActionResult CrearCategoria(CategoriaModel categoria)
         {
@@ -92,6 +115,11 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>Muestra el formulario de edición de categoría.</summary>
+        /// <returns>
+        /// View: EditarCategoria — ViewData["Categorias"] (SelectListItem), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult EditarCategoria()
         {
             ViewBag.Role = GetRole();
@@ -102,6 +130,13 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>Elimina una categoría del sistema.</summary>
+        /// <param name="idCategoria">ID de la categoría a eliminar.</param>
+        /// <returns>
+        /// Redirects to ListaCategorias. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] on failure.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult EliminarCategoria(int idCategoria)
         {
             try
