@@ -3,6 +3,9 @@ using webMetics.Handlers;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador de inicio de la aplicación. Redirige a la lista de grupos disponibles.
+    /// </summary>
     public class HomeController : Controller
     {
         private BaseDeDatosHandler accesoABaseDatos;
@@ -17,9 +20,10 @@ namespace webMetics.Controllers
             accesoABaseDatos = new BaseDeDatosHandler(environment, configuration);
         }
 
+        /// <summary>Redirige a la página de inicio de la aplicación (lista de grupos disponibles).</summary>
+        /// <returns>Redirects to Grupo/ListaGruposDisponibles.</returns>
         public ActionResult Index()
         {
-            //La página de inicio es la lista de los grupos disponibles
             return Redirect("~/Grupo/ListaGruposDisponibles");
         }
     }
