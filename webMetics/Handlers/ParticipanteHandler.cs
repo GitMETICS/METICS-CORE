@@ -145,7 +145,9 @@ namespace webMetics.Handlers
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    object? resultado = command.ExecuteScalar();
+                    int filasAfectadas = resultado != null ? Convert.ToInt32(resultado) : 0;
+                    exito = filasAfectadas >= 1;
                 }
                 catch (Exception ex)
                 {
