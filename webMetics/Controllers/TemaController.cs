@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
-/* 
- * Controlador de la entidad Tema
- */
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Gestiona las operaciones CRUD sobre la entidad Tema (áreas de competencia).
+    /// Los temas se asocian a categorías y pueden asignarse a grupos.
+    /// </summary>
     public class TemaController : Controller
     {
         private CategoriaHandler accesoACategoria;
@@ -23,6 +24,7 @@ namespace webMetics.Controllers
             accesoATema = new TemaHandler(environment, configuration);
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -35,6 +37,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -47,7 +50,12 @@ namespace webMetics.Controllers
             return id;
         }
 
-        /* Vista de la lista de temas */
+        /// <summary>Muestra el listado de todas las áreas de competencia (temas) registradas.</summary>
+        /// <returns>
+        /// View: ListaTemas —
+        /// ViewBag.Temas, ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler. Role required: Admin (1).</remarks>
         public ActionResult ListaTemas()
         {
             ViewBag.Role = GetRole();
@@ -61,7 +69,13 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Vista del formulario para crear un tema */
+        /// <summary>Muestra el formulario para registrar una nueva área de competencia.</summary>
+        /// <returns>
+        /// View: CrearTema —
+        /// ViewData["Temas"] (SelectListItem), ViewData["Categorias"] (SelectListItem),
+        /// ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult CrearTema()
         {
             ViewBag.Role = GetRole();
@@ -73,7 +87,13 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Formulario para crear un tema con los datos del modelo ingresados */
+        /// <summary>Procesa el formulario de creación de área de competencia.</summary>
+        /// <param name="tema">Datos del tema a crear.</param>
+        /// <returns>
+        /// Redirects to ListaTemas on success. Sets TempData["successMessage"] or
+        /// TempData["errorMessage"]. Returns View CrearTema with model on failure.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public ActionResult CrearTema(TemaModel tema)
         {
@@ -102,7 +122,14 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Vista del formulario para crear un tema */
+        /// <summary>Muestra el formulario precargado con los datos del área de competencia para su edición.</summary>
+        /// <param name="idTema">ID del tema a editar.</param>
+        /// <returns>
+        /// View: EditarTema (model: TemaModel) —
+        /// ViewData["Temas"] (SelectListItem), ViewData["Categorias"] (SelectListItem),
+        /// ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         public ActionResult EditarTema(int idTema)
         {
             ViewBag.Role = GetRole();
@@ -116,6 +143,13 @@ namespace webMetics.Controllers
             return View(tema);
         }
 
+        /// <summary>Procesa el formulario de edición de área de competencia.</summary>
+        /// <param name="tema">Datos actualizados del tema.</param>
+        /// <returns>
+        /// Redirects to ListaTemas on success. Sets TempData["successMessage"] or
+        /// TempData["errorMessage"]. Returns View EditarTema with model on failure.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
         public ActionResult EditarTema(TemaModel tema)
         {
@@ -144,7 +178,13 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para eliminar un tema */
+        /// <summary>Elimina un área de competencia del sistema.</summary>
+        /// <param name="idTema">ID del tema a eliminar.</param>
+        /// <returns>
+        /// Redirects to ListaTemas. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] on failure.
+        /// </returns>
+        /// <remarks>Handlers: TemaHandler. Role required: Admin (1).</remarks>
         public ActionResult EliminarTema(int idTema)
         {
             try

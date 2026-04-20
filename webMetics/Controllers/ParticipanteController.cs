@@ -22,6 +22,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador para la entidad Participante (funcionario UCR).
+    /// Gestiona la visualización, búsqueda, alta, edición y eliminación de participantes,
+    /// la asignación de medallas, importación masiva desde Excel, exportaciones en PDF/Word/Excel
+    /// y la recuperación de contraseña.
+    /// </summary>
     public class ParticipanteController : Controller
     {
         private protected UsuarioHandler accesoAUsuario;
@@ -47,6 +53,22 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
+        /// <summary>
+        /// Muestra la lista de participantes inscritos en un grupo específico.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: ListaParticipantes —
+        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo,
+        /// ViewBag.ListaParticipantes (List&lt;ParticipanteModel&gt;),
+        /// ViewBag.Inscripciones, ViewBag.TodasLasMedallas,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Grupo/ListaGruposDisponibles on exception.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ListaParticipantes(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -82,7 +104,20 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para ver todos los participantes y sus horas matriculadas y aprobadas (administrador) */
+        /// <summary>
+        /// Muestra todos los participantes del sistema con sus horas matriculadas y aprobadas,
+        /// incluyendo los grupos en los que cada uno está inscrito.
+        /// </summary>
+        /// <returns>
+        /// View: VerParticipantes —
+        /// ViewBag.ListaParticipantes (List&lt;ParticipanteModel&gt; con gruposInscritos cargados),
+        /// ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult VerParticipantes()
         {
             ViewBag.Role = GetRole();
@@ -117,6 +152,19 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Filtra y muestra participantes cuyo nombre, apellidos, correo, unidad académica u horas
+        /// contengan el término de búsqueda. Reutiliza la vista VerParticipantes.
+        /// </summary>
+        /// <param name="searchTerm">Texto libre para filtrar participantes.</param>
+        /// <returns>
+        /// View: VerParticipantes —
+        /// ViewBag.ListaParticipantes (filtrada), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public IActionResult BuscarParticipantes(string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -145,11 +193,22 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para buscar participantes inscritos en un grupo específico
+        /// Filtra los participantes inscritos en un grupo por nombre, apellidos, correo o unidad académica.
+        /// Reutiliza la vista ListaParticipantes.
         /// </summary>
-        /// <param name="idGrupo"></param>
-        /// <param name="searchTerm"></param>
-        /// <returns></returns>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="searchTerm">Texto libre para filtrar participantes del grupo.</param>
+        /// <returns>
+        /// View: ListaParticipantes —
+        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo,
+        /// ViewBag.ListaParticipantes (filtrada), ViewBag.Inscripciones, ViewBag.TodasLasMedallas,
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Grupo/ListaGruposDisponibles on exception.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public IActionResult BuscarParticipantesDelGrupo(int idGrupo, string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -200,11 +259,19 @@ namespace webMetics.Controllers
 
 
         /// <summary>
-        /// Asigna medallas a un participante específico.
+        /// Asigna una o varias medallas a un participante específico.
+        /// Solo agrega las medallas que el participante aún no posee.
         /// </summary>
         /// <param name="idParticipante">Identificador del participante.</param>
-        /// <param name="selectedMedallas">Medallas seleccionadas para asignar.</param>
-        /// <returns></returns>
+        /// <param name="selectedMedallas">Lista de nombres de medallas a asignar.</param>
+        /// <returns>
+        /// Redirects to VerDatosParticipante. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// Redirects to VerDatosParticipante with TempData["errorMessage"] si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
         {
@@ -244,6 +311,19 @@ namespace webMetics.Controllers
             return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
         }
 
+        /// <summary>
+        /// Asigna una medalla a múltiples participantes a la vez desde la lista o una vista de grupo.
+        /// </summary>
+        /// <param name="nombreMedalla">Nombre de la medalla a asignar.</param>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes que recibirán la medalla.</param>
+        /// <returns>
+        /// Redirects to la URL referente (Referer) si existe; de lo contrario a Grupo/ListaGruposDisponibles.
+        /// Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
         {
@@ -278,6 +358,19 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
+        /// <summary>
+        /// Importa participantes desde un archivo Excel. Por cada fila crea un usuario y un participante
+        /// si aún no existen, enviando la contraseña generada por correo.
+        /// </summary>
+        /// <param name="file">Archivo Excel (.xlsx) con columnas: Unidad Académica, Nombre, Primer Apellido,
+        /// Segundo Apellido, Correo Institucional, Horas Aprobadas.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler (vía IngresarParticipante).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
@@ -346,6 +439,16 @@ namespace webMetics.Controllers
 
 
 
+        /// <summary>
+        /// Envía un correo de notificación al responsable de METICS cuando el participante supera 30 horas aprobadas
+        /// y marca el envío en la base de datos.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <returns>Redirects to VerParticipantes.</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler (para obtener correo destino).
+        /// Role required: Admin (1).
+        /// </remarks>
         public IActionResult NotificarLimiteHoras(string idParticipante)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
@@ -378,6 +481,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes");
         }
 
+        /// <summary>Envía un correo al responsable cuando un participante supera el límite de 30 horas aprobadas.</summary>
         private async Task<IActionResult> EnviarCorreoNotificacion(string idParticipante)
         {
             string subject = "Notificación Límite de Horas Aprobadas - SISTEMA DE INSCRIPCIONES METICS";
@@ -388,6 +492,16 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Genera y descarga un PDF en formato A2 con la lista de participantes y sus módulos inscritos.
+        /// Aplica el mismo filtro de búsqueda de texto que VerParticipantes.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/pdf) — "Lista_de_Participantes_Módulos.pdf".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -492,6 +606,15 @@ namespace webMetics.Controllers
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un documento Word (.docx) con la lista de participantes y sus módulos inscritos.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.wordprocessingml.document) — "Lista_de_Participantes_Módulos.docx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesWord(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -608,6 +731,16 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un Excel (.xlsx) con la lista completa de participantes y todos sus módulos inscritos
+        /// (columnas: identificación, nombre, correo, condición, unidad académica, teléfono, módulo, horas, calificación).
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Participantes_Módulos.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesExcel(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -741,6 +874,17 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Genera y descarga un Excel (.xlsx) simplificado con totales de horas por participante
+        /// (columnas: unidad académica, nombre, apellidos, correo, total horas inscritas, total horas aprobadas).
+        /// Soporta filtrado opcional igual que ExportarParticipantesExcel.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Participantes_Módulos.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesExcel2(string? searchTerm)
         {
             try
@@ -834,6 +978,15 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Genera y descarga la plantilla Excel (.xlsx) para la importación masiva de participantes.
+        /// Columnas: Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas.
+        /// </summary>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Plantilla_Lista_Participantes.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ninguno.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
             // Creamos el archivo de Excel
@@ -867,6 +1020,22 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
+        /// <summary>
+        /// Muestra el perfil completo de un participante: datos personales, inscripciones y medallas.
+        /// Para asesores (rol 2) solo muestra las inscripciones en grupos que el asesor imparte.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <param name="idGrupo">Opcional. Si se provee, se guarda en ViewBag.IdGrupo para el botón "Volver al grupo".</param>
+        /// <returns>
+        /// View: VerDatosParticipante —
+        /// ViewBag.Participante (ParticipanteModel), ViewBag.Inscripciones, ViewBag.Medallas,
+        /// ViewBag.TodasMedallas, ViewBag.IdGrupo (opcional),
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler, GrupoHandler (solo rol 2).
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult VerDatosParticipante(string idParticipante, int? idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -908,6 +1077,18 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Muestra el formulario vacío para agregar manualmente un nuevo participante.
+        /// </summary>
+        /// <returns>
+        /// View: FormularioParticipante —
+        /// ViewData["jsonDataAreas"] (JSON de la jerarquía de áreas UCR),
+        /// ViewBag.Id, ViewBag.Role.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult FormularioParticipante()
         {
             ViewBag.Id = GetId();
@@ -917,6 +1098,19 @@ namespace webMetics.Controllers
             return View("FormularioParticipante");
         }
 
+        /// <summary>
+        /// Procesa el formulario de alta manual de un participante.
+        /// Crea usuario y participante si no existen, enviando contraseña por correo.
+        /// </summary>
+        /// <param name="participante">Modelo con los datos del nuevo participante.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes on success or error; sets TempData["successMessage"] o TempData["errorMessage"].
+        /// View: FormularioParticipante con errores de validación si ModelState es inválido.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler (vía IngresarParticipante).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
@@ -948,10 +1142,10 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Registra un nuevo participante en el sistema.
-        /// Si el usuario no existe, se crea una cuenta de usuario con una contraseña generada aleatoriamente
-        /// y se envía por correo electrónico.
+        /// Si el usuario no existe, crea una cuenta con una contraseña generada aleatoriamente
+        /// y la envía por correo. Si el participante no existe, lo crea.
         /// </summary>
-        /// <param name="participante"></param>
+        /// <param name="participante">Modelo con los datos del participante a registrar.</param>
         private void IngresarParticipante(ParticipanteModel participante)
         {
             if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
@@ -974,7 +1168,21 @@ namespace webMetics.Controllers
         }
 
 
-        // Método de la vista del formulario para editar a un participante
+        /// <summary>
+        /// Muestra el formulario de edición de un participante con sus datos actuales
+        /// y la jerarquía de áreas/departamentos/secciones preseleccionada.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante a editar.</param>
+        /// <returns>
+        /// View: EditarParticipante con el modelo ParticipanteModel —
+        /// ViewData["jsonDataAreas"], ViewData["jsonDataDepartamentos"], ViewData["jsonDataUnidadesAcademicas"],
+        /// ViewBag.Role, ViewBag.Id.
+        /// Redirects to VerParticipantes on error; sets TempData["Message"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EditarParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -998,7 +1206,20 @@ namespace webMetics.Controllers
             }
         }
 
-        // Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor
+        /// <summary>
+        /// Persiste la edición de los datos de un participante. Si el participante también es asesor,
+        /// sincroniza los datos en la tabla de asesores.
+        /// </summary>
+        /// <param name="participante">Modelo con los datos actualizados del participante.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes on success; sets TempData["successMessage"].
+        /// View: EditarParticipante con errores si ModelState es inválido.
+        /// Redirects to VerParticipantes on exception; sets TempData["Message"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarParticipante(ParticipanteModel participante)
@@ -1058,7 +1279,17 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para que un administrador elimine un participante */
+        /// <summary>
+        /// Elimina el participante y su cuenta de usuario del sistema.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante a eliminar.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
@@ -1080,7 +1311,15 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes", "Participante");
         }
 
-        // Muestra un modal con info del participante
+        /// <summary>
+        /// Devuelve la vista parcial del modal con los grupos inscritos de un participante.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <returns>PartialView: _Modal — ViewBag.ListaGrupos, ViewBag.IdParticipante.</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         [HttpPost]
         public ActionResult DisplayModal(string idParticipante)
         {
@@ -1093,7 +1332,7 @@ namespace webMetics.Controllers
             return PartialView("_Modal");
         }
 
-        // Métodos AJAX para obtener tipos de participantes, departamentos y secciones según el área seleccionada en el formulario
+        /// <summary>Devuelve la lista de tipos de participante definidos en el enum TipoDeParticipantes.</summary>
         [HttpGet]
         public JsonResult GetTiposParticipante(string tipoParticipante)
         {
@@ -1103,6 +1342,7 @@ namespace webMetics.Controllers
             return Json(tipoDeParticipantesLista);
         }
 
+        /// <summary>Devuelve los departamentos disponibles para un área UCR, consultando dataAreas.json vía ParticipanteHandler.</summary>
         [HttpGet]
         public JsonResult GetDepartamentosByArea(string areaName)
         {
@@ -1110,6 +1350,7 @@ namespace webMetics.Controllers
             return Json(departamentos);
         }
 
+        /// <summary>Devuelve las secciones/unidades académicas disponibles para un área y departamento UCR.</summary>
         [HttpGet]
         public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
@@ -1117,6 +1358,7 @@ namespace webMetics.Controllers
             return Json(secciones);
         }
 
+        /// <summary>Devuelve la lista de áreas UCR como SelectListItem (datos estáticos/predefinidos de dataAreas.json).</summary>
         [HttpGet]
         public static List<SelectListItem> GetAreas()
         {
@@ -1136,6 +1378,10 @@ namespace webMetics.Controllers
             };
         }
 
+        /// <summary>
+        /// Devuelve en JSON la estructura completa de áreas, departamentos y secciones UCR
+        /// para poblar los desplegables del formulario de participante.
+        /// </summary>
         [HttpGet]
         public JsonResult GetAllAreasData()
         {
@@ -1168,6 +1414,7 @@ namespace webMetics.Controllers
             return Json(allData);
         }
 
+        /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
         [HttpGet]
         public JsonResult GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
         {
@@ -1178,12 +1425,14 @@ namespace webMetics.Controllers
             return Json(carreras);
         }
 
+        /// <summary>Wrapper JSON que delega en el método estático GetDepartamento para retornar departamentos por área.</summary>
         [HttpGet]
         public JsonResult GetDepartamentoJSON(string areaName)
         {
             return Json(GetDepartamento(areaName));
         }
 
+        /// <summary>Devuelve la lista de departamentos/facultades para un área UCR como SelectListItem (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetDepartamento(string value)
         {
@@ -1245,6 +1494,7 @@ namespace webMetics.Controllers
             }
             return departamentos;
         }
+        /// <summary>Devuelve la lista de unidades académicas/escuelas para un departamento/facultad UCR (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetUnidades(string value)
         {
@@ -1470,6 +1720,7 @@ namespace webMetics.Controllers
             return unidades;
         }
 
+        /// <summary>Devuelve la lista de sedes y recintos UCR como SelectListItem agrupados por sede (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetSedes()
         {
@@ -1503,6 +1754,7 @@ namespace webMetics.Controllers
             return sedes;
         }
 
+        /// <summary>Busca el índice (base-1) de una columna en la primera fila del worksheet, ignorando acentos y mayúsculas.</summary>
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
         {
             // Normalize and remove accents from the input column name
@@ -1523,7 +1775,7 @@ namespace webMetics.Controllers
             throw new Exception($"Column '{columnName}' not found");
         }
 
-        // Helper method to remove accents (diacritics)
+        /// <summary>Elimina diacríticos (acentos) de un texto normalizando a Unicode FormD.</summary>
         private string RemoveAccents(string text)
         {
             return string.Concat(text.Normalize(NormalizationForm.FormD)
@@ -1531,7 +1783,7 @@ namespace webMetics.Controllers
                 .Normalize(NormalizationForm.FormC);
         }
 
-        // Método para enviar confirmación de registro al usuario
+        /// <summary>Envía al nuevo participante un correo con su contraseña temporal.</summary>
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
         {
             string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
@@ -1543,6 +1795,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>Genera una contraseña aleatoria de 10 caracteres alfanuméricos.</summary>
         private string GenerateRandomPassword()
         {
             int length = 10;
@@ -1554,6 +1807,7 @@ namespace webMetics.Controllers
             return password;
         }
 
+        /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -1566,6 +1820,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario actual desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -1577,11 +1832,26 @@ namespace webMetics.Controllers
 
             return id;
         }
+
+        /// <summary>Muestra el formulario de recuperación de contraseña.</summary>
+        /// <returns>View: FormularioRecuperarContrasena.</returns>
         public ActionResult FormularioRecuperarContrasena()
         {
             return View("FormularioRecuperarContrasena");
         }
 
+        /// <summary>
+        /// Genera una nueva contraseña aleatoria para el participante y la envía por correo.
+        /// </summary>
+        /// <param name="participante">Modelo que contiene el correo institucional del participante.</param>
+        /// <returns>
+        /// View: FormularioRecuperarContrasena —
+        /// ViewBag.SuccessMessage o ViewBag.ErrorMessage según resultado.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, UsuarioHandler.
+        /// Role required: Any (autoservicio).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
         {
