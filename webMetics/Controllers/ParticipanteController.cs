@@ -1413,6 +1413,37 @@ namespace webMetics.Controllers
             }
         }
 
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new
+            {
+                success = false,
+                fieldErrors,
+                globalErrors
+            };
+        }
+
         /// <summary>
         /// Elimina el participante y su cuenta de usuario del sistema.
         /// </summary>
