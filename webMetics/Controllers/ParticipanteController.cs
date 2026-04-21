@@ -1112,32 +1112,74 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
+            bool isAjaxRequest = IsAjaxRequest();
 
-            if (ModelState.IsValid)
+            ValidarAreasExtra(participante);
+
+            if (!ModelState.IsValid)
             {
-                participante.idParticipante = participante.correo;
-                try
+                if (isAjaxRequest)
                 {
-                    IngresarParticipante(participante);
-
-                    TempData["successMessage"] = "Participante agregado.";
-                }
-                catch
-                {
-                    TempData["errorMessage"] = "Error al agregar al participante.";
+                    return BadRequest(BuildAjaxValidationErrorResponse());
                 }
 
-                return RedirectToAction("VerParticipantes");
-            }
-            else
-            {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 return View("FormularioParticipante", participante);
             }
+
+            participante.idParticipante = participante.correo;
+
+            try
+            {
+                bool exito = IngresarParticipante(participante);
+
+                if (isAjaxRequest)
+                {
+                    if (exito)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = Url.Action("VerParticipantes", "Participante")
+                        });
+                    }
+
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Participante creado, pero ocurrió un error al guardar las áreas extra."
+                    });
+                }
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Participante agregado.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Participante creado, pero ocurrió un error al guardar las áreas extra.";
+                }
+            }
+            catch
+            {
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Error al agregar al participante."
+                    });
+                }
+
+                TempData["errorMessage"] = "Error al agregar al participante.";
+            }
+
+            return RedirectToAction("VerParticipantes");
         }
 
         /// <summary>
@@ -1146,7 +1188,7 @@ namespace webMetics.Controllers
         /// y la envía por correo. Si el participante no existe, lo crea.
         /// </summary>
         /// <param name="participante">Modelo con los datos del participante a registrar.</param>
-        private void IngresarParticipante(ParticipanteModel participante)
+        private bool IngresarParticipante(ParticipanteModel participante)
         {
             if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
             {
@@ -1163,8 +1205,53 @@ namespace webMetics.Controllers
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
             {
-                accesoAParticipante.CrearParticipante(participante);
+                bool participanteCreado = accesoAParticipante.CrearParticipante(participante);
+
+                if (participanteCreado)
+                {
+                    List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                    return accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+                }
+
+                return false;
             }
+
+            return true;
+        }
+
+        private void ValidarAreasExtra(ParticipanteModel participante)
+        {
+            if (participante.areasExtra == null || participante.areasExtra.Count == 0)
+            {
+                return;
+            }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            bool contieneInvalida = participante.areasExtra
+                .Any(area => !areasValidas.Contains(area));
+
+            if (contieneInvalida)
+            {
+                ModelState.AddModelError(nameof(ParticipanteModel.areasExtra), "Se detectaron áreas extra inválidas.");
+            }
+            }
+
+        private List<string> FiltrarAreasExtraValidas(List<string>? areasExtraSeleccionadas, string? areaPrincipal)
+        {
+            if (areasExtraSeleccionadas == null || areasExtraSeleccionadas.Count == 0)
+            {
+                return new List<string>();
+        }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            return areasExtraSeleccionadas
+                .Where(area => !string.IsNullOrWhiteSpace(area))
+                .Where(area => areasValidas.Contains(area))
+                .Where(area => !string.Equals(area, areaPrincipal, StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
 
 
@@ -1226,54 +1313,101 @@ namespace webMetics.Controllers
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
+            bool isAjaxRequest = IsAjaxRequest();
+
+            ValidarAreasExtra(participante);
 
             try
             {
-                if (ModelState.IsValid)
+                // Validar que correo alternativo sea diferente del correo institucional
+                if (!string.IsNullOrWhiteSpace(participante.correoAlternativo) &&
+                    !string.IsNullOrWhiteSpace(participante.correo) &&
+                    participante.correo.Equals(participante.correoAlternativo, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Validar que correo alternativo sea diferente del correo institucional
-                    if (participante.correo.Equals(participante.correoAlternativo, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ModelState.AddModelError("correoAlternativo", "El correo alternativo debe ser diferente del correo institucional.");
-                        ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-                        ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
-                        ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
-                        return View("EditarParticipante", participante);
-                    }
-
-                    participante.idParticipante = participante.correo;
-                    accesoAParticipante.EditarParticipante(participante);
-
-                    AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
-                    if (asesorAsociado != null)
-                    {
-                        asesorAsociado.nombre = participante.nombre;
-                        asesorAsociado.primerApellido = participante.primerApellido;
-                        asesorAsociado.segundoApellido = participante.segundoApellido;
-                        asesorAsociado.correo = participante.correo;
-                        asesorAsociado.correoAlternativo = participante.correoAlternativo;
-                        asesorAsociado.gradoAcademico = participante.gradoAcademico;
-                        asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
-                        asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
-                        asesorAsociado.telefono = participante.telefono;
-
-                        accesoAAsesor.EditarAsesor(asesorAsociado);
-                    }
-
-                    TempData["successMessage"] = "Los datos fueron guardados.";
-                    return RedirectToAction("VerParticipantes", "Participante");
+                    ModelState.AddModelError("correoAlternativo", "El correo alternativo debe ser diferente del correo institucional.");
                 }
-                else
+
+                if (!ModelState.IsValid)
                 {
+                    if (isAjaxRequest)
+                    {
+                        return BadRequest(BuildAjaxValidationErrorResponse());
+                    }
+
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                     ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
                     ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
 
                     return View("EditarParticipante", participante);
                 }
+
+                participante.idParticipante = participante.correo;
+
+                bool participanteEditado = accesoAParticipante.EditarParticipante(participante);
+                if (!participanteEditado)
+                {
+                    throw new Exception("No se pudo actualizar la información del participante.");
+                }
+
+                List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+
+                AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
+                if (asesorAsociado != null)
+                {
+                    asesorAsociado.nombre = participante.nombre;
+                    asesorAsociado.primerApellido = participante.primerApellido;
+                    asesorAsociado.segundoApellido = participante.segundoApellido;
+                    asesorAsociado.correo = participante.correo;
+                    asesorAsociado.correoAlternativo = participante.correoAlternativo;
+                    asesorAsociado.gradoAcademico = participante.gradoAcademico;
+                    asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
+                    asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
+                    asesorAsociado.telefono = participante.telefono;
+
+                    accesoAAsesor.EditarAsesor(asesorAsociado);
+                }
+
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                    {
+                        return StatusCode(500, new
+                        {
+                            success = false,
+                            message = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra."
+                        });
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl = Url.Action("VerParticipantes", "Participante")
+                    });
+                }
+
+                if (areasExtraGuardadas)
+                {
+                    TempData["successMessage"] = "Los datos fueron guardados.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra.";
+                }
+
+                return RedirectToAction("VerParticipantes", "Participante");
             }
             catch
             {
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Ocurrió un error al editar los datos."
+                    });
+                }
+
                 TempData["Message"] = "Ocurrió un error al editar los datos.";
                 return RedirectToAction("VerParticipantes", "Participante");
             }
@@ -1358,25 +1492,6 @@ namespace webMetics.Controllers
             return Json(secciones);
         }
 
-        /// <summary>Devuelve la lista de áreas UCR como SelectListItem (datos estáticos/predefinidos de dataAreas.json).</summary>
-        [HttpGet]
-        public static List<SelectListItem> GetAreas()
-        {
-            return new List<SelectListItem>
-            {
-                new SelectListItem { Text = "Área de Artes y Letras" },
-                new SelectListItem { Text = "Área de Ciencias Agroalimentarias" },
-                new SelectListItem { Text = "Área de Ciencias Básicas" },
-                new SelectListItem { Text = "Área de Ciencias Sociales" },
-                new SelectListItem { Text = "Área de Ingeniería" },
-                new SelectListItem { Text = "Área de Salud" },
-                new SelectListItem { Text = "Sistema de Educación General" },
-                new SelectListItem { Text = "Sistema de Estudios de Posgrado" },
-                new SelectListItem { Text = "Sedes Regionales" },
-                new SelectListItem { Text = "Oficinas Administrativas" },
-                new SelectListItem { Text = "Otros" }
-            };
-        }
 
         /// <summary>
         /// Devuelve en JSON la estructura completa de áreas, departamentos y secciones UCR
@@ -1385,7 +1500,7 @@ namespace webMetics.Controllers
         [HttpGet]
         public JsonResult GetAllAreasData()
         {
-            var allAreas = GetAreas().Select(x => x.Text).ToList();
+            var allAreas = accesoAParticipante.GetAllAreas();
             var departamentosByArea = new Dictionary<string, List<string>>();
             var seccionesByDepartamento = new Dictionary<string, List<string>>();
             var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
@@ -1416,12 +1531,12 @@ namespace webMetics.Controllers
 
         /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
         [HttpGet]
-        public JsonResult GetCarrerasBySeccionAndSede(string unidadAcademica, string sede)
+        public JsonResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
         {
-            if (string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
+            if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
 
-            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(unidadAcademica, sede);
+            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(areaName, departamentoName, unidadAcademica, sede);
             return Json(carreras);
         }
 
