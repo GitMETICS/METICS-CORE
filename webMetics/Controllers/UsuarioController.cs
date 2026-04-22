@@ -507,7 +507,7 @@ namespace webMetics.Controllers
         /// </summary>
         /// <param name="usuario">Modelo que contiene el correoAlternativo.</param>
         /// <returns>
-        /// Redirects to Grupo/ListaGruposDisponibles on success; sets TempData["successMessage"].
+        /// Redirects based on role via DeterminarRedireccionPostLogin on success; sets TempData["successMessage"].
         /// Redirects to CompletarCorreoAlternativo on error; sets TempData["errorMessage"].
         /// Redirects to IniciarSesion si la sesión no es válida.
         /// </returns>
