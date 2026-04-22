@@ -1144,5 +1144,25 @@ namespace webMetics.Controllers
 
             return id;
         }
+
+        /// <summary>
+        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
+        /// Verifica en orden: correoAlternativo (todos los roles), carrera (solo participantes rol 0).
+        /// </summary>
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        {
+            string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(idUsuario);
+            if (string.IsNullOrWhiteSpace(correoAlternativo))
+                return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
+
+            if (rol == 0)
+            {
+                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                if (participante != null && string.IsNullOrWhiteSpace(participante.carrera))
+                    return RedirectToAction("CompletarCarreraYAreas", "Usuario");
+            }
+
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
+        }
     }
 }
