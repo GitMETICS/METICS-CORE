@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
+using webMetics.Models;
 
 namespace webMetics.Controllers
 {
@@ -25,6 +27,22 @@ namespace webMetics.Controllers
         public ActionResult Index()
         {
             return Redirect("~/Grupo/ListaGruposDisponibles");
+        }
+
+        /// <summary>
+        /// Endpoint de prueba para verificar el manejo de excepciones no controladas.
+        /// </summary>
+        /// <returns>Nunca retorna; siempre lanza una excepción.</returns>
+        [HttpGet]
+        public IActionResult ThrowTest()
+        {
+            throw new Exception("Intentional test exception to verify production error handling.");
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
