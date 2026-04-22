@@ -306,6 +306,24 @@ namespace webMetics.Handlers
             return gradoAcademico;
         }
 
+        public bool ActualizarCorreoAlternativoYGradoAcademico(string idUsuario, string correoAlternativo, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo, grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         public bool ActualizarCorreoAlternativo(string idUsuario, string correoAlternativo)
         {
             string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo WHERE id_usuario_PK = @idUsuario;";

@@ -1349,6 +1349,13 @@ namespace webMetics.Controllers
                     throw new Exception("No se pudo actualizar la información del participante.");
                 }
 
+                // Actualizar correoAlternativo y gradoAcademico en tabla usuario
+                bool usuarioActualizado = accesoAUsuario.ActualizarCorreoAlternativoYGradoAcademico(
+                    participante.idParticipante,
+                    participante.correoAlternativo,
+                    participante.gradoAcademico
+                );
+
                 List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
 
