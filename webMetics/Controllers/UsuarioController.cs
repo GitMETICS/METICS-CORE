@@ -87,14 +87,7 @@ namespace webMetics.Controllers
                 {
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
-                    string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(usuarioAutorizado.id);
-                    if (string.IsNullOrWhiteSpace(correoAlternativo))
-                    {
-                        // Usuario no tiene correoAlternativo: mostrar vista de completación
-                        return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
-                    }
-
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id, usuarioAutorizado.rol);
                 }
                 else
                 {
