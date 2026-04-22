@@ -220,10 +220,10 @@
                             </td>
                         </tr>
                         @* NUEVA FILA — Carrera y Áreas Extra *@
-                        <tr class="table-light">
+                        <tr style="background-color:#f8f9fa;">
                             <td colspan="2">
                                 <span class="text-muted small">Carrera: </span>
-                                @if (string.IsNullOrWhiteSpace(ViewBag.Participante.carrera as string))
+                                @if (string.IsNullOrWhiteSpace(ViewBag.Participante.carrera))
                                 {
                                     <span class="badge bg-warning text-dark">Sin actualizar</span>
                                 }
