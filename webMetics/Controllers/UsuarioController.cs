@@ -62,12 +62,13 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Procesa el formulario de inicio de sesión. Si las credenciales son válidas, crea las cookies
-        /// de sesión y redirige al paso de correo alternativo o a la lista de grupos.
+        /// de sesión y redirige según los datos de perfil pendientes.
         /// Registra el intento (EXITO / FRACASO) en la bitácora de accesos.
         /// </summary>
         /// <param name="usuario">Modelo con correo institucional y contraseña.</param>
         /// <returns>
         /// Redirects to CompletarCorreoAlternativo si el usuario no tiene correo alternativo.
+        /// Redirects to CompletarCarreraYAreas si el participante (rol 0) no tiene carrera registrada.
         /// Redirects to Grupo/ListaGruposDisponibles on success.
         /// Redirects to IniciarSesion on failure; sets TempData["errorMessage"].
         /// View: IniciarSesion con errores de validación si ModelState es inválido.
@@ -75,6 +76,7 @@ namespace webMetics.Controllers
         /// <remarks>
         /// Handlers: UsuarioHandler.
         /// Sets cookies: USUARIOAUTORIZADO (protegido), rolUsuario, idUsuario.
+        /// Redirect logic is determined by DeterminarRedireccionPostLogin.
         /// </remarks>
         [HttpPost]
         public ActionResult IniciarSesion(LoginModel usuario)
