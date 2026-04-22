@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
+using webMetics.Models;
 
 namespace webMetics.Controllers
 {
@@ -25,6 +27,12 @@ namespace webMetics.Controllers
         public ActionResult Index()
         {
             return Redirect("~/Grupo/ListaGruposDisponibles");
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
