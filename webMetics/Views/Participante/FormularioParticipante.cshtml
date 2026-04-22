@@ -256,6 +256,10 @@ else
 
     var guardarPopover = null;
 
+    function escaparHtml(texto) {
+        return $('<div>').text(texto).html();
+    }
+
     function mostrarPopoverGuardar(mensaje) {
         if (guardarPopover) {
             guardarPopover.dispose();
