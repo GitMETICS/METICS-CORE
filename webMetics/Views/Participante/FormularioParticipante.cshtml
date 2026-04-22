@@ -262,9 +262,12 @@ else
         }
         $(document).off('click.guardarPopover');
         guardarPopover = new bootstrap.Popover(document.getElementById('guardarBtn'), {
-            content: mensaje,
-            placement: 'top',
-            trigger: 'manual'
+            title: '<i class="bi bi-exclamation-circle-fill text-danger me-1"></i> Error',
+            content: '<span style="font-size:1.3em">' + escaparHtml(mensaje) + '</span>',
+            placement: 'right',
+            trigger: 'manual',
+            html: true,
+            sanitize: false
         });
         var scrollX = window.pageXOffset;
         var scrollY = window.pageYOffset;
