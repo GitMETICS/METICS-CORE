@@ -1094,8 +1094,16 @@ namespace webMetics.Controllers
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
 
-            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-            return View("FormularioParticipante");
+            try
+            {
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View("FormularioParticipante");
+            }
+            catch
+            {
+                TempData["errorMessage"] = "Error al cargar el formulario de participante.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
         /// <summary>
@@ -1288,7 +1296,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["Message"] = "Ocurrió un error al obtener los datos solicitados.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos solicitados.";
                 return RedirectToAction("VerParticipantes");
             }
         }
@@ -1415,7 +1423,7 @@ namespace webMetics.Controllers
                     });
                 }
 
-                TempData["Message"] = "Ocurrió un error al editar los datos.";
+                TempData["errorMessage"] = "Ocurrió un error al editar los datos.";
                 return RedirectToAction("VerParticipantes", "Participante");
             }
         }
@@ -1518,16 +1526,30 @@ namespace webMetics.Controllers
         [HttpGet]
         public JsonResult GetDepartamentosByArea(string areaName)
         {
-            List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
-            return Json(departamentos);
+            try
+            {
+                List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                return Json(departamentos);
+            }
+            catch
+            {
+                return Json(new List<string>());
+            }
         }
 
         /// <summary>Devuelve las secciones/unidades académicas disponibles para un área y departamento UCR.</summary>
         [HttpGet]
         public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
-            List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
-            return Json(secciones);
+            try
+            {
+                List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                return Json(secciones);
+            }
+            catch
+            {
+                return Json(new List<string>());
+            }
         }
 
 
@@ -1538,33 +1560,44 @@ namespace webMetics.Controllers
         [HttpGet]
         public JsonResult GetAllAreasData()
         {
-            var allAreas = accesoAParticipante.GetAllAreas();
-            var departamentosByArea = new Dictionary<string, List<string>>();
-            var seccionesByDepartamento = new Dictionary<string, List<string>>();
-            var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
-
-            foreach (var areaName in allAreas)
+            try
             {
-                var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
-                departamentosByArea[areaName] = departamentos;
+                var allAreas = accesoAParticipante.GetAllAreas();
+                var departamentosByArea = new Dictionary<string, List<string>>();
+                var seccionesByDepartamento = new Dictionary<string, List<string>>();
+                var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
 
-                foreach (var departamentoName in departamentos)
+                foreach (var areaName in allAreas)
                 {
-                    var key = $"{areaName}|{departamentoName}";
-                    var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
-                    seccionesByDepartamento[key] = secciones;
+                    var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                    departamentosByArea[areaName] = departamentos;
+
+                    foreach (var departamentoName in departamentos)
+                    {
+                        var key = $"{areaName}|{departamentoName}";
+                        var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                        seccionesByDepartamento[key] = secciones;
+                    }
                 }
+
+                return Json(new
+                {
+                    areas = allAreas,
+                    departamentosByArea,
+                    seccionesByDepartamento,
+                    carrerasBySeccionAndSede
+                });
             }
-
-            var allData = new
+            catch
             {
-                areas = allAreas,
-                departamentosByArea,
-                seccionesByDepartamento,
-                carrerasBySeccionAndSede
-            };
-
-            return Json(allData);
+                return Json(new
+                {
+                    areas = new List<string>(),
+                    departamentosByArea = new Dictionary<string, List<string>>(),
+                    seccionesByDepartamento = new Dictionary<string, List<string>>(),
+                    carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>()
+                });
+            }
         }
 
         /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
@@ -1574,8 +1607,15 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
 
-            var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(areaName, departamentoName, unidadAcademica, sede);
-            return Json(carreras);
+            try
+            {
+                var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(areaName, departamentoName, unidadAcademica, sede);
+                return Json(carreras);
+            }
+            catch
+            {
+                return Json(new List<string>());
+            }
         }
 
         /// <summary>Wrapper JSON que delega en el método estático GetDepartamento para retornar departamentos por área.</summary>

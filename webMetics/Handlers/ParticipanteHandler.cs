@@ -1092,8 +1092,6 @@ namespace webMetics.Handlers
                             }
                             else
                             {
-                                // Si no hay secciones, agregar una cadena vacía a la lista de secciones
-                                seccionesList.Add("");
                                 break;
                             }
                         }
