@@ -180,7 +180,7 @@
                             <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
                         </div>
                         <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            <input type="submit" id="guardarBtn" class="btn btn-primary btn-block" value="Guardar" />
                         </div>
                     </div>
                 </div>
@@ -216,6 +216,7 @@ else
             .addClass('field-validation-valid');
 
         $('.input-validation-error').removeClass('input-validation-error');
+        ocultarPopoverGuardar();
     }
 
     function mostrarMensajesValidacion(fieldErrors) {
@@ -251,6 +252,38 @@ else
             title: 'Error',
             text: mensaje
         });
+    }
+
+    var guardarPopover = null;
+
+    function mostrarPopoverGuardar(mensaje) {
+        if (guardarPopover) {
+            guardarPopover.dispose();
+        }
+        $(document).off('click.guardarPopover');
+        guardarPopover = new bootstrap.Popover(document.getElementById('guardarBtn'), {
+            content: mensaje,
+            placement: 'top',
+            trigger: 'manual'
+        });
+        var scrollX = window.pageXOffset;
+        var scrollY = window.pageYOffset;
+        guardarPopover.show();
+        window.scrollTo(scrollX, scrollY);
+        $(document).on('click.guardarPopover', function (e) {
+            var $popover = $('.popover');
+            if (!$popover.is(e.target) && $popover.has(e.target).length === 0 &&
+                !$('#guardarBtn').is(e.target)) {
+                ocultarPopoverGuardar();
+            }
+        });
+    }
+
+    function ocultarPopoverGuardar() {
+        $(document).off('click.guardarPopover');
+        if (guardarPopover) {
+            guardarPopover.hide();
+        }
     }
 
     function resetDepartamentos() {
@@ -468,27 +501,28 @@ else
                         return;
                     }
 
-                    if (response && response.fieldErrors) {
-                        mostrarMensajesValidacion(response.fieldErrors);
-                    }
+                    var tieneFieldErrors = response && response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
+                    var tieneGlobalErrors = response && response.globalErrors && response.globalErrors.length > 0;
 
-                    if (response && response.globalErrors && response.globalErrors.length > 0) {
-                        mostrarErrorGlobal(response.globalErrors.join(' '));
+                    if (tieneFieldErrors) {
+                        mostrarMensajesValidacion(response.fieldErrors);
+                        mostrarPopoverGuardar('Por favor, revise los campos marcados en rojo.');
+                    } else if (tieneGlobalErrors) {
+                        mostrarPopoverGuardar(response.globalErrors.join(' '));
                     }
                 },
                 error: function (xhr) {
                     var response = xhr.responseJSON || {};
+                    var tieneFieldErrors = response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
+                    var tieneGlobalErrors = response.globalErrors && response.globalErrors.length > 0;
 
-                    if (response.fieldErrors) {
+                    if (tieneFieldErrors) {
                         mostrarMensajesValidacion(response.fieldErrors);
-                    }
-
-                    if (response.globalErrors && response.globalErrors.length > 0) {
-                        mostrarErrorGlobal(response.globalErrors.join(' '));
-                    } else if (response.message) {
-                        mostrarErrorGlobal(response.message);
+                        mostrarPopoverGuardar('Por favor, revise los campos marcados en rojo.');
+                    } else if (tieneGlobalErrors) {
+                        mostrarPopoverGuardar(response.globalErrors.join(' '));
                     } else {
-                        mostrarErrorGlobal('Ocurrió un error inesperado al guardar el participante.');
+                        mostrarPopoverGuardar('Ocurrió un error inesperado.');
                     }
                 },
                 complete: function () {
