@@ -571,6 +571,37 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
+        /// Muestra el formulario para que un participante ingrese su área, departamento,
+        /// unidad académica, sede, carrera y áreas extra tras el inicio de sesión.
+        /// Redirige a IniciarSesion si no hay sesión activa.
+        /// </summary>
+        /// <returns>
+        /// View: CompletarCarreraYAreas con ParticipanteModel —
+        /// ViewData["jsonDataAreas"] (lista de áreas UCR).
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        public ActionResult CompletarCarreraYAreas()
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+
+            if (TempData["errorMessage"] != null)
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            if (TempData["successMessage"] != null)
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+
+            return View(participante);
+        }
+
+        /// <summary>
         /// Muestra el formulario (solo para admins) para cambiar el correo/id y contraseña de otro usuario.
         /// </summary>
         /// <param name="idUsuario">Correo institucional del usuario a modificar.</param>
