@@ -602,6 +602,68 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
+        /// Persiste área, departamento, unidadAcademica, sede, carrera y areasExtra del participante.
+        /// </summary>
+        /// <param name="participante">Modelo con los campos del formulario.</param>
+        /// <returns>
+        /// Llama DeterminarRedireccionPostLogin en éxito.
+        /// Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarCarreraYAreas(ParticipanteModel participante)
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            if (string.IsNullOrWhiteSpace(participante.carrera))
+            {
+                TempData["errorMessage"] = "Es necesario seleccionar una carrera.";
+                return RedirectToAction("CompletarCarreraYAreas");
+            }
+
+            try
+            {
+                ParticipanteModel participanteCompleto = accesoAParticipante.ObtenerParticipante(idUsuario);
+                if (participanteCompleto == null)
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+                participanteCompleto.area = participante.area;
+                participanteCompleto.departamento = participante.departamento;
+                participanteCompleto.unidadAcademica = participante.unidadAcademica;
+                participanteCompleto.sede = participante.sede;
+                participanteCompleto.carrera = participante.carrera;
+
+                bool exito = accesoAParticipante.EditarParticipante(participanteCompleto);
+                if (!exito)
+                {
+                    TempData["errorMessage"] = "Error al guardar los datos. Intente nuevamente.";
+                    return RedirectToAction("CompletarCarreraYAreas");
+                }
+
+                var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+                List<string> areasExtraFiltradas = (participante.areasExtra ?? new List<string>())
+                    .Where(a => !string.IsNullOrWhiteSpace(a))
+                    .Where(a => areasValidas.Contains(a))
+                    .Where(a => !string.Equals(a, participanteCompleto.area, StringComparison.OrdinalIgnoreCase))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
+
+                TempData["successMessage"] = "Información académica guardada correctamente.";
+                return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarCarreraYAreas");
+            }
+        }
+
+        /// <summary>
         /// Muestra el formulario (solo para admins) para cambiar el correo/id y contraseña de otro usuario.
         /// </summary>
         /// <param name="idUsuario">Correo institucional del usuario a modificar.</param>
