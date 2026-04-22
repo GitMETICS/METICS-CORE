@@ -230,21 +230,23 @@ namespace webMetics.Handlers
             var areasExtraSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             const string consulta = "SELECT area_extra FROM participante_area_extra WHERE id_participante_FK = @idParticipante;";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-
             try
             {
-                using (var reader = comandoConsulta.ExecuteReader())
+                ConexionMetics.Open();
+
+                using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
                 {
-                    while (reader.Read())
+                    comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+                    using (var reader = comandoConsulta.ExecuteReader())
                     {
-                        string? areaExtra = reader["area_extra"]?.ToString();
-                        if (!string.IsNullOrWhiteSpace(areaExtra) && areasExtraSet.Add(areaExtra))
+                        while (reader.Read())
                         {
-                            areasExtra.Add(areaExtra);
+                            string? areaExtra = reader["area_extra"]?.ToString();
+                            if (!string.IsNullOrWhiteSpace(areaExtra) && areasExtraSet.Add(areaExtra))
+                            {
+                                areasExtra.Add(areaExtra);
+                            }
                         }
                     }
                 }
