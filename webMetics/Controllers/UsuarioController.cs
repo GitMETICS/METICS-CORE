@@ -555,7 +555,7 @@ namespace webMetics.Controllers
                     }
 
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
                 }
                 else
                 {
