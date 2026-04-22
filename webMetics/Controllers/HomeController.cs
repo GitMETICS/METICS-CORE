@@ -29,6 +29,16 @@ namespace webMetics.Controllers
             return Redirect("~/Grupo/ListaGruposDisponibles");
         }
 
+        /// <summary>
+        /// Endpoint de prueba para verificar el manejo de excepciones no controladas.
+        /// </summary>
+        /// <returns>Nunca retorna; siempre lanza una excepción.</returns>
+        [HttpGet]
+        public IActionResult ThrowTest()
+        {
+            throw new Exception("Intentional test exception to verify production error handling.");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
