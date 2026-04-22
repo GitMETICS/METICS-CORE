@@ -1507,7 +1507,7 @@ namespace webMetics.Controllers
 
         /// <summary>Devuelve los departamentos disponibles para un área UCR, consultando dataAreas.json vía ParticipanteHandler.</summary>
         [HttpGet]
-        public JsonResult GetDepartamentosByArea(string areaName)
+        public IActionResult GetDepartamentosByArea(string areaName)
         {
             try
             {
@@ -1516,13 +1516,13 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 
         /// <summary>Devuelve las secciones/unidades académicas disponibles para un área y departamento UCR.</summary>
         [HttpGet]
-        public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
+        public IActionResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
             try
             {
@@ -1531,7 +1531,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 
@@ -1541,7 +1541,7 @@ namespace webMetics.Controllers
         /// para poblar los desplegables del formulario de participante.
         /// </summary>
         [HttpGet]
-        public JsonResult GetAllAreasData()
+        public IActionResult GetAllAreasData()
         {
             try
             {
@@ -1573,19 +1573,13 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new
-                {
-                    areas = new List<string>(),
-                    departamentosByArea = new Dictionary<string, List<string>>(),
-                    seccionesByDepartamento = new Dictionary<string, List<string>>(),
-                    carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>()
-                });
+                return StatusCode(500);
             }
         }
 
         /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
         [HttpGet]
-        public JsonResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
+        public IActionResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
         {
             if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
@@ -1597,7 +1591,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 
