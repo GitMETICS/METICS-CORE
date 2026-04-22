@@ -259,8 +259,10 @@
     </div>
 
     <script>
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
-            new bootstrap.Tooltip(el);
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+                new bootstrap.Tooltip(el);
+            });
         });
     </script>
 }
@@ -286,6 +288,14 @@ else
         language: {
             url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
         },
-        "searching": false
+        searching: false,
+        drawCallback: function () {
+            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                var existing = bootstrap.Tooltip.getInstance(this);
+                if (!existing) {
+                    new bootstrap.Tooltip(this);
+                }
+            });
+        }
     });
 </script>
