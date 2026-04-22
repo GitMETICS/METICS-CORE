@@ -131,6 +131,7 @@ namespace webMetics.Controllers
                 {
                     string idParticipante = participante.idParticipante;
                     participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+                    participante.areasExtra = accesoAParticipante.GetAreasExtraByParticipante(idParticipante);
                 }
 
                 ViewBag.ListaParticipantes = participantes;
@@ -185,6 +186,14 @@ namespace webMetics.Controllers
                     p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
+            }
+
+            if (participantes != null)
+            {
+                foreach (var participante in participantes)
+                {
+                    participante.areasExtra = accesoAParticipante.GetAreasExtraByParticipante(participante.idParticipante);
+                }
             }
 
             ViewBag.ListaParticipantes = participantes;
