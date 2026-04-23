@@ -127,11 +127,15 @@ namespace webMetics.Controllers
 
             if (participantes != null)
             {
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
+
                 foreach (ParticipanteModel participante in participantes)
                 {
                     string idParticipante = participante.idParticipante;
                     participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-                    participante.areasExtra = accesoAParticipante.GetAreasExtraByParticipante(idParticipante);
+                    participante.areasExtra = areasExtraMap.TryGetValue(idParticipante, out var areas)
+                        ? areas
+                        : new List<string>();
                 }
 
                 ViewBag.ListaParticipantes = participantes;
@@ -188,11 +192,15 @@ namespace webMetics.Controllers
                 ).ToList();
             }
 
-            if (participantes != null)
+            if (participantes != null && participantes.Count > 0)
             {
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
+
                 foreach (var participante in participantes)
                 {
-                    participante.areasExtra = accesoAParticipante.GetAreasExtraByParticipante(participante.idParticipante);
+                    participante.areasExtra = areasExtraMap.TryGetValue(participante.idParticipante, out var areas)
+                        ? areas
+                        : new List<string>();
                 }
             }
 
