@@ -193,7 +193,7 @@
             dataType: 'json',
             success: function (data) {
                 $.each(data || [], function (index, value) {
-                    $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    $('#seccionDropdown').append($('<option>', { value: value, text: value }));
                 });
                 if (seccionSeleccionada) {
                     $('#seccionDropdown').val(seccionSeleccionada);
@@ -221,7 +221,7 @@
             dataType: 'json',
             success: function (data) {
                 $.each(data || [], function (index, value) {
-                    $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                    $('#departamentoDropdown').append($('<option>', { value: value, text: value }));
                 });
                 if (departamentoSeleccionado) {
                     $('#departamentoDropdown').val(departamentoSeleccionado);
@@ -243,7 +243,7 @@
             return;
         }
         $.each(carreras, function (index, value) {
-            $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
+            $('#carreraDropdown').append($('<option>', { value: value, text: value }));
         });
         if (carreraSeleccionada) {
             $('#carreraDropdown').val(carreraSeleccionada);
