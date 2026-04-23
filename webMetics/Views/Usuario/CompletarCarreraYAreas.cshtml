@@ -214,7 +214,9 @@
             return $.Deferred().resolve().promise();
         }
 
-        return $.ajax({
+        var deferred = $.Deferred();
+
+        $.ajax({
             url: '/Participante/GetDepartamentosByArea',
             type: 'GET',
             data: { areaName: areaName },
@@ -225,15 +227,19 @@
                 });
                 if (departamentoSeleccionado) {
                     $('#departamentoDropdown').val(departamentoSeleccionado);
-                }
-                if (departamentoSeleccionado) {
-                    cargarSecciones(areaName, departamentoSeleccionado, seccionSeleccionada);
+                    cargarSecciones(areaName, departamentoSeleccionado, seccionSeleccionada)
+                        .always(function () { deferred.resolve(); });
+                } else {
+                    deferred.resolve();
                 }
             },
             error: function (xhr, status, error) {
                 mostrarErrorGlobal('Error al cargar los departamentos: ' + error);
+                deferred.resolve();
             }
         });
+
+        return deferred.promise();
     }
 
     function setCarreras(carreras, carreraSeleccionada) {
