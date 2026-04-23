@@ -1289,7 +1289,7 @@ namespace webMetics.Controllers
         /// View: EditarParticipante con el modelo ParticipanteModel —
         /// ViewData["jsonDataAreas"], ViewData["jsonDataDepartamentos"], ViewData["jsonDataUnidadesAcademicas"],
         /// ViewBag.Role, ViewBag.Id.
-        /// Redirects to VerParticipantes on error; sets TempData["Message"].
+        /// Redirects to VerParticipantes on error; sets TempData["errorMessage"].
         /// </returns>
         /// <remarks>
         /// Handlers: ParticipanteHandler.
@@ -1326,7 +1326,7 @@ namespace webMetics.Controllers
         /// <returns>
         /// Redirects to VerParticipantes on success; sets TempData["successMessage"].
         /// View: EditarParticipante con errores si ModelState es inválido.
-        /// Redirects to VerParticipantes on exception; sets TempData["Message"].
+        /// Redirects to VerParticipantes on exception; sets TempData["errorMessage"].
         /// </returns>
         /// <remarks>
         /// Handlers: ParticipanteHandler, AsesorHandler.
