@@ -283,7 +283,7 @@ else
         },
         searching: false,
         drawCallback: function () {
-            if (typeof bootstrap === 'undefined') return;
+            if (!window.bootstrap?.Tooltip) return;
             $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
                 var existing = bootstrap.Tooltip.getInstance(this);
                 if (!existing) {
@@ -294,6 +294,7 @@ else
     });
 
     document.addEventListener('DOMContentLoaded', function () {
+        if (!window.bootstrap?.Tooltip) return;
         $('#tblCustomers [data-bs-toggle="tooltip"]').each(function () {
             if (!bootstrap.Tooltip.getInstance(this)) {
                 new bootstrap.Tooltip(this);
