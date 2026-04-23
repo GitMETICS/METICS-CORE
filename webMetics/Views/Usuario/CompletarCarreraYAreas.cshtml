@@ -1,0 +1,323 @@
+@model webMetics.Models.ParticipanteModel
+@{
+    ViewBag.Title = "Completar Información - Datos Académicos";
+
+    var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(a => a)
+        .ToList();
+}
+
+<div class="contenedor-caja container-fluid">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-lg" style="border: none; border-radius: 15px;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h1 class="mb-2">Actualización Requerida</h1>
+                        <p class="text-muted">Para continuar, complete su información académica</p>
+                    </div>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error:</strong> @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Éxito:</strong> @ViewBag.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @using (Html.BeginForm("CompletarCarreraYAreas", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "completarCarreraForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <p class="mb-0">
+                                <strong>Correo Institucional:</strong><br />
+                                <span class="text-secondary">@Model.correo</span>
+                            </p>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.area, new { @class = "form-label fw-bold" })
+                            <a style="color:red">*</a>
+                            @Html.DropDownListFor(m => m.area,
+                                new SelectList(ViewData["jsonDataAreas"] as List<string>),
+                                "Seleccione un área...",
+                                new { @class = "form-control", id = "areaDropdown" })
+                            @Html.ValidationMessageFor(m => m.area, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.departamento, new { @class = "form-label fw-bold" })
+                            <a style="color:red">*</a>
+                            @Html.DropDownListFor(m => m.departamento,
+                                new SelectList(Enumerable.Empty<SelectListItem>()),
+                                "Seleccione un departamento...",
+                                new { @class = "form-control", id = "departamentoDropdown" })
+                            @Html.ValidationMessageFor(m => m.departamento, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.unidadAcademica, new { @class = "form-label fw-bold" })
+                            <a style="color:red">*</a>
+                            @Html.DropDownListFor(m => m.unidadAcademica,
+                                new SelectList(Enumerable.Empty<SelectListItem>()),
+                                "Seleccione una unidad académica...",
+                                new { @class = "form-control", id = "seccionDropdown" })
+                            @Html.ValidationMessageFor(m => m.unidadAcademica, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.sede, new { @class = "form-label fw-bold" })
+                            <a style="color:red">*</a>
+                            @Html.DropDownListFor(m => m.sede,
+                                webMetics.Controllers.ParticipanteController.GetSedes(),
+                                "Seleccione una sede y recinto...",
+                                new { @class = "form-control", id = "sedeDropdown" })
+                            @Html.ValidationMessageFor(m => m.sede, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.carrera, new { @class = "form-label fw-bold" })
+                            <a style="color:red">*</a>
+                            @Html.DropDownListFor(m => m.carrera,
+                                new SelectList(Enumerable.Empty<SelectListItem>()),
+                                "Seleccione una carrera...",
+                                new { @class = "form-control", id = "carreraDropdown" })
+                            @Html.ValidationMessageFor(m => m.carrera, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <fieldset class="border rounded p-3">
+                                <legend class="float-none w-auto px-2 fw-bold" style="font-size: 1rem;">
+                                    @Html.DisplayNameFor(m => m.areasExtra)
+                                </legend>
+                                <small class="form-text text-muted d-block mb-2">
+                                    Opcional. Debe ser diferente al área principal.
+                                </small>
+
+                                @{ int areaIndex = 0; }
+                                @foreach (var areaExtra in areasDisponibles)
+                                {
+                                    var checkboxId = $"areaExtra_{areaIndex++}";
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input area-extra-checkbox"
+                                            type="checkbox"
+                                            name="areasExtra"
+                                            id="@checkboxId"
+                                            value="@areaExtra"
+                                            @(Model?.areasExtra?.Contains(areaExtra, StringComparer.OrdinalIgnoreCase) == true ? "checked" : null) />
+                                        <label class="form-check-label" for="@checkboxId">@areaExtra</label>
+                                    </div>
+                                }
+                            </fieldset>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" style="border-radius: 8px; font-weight: 500; padding: 12px; font-size: 16px;">
+                                <i class="bi bi-check-circle me-2"></i>Guardar y Continuar
+                            </button>
+                        </div>
+
+                        <p class="text-center text-muted small mt-3">
+                            Los campos marcados con <span style="color:red">*</span> son requeridos.
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript">
+    var areasData = { carrerasBySeccionAndSede: {} };
+
+    var estadoInicial = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
+    {
+        area = Model?.area ?? string.Empty,
+        departamento = Model?.departamento ?? string.Empty,
+        unidadAcademica = Model?.unidadAcademica ?? string.Empty,
+        sede = Model?.sede ?? string.Empty,
+        carrera = Model?.carrera ?? string.Empty
+    }));
+
+    function mostrarErrorGlobal(mensaje) {
+        alert(mensaje);
+    }
+
+    function resetDepartamentos() {
+        $('#departamentoDropdown').empty().append('<option value="">Seleccione un departamento...</option>');
+    }
+
+    function resetSecciones() {
+        $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
+    }
+
+    function resetCarreras() {
+        $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
+    }
+
+    function actualizarAreasExtraDisponibles() {
+        var areaPrincipal = $('#areaDropdown').val();
+        $('.area-extra-checkbox').each(function () {
+            var esAreaPrincipal = $(this).val() === areaPrincipal;
+            $(this).prop('disabled', esAreaPrincipal);
+            if (esAreaPrincipal) {
+                $(this).prop('checked', false);
+            }
+        });
+    }
+
+    function cargarSecciones(areaName, departamentoName, seccionSeleccionada) {
+        resetSecciones();
+        resetCarreras();
+
+        if (!areaName || !departamentoName) {
+            return $.Deferred().resolve().promise();
+        }
+
+        return $.ajax({
+            url: '/Participante/GetSeccionesByDepartamento',
+            type: 'GET',
+            data: { areaName: areaName, departamentoName: departamentoName },
+            dataType: 'json',
+            success: function (data) {
+                $.each(data || [], function (index, value) {
+                    $('#seccionDropdown').append('<option value="' + value + '">' + value + '</option>');
+                });
+                if (seccionSeleccionada) {
+                    $('#seccionDropdown').val(seccionSeleccionada);
+                }
+            },
+            error: function (xhr, status, error) {
+                mostrarErrorGlobal('Error al cargar las unidades académicas: ' + error);
+            }
+        });
+    }
+
+    function cargarDepartamentos(areaName, departamentoSeleccionado, seccionSeleccionada) {
+        resetDepartamentos();
+        resetSecciones();
+        resetCarreras();
+
+        if (!areaName) {
+            return $.Deferred().resolve().promise();
+        }
+
+        return $.ajax({
+            url: '/Participante/GetDepartamentosByArea',
+            type: 'GET',
+            data: { areaName: areaName },
+            dataType: 'json',
+            success: function (data) {
+                $.each(data || [], function (index, value) {
+                    $('#departamentoDropdown').append('<option value="' + value + '">' + value + '</option>');
+                });
+                if (departamentoSeleccionado) {
+                    $('#departamentoDropdown').val(departamentoSeleccionado);
+                }
+                if (departamentoSeleccionado) {
+                    cargarSecciones(areaName, departamentoSeleccionado, seccionSeleccionada);
+                }
+            },
+            error: function (xhr, status, error) {
+                mostrarErrorGlobal('Error al cargar los departamentos: ' + error);
+            }
+        });
+    }
+
+    function setCarreras(carreras, carreraSeleccionada) {
+        resetCarreras();
+        if (!carreras || carreras.length === 0) {
+            $('#carreraDropdown').append('<option value="">No hay carreras disponibles para esta combinación</option>');
+            return;
+        }
+        $.each(carreras, function (index, value) {
+            $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
+        });
+        if (carreraSeleccionada) {
+            $('#carreraDropdown').val(carreraSeleccionada);
+        }
+    }
+
+    function actualizarCarreras(carreraSeleccionada) {
+        var area = $('#areaDropdown').val();
+        var departamento = $('#departamentoDropdown').val();
+        var seccion = $('#seccionDropdown').val();
+        var sede = $('#sedeDropdown').val();
+
+        resetCarreras();
+
+        if (!area || !departamento || !seccion || !sede) {
+            return $.Deferred().resolve().promise();
+        }
+
+        if (areasData.carrerasBySeccionAndSede[seccion] &&
+            areasData.carrerasBySeccionAndSede[seccion][sede]) {
+            setCarreras(areasData.carrerasBySeccionAndSede[seccion][sede], carreraSeleccionada);
+            return $.Deferred().resolve().promise();
+        }
+
+        return $.ajax({
+            url: '/Participante/GetCarrerasBySeccionAndSede',
+            type: 'GET',
+            data: {
+                areaName: area,
+                departamentoName: departamento,
+                unidadAcademica: seccion,
+                sede: sede
+            },
+            dataType: 'json',
+            success: function (carreras) {
+                if (!areasData.carrerasBySeccionAndSede[seccion]) {
+                    areasData.carrerasBySeccionAndSede[seccion] = {};
+                }
+                areasData.carrerasBySeccionAndSede[seccion][sede] = carreras || [];
+                setCarreras(carreras, carreraSeleccionada);
+            },
+            error: function () {
+                mostrarErrorGlobal('Error al cargar las carreras.');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        if (estadoInicial.area) {
+            cargarDepartamentos(
+                estadoInicial.area,
+                estadoInicial.departamento,
+                estadoInicial.unidadAcademica
+            ).then(function () {
+                if (estadoInicial.sede) {
+                    $('#sedeDropdown').val(estadoInicial.sede);
+                }
+                actualizarCarreras(estadoInicial.carrera);
+            });
+        }
+
+        actualizarAreasExtraDisponibles();
+
+        $('#areaDropdown').on('change', function () {
+            cargarDepartamentos($(this).val(), null, null);
+            actualizarAreasExtraDisponibles();
+        });
+
+        $('#departamentoDropdown').on('change', function () {
+            cargarSecciones($('#areaDropdown').val(), $(this).val(), null);
+        });
+
+        $('#seccionDropdown, #sedeDropdown').on('change', function () {
+            actualizarCarreras(null);
+        });
+    });
+</script>
