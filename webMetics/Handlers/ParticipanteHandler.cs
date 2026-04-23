@@ -265,7 +265,7 @@ namespace webMetics.Handlers
 
         public Dictionary<string, List<string>> GetAreasExtraParticipantes()
         {
-            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            var sets = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             const string consulta = "SELECT id_participante_FK, area_extra FROM participante_area_extra;";
 
             try
@@ -283,14 +283,10 @@ namespace webMetics.Handlers
                         if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(area))
                             continue;
 
-                        if (!result.TryGetValue(id, out var lista))
-                        {
-                            lista = new List<string>();
-                            result[id] = lista;
-                        }
+                        if (!sets.TryGetValue(id, out var set))
+                            sets[id] = set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                        if (!lista.Contains(area, StringComparer.OrdinalIgnoreCase))
-                            lista.Add(area);
+                        set.Add(area);
                     }
                 }
             }
@@ -303,7 +299,7 @@ namespace webMetics.Handlers
                 ConexionMetics.Close();
             }
 
-            return result;
+            return sets.ToDictionary(kv => kv.Key, kv => kv.Value.ToList(), StringComparer.OrdinalIgnoreCase);
         }
 
         private string ObtenerCorreoAlternativoUsuario(string idUsuario)
