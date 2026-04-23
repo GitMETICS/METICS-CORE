@@ -127,10 +127,15 @@ namespace webMetics.Controllers
 
             if (participantes != null)
             {
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
+
                 foreach (ParticipanteModel participante in participantes)
                 {
                     string idParticipante = participante.idParticipante;
                     participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
+                    participante.areasExtra = areasExtraMap.TryGetValue(idParticipante, out var areas)
+                        ? areas
+                        : new List<string>();
                 }
 
                 ViewBag.ListaParticipantes = participantes;
@@ -185,6 +190,18 @@ namespace webMetics.Controllers
                     p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
+            }
+
+            if (participantes != null && participantes.Count > 0)
+            {
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
+
+                foreach (var participante in participantes)
+                {
+                    participante.areasExtra = areasExtraMap.TryGetValue(participante.idParticipante, out var areas)
+                        ? areas
+                        : new List<string>();
+                }
             }
 
             ViewBag.ListaParticipantes = participantes;
@@ -1272,7 +1289,7 @@ namespace webMetics.Controllers
         /// View: EditarParticipante con el modelo ParticipanteModel —
         /// ViewData["jsonDataAreas"], ViewData["jsonDataDepartamentos"], ViewData["jsonDataUnidadesAcademicas"],
         /// ViewBag.Role, ViewBag.Id.
-        /// Redirects to VerParticipantes on error; sets TempData["Message"].
+        /// Redirects to VerParticipantes on error; sets TempData["errorMessage"].
         /// </returns>
         /// <remarks>
         /// Handlers: ParticipanteHandler.
@@ -1309,7 +1326,7 @@ namespace webMetics.Controllers
         /// <returns>
         /// Redirects to VerParticipantes on success; sets TempData["successMessage"].
         /// View: EditarParticipante con errores si ModelState es inválido.
-        /// Redirects to VerParticipantes on exception; sets TempData["Message"].
+        /// Redirects to VerParticipantes on exception; sets TempData["errorMessage"].
         /// </returns>
         /// <remarks>
         /// Handlers: ParticipanteHandler, AsesorHandler.
@@ -1507,7 +1524,7 @@ namespace webMetics.Controllers
 
         /// <summary>Devuelve los departamentos disponibles para un área UCR, consultando dataAreas.json vía ParticipanteHandler.</summary>
         [HttpGet]
-        public JsonResult GetDepartamentosByArea(string areaName)
+        public IActionResult GetDepartamentosByArea(string areaName)
         {
             try
             {
@@ -1516,13 +1533,13 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 
         /// <summary>Devuelve las secciones/unidades académicas disponibles para un área y departamento UCR.</summary>
         [HttpGet]
-        public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
+        public IActionResult GetSeccionesByDepartamento(string areaName, string departamentoName)
         {
             try
             {
@@ -1531,7 +1548,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 
@@ -1541,7 +1558,7 @@ namespace webMetics.Controllers
         /// para poblar los desplegables del formulario de participante.
         /// </summary>
         [HttpGet]
-        public JsonResult GetAllAreasData()
+        public IActionResult GetAllAreasData()
         {
             try
             {
@@ -1573,19 +1590,13 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new
-                {
-                    areas = new List<string>(),
-                    departamentosByArea = new Dictionary<string, List<string>>(),
-                    seccionesByDepartamento = new Dictionary<string, List<string>>(),
-                    carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>()
-                });
+                return StatusCode(500);
             }
         }
 
         /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
         [HttpGet]
-        public JsonResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
+        public IActionResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
         {
             if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
                 return Json(new List<string>());
@@ -1597,7 +1608,7 @@ namespace webMetics.Controllers
             }
             catch
             {
-                return Json(new List<string>());
+                return StatusCode(500);
             }
         }
 

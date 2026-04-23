@@ -219,6 +219,37 @@
                                 <span>@ViewBag.Participante.horasAprobadas</span>
                             </td>
                         </tr>
+                        @* NUEVA FILA — Carrera y Áreas Extra *@
+                        <tr style="background-color:#f8f9fa;">
+                            <td colspan="2">
+                                <span class="text-muted small">Carrera: </span>
+                                @if (string.IsNullOrWhiteSpace(ViewBag.Participante.carrera))
+                                {
+                                    <span class="badge bg-warning text-dark">Sin actualizar</span>
+                                }
+                                else
+                                {
+                                    <strong>@ViewBag.Participante.carrera</strong>
+                                }
+                            </td>
+                            <td colspan="3">
+                                <span class="text-muted small">Áreas Extra: </span>
+                                @{
+                                    var areasParticipante = ViewBag.Participante.areasExtra as List<string> ?? new List<string>();
+                                }
+                                @if (!areasParticipante.Any())
+                                {
+                                    <span class="text-muted">Ninguna</span>
+                                }
+                                else
+                                {
+                                    foreach (var area in areasParticipante)
+                                    {
+                                        <span class="badge bg-primary me-1">@area</span>
+                                    }
+                                }
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 

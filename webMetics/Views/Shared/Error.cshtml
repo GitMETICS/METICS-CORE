@@ -1,13 +1,22 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Error</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-    <hgroup>
-        <h1>Error.</h1>
-        <h2>An error occurred while processing your request.</h2>
-    </hgroup>
+    <main class="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+        <div style="max-width: 540px; width: 100%;" class="error-card text-center px-4">
+            <i style="font-size: 4rem; color: #095998;" class="bi bi-exclamation-circle error-icon mb-3 d-block"></i>
+            <h1 class="h3 fw-bold text-dark mb-2">Ocurrió un problema</h1>
+            <p class="text-muted mb-4">
+                Lo sentimos, algo salió mal al procesar su solicitud.<br />
+                Si el problema persiste, comuníquese con el equipo de soporte.
+            </p>
+            <a href="/" class="btn btn-primary px-4" style="background-color: #095998; border-color: #095998;">
+                <i class="bi bi-house-door me-2"></i>Volver al inicio
+            </a>
+        </div>
+    </main>
 </body>
 </html>

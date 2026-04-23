@@ -272,7 +272,9 @@ else
             placement: 'right',
             trigger: 'manual',
             html: true,
-            sanitize: false
+            allowList: Object.assign({}, bootstrap.Popover.Default.allowList, {
+                span: ['style']
+            })
         });
         var scrollX = window.pageXOffset;
         var scrollY = window.pageYOffset;
@@ -527,7 +529,7 @@ else
                     } else if (tieneGlobalErrors) {
                         mostrarPopoverGuardar(response.globalErrors.join(' '));
                     } else {
-                        mostrarPopoverGuardar('Ocurrió un error inesperado.');
+                        mostrarPopoverGuardar(response.message || 'Ocurrió un error inesperado.');
                     }
                 },
                 complete: function () {
