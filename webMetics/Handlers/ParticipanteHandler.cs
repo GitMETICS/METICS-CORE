@@ -263,6 +263,49 @@ namespace webMetics.Handlers
             return areasExtra;
         }
 
+        public Dictionary<string, List<string>> GetAreasExtraParticipantes()
+        {
+            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            const string consulta = "SELECT id_participante_FK, area_extra FROM participante_area_extra;";
+
+            try
+            {
+                ConexionMetics.Open();
+
+                using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string? id = reader["id_participante_FK"]?.ToString();
+                        string? area = reader["area_extra"]?.ToString();
+
+                        if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(area))
+                            continue;
+
+                        if (!result.TryGetValue(id, out var lista))
+                        {
+                            lista = new List<string>();
+                            result[id] = lista;
+                        }
+
+                        if (!lista.Contains(area, StringComparer.OrdinalIgnoreCase))
+                            lista.Add(area);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener áreas extra en batch: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return result;
+        }
+
         private string ObtenerCorreoAlternativoUsuario(string idUsuario)
         {
             string correoAlternativo = null;
