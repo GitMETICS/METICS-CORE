@@ -34,7 +34,7 @@
                         </div>
                     }
 
-                    @using (Html.BeginForm("CompletarCarreraYAreas", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "completarCarreraForm" }))
+                    @using (Html.BeginForm("CompletarCarreraYAreas", "Usuario", FormMethod.Post, new { id = "completarCarreraForm" }))
                     {
                         @Html.AntiForgeryToken()
 

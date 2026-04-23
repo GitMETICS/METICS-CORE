@@ -587,6 +587,9 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
 
+            if (GetRole() != 0)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
             if (participante == null)
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
@@ -612,11 +615,14 @@ namespace webMetics.Controllers
         /// </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CompletarCarreraYAreas(ParticipanteModel participante)
+        public ActionResult CompletarCarreraYAreas([Bind("area,departamento,unidadAcademica,sede,carrera,areasExtra")] ParticipanteModel participante)
         {
             string idUsuario = GetId();
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
+
+            if (GetRole() != 0)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
 
             if (string.IsNullOrWhiteSpace(participante.carrera))
             {
@@ -651,9 +657,11 @@ namespace webMetics.Controllers
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
 
-                accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
 
-                TempData["successMessage"] = "Información académica guardada correctamente.";
+                TempData["successMessage"] = areasExtraGuardadas
+                    ? "Información académica guardada correctamente."
+                    : "Carrera guardada. No se pudieron guardar las áreas extra.";
                 return DeterminarRedireccionPostLogin(idUsuario, GetRole());
             }
             catch (Exception)
