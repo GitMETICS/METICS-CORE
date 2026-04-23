@@ -192,7 +192,7 @@ namespace webMetics.Controllers
                 ).ToList();
             }
 
-            if (participantes != null)
+            if (participantes != null && participantes.Count > 0)
             {
                 var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
