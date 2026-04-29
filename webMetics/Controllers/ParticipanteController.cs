@@ -504,6 +504,8 @@ namespace webMetics.Controllers
         /// </remarks>
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
+            try
+            {
             // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
@@ -570,14 +572,14 @@ namespace webMetics.Controllers
                 {
                     foreach (var inscripcion in inscripcionesParticipante)
                     {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
 
                         // Datos del módulo
                         table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
@@ -588,14 +590,14 @@ namespace webMetics.Controllers
                 else
                 {
                     // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
 
                     table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
@@ -609,9 +611,16 @@ namespace webMetics.Controllers
             // Cerrar el documento
             document.Close();
 
-            // Devolver el archivo PDF 
+            // Devolver el archivo PDF
             string fileName = "Lista_de_Participantes_Módulos.pdf";
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting PDF: {ex.Message}");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo PDF.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
         /// <summary>
@@ -989,7 +998,8 @@ namespace webMetics.Controllers
             {
                 // Basic error handling (log or return an error view)
                 Console.WriteLine($"Error exporting Excel: {ex.Message}");
-                return Content("An error occurred while exporting the Excel file.");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo Excel.";
+                return RedirectToAction("VerParticipantes");
             }
         }
 
