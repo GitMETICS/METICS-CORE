@@ -62,12 +62,11 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Procesa el formulario de inicio de sesión. Si las credenciales son válidas, crea las cookies
-        /// de sesión y redirige al paso de correo alternativo o a la lista de grupos.
+        /// de sesión y redirige según los datos de perfil pendientes.
         /// Registra el intento (EXITO / FRACASO) en la bitácora de accesos.
         /// </summary>
         /// <param name="usuario">Modelo con correo institucional y contraseña.</param>
         /// <returns>
-        /// Redirects to CompletarCorreoAlternativo si el usuario no tiene correo alternativo.
         /// Redirects to Grupo/ListaGruposDisponibles on success.
         /// Redirects to IniciarSesion on failure; sets TempData["errorMessage"].
         /// View: IniciarSesion con errores de validación si ModelState es inválido.
@@ -75,6 +74,7 @@ namespace webMetics.Controllers
         /// <remarks>
         /// Handlers: UsuarioHandler.
         /// Sets cookies: USUARIOAUTORIZADO (protegido), rolUsuario, idUsuario.
+        /// Redirect logic is determined by DeterminarRedireccionPostLogin.
         /// </remarks>
         [HttpPost]
         public ActionResult IniciarSesion(LoginModel usuario)
@@ -85,33 +85,12 @@ namespace webMetics.Controllers
 
                 if (usuarioAutorizado != null)
                 {
-                    // La autenticación fue exitosa.
-                    // 1. Llama al método para insertar el registro de acceso.
-                    // Se usa el ID del usuario autorizado.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
-                    // 2. Validar si el usuario tiene correoAlternativo
-                    string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(usuarioAutorizado.id);
-                    if (string.IsNullOrWhiteSpace(correoAlternativo))
-                    {
-                        // Usuario no tiene correoAlternativo: mostrar vista de completación
-                        return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
-                    }
-
-                    // 3. Validar si el usuario tiene gradoAcademico
-                    string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(usuarioAutorizado.id);
-                    if (string.IsNullOrWhiteSpace(gradoAcademico))
-                    {
-                        // Usuario no tiene gradoAcademico: mostrar vista de completación
-                        return RedirectToAction("CompletarGradoAcademico", "Usuario");
-                    }
-
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id, usuarioAutorizado.rol);
                 }
                 else
                 {
-                    // La autenticación falló.
-                    // 1. Llama al método para insertar el registro de acceso.
                     // Se usa el correo proporcionado para identificar al usuario que intentó el acceso.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuario.id, "FRACASO");
 
@@ -500,11 +479,9 @@ namespace webMetics.Controllers
                 return RedirectToAction("IniciarSesion");
             }
 
-            // Obtener datos del participante o asesor para llenar nombre y apellido
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
             AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
 
-            // Crear modelo para la vista
             UsuarioModel usuario = new UsuarioModel()
             {
                 id = idUsuario,
@@ -530,7 +507,7 @@ namespace webMetics.Controllers
         /// </summary>
         /// <param name="usuario">Modelo que contiene el correoAlternativo.</param>
         /// <returns>
-        /// Redirects to Grupo/ListaGruposDisponibles on success; sets TempData["successMessage"].
+        /// Redirects based on role via DeterminarRedireccionPostLogin on success; sets TempData["successMessage"].
         /// Redirects to CompletarCorreoAlternativo on error; sets TempData["errorMessage"].
         /// Redirects to IniciarSesion si la sesión no es válida.
         /// </returns>
@@ -549,7 +526,6 @@ namespace webMetics.Controllers
                 return RedirectToAction("IniciarSesion");
             }
 
-            // Validar que el campo correoAlternativo no esté vacío
             if (string.IsNullOrWhiteSpace(usuario.correoAlternativo))
             {
                 TempData["errorMessage"] = "Es necesario ingresar un correo alternativo.";
@@ -586,16 +562,7 @@ namespace webMetics.Controllers
                     }
 
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
-
-                    // Validar si el usuario tiene gradoAcademico
-                    string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(idUsuario);
-                    if (string.IsNullOrWhiteSpace(gradoAcademico))
-                    {
-                        // Usuario no tiene gradoAcademico: mostrar vista de completación
-                        return RedirectToAction("CompletarGradoAcademico", "Usuario");
-                    }
-
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
                 }
                 else
                 {
@@ -607,6 +574,111 @@ namespace webMetics.Controllers
             {
                 TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("CompletarCorreoAlternativo");
+            }
+        }
+
+        /// <summary>
+        /// Muestra el formulario para que un participante ingrese su área, departamento,
+        /// unidad académica, sede, carrera y áreas extra tras el inicio de sesión.
+        /// Redirige a IniciarSesion si no hay sesión activa.
+        /// </summary>
+        /// <returns>
+        /// View: CompletarCarreraYAreas con ParticipanteModel —
+        /// ViewData["jsonDataAreas"] (lista de áreas UCR).
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        public ActionResult CompletarCarreraYAreas()
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            if (GetRole() != 0)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+
+            if (TempData["errorMessage"] != null)
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            if (TempData["successMessage"] != null)
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+
+            return View(participante);
+        }
+
+        /// <summary>
+        /// Persiste área, departamento, unidadAcademica, sede, carrera y areasExtra del participante.
+        /// </summary>
+        /// <param name="participante">Modelo con los campos del formulario.</param>
+        /// <returns>
+        /// Llama DeterminarRedireccionPostLogin en éxito.
+        /// Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarCarreraYAreas([Bind("area,departamento,unidadAcademica,sede,carrera,areasExtra")] ParticipanteModel participante)
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            if (GetRole() != 0)
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+            if (string.IsNullOrWhiteSpace(participante.area) ||
+                string.IsNullOrWhiteSpace(participante.departamento) ||
+                string.IsNullOrWhiteSpace(participante.unidadAcademica) ||
+                string.IsNullOrWhiteSpace(participante.sede) ||
+                string.IsNullOrWhiteSpace(participante.carrera))
+            {
+                TempData["errorMessage"] = "Es necesario completar todos los campos requeridos: área, departamento, unidad académica, sede y carrera.";
+                return RedirectToAction("CompletarCarreraYAreas");
+            }
+
+            try
+            {
+                ParticipanteModel participanteCompleto = accesoAParticipante.ObtenerParticipante(idUsuario);
+                if (participanteCompleto == null)
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+
+                participanteCompleto.area = participante.area;
+                participanteCompleto.departamento = participante.departamento;
+                participanteCompleto.unidadAcademica = participante.unidadAcademica;
+                participanteCompleto.sede = participante.sede;
+                participanteCompleto.carrera = participante.carrera;
+
+                bool exito = accesoAParticipante.EditarParticipante(participanteCompleto);
+                if (!exito)
+                {
+                    TempData["errorMessage"] = "Error al guardar los datos. Intente nuevamente.";
+                    return RedirectToAction("CompletarCarreraYAreas");
+                }
+
+                var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+                List<string> areasExtraFiltradas = (participante.areasExtra ?? new List<string>())
+                    .Where(a => !string.IsNullOrWhiteSpace(a))
+                    .Where(a => areasValidas.Contains(a))
+                    .Where(a => !string.Equals(a, participanteCompleto.area, StringComparison.OrdinalIgnoreCase))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
+
+                TempData["successMessage"] = areasExtraGuardadas
+                    ? "Información académica guardada correctamente."
+                    : "Carrera guardada. No se pudieron guardar las áreas extra.";
+                return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarCarreraYAreas");
             }
         }
 
@@ -1278,6 +1350,31 @@ namespace webMetics.Controllers
             }
 
             return id;
+        }
+
+        /// <summary>
+        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
+        /// Verifica en orden: correoAlternativo (todos los roles), carrera (solo participantes rol 0).
+        /// </summary>
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        {
+            string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(idUsuario);
+            if (string.IsNullOrWhiteSpace(correoAlternativo))
+                return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
+
+            // Validar si el usuario tiene gradoAcademico
+            string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(idUsuario);
+            if (string.IsNullOrWhiteSpace(gradoAcademico))
+                return RedirectToAction("CompletarGradoAcademico", "Usuario");
+
+            if (rol == 0)
+            {
+                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                if (participante != null && string.IsNullOrWhiteSpace(participante.carrera))
+                    return RedirectToAction("CompletarCarreraYAreas", "Usuario");
+            }
+
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
     }
 }
