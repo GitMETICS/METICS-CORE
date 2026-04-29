@@ -127,15 +127,10 @@ namespace webMetics.Controllers
 
             if (participantes != null)
             {
-                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
-
                 foreach (ParticipanteModel participante in participantes)
                 {
                     string idParticipante = participante.idParticipante;
                     participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-                    participante.areasExtra = areasExtraMap.TryGetValue(idParticipante, out var areas)
-                        ? areas
-                        : new List<string>();
                 }
 
                 ViewBag.ListaParticipantes = participantes;
@@ -190,18 +185,6 @@ namespace webMetics.Controllers
                     p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
-            }
-
-            if (participantes != null && participantes.Count > 0)
-            {
-                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
-
-                foreach (var participante in participantes)
-                {
-                    participante.areasExtra = areasExtraMap.TryGetValue(participante.idParticipante, out var areas)
-                        ? areas
-                        : new List<string>();
-                }
             }
 
             ViewBag.ListaParticipantes = participantes;
@@ -521,9 +504,12 @@ namespace webMetics.Controllers
         /// </remarks>
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
+            try
+            {
             // Obtener la lista de participantes e inscripciones
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+            var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
             // Filtrar la lista si se ha ingresado un término de búsqueda
             if (!string.IsNullOrEmpty(searchTerm))
@@ -560,12 +546,12 @@ namespace webMetics.Controllers
                 .SetMarginBottom(20);
             document.Add(header);
 
-            // Crear la tabla (9 columnas)
-            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
+            // Crear la tabla (11 columnas)
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 2, 2, 3, 2, 2 });
             table.SetWidth(UnitValue.CreatePercentValue(100));
 
             // Agregar encabezados de la tabla con estilo
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Carrera", "Áreas Extra", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
             foreach (var headerText in headers)
             {
                 table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
@@ -578,17 +564,22 @@ namespace webMetics.Controllers
             {
                 // Obtener las inscripciones del participante
                 var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
+                string areasStr = areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                    ? string.Join(", ", areas)
+                    : "";
 
                 if (inscripcionesParticipante.Any())
                 {
                     foreach (var inscripcion in inscripcionesParticipante)
                     {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
 
                         // Datos del módulo
                         table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
@@ -599,12 +590,14 @@ namespace webMetics.Controllers
                 else
                 {
                     // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
 
                     table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
                     table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
@@ -618,9 +611,16 @@ namespace webMetics.Controllers
             // Cerrar el documento
             document.Close();
 
-            // Devolver el archivo PDF 
+            // Devolver el archivo PDF
             string fileName = "Lista_de_Participantes_Módulos.pdf";
             return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting PDF: {ex.Message}");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo PDF.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
         /// <summary>
@@ -917,6 +917,8 @@ namespace webMetics.Controllers
                     participantes = accesoAParticipante.ObtenerListaParticipantes();
                 }
 
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
+
                 // Optimized Inscripciones retrieval if needed.
                 List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
 
@@ -943,7 +945,7 @@ namespace webMetics.Controllers
                 bodyStyle.BorderRight = BorderStyle.Thin;
 
                 // Headers
-                string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+                string[] headers = { "Unidad Académica", "Carrera", "Áreas Extra", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
                 IRow headerRow = sheet.CreateRow(3);
 
                 for (int i = 0; i < headers.Length; i++)
@@ -959,12 +961,17 @@ namespace webMetics.Controllers
                 {
                     IRow dataRow = sheet.CreateRow(rowNumber++);
                     dataRow.CreateCell(0).SetCellValue(participante.unidadAcademica);
-                    dataRow.CreateCell(1).SetCellValue(participante.nombre);
-                    dataRow.CreateCell(2).SetCellValue(participante.primerApellido);
-                    dataRow.CreateCell(3).SetCellValue(participante.segundoApellido);
-                    dataRow.CreateCell(4).SetCellValue(participante.correo); // changed from idParticipante to correo
-                    dataRow.CreateCell(5).SetCellValue(participante.horasMatriculadas);
-                    dataRow.CreateCell(6).SetCellValue(participante.horasAprobadas);
+                    dataRow.CreateCell(1).SetCellValue(participante.carrera ?? "");
+                    dataRow.CreateCell(2).SetCellValue(
+                        areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                            ? string.Join(", ", areas)
+                            : "");
+                    dataRow.CreateCell(3).SetCellValue(participante.nombre);
+                    dataRow.CreateCell(4).SetCellValue(participante.primerApellido);
+                    dataRow.CreateCell(5).SetCellValue(participante.segundoApellido);
+                    dataRow.CreateCell(6).SetCellValue(participante.correo);
+                    dataRow.CreateCell(7).SetCellValue(participante.horasMatriculadas);
+                    dataRow.CreateCell(8).SetCellValue(participante.horasAprobadas);
 
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -991,7 +998,8 @@ namespace webMetics.Controllers
             {
                 // Basic error handling (log or return an error view)
                 Console.WriteLine($"Error exporting Excel: {ex.Message}");
-                return Content("An error occurred while exporting the Excel file.");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo Excel.";
+                return RedirectToAction("VerParticipantes");
             }
         }
 
