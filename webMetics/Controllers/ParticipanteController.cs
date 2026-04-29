@@ -127,15 +127,10 @@ namespace webMetics.Controllers
 
             if (participantes != null)
             {
-                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
-
                 foreach (ParticipanteModel participante in participantes)
                 {
                     string idParticipante = participante.idParticipante;
                     participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-                    participante.areasExtra = areasExtraMap.TryGetValue(idParticipante, out var areas)
-                        ? areas
-                        : new List<string>();
                 }
 
                 ViewBag.ListaParticipantes = participantes;
@@ -190,18 +185,6 @@ namespace webMetics.Controllers
                     p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                     p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
-            }
-
-            if (participantes != null && participantes.Count > 0)
-            {
-                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
-
-                foreach (var participante in participantes)
-                {
-                    participante.areasExtra = areasExtraMap.TryGetValue(participante.idParticipante, out var areas)
-                        ? areas
-                        : new List<string>();
-                }
             }
 
             ViewBag.ListaParticipantes = participantes;
@@ -521,106 +504,104 @@ namespace webMetics.Controllers
         /// </remarks>
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
-            // Obtener la lista de participantes e inscripciones
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
+            try
             {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
+                // Obtener la lista de participantes e inscripciones
+                List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
-            // Crear el archivo PDF
-            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes_Módulos.pdf");
-            PdfWriter writer = new PdfWriter(filePath);
-            PdfDocument pdf = new PdfDocument(writer);
-
-            // Definir tamaño de página más grande (A2 o A3)
-            PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
-            iText.Layout.Document document = new iText.Layout.Document(pdf, pageSize);
-
-            // Establecer fuente en negrita para encabezado
-            PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
-            PdfFont regularFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
-
-            // Crear encabezado del documento
-            Paragraph header = new Paragraph("Lista de Participantes y Módulos")
-                .SetFont(boldFont)
-                .SetFontSize(14)
-                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
-                .SetMarginBottom(20);
-            document.Add(header);
-
-            // Crear la tabla (9 columnas)
-            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
-            table.SetWidth(UnitValue.CreatePercentValue(100));
-
-            // Agregar encabezados de la tabla con estilo
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
-            foreach (var headerText in headers)
-            {
-                table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
-                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
-                    .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY));
-            }
-
-            // Rellenar la tabla con los datos
-            foreach (var participante in participantes)
-            {
-                // Obtener las inscripciones del participante
-                var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
-
-                if (inscripcionesParticipante.Any())
+                // Filtrar la lista si se ha ingresado un término de búsqueda
+                if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    foreach (var inscripcion in inscripcionesParticipante)
-                    {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                    participantes = participantes.Where(p =>
+                        p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
 
-                        // Datos del módulo
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.horasAprobadas.ToString()).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.calificacion.ToString()).SetFont(regularFont).SetFontSize(9)));
+                using var memoryStream = new MemoryStream();
+                using var writer = new PdfWriter(memoryStream);
+                using var pdf = new PdfDocument(writer);
+                using var document = new iText.Layout.Document(pdf, PageSize.A2);
+
+                PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
+                PdfFont regularFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
+
+                Paragraph header = new Paragraph("Lista de Participantes y Módulos")
+                    .SetFont(boldFont)
+                    .SetFontSize(14)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetMarginBottom(20);
+                document.Add(header);
+
+                iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 2, 2, 3, 2, 2 });
+                table.SetWidth(UnitValue.CreatePercentValue(100));
+
+                string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Carrera", "Áreas Extra", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+                foreach (var headerText in headers)
+                {
+                    table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY));
+                }
+
+                foreach (var participante in participantes)
+                {
+                    var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
+                    string areasStr = areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                        ? string.Join(", ", areas)
+                        : "";
+
+                    if (inscripcionesParticipante.Any())
+                    {
+                        foreach (var inscripcion in inscripcionesParticipante)
+                        {
+                            table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.horasAprobadas.ToString()).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.calificacion.ToString()).SetFont(regularFont).SetFontSize(9)));
+                        }
+                    }
+                    else
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
                     }
                 }
-                else
-                {
-                    // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
 
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                }
+                document.Add(table);
+                document.Close();
+
+                return File(memoryStream.ToArray(), "application/pdf", "Lista_de_Participantes_Módulos.pdf");
             }
-
-            // Añadir la tabla al documento
-            document.Add(table);
-
-            // Cerrar el documento
-            document.Close();
-
-            // Devolver el archivo PDF 
-            string fileName = "Lista_de_Participantes_Módulos.pdf";
-            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting PDF: {ex.Message}");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo PDF.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
         /// <summary>
@@ -910,15 +891,14 @@ namespace webMetics.Controllers
                 List<ParticipanteModel> participantes;
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm); // Assuming this method exists
+                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm) ?? [];
                 }
                 else
                 {
                     participantes = accesoAParticipante.ObtenerListaParticipantes();
                 }
 
-                // Optimized Inscripciones retrieval if needed.
-                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
                 // Excel Workbook Setup
                 XSSFWorkbook workbook = new XSSFWorkbook();
@@ -943,7 +923,7 @@ namespace webMetics.Controllers
                 bodyStyle.BorderRight = BorderStyle.Thin;
 
                 // Headers
-                string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+                string[] headers = { "Unidad Académica", "Carrera", "Áreas Extra", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
                 IRow headerRow = sheet.CreateRow(3);
 
                 for (int i = 0; i < headers.Length; i++)
@@ -959,12 +939,17 @@ namespace webMetics.Controllers
                 {
                     IRow dataRow = sheet.CreateRow(rowNumber++);
                     dataRow.CreateCell(0).SetCellValue(participante.unidadAcademica);
-                    dataRow.CreateCell(1).SetCellValue(participante.nombre);
-                    dataRow.CreateCell(2).SetCellValue(participante.primerApellido);
-                    dataRow.CreateCell(3).SetCellValue(participante.segundoApellido);
-                    dataRow.CreateCell(4).SetCellValue(participante.correo); // changed from idParticipante to correo
-                    dataRow.CreateCell(5).SetCellValue(participante.horasMatriculadas);
-                    dataRow.CreateCell(6).SetCellValue(participante.horasAprobadas);
+                    dataRow.CreateCell(1).SetCellValue(participante.carrera ?? "");
+                    dataRow.CreateCell(2).SetCellValue(
+                        areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                            ? string.Join(", ", areas)
+                            : "");
+                    dataRow.CreateCell(3).SetCellValue(participante.nombre);
+                    dataRow.CreateCell(4).SetCellValue(participante.primerApellido);
+                    dataRow.CreateCell(5).SetCellValue(participante.segundoApellido);
+                    dataRow.CreateCell(6).SetCellValue(participante.correo);
+                    dataRow.CreateCell(7).SetCellValue(participante.horasMatriculadas);
+                    dataRow.CreateCell(8).SetCellValue(participante.horasAprobadas);
 
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -991,7 +976,8 @@ namespace webMetics.Controllers
             {
                 // Basic error handling (log or return an error view)
                 Console.WriteLine($"Error exporting Excel: {ex.Message}");
-                return Content("An error occurred while exporting the Excel file.");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo Excel.";
+                return RedirectToAction("VerParticipantes");
             }
         }
 

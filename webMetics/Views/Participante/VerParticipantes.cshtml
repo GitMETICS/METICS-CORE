@@ -158,34 +158,6 @@
                                 }
 
                                 <td>@participante.unidadAcademica</td>
-                                <td>
-                                    @if (string.IsNullOrWhiteSpace(participante.carrera))
-                                    {
-                                        <span class="badge bg-warning text-dark">Sin actualizar</span>
-                                    }
-                                    else
-                                    {
-                                        @participante.carrera
-                                    }
-                                </td>
-                                <td>
-                                    @{
-                                        int areasCount = participante.areasExtra?.Count ?? 0;
-                                        string areasTitle = areasCount > 0
-                                            ? string.Join(", ", participante.areasExtra)
-                                            : string.Empty;
-                                    }
-                                    @if (areasCount == 0)
-                                    {
-                                        <span class="text-muted">Ninguna</span>
-                                    }
-                                    else
-                                    {
-                                        <span data-bs-toggle="tooltip" title="@areasTitle" style="cursor:default">
-                                            @areasCount área(s)
-                                        </span>
-                                    }
-                                </td>
                                 <td>@participante.nombre</td>
                                 <td>@participante.primerApellido</td>
                                 <td>@participante.segundoApellido</td>
