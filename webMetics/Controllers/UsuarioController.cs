@@ -631,9 +631,13 @@ namespace webMetics.Controllers
             if (GetRole() != 0)
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
 
-            if (string.IsNullOrWhiteSpace(participante.carrera))
+            if (string.IsNullOrWhiteSpace(participante.area) ||
+                string.IsNullOrWhiteSpace(participante.departamento) ||
+                string.IsNullOrWhiteSpace(participante.unidadAcademica) ||
+                string.IsNullOrWhiteSpace(participante.sede) ||
+                string.IsNullOrWhiteSpace(participante.carrera))
             {
-                TempData["errorMessage"] = "Es necesario seleccionar una carrera.";
+                TempData["errorMessage"] = "Es necesario completar todos los campos requeridos: área, departamento, unidad académica, sede y carrera.";
                 return RedirectToAction("CompletarCarreraYAreas");
             }
 
