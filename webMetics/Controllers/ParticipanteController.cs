@@ -891,7 +891,7 @@ namespace webMetics.Controllers
                 List<ParticipanteModel> participantes;
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm); // Assuming this method exists
+                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm) ?? [];
                 }
                 else
                 {
