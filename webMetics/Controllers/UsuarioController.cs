@@ -85,8 +85,12 @@ namespace webMetics.Controllers
 
                 if (usuarioAutorizado != null)
                 {
+                    // La autenticación fue exitosa.
+                    // 1. Llama al método para insertar el registro de acceso.
+                    // Se usa el ID del usuario autorizado.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
+                    // 2. Validar si el usuario tiene correoAlternativo
                     string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(usuarioAutorizado.id);
                     if (string.IsNullOrWhiteSpace(correoAlternativo))
                     {
@@ -94,10 +98,20 @@ namespace webMetics.Controllers
                         return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
                     }
 
+                    // 3. Validar si el usuario tiene gradoAcademico
+                    string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(usuarioAutorizado.id);
+                    if (string.IsNullOrWhiteSpace(gradoAcademico))
+                    {
+                        // Usuario no tiene gradoAcademico: mostrar vista de completación
+                        return RedirectToAction("CompletarGradoAcademico", "Usuario");
+                    }
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
                 {
+                    // La autenticación falló.
+                    // 1. Llama al método para insertar el registro de acceso.
                     // Se usa el correo proporcionado para identificar al usuario que intentó el acceso.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuario.id, "FRACASO");
 
@@ -387,6 +401,7 @@ namespace webMetics.Controllers
                         numeroIdentificacion = participante.numeroIdentificacion,
                         correo = participante.correo,
                         correoAlternativo = participante.correoAlternativo,
+                        gradoAcademico = participante.gradoAcademico,
                         tipoParticipante = participante.tipoParticipante,
                         condicion = participante.condicion,
                         telefono = participante.telefono,
@@ -418,6 +433,7 @@ namespace webMetics.Controllers
                         numeroIdentificacion = asesor.numeroIdentificacion,
                         correo = asesor.correo,
                         correoAlternativo = asesor.correoAlternativo,
+                        gradoAcademico = asesor.gradoAcademico,
                         telefono = asesor.telefono,
                     };
 
@@ -484,9 +500,11 @@ namespace webMetics.Controllers
                 return RedirectToAction("IniciarSesion");
             }
 
+            // Obtener datos del participante o asesor para llenar nombre y apellido
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
             AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
 
+            // Crear modelo para la vista
             UsuarioModel usuario = new UsuarioModel()
             {
                 id = idUsuario,
@@ -531,9 +549,17 @@ namespace webMetics.Controllers
                 return RedirectToAction("IniciarSesion");
             }
 
+            // Validar que el campo correoAlternativo no esté vacío
             if (string.IsNullOrWhiteSpace(usuario.correoAlternativo))
             {
                 TempData["errorMessage"] = "Es necesario ingresar un correo alternativo.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            // Validar que correo alternativo sea diferente del correo institucional
+            if (idUsuario.Equals(usuario.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["errorMessage"] = "El correo alternativo debe ser diferente del correo institucional.";
                 return RedirectToAction("CompletarCorreoAlternativo");
             }
 
@@ -560,6 +586,15 @@ namespace webMetics.Controllers
                     }
 
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
+
+                    // Validar si el usuario tiene gradoAcademico
+                    string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(idUsuario);
+                    if (string.IsNullOrWhiteSpace(gradoAcademico))
+                    {
+                        // Usuario no tiene gradoAcademico: mostrar vista de completación
+                        return RedirectToAction("CompletarGradoAcademico", "Usuario");
+                    }
+
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else
@@ -590,6 +625,106 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, AsesorHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        // Método GET para mostrar el formulario de completar grado académico
+        public ActionResult CompletarGradoAcademico()
+        {
+            // Validar que el usuario esté logueado
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Obtener datos del participante o asesor para llenar nombre y apellido
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
+            // Crear modelo para la vista
+            UsuarioModel usuario = new UsuarioModel()
+            {
+                id = idUsuario,
+                nombre = participante?.nombre ?? asesor?.nombre ?? "Usuario",
+                primerApellido = participante?.primerApellido ?? asesor?.primerApellido ?? "",
+                correo = idUsuario // El correo es el ID del usuario
+            };
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View(usuario);
+        }
+
+        // Método POST para guardar el grado académico
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarGradoAcademico(UsuarioModel usuario)
+        {
+            string idUsuario = GetId();
+
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Validar que el campo gradoAcademico no esté vacío
+            if (string.IsNullOrWhiteSpace(usuario.gradoAcademico))
+            {
+                TempData["errorMessage"] = "Es necesario ingresar un grado académico.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+
+            // Validar que sea una opción válida
+            var opcionesValidas = new List<string> { "Doctorado - PhD", "Maestría - MSc", "Licenciatura - Lic", "Bachillerato - Bach" };
+            if (!opcionesValidas.Contains(usuario.gradoAcademico))
+            {
+                TempData["errorMessage"] = "Seleccione un grado académico válido.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+
+            try
+            {
+                // Actualizar grado académico en la BD
+                bool exito = accesoAUsuario.ActualizarGradoAcademico(idUsuario, usuario.gradoAcademico);
+
+                if (exito)
+                {
+                    // También actualizar en los modelos relacionados (Participante y Asesor)
+                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+                    if (participante != null)
+                    {
+                        participante.gradoAcademico = usuario.gradoAcademico;
+                        accesoAParticipante.EditarParticipante(participante);
+                    }
+
+                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+                    if (asesor != null)
+                    {
+                        asesor.gradoAcademico = usuario.gradoAcademico;
+                        accesoAAsesor.EditarAsesor(asesor);
+                    }
+
+                    TempData["successMessage"] = "Grado académico guardado correctamente.";
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al guardar el grado académico. Intente nuevamente.";
+                    return RedirectToAction("CompletarGradoAcademico");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+        }
+
         public ActionResult CambiarCredencialesUsuario(string idUsuario, string nombreCompleto)
         {
             if (GetRole() == 1)
