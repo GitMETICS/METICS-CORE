@@ -21,8 +21,9 @@ namespace webMetics.Handlers
         /// <param name="contrasena">Contraseña del usuario, que se almacenará en la base de datos.</param>
         /// <param name="rol">Rol del usuario, representado como un entero (0 para participante, 1 para administrador). Por defecto es 0.</param>
         /// <param name="correoAlternativo">Correo alternativo del usuario, que es opcional y puede ser null.</param>
+        /// <param name="gradoAcademico">Grado académico del usuario, que es obligatorio y no puede ser null.</param>
         /// <returns></returns>
-        public bool CrearUsuario(string id, string contrasena, int rol = 0, string correoAlternativo = null)
+        public bool CrearUsuario(string id, string contrasena, int rol = 0, string correoAlternativo = null, string gradoAcademico = null)
         {
             bool exito = false;
 
@@ -32,7 +33,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
-                command.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
+                command.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {
@@ -120,8 +122,9 @@ namespace webMetics.Handlers
             return existe;
         }
 
-        public bool EditarUsuario(string id, int rol, string contrasena)
+        public bool EditarUsuario(string id, int rol, string contrasena, string gradoAcademico = null)
         {
+            // Nota: gradoAcademico es obligatorio en la aplicación, aunque tiene valor por defecto aquí para compatibilidad
             bool exito = false;
 
             using (var command = new SqlCommand("UpdateUsuario", ConexionMetics))
@@ -130,6 +133,7 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
+                command.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {
@@ -268,6 +272,58 @@ namespace webMetics.Handlers
             return correoAlternativo;
         }
 
+        public string ObtenerGradoAcademico(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
+        public bool ActualizarCorreoAlternativoYGradoAcademico(string idUsuario, string correoAlternativo, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo, grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
         public bool ActualizarCorreoAlternativo(string idUsuario, string correoAlternativo)
         {
             string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo WHERE id_usuario_PK = @idUsuario;";
@@ -277,6 +333,23 @@ namespace webMetics.Handlers
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
             comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public bool ActualizarGradoAcademico(string idUsuario, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico);
 
             bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 

@@ -219,6 +219,7 @@ namespace webMetics.Handlers
             {
                 participante.correoAlternativo = ObtenerCorreoAlternativoUsuario(idParticipante);
                 participante.areasExtra = GetAreasExtraByParticipante(idParticipante);
+                participante.gradoAcademico = ObtenerGradoAcademicoUsuario(idParticipante);
             }
 
             return participante;
@@ -387,6 +388,39 @@ namespace webMetics.Handlers
 
             return exito;
         }
+        private string ObtenerGradoAcademicoUsuario(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
 
 
         /*// Método async para obtener un participante específico según su ID
@@ -396,7 +430,7 @@ namespace webMetics.Handlers
 
             using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
             {
-                command.CommandType = CommandType.StoredProcedure;
+
                 command.Parameters.AddWithValue("@id", idParticipante);
 
                 try
@@ -628,12 +662,13 @@ namespace webMetics.Handlers
 
             // Obtener correoAlternativo desde tabla usuario
             info.correoAlternativo = ObtenerCorreoAlternativoUsuario(info.idParticipante);
+            info.gradoAcademico = ObtenerGradoAcademicoUsuario(info.idParticipante);
 
             return info;
         }
 
 
-        // Método para obtener una lista de todos los participantes
+
         public List<ParticipanteModel> ObtenerListaParticipantes()
         {
             string consulta = "SELECT * FROM participante";

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using webMetics.Helpers;
 
 namespace webMetics.Models
 {
@@ -24,8 +25,13 @@ namespace webMetics.Models
 
         [EmailAddress(ErrorMessage = "El correo alternativo debe ser válido.")]
         [Required(ErrorMessage = "Es necesario ingresar un correo alternativo.")]
+        [CorreoAlternativoDiferente("correo", ErrorMessage = "El correo alternativo debe ser diferente del correo institucional.")]
         [Display(Name = "Correo Alternativo")]
         public string? correoAlternativo { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar un grado académico.")]
+        [Display(Name = "Grado Académico")]
+        public string? gradoAcademico { get; set; }
 
         [Display(Name = "Tipo de Identificación")]
         public string? tipoIdentificacion { get; set; }
