@@ -76,6 +76,17 @@
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.correoAlternativo, "", new { @class = "text-danger" })
                             </div>
                         </div>
+                        <div class="form-group mt-1">
+                            @Html.LabelFor(participanteModel => participanteModel.gradoAcademico, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            @Html.DropDownListFor(participanteModel => participanteModel.gradoAcademico, new SelectList(new List<string> 
+                            { 
+                                "Doctorado - PhD", 
+                                "Maestría - MSc", 
+                                "Licenciatura - Lic", 
+                                "Bachillerato - Bach" 
+                            }), "Seleccione su grado académico...", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(participanteModel => participanteModel.gradoAcademico, "", new { @class = "text-danger" })
+                        </div>
                         <div class="row mt-1">
                             <div class="col">
                                 @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>

@@ -1344,6 +1344,14 @@ namespace webMetics.Controllers
 
             try
             {
+                // Validar que correo alternativo sea diferente del correo institucional
+                if (!string.IsNullOrWhiteSpace(participante.correoAlternativo) &&
+                    !string.IsNullOrWhiteSpace(participante.correo) &&
+                    participante.correo.Equals(participante.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("correoAlternativo", "El correo alternativo debe ser diferente del correo institucional.");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     if (isAjaxRequest)
@@ -1359,11 +1367,19 @@ namespace webMetics.Controllers
                 }
 
                 participante.idParticipante = participante.correo;
+
                 bool participanteEditado = accesoAParticipante.EditarParticipante(participante);
                 if (!participanteEditado)
                 {
                     throw new Exception("No se pudo actualizar la información del participante.");
                 }
+
+                // Actualizar correoAlternativo y gradoAcademico en tabla usuario
+                bool usuarioActualizado = accesoAUsuario.ActualizarCorreoAlternativoYGradoAcademico(
+                    participante.idParticipante,
+                    participante.correoAlternativo,
+                    participante.gradoAcademico
+                );
 
                 List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
@@ -1376,6 +1392,7 @@ namespace webMetics.Controllers
                     asesorAsociado.segundoApellido = participante.segundoApellido;
                     asesorAsociado.correo = participante.correo;
                     asesorAsociado.correoAlternativo = participante.correoAlternativo;
+                    asesorAsociado.gradoAcademico = participante.gradoAcademico;
                     asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
                     asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
                     asesorAsociado.telefono = participante.telefono;

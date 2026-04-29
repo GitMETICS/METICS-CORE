@@ -35,6 +35,7 @@ namespace webMetics.Handlers
 
                 // Obtener correoAlternativo desde tabla usuario
                 asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(asesor.idAsesor);
+                asesor.gradoAcademico = ObtenerGradoAcademicoUsuario(asesor.idAsesor);
 
                 asesores.Add(asesor);
             }
@@ -77,6 +78,7 @@ namespace webMetics.Handlers
             if (asesor != null)
             {
                 asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(idAsesor);
+                asesor.gradoAcademico = ObtenerGradoAcademicoUsuario(idAsesor);
             }
 
             return asesor;
@@ -114,6 +116,40 @@ namespace webMetics.Handlers
             }
 
             return correoAlternativo;
+        }
+
+        private string ObtenerGradoAcademicoUsuario(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
         }
 
         public List<SelectListItem> ObtenerListaSeleccionAsesores()
@@ -203,7 +239,7 @@ namespace webMetics.Handlers
             bool exito = false;
             using (var command = new SqlCommand("UpdateAsesor", ConexionMetics))
             {
-                command.CommandType = CommandType.StoredProcedure;
+
                 command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
                 command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
                 command.Parameters.AddWithValue("@nombre", asesor.nombre);
