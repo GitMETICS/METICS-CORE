@@ -33,10 +33,6 @@ namespace webMetics.Handlers
                     telefono = Convert.ToString(fila["telefono"])
                 };
 
-                // Obtener correoAlternativo desde tabla usuario
-                asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(asesor.idAsesor);
-                asesor.gradoAcademico = ObtenerGradoAcademicoUsuario(asesor.idAsesor);
-
                 asesores.Add(asesor);
             }
             return asesores;
@@ -72,13 +68,6 @@ namespace webMetics.Handlers
                 }
 
                 ConexionMetics.Close();
-            }
-
-            // Obtener correoAlternativo desde tabla usuario
-            if (asesor != null)
-            {
-                asesor.correoAlternativo = ObtenerCorreoAlternativoUsuario(idAsesor);
-                asesor.gradoAcademico = ObtenerGradoAcademicoUsuario(idAsesor);
             }
 
             return asesor;
