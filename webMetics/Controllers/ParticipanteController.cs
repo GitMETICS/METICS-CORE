@@ -1205,11 +1205,11 @@ namespace webMetics.Controllers
             {
                 string contrasena = GenerateRandomPassword();
 
+                
                 accesoAUsuario.CrearUsuario(
                     participante.idParticipante,
                     contrasena,
-                    0,
-                    participante.correoAlternativo);
+                    0);
 
                 EnviarContrasenaPorCorreo(participante.idParticipante, contrasena);
             }
@@ -1360,13 +1360,6 @@ namespace webMetics.Controllers
                     throw new Exception("No se pudo actualizar la información del participante.");
                 }
 
-                // Actualizar correoAlternativo y gradoAcademico en tabla usuario
-                bool usuarioActualizado = accesoAUsuario.ActualizarCorreoAlternativoYGradoAcademico(
-                    participante.idParticipante,
-                    participante.correoAlternativo,
-                    participante.gradoAcademico
-                );
-
                 List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
 
@@ -1377,8 +1370,6 @@ namespace webMetics.Controllers
                     asesorAsociado.primerApellido = participante.primerApellido;
                     asesorAsociado.segundoApellido = participante.segundoApellido;
                     asesorAsociado.correo = participante.correo;
-                    asesorAsociado.correoAlternativo = participante.correoAlternativo;
-                    asesorAsociado.gradoAcademico = participante.gradoAcademico;
                     asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
                     asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
                     asesorAsociado.telefono = participante.telefono;
