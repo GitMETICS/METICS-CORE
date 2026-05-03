@@ -65,8 +65,6 @@
                             <th scope="col" style="width:9%;">Primer<br>Apellido</th>
                             <th scope="col" style="width:9%;">Segundo<br>Apellido</th>
                             <th scope="col" style="width:13%;">Correo Institucional</th>
-                            <th scope="col" style="width:13%;">Correo Alternativo</th>
-                            <th scope="col" style="width:12%;">Grado Académico</th>
                             <th scope="col" style="width:15%;">Descripción</th>
                             <th scope="col" style="width:6%;">Teléfono</th>
                             <th class="text-center" scope="col" style="width:2%;"></th>
@@ -89,8 +87,6 @@
                                 <td>@asesor.primerApellido</td>
                                 <td>@asesor.segundoApellido</td>
                                 <td>@asesor.correo</td>
-                                <td>@(string.IsNullOrWhiteSpace(asesor.correoAlternativo) ? "-" : asesor.correoAlternativo)</td>
-                                <td>@(string.IsNullOrWhiteSpace(asesor.gradoAcademico) ? "-" : asesor.gradoAcademico)</td>
                                 <td>@asesor.descripcion</td>
                                 <td>@asesor.telefono</td>
                                 <td>
