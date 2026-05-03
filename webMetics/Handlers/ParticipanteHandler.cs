@@ -799,7 +799,6 @@ namespace webMetics.Handlers
                 horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
                 correoNotificacionEnviado = Convert.ToInt32(filaParticipante["correo_notificacion_enviado"]),
                 gruposInscritos = new List<GrupoModel>(),
-                // ✅ Obtener correoAlternativo y gradoAcademico directamente desde participante (no desde usuario)
                 correoAlternativo = filaParticipante.Table.Columns.Contains("correo_alternativo") ? 
                     (filaParticipante["correo_alternativo"] != DBNull.Value ? Convert.ToString(filaParticipante["correo_alternativo"]) : null) : null,
                 gradoAcademico = filaParticipante.Table.Columns.Contains("grado_academico") ? 
