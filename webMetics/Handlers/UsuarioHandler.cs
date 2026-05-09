@@ -118,9 +118,8 @@ namespace webMetics.Handlers
             return existe;
         }
 
-        public bool EditarUsuario(string id, int rol, string contrasena, string gradoAcademico = null)
+        public bool EditarUsuario(string id, int rol, string contrasena)
         {
-            // Nota: gradoAcademico es obligatorio en la aplicación, aunque tiene valor por defecto aquí para compatibilidad
             bool exito = false;
 
             using (var command = new SqlCommand("UpdateUsuario", ConexionMetics))
@@ -129,7 +128,6 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
-                command.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {

@@ -228,17 +228,19 @@ namespace webMetics.Handlers
             bool exito = false;
             using (var command = new SqlCommand("UpdateAsesor", ConexionMetics))
             {
-
+                command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@idUsuario", asesor.idAsesor);
                 command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
                 command.Parameters.AddWithValue("@nombre", asesor.nombre);
                 command.Parameters.AddWithValue("@apellido1", asesor.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", asesor.correo);
-                command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
-                command.Parameters.AddWithValue("@telefono", asesor.telefono);
+                command.Parameters.AddWithValue("@descripcion", asesor.descripcion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", asesor.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", string.Empty);
+                command.Parameters.AddWithValue("@sede", string.Empty);
 
                 try
                 {
