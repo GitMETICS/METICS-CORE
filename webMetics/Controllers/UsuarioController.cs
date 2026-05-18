@@ -1349,10 +1349,10 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
+        /// Construye la URL a la que redirigir al usuario tras un login o paso de completación exitoso.
         /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
         /// </summary>
-        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        private string GetPostLoginRedirectUrl(string idUsuario)
         {
             // Primero verificar si el usuario tiene un registro como participante
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
@@ -1360,21 +1360,30 @@ namespace webMetics.Controllers
             // Si NO es participante, no validar correo alternativo ni grado académico
             if (participante == null)
             {
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                return Url.Action("ListaGruposDisponibles", "Grupo");
             }
 
             // Si ES participante, validar correo alternativo
             if (string.IsNullOrWhiteSpace(participante.correoAlternativo))
-                return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
+                return Url.Action("CompletarCorreoAlternativo", "Usuario");
 
             // Validar grado académico
             if (string.IsNullOrWhiteSpace(participante.gradoAcademico))
-                return RedirectToAction("CompletarGradoAcademico", "Usuario");
+                return Url.Action("CompletarGradoAcademico", "Usuario");
 
             if (string.IsNullOrWhiteSpace(participante.carrera))
-                return RedirectToAction("CompletarCarreraYAreas", "Usuario");
+                return Url.Action("CompletarCarreraYAreas", "Usuario");
 
-            return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            return Url.Action("ListaGruposDisponibles", "Grupo");
+        }
+
+        /// <summary>
+        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
+        /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
+        /// </summary>
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        {
+            return Redirect(GetPostLoginRedirectUrl(idUsuario));
         }
     }
 }
