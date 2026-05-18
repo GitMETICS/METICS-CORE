@@ -633,14 +633,15 @@ namespace webMetics.Controllers
             if (GetRole() != 0)
                 return RedirectToAction("ListaGruposDisponibles", "Grupo");
 
-            if (string.IsNullOrWhiteSpace(participante.area) ||
-                string.IsNullOrWhiteSpace(participante.departamento) ||
-                string.IsNullOrWhiteSpace(participante.unidadAcademica) ||
-                string.IsNullOrWhiteSpace(participante.sede) ||
-                string.IsNullOrWhiteSpace(participante.carrera))
+            bool isAjaxRequest = IsAjaxRequest();
+
+            if (!ModelState.IsValid)
             {
-                TempData["errorMessage"] = "Es necesario completar todos los campos requeridos: área, departamento, unidad académica, sede y carrera.";
-                return RedirectToAction("CompletarCarreraYAreas");
+                if (isAjaxRequest)
+                    return BadRequest(BuildAjaxValidationErrorResponse());
+
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View(participante);
             }
 
             try
@@ -658,6 +659,9 @@ namespace webMetics.Controllers
                 bool exito = accesoAParticipante.EditarParticipante(participanteCompleto);
                 if (!exito)
                 {
+                    if (isAjaxRequest)
+                        return StatusCode(500, new { success = false, globalErrors = new[] { "Error al guardar los datos. Intente nuevamente." } });
+
                     TempData["errorMessage"] = "Error al guardar los datos. Intente nuevamente.";
                     return RedirectToAction("CompletarCarreraYAreas");
                 }
@@ -672,6 +676,18 @@ namespace webMetics.Controllers
 
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
 
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                        return StatusCode(500, new
+                        {
+                            success = false,
+                            globalErrors = new[] { "Carrera guardada, pero ocurrió un error al guardar las áreas extra." }
+                        });
+
+                    return Json(new { success = true, redirectUrl = GetPostLoginRedirectUrl(idUsuario) });
+                }
+
                 TempData["successMessage"] = areasExtraGuardadas
                     ? "Información académica guardada correctamente."
                     : "Carrera guardada. No se pudieron guardar las áreas extra.";
@@ -679,6 +695,9 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
+                if (isAjaxRequest)
+                    return StatusCode(500, new { success = false, globalErrors = new[] { "Error al procesar la solicitud. Intente nuevamente." } });
+
                 TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("CompletarCarreraYAreas");
             }
@@ -1384,6 +1403,32 @@ namespace webMetics.Controllers
         private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
         {
             return Redirect(GetPostLoginRedirectUrl(idUsuario));
+        }
+
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new { success = false, fieldErrors, globalErrors };
         }
     }
 }
