@@ -601,12 +601,7 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
 
-            if (GetRole() != 0)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
-
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-            if (participante == null)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
 
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
 
@@ -1376,8 +1371,7 @@ namespace webMetics.Controllers
             if (string.IsNullOrWhiteSpace(participante.gradoAcademico))
                 return RedirectToAction("CompletarGradoAcademico", "Usuario");
 
-            // Validar carrera solo si es participante (rol 0)
-            if (rol == 0 && string.IsNullOrWhiteSpace(participante.carrera))
+            if (string.IsNullOrWhiteSpace(participante.carrera))
                 return RedirectToAction("CompletarCarreraYAreas", "Usuario");
 
             return RedirectToAction("ListaGruposDisponibles", "Grupo");
