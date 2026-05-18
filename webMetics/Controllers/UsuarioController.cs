@@ -87,7 +87,7 @@ namespace webMetics.Controllers
                 {
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
-                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id, usuarioAutorizado.rol);
+                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id);
                 }
                 else
                 {
@@ -568,7 +568,7 @@ namespace webMetics.Controllers
                 if (exito)
                 {
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
-                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                    return DeterminarRedireccionPostLogin(idUsuario);
                 }
                 else
                 {
@@ -648,7 +648,11 @@ namespace webMetics.Controllers
             {
                 ParticipanteModel participanteCompleto = accesoAParticipante.ObtenerParticipante(idUsuario);
                 if (participanteCompleto == null)
+                {
+                    if (isAjaxRequest)
+                        return Json(new { success = false, globalErrors = new[] { "No se encontró el participante. Intente iniciar sesión nuevamente." } });
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
 
                 participanteCompleto.area = participante.area;
                 participanteCompleto.departamento = participante.departamento;
@@ -692,7 +696,7 @@ namespace webMetics.Controllers
                 TempData["successMessage"] = areasExtraGuardadas
                     ? "Información académica guardada correctamente."
                     : "Carrera guardada. No se pudieron guardar las áreas extra.";
-                return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                return DeterminarRedireccionPostLogin(idUsuario);
             }
             catch (Exception)
             {
@@ -797,7 +801,7 @@ namespace webMetics.Controllers
                 if (exito)
                 {
                     TempData["successMessage"] = "Grado académico guardado correctamente.";
-                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                    return DeterminarRedireccionPostLogin(idUsuario);
                 }
                 else
                 {
@@ -1401,7 +1405,7 @@ namespace webMetics.Controllers
         /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
         /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
         /// </summary>
-        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario)
         {
             return Redirect(GetPostLoginRedirectUrl(idUsuario));
         }
