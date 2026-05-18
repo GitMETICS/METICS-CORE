@@ -172,6 +172,30 @@
         $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
     }
 
+    function limpiarMensajesValidacion() {
+        $('.field-validation-error')
+            .text('')
+            .removeClass('field-validation-error')
+            .addClass('field-validation-valid');
+        $('.input-validation-error').removeClass('input-validation-error');
+    }
+
+    function mostrarMensajesValidacion(fieldErrors) {
+        if (!fieldErrors) return;
+        $.each(fieldErrors, function (fieldName, mensajes) {
+            if (!mensajes || mensajes.length === 0) return;
+            var mensaje = mensajes[0];
+            var $campo = $('[name="' + fieldName + '"]');
+            var $mensaje = $('[data-valmsg-for="' + fieldName + '"]');
+            if ($campo.length) $campo.addClass('input-validation-error');
+            if ($mensaje.length) {
+                $mensaje.text(mensaje)
+                    .removeClass('field-validation-valid')
+                    .addClass('field-validation-error');
+            }
+        });
+    }
+
     function actualizarAreasExtraDisponibles() {
         var areaPrincipal = $('#areaDropdown').val();
         $('.area-extra-checkbox').each(function () {
@@ -329,6 +353,58 @@
 
         $('#seccionDropdown, #sedeDropdown').on('change', function () {
             actualizarCarreras(null);
+        });
+
+        var enviando = false;
+
+        $('#completarCarreraForm').on('submit', function (event) {
+            event.preventDefault();
+
+            if (enviando) return;
+            enviando = true;
+
+            limpiarMensajesValidacion();
+
+            var $btn = $(this).find('button[type="submit"]');
+            var textoOriginal = $btn.text();
+            $btn.prop('disabled', true).text('Guardando...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (response) {
+                    if (response && response.success && response.redirectUrl) {
+                        window.location.href = response.redirectUrl;
+                        return;
+                    }
+                    var tieneFieldErrors = response && response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
+                    var tieneGlobalErrors = response && response.globalErrors && response.globalErrors.length > 0;
+                    if (tieneFieldErrors) {
+                        mostrarMensajesValidacion(response.fieldErrors);
+                    }
+                    if (tieneGlobalErrors) {
+                        mostrarErrorGlobal(response.globalErrors.join(' '));
+                    }
+                },
+                error: function (xhr) {
+                    var response = xhr.responseJSON || {};
+                    var tieneFieldErrors = response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
+                    var tieneGlobalErrors = response.globalErrors && response.globalErrors.length > 0;
+                    if (tieneFieldErrors) {
+                        mostrarMensajesValidacion(response.fieldErrors);
+                    } else if (tieneGlobalErrors) {
+                        mostrarErrorGlobal(response.globalErrors.join(' '));
+                    } else {
+                        mostrarErrorGlobal(response.message || 'Ocurrió un error inesperado.');
+                    }
+                },
+                complete: function () {
+                    enviando = false;
+                    $btn.prop('disabled', false).text(textoOriginal);
+                }
+            });
         });
     });
 </script>
