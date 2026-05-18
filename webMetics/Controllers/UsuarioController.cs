@@ -630,9 +630,6 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
 
-            if (GetRole() != 0)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
-
             bool isAjaxRequest = IsAjaxRequest();
 
             if (!ModelState.IsValid)
