@@ -20,10 +20,8 @@ namespace webMetics.Handlers
         /// <param name="id">Correo institucional del usuario, que también se usará como su identificador único.</param>
         /// <param name="contrasena">Contraseña del usuario, que se almacenará en la base de datos.</param>
         /// <param name="rol">Rol del usuario, representado como un entero (0 para participante, 1 para administrador). Por defecto es 0.</param>
-        /// <param name="correoAlternativo">Correo alternativo del usuario, que es opcional y puede ser null.</param>
-        /// <param name="gradoAcademico">Grado académico del usuario, que es obligatorio y no puede ser null.</param>
-        /// <returns></returns>
-        public bool CrearUsuario(string id, string contrasena, int rol = 0, string correoAlternativo = null, string gradoAcademico = null)
+        /// <returns>true si el usuario se creó exitosamente; false en caso contrario.</returns>
+        public bool CrearUsuario(string id, string contrasena, int rol = 0)
         {
             bool exito = false;
 
@@ -33,8 +31,6 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
-                command.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {
@@ -122,9 +118,8 @@ namespace webMetics.Handlers
             return existe;
         }
 
-        public bool EditarUsuario(string id, int rol, string contrasena, string gradoAcademico = null)
+        public bool EditarUsuario(string id, int rol, string contrasena)
         {
-            // Nota: gradoAcademico es obligatorio en la aplicación, aunque tiene valor por defecto aquí para compatibilidad
             bool exito = false;
 
             using (var command = new SqlCommand("UpdateUsuario", ConexionMetics))
@@ -133,7 +128,6 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@rol", rol);
                 command.Parameters.AddWithValue("@contrasena", contrasena);
-                command.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
 
                 try
                 {

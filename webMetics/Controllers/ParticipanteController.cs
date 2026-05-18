@@ -540,10 +540,10 @@ namespace webMetics.Controllers
                     .SetMarginBottom(20);
                 document.Add(header);
 
-                iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 2, 2, 3, 2, 2 });
+                iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 3, 2, 2 });
                 table.SetWidth(UnitValue.CreatePercentValue(100));
 
-                string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Carrera", "Áreas Extra", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+                string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Correo Alternativo", "Grado Académico", "Condición", "Unidad académica", "Carrera", "Áreas Extra", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
                 foreach (var headerText in headers)
                 {
                     table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
@@ -565,6 +565,8 @@ namespace webMetics.Controllers
                             table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
                             table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
                             table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.correoAlternativo ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.gradoAcademico ?? "").SetFont(regularFont).SetFontSize(9)));
                             table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
                             table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
                             table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
@@ -580,6 +582,8 @@ namespace webMetics.Controllers
                         table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.correoAlternativo ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.gradoAcademico ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
                         table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
@@ -648,30 +652,34 @@ namespace webMetics.Controllers
             titleRun.AddBreak(); // Salto de línea después del título
 
             // Crear tabla con el número de participantes y columnas para los módulos
-            XWPFTable table = wordDoc.CreateTable(participantes.Count + 1, 9); // +1 para la fila de encabezado
+            XWPFTable table = wordDoc.CreateTable(1, 11);
 
             // Ajustar los anchos de columna (simulando margen)
             table.SetColumnWidth(0, 750);  // Ajustar más ancho para la columna de identificación
             table.SetColumnWidth(1, 1000);  // Ancho de columna de nombre
             table.SetColumnWidth(2, 1500);  // Columna de correo
-            table.SetColumnWidth(3, 750);  // Columna de condición
-            table.SetColumnWidth(4, 1500);  // Columna de unidad académica
-            table.SetColumnWidth(5, 750);  // Columna de teléfono
-            table.SetColumnWidth(6, 1500);  // Nombre del módulo
-            table.SetColumnWidth(7, 750);  // Horas aprobadas
-            table.SetColumnWidth(8, 750);  // Nota del módulo
+            table.SetColumnWidth(3, 1500);  // Columna de correo alternativo
+            table.SetColumnWidth(4, 1000);  // Columna de grado académico
+            table.SetColumnWidth(5, 750);  // Columna de condición
+            table.SetColumnWidth(6, 1500);  // Columna de unidad académica
+            table.SetColumnWidth(7, 750);  // Columna de teléfono
+            table.SetColumnWidth(8, 1500);  // Nombre del módulo
+            table.SetColumnWidth(9, 750);  // Horas aprobadas
+            table.SetColumnWidth(10, 750);  // Nota del módulo
 
             // Estilo para el encabezado
             var headerRow = table.GetRow(0);
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre del participante");
             headerRow.GetCell(2).SetText("Correo institucional");
-            headerRow.GetCell(3).SetText("Condición");
-            headerRow.GetCell(4).SetText("Unidad académica");
-            headerRow.GetCell(5).SetText("Teléfono");
-            headerRow.GetCell(6).SetText("Módulo");
-            headerRow.GetCell(7).SetText("Horas aprobadas");
-            headerRow.GetCell(8).SetText("Calificación del módulo");
+            headerRow.GetCell(3).SetText("Correo alternativo");
+            headerRow.GetCell(4).SetText("Grado académico");
+            headerRow.GetCell(5).SetText("Condición");
+            headerRow.GetCell(6).SetText("Unidad académica");
+            headerRow.GetCell(7).SetText("Teléfono");
+            headerRow.GetCell(8).SetText("Módulo");
+            headerRow.GetCell(9).SetText("Horas aprobadas");
+            headerRow.GetCell(10).SetText("Calificación del módulo");
 
             // Rellenar la tabla con los datos de los participantes e inscripciones
             int rowIndex = 1; // Comenzar después del encabezado
@@ -690,14 +698,16 @@ namespace webMetics.Controllers
                         row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
                         row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                         row.GetCell(2).SetText(participante.idParticipante.ToString());
-                        row.GetCell(3).SetText(participante.condicion.ToString());
-                        row.GetCell(4).SetText(participante.unidadAcademica);
-                        row.GetCell(5).SetText(participante.telefono.ToString());
+                        row.GetCell(3).SetText(participante.correoAlternativo ?? "");
+                        row.GetCell(4).SetText(participante.gradoAcademico ?? "");
+                        row.GetCell(5).SetText(participante.condicion.ToString());
+                        row.GetCell(6).SetText(participante.unidadAcademica);
+                        row.GetCell(7).SetText(participante.telefono.ToString());
 
                         // Información del módulo
-                        row.GetCell(6).SetText(inscripcion.nombreGrupo);
-                        row.GetCell(7).SetText(inscripcion.horasAprobadas.ToString());
-                        row.GetCell(8).SetText(inscripcion.calificacion.ToString());
+                        row.GetCell(8).SetText(inscripcion.nombreGrupo);
+                        row.GetCell(9).SetText(inscripcion.horasAprobadas.ToString());
+                        row.GetCell(10).SetText(inscripcion.calificacion.ToString());
 
                         rowIndex++;
                     }
@@ -710,13 +720,15 @@ namespace webMetics.Controllers
                     row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
                     row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                     row.GetCell(2).SetText(participante.idParticipante.ToString());
-                    row.GetCell(3).SetText(participante.condicion.ToString());
-                    row.GetCell(4).SetText(participante.unidadAcademica);
-                    row.GetCell(5).SetText(participante.telefono.ToString());
+                    row.GetCell(3).SetText(participante.correoAlternativo ?? "");
+                    row.GetCell(4).SetText(participante.gradoAcademico ?? "");
+                    row.GetCell(5).SetText(participante.condicion.ToString());
+                    row.GetCell(6).SetText(participante.unidadAcademica);
+                    row.GetCell(7).SetText(participante.telefono.ToString());
 
-                    row.GetCell(6).SetText("N/A");
-                    row.GetCell(7).SetText("N/A");
                     row.GetCell(8).SetText("N/A");
+                    row.GetCell(9).SetText("N/A");
+                    row.GetCell(10).SetText("N/A");
 
                     rowIndex++;
                 }
@@ -787,7 +799,7 @@ namespace webMetics.Controllers
 
             // Crear el encabezado de la tabla
             IRow rowHeaders = sheet.CreateRow(3);
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Correo Alternativo", "Grado Académico", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
 
             for (int i = 0; i < headers.Length; i++)
             {
@@ -813,17 +825,19 @@ namespace webMetics.Controllers
                         row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
                         row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
                         row.CreateCell(2).SetCellValue(participante.idParticipante);
-                        row.CreateCell(3).SetCellValue(participante.condicion);
-                        row.CreateCell(4).SetCellValue(participante.unidadAcademica);
-                        row.CreateCell(5).SetCellValue(participante.telefono);
+                        row.CreateCell(3).SetCellValue(participante.correoAlternativo ?? "");
+                        row.CreateCell(4).SetCellValue(participante.gradoAcademico ?? "");
+                        row.CreateCell(5).SetCellValue(participante.condicion);
+                        row.CreateCell(6).SetCellValue(participante.unidadAcademica);
+                        row.CreateCell(7).SetCellValue(participante.telefono);
 
                         // Completar los datos del módulo
-                        row.CreateCell(6).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
-                        row.CreateCell(7).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
-                        row.CreateCell(8).SetCellValue(inscripcion.calificacion); // Nota del módulo
+                        row.CreateCell(8).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
+                        row.CreateCell(9).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
+                        row.CreateCell(10).SetCellValue(inscripcion.calificacion); // Nota del módulo
 
                         // Aplicar estilo al cuerpo
-                        for (int i = 0; i < 9; i++)
+                        for (int i = 0; i < 11; i++)
                         {
                             row.GetCell(i).CellStyle = bodyStyle;
                         }
@@ -839,15 +853,17 @@ namespace webMetics.Controllers
                     row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
                     row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
                     row.CreateCell(2).SetCellValue(participante.idParticipante);
-                    row.CreateCell(3).SetCellValue(participante.condicion);
-                    row.CreateCell(4).SetCellValue(participante.unidadAcademica);
-                    row.CreateCell(5).SetCellValue(participante.telefono);
-                    row.CreateCell(6).SetCellValue("N/A");
-                    row.CreateCell(7).SetCellValue("N/A");
+                    row.CreateCell(3).SetCellValue(participante.correoAlternativo ?? "");
+                    row.CreateCell(4).SetCellValue(participante.gradoAcademico ?? "");
+                    row.CreateCell(5).SetCellValue(participante.condicion);
+                    row.CreateCell(6).SetCellValue(participante.unidadAcademica);
+                    row.CreateCell(7).SetCellValue(participante.telefono);
                     row.CreateCell(8).SetCellValue("N/A");
+                    row.CreateCell(9).SetCellValue("N/A");
+                    row.CreateCell(10).SetCellValue("N/A");
 
                     // Aplicar estilo al cuerpo
-                    for (int i = 0; i < 9; i++)
+                    for (int i = 0; i < 11; i++)
                     {
                         row.GetCell(i).CellStyle = bodyStyle;
                     }
@@ -923,7 +939,7 @@ namespace webMetics.Controllers
                 bodyStyle.BorderRight = BorderStyle.Thin;
 
                 // Headers
-                string[] headers = { "Unidad Académica", "Carrera", "Áreas Extra", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+                string[] headers = { "Unidad Académica", "Carrera", "Áreas Extra", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Correo Alternativo", "Grado Académico", "Total Horas Inscritas", "Total Horas Aprobadas" };
                 IRow headerRow = sheet.CreateRow(3);
 
                 for (int i = 0; i < headers.Length; i++)
@@ -948,8 +964,10 @@ namespace webMetics.Controllers
                     dataRow.CreateCell(4).SetCellValue(participante.primerApellido);
                     dataRow.CreateCell(5).SetCellValue(participante.segundoApellido);
                     dataRow.CreateCell(6).SetCellValue(participante.correo);
-                    dataRow.CreateCell(7).SetCellValue(participante.horasMatriculadas);
-                    dataRow.CreateCell(8).SetCellValue(participante.horasAprobadas);
+                    dataRow.CreateCell(7).SetCellValue(participante.correoAlternativo ?? "");
+                    dataRow.CreateCell(8).SetCellValue(participante.gradoAcademico ?? "");
+                    dataRow.CreateCell(9).SetCellValue(participante.horasMatriculadas);
+                    dataRow.CreateCell(10).SetCellValue(participante.horasAprobadas);
 
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -1205,11 +1223,11 @@ namespace webMetics.Controllers
             {
                 string contrasena = GenerateRandomPassword();
 
+                
                 accesoAUsuario.CrearUsuario(
                     participante.idParticipante,
                     contrasena,
-                    0,
-                    participante.correoAlternativo);
+                    0);
 
                 EnviarContrasenaPorCorreo(participante.idParticipante, contrasena);
             }
@@ -1360,13 +1378,6 @@ namespace webMetics.Controllers
                     throw new Exception("No se pudo actualizar la información del participante.");
                 }
 
-                // Actualizar correoAlternativo y gradoAcademico en tabla usuario
-                bool usuarioActualizado = accesoAUsuario.ActualizarCorreoAlternativoYGradoAcademico(
-                    participante.idParticipante,
-                    participante.correoAlternativo,
-                    participante.gradoAcademico
-                );
-
                 List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
 
@@ -1377,8 +1388,6 @@ namespace webMetics.Controllers
                     asesorAsociado.primerApellido = participante.primerApellido;
                     asesorAsociado.segundoApellido = participante.segundoApellido;
                     asesorAsociado.correo = participante.correo;
-                    asesorAsociado.correoAlternativo = participante.correoAlternativo;
-                    asesorAsociado.gradoAcademico = participante.gradoAcademico;
                     asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
                     asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
                     asesorAsociado.telefono = participante.telefono;

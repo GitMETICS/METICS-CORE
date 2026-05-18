@@ -64,6 +64,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
+                command.Parameters.AddWithValue("@correoAlternativo", participante.correoAlternativo ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@gradoAcademico", participante.gradoAcademico ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
                 command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
                 command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
@@ -131,6 +133,8 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
+                command.Parameters.AddWithValue("@correoAlternativo", participante.correoAlternativo ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@gradoAcademico", participante.gradoAcademico ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
                 command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
                 command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
@@ -189,6 +193,8 @@ namespace webMetics.Handlers
                                 tipoIdentificacion = reader["tipo_identificacion"].ToString(),
                                 numeroIdentificacion = reader["numero_identificacion"].ToString(),
                                 correo = reader["correo"].ToString(),
+                                correoAlternativo = reader["correo_alternativo"] != DBNull.Value ? reader["correo_alternativo"].ToString() : null,
+                                gradoAcademico = reader["grado_academico"] != DBNull.Value ? reader["grado_academico"].ToString() : null,
                                 tipoParticipante = reader["tipo_participante"].ToString(),
                                 condicion = reader["condicion"].ToString(),
                                 telefono = reader["telefono"].ToString(),
@@ -214,12 +220,10 @@ namespace webMetics.Handlers
                 }
             }
 
-            // Obtener correoAlternativo desde tabla usuario
+            // Obtener áreas extra
             if (participante != null)
             {
-                participante.correoAlternativo = ObtenerCorreoAlternativoUsuario(idParticipante);
                 participante.areasExtra = GetAreasExtraByParticipante(idParticipante);
-                participante.gradoAcademico = ObtenerGradoAcademicoUsuario(idParticipante);
             }
 
             return participante;
@@ -388,6 +392,143 @@ namespace webMetics.Handlers
 
             return exito;
         }
+
+        /// <summary>
+        /// Actualiza el correo alternativo de un participante directamente en la tabla participante.
+        /// </summary>
+        public bool ActualizarCorreoAlternativoParticipante(string idParticipante, string correoAlternativo)
+        {
+            bool exito = false;
+            string consulta = "UPDATE participante SET correo_alternativo = @correoAlternativo WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comando.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+                    exito = comando.ExecuteNonQuery() >= 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar correo alternativo en participante: {ex.Message}");
+                exito = false;
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Actualiza el grado académico de un participante directamente en la tabla participante.
+        /// </summary>
+        public bool ActualizarGradoAcademicoParticipante(string idParticipante, string gradoAcademico)
+        {
+            bool exito = false;
+            string consulta = "UPDATE participante SET grado_academico = @gradoAcademico WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comando.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
+                    exito = comando.ExecuteNonQuery() >= 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar grado académico en participante: {ex.Message}");
+                exito = false;
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Obtiene el correo alternativo de un participante desde la tabla participante.
+        /// </summary>
+        public string ObtenerCorreoAlternativoParticipante(string idParticipante)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM participante WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    using (var reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                                ? reader["correo_alternativo"].ToString()
+                                : null;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo del participante: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        /// <summary>
+        /// Obtiene el grado académico de un participante desde la tabla participante.
+        /// </summary>
+        public string ObtenerGradoAcademicoParticipante(string idParticipante)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM participante WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    using (var reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            gradoAcademico = reader["grado_academico"] != DBNull.Value
+                                ? reader["grado_academico"].ToString()
+                                : null;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico del participante: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
         private string ObtenerGradoAcademicoUsuario(string idUsuario)
         {
             string gradoAcademico = null;
@@ -657,12 +798,12 @@ namespace webMetics.Handlers
                 horasMatriculadas = Convert.ToInt32(filaParticipante["total_horas_matriculadas"]),
                 horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
                 correoNotificacionEnviado = Convert.ToInt32(filaParticipante["correo_notificacion_enviado"]),
-                gruposInscritos = new List<GrupoModel>()
+                gruposInscritos = new List<GrupoModel>(),
+                correoAlternativo = filaParticipante.Table.Columns.Contains("correo_alternativo") ? 
+                    (filaParticipante["correo_alternativo"] != DBNull.Value ? Convert.ToString(filaParticipante["correo_alternativo"]) : null) : null,
+                gradoAcademico = filaParticipante.Table.Columns.Contains("grado_academico") ? 
+                    (filaParticipante["grado_academico"] != DBNull.Value ? Convert.ToString(filaParticipante["grado_academico"]) : null) : null
             };
-
-            // Obtener correoAlternativo desde tabla usuario
-            info.correoAlternativo = ObtenerCorreoAlternativoUsuario(info.idParticipante);
-            info.gradoAcademico = ObtenerGradoAcademicoUsuario(info.idParticipante);
 
             return info;
         }

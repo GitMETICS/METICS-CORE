@@ -138,18 +138,19 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
-<script type="text/javascript">
-    var areasData = { carrerasBySeccionAndSede: {} };
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+    <script type="text/javascript">
+        var areasData = { carrerasBySeccionAndSede: {} };
 
-    var estadoInicial = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
-    {
-        area = Model?.area ?? string.Empty,
-        departamento = Model?.departamento ?? string.Empty,
-        unidadAcademica = Model?.unidadAcademica ?? string.Empty,
-        sede = Model?.sede ?? string.Empty,
-        carrera = Model?.carrera ?? string.Empty
-    }));
+        var estadoInicial = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            area = Model?.area ?? string.Empty,
+            departamento = Model?.departamento ?? string.Empty,
+            unidadAcademica = Model?.unidadAcademica ?? string.Empty,
+            sede = Model?.sede ?? string.Empty,
+            carrera = Model?.carrera ?? string.Empty
+        }));
 
     function mostrarErrorGlobal(mensaje) {
         Swal.fire({
@@ -331,3 +332,4 @@
         });
     });
 </script>
+}

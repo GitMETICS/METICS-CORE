@@ -218,7 +218,6 @@ namespace webMetics.Controllers
                         asesor.tipoIdentificacion = usuario.tipoIdentificacion;
                         asesor.numeroIdentificacion = usuario.numeroIdentificacion;
                         asesor.correo = usuario.correo;
-                        asesor.correoAlternativo = usuario.correoAlternativo;
                         asesor.telefono = usuario.telefono;
 
                         rolUsuario = 2;
@@ -249,7 +248,7 @@ namespace webMetics.Controllers
                 {
                     if (!accesoAUsuario.ExisteUsuario(usuario.id))
                     {
-                        accesoAUsuario.CrearUsuario(usuario.id, contrasena, 0, usuario.correoAlternativo);
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena, 0);
 
                         if (!accesoAParticipante.ExisteParticipante(usuario.id))
                         {
@@ -411,8 +410,6 @@ namespace webMetics.Controllers
                         tipoIdentificacion = asesor.tipoIdentificacion,
                         numeroIdentificacion = asesor.numeroIdentificacion,
                         correo = asesor.correo,
-                        correoAlternativo = asesor.correoAlternativo,
-                        gradoAcademico = asesor.gradoAcademico,
                         telefono = asesor.telefono,
                     };
 
@@ -503,7 +500,7 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Persiste el correo alternativo del usuario y sincroniza el cambio en participante y asesor si aplica.
+        /// Persiste el correo alternativo del participante en la tabla participante.
         /// </summary>
         /// <param name="usuario">Modelo que contiene el correoAlternativo.</param>
         /// <returns>
@@ -512,7 +509,7 @@ namespace webMetics.Controllers
         /// Redirects to IniciarSesion si la sesión no es válida.
         /// </returns>
         /// <remarks>
-        /// Handlers: UsuarioHandler, ParticipanteHandler, AsesorHandler.
+        /// Handlers: ParticipanteHandler.
         /// Role required: Any (autenticado).
         /// </remarks>
         [HttpPost]
@@ -524,6 +521,14 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
             {
                 return RedirectToAction("IniciarSesion");
+            }
+
+            // Verificar que el usuario sea participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+            {
+                TempData["errorMessage"] = "No tienes registro como participante.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
 
             if (string.IsNullOrWhiteSpace(usuario.correoAlternativo))
@@ -539,28 +544,29 @@ namespace webMetics.Controllers
                 return RedirectToAction("CompletarCorreoAlternativo");
             }
 
+            // Validar que sea un email válido
             try
             {
-                // Actualizar solo el correoAlternativo en la BD
-                bool exito = accesoAUsuario.ActualizarCorreoAlternativo(idUsuario, usuario.correoAlternativo);
+                var addr = new System.Net.Mail.MailAddress(usuario.correoAlternativo);
+                if (!addr.Address.Equals(usuario.correoAlternativo))
+                {
+                    TempData["errorMessage"] = "El correo alternativo no es válido.";
+                    return RedirectToAction("CompletarCorreoAlternativo");
+                }
+            }
+            catch
+            {
+                TempData["errorMessage"] = "El correo alternativo no es válido.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            try
+            {
+                // Actualizar correoAlternativo en participante
+                bool exito = accesoAParticipante.ActualizarCorreoAlternativoParticipante(idUsuario, usuario.correoAlternativo);
 
                 if (exito)
                 {
-                    // También actualizar en los modelos relacionados (Participante y Asesor)
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-                    if (participante != null)
-                    {
-                        participante.correoAlternativo = usuario.correoAlternativo;
-                        accesoAParticipante.EditarParticipante(participante);
-                    }
-
-                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
-                    if (asesor != null)
-                    {
-                        asesor.correoAlternativo = usuario.correoAlternativo;
-                        accesoAAsesor.EditarAsesor(asesor);
-                    }
-
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
                     return DeterminarRedireccionPostLogin(idUsuario, GetRole());
                 }
@@ -572,6 +578,7 @@ namespace webMetics.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in CompletarCorreoAlternativo POST: {ex.Message}");
                 TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("CompletarCorreoAlternativo");
             }
@@ -594,12 +601,7 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
 
-            if (GetRole() != 0)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
-
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-            if (participante == null)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
 
             ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
 
@@ -744,6 +746,14 @@ namespace webMetics.Controllers
                 return RedirectToAction("IniciarSesion");
             }
 
+            // Verificar que el usuario sea participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+            {
+                TempData["errorMessage"] = "No tienes registro como participante.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            }
+
             // Validar que el campo gradoAcademico no esté vacío
             if (string.IsNullOrWhiteSpace(usuario.gradoAcademico))
             {
@@ -761,28 +771,13 @@ namespace webMetics.Controllers
 
             try
             {
-                // Actualizar grado académico en la BD
-                bool exito = accesoAUsuario.ActualizarGradoAcademico(idUsuario, usuario.gradoAcademico);
+                // Actualizar grado académico en la tabla participante
+                bool exito = accesoAParticipante.ActualizarGradoAcademicoParticipante(idUsuario, usuario.gradoAcademico);
 
                 if (exito)
                 {
-                    // También actualizar en los modelos relacionados (Participante y Asesor)
-                    ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-                    if (participante != null)
-                    {
-                        participante.gradoAcademico = usuario.gradoAcademico;
-                        accesoAParticipante.EditarParticipante(participante);
-                    }
-
-                    AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
-                    if (asesor != null)
-                    {
-                        asesor.gradoAcademico = usuario.gradoAcademico;
-                        accesoAAsesor.EditarAsesor(asesor);
-                    }
-
                     TempData["successMessage"] = "Grado académico guardado correctamente.";
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
                 }
                 else
                 {
@@ -792,6 +787,7 @@ namespace webMetics.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in CompletarGradoAcademico POST: {ex.Message}");
                 TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("CompletarGradoAcademico");
             }
@@ -1354,25 +1350,29 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
-        /// Verifica en orden: correoAlternativo (todos los roles), carrera (solo participantes rol 0).
+        /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
         /// </summary>
         private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
         {
-            string correoAlternativo = accesoAUsuario.ObtenerCorreoAlternativo(idUsuario);
-            if (string.IsNullOrWhiteSpace(correoAlternativo))
+            // Primero verificar si el usuario tiene un registro como participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+
+            // Si NO es participante, no validar correo alternativo ni grado académico
+            if (participante == null)
+            {
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            }
+
+            // Si ES participante, validar correo alternativo
+            if (string.IsNullOrWhiteSpace(participante.correoAlternativo))
                 return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
 
-            // Validar si el usuario tiene gradoAcademico
-            string gradoAcademico = accesoAUsuario.ObtenerGradoAcademico(idUsuario);
-            if (string.IsNullOrWhiteSpace(gradoAcademico))
+            // Validar grado académico
+            if (string.IsNullOrWhiteSpace(participante.gradoAcademico))
                 return RedirectToAction("CompletarGradoAcademico", "Usuario");
 
-            if (rol == 0)
-            {
-                ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
-                if (participante != null && string.IsNullOrWhiteSpace(participante.carrera))
-                    return RedirectToAction("CompletarCarreraYAreas", "Usuario");
-            }
+            if (string.IsNullOrWhiteSpace(participante.carrera))
+                return RedirectToAction("CompletarCarreraYAreas", "Usuario");
 
             return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
