@@ -5,10 +5,9 @@ BEGIN TRY
     BEGIN TRANSACTION;
 
     -- Disable triggers that use scalar subqueries on inserted — they break on multi-row updates
-    --ENABLE TRIGGER TR_ActualizarIdParticipante ON dbo.usuario;
-    --ENABLE TRIGGER TR_ActualizarIdAsesor ON dbo.usuario;
-    --ENABLE TRIGGER TR_ActualizarIdParticipante ON dbo.usuario;
-    --ENABLE TRIGGER TR_ActualizarIdAsesor ON dbo.usuario;
+    --DISABLE  TRIGGER TR_ActualizarIdParticipante ON dbo.usuario;
+    --DISABLE  TRIGGER TR_ActualizarIdAsesor ON dbo.usuario;
+    -- Remember to re-enable them after the update
 
     IF COL_LENGTH('dbo.usuario', 'correo_alternativo') IS NOT NULL
     BEGIN
