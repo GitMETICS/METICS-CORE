@@ -679,10 +679,11 @@ namespace webMetics.Controllers
                 if (isAjaxRequest)
                 {
                     if (!areasExtraGuardadas)
-                        return StatusCode(500, new
+                        return Json(new
                         {
-                            success = false,
-                            globalErrors = new[] { "Carrera guardada, pero ocurrió un error al guardar las áreas extra." }
+                            success = true,
+                            redirectUrl = GetPostLoginRedirectUrl(idUsuario),
+                            warnings = new[] { "Carrera guardada, pero ocurrió un error al guardar las áreas extra." }
                         });
 
                     return Json(new { success = true, redirectUrl = GetPostLoginRedirectUrl(idUsuario) });
