@@ -652,7 +652,7 @@ namespace webMetics.Controllers
             titleRun.AddBreak(); // Salto de línea después del título
 
             // Crear tabla con el número de participantes y columnas para los módulos
-            XWPFTable table = wordDoc.CreateTable(participantes.Count + 1, 11); // +1 para la fila de encabezado, +2 columnas nuevas
+            XWPFTable table = wordDoc.CreateTable(1, 11);
 
             // Ajustar los anchos de columna (simulando margen)
             table.SetColumnWidth(0, 750);  // Ajustar más ancho para la columna de identificación
