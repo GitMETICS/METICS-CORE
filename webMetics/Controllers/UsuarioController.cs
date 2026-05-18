@@ -87,7 +87,7 @@ namespace webMetics.Controllers
                 {
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
-                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id, usuarioAutorizado.rol);
+                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id);
                 }
                 else
                 {
@@ -568,7 +568,7 @@ namespace webMetics.Controllers
                 if (exito)
                 {
                     TempData["successMessage"] = "Correo alternativo guardado correctamente.";
-                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                    return DeterminarRedireccionPostLogin(idUsuario);
                 }
                 else
                 {
@@ -615,12 +615,18 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Persiste área, departamento, unidadAcademica, sede, carrera y areasExtra del participante.
+        /// Accesible para cualquier rol autenticado que también sea participante.
         /// </summary>
-        /// <param name="participante">Modelo con los campos del formulario.</param>
+        /// <param name="participante">Modelo con los campos del formulario (solo los campos del [Bind] son poblados).</param>
         /// <returns>
-        /// Llama DeterminarRedireccionPostLogin en éxito.
-        /// Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
-        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// AJAX: JSON { success, redirectUrl } en éxito; { success, warnings } si areasExtra falló.
+        /// AJAX: 400 { success, fieldErrors, globalErrors } si ModelState es inválido.
+        /// AJAX: 500 { success, globalErrors } si EditarParticipante falla o lanza excepción.
+        /// AJAX: JSON { success, globalErrors } si el participante no existe en BD.
+        /// No-AJAX: Llama DeterminarRedireccionPostLogin en éxito.
+        /// No-AJAX: Redirects to IniciarSesion si la sesión no es válida.
+        /// No-AJAX: View(participante) con ViewData["jsonDataAreas"] si ModelState es inválido.
+        /// No-AJAX: Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
         /// </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -630,24 +636,34 @@ namespace webMetics.Controllers
             if (string.IsNullOrEmpty(idUsuario))
                 return RedirectToAction("IniciarSesion");
 
-            if (GetRole() != 0)
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            bool isAjaxRequest = IsAjaxRequest();
 
-            if (string.IsNullOrWhiteSpace(participante.area) ||
-                string.IsNullOrWhiteSpace(participante.departamento) ||
-                string.IsNullOrWhiteSpace(participante.unidadAcademica) ||
-                string.IsNullOrWhiteSpace(participante.sede) ||
-                string.IsNullOrWhiteSpace(participante.carrera))
+            // [Bind] restricts which properties are populated, but [Required] on the full
+            // model still fires for unbound properties. Remove those to scope validation
+            // to only the fields this form is responsible for.
+            var boundFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { "area", "departamento", "unidadAcademica", "sede", "carrera", "areasExtra" };
+            foreach (var key in ModelState.Keys.Where(k => !boundFields.Contains(k)).ToList())
+                ModelState.Remove(key);
+
+            if (!ModelState.IsValid)
             {
-                TempData["errorMessage"] = "Es necesario completar todos los campos requeridos: área, departamento, unidad académica, sede y carrera.";
-                return RedirectToAction("CompletarCarreraYAreas");
+                if (isAjaxRequest)
+                    return BadRequest(BuildAjaxValidationErrorResponse());
+
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View(participante);
             }
 
             try
             {
                 ParticipanteModel participanteCompleto = accesoAParticipante.ObtenerParticipante(idUsuario);
                 if (participanteCompleto == null)
+                {
+                    if (isAjaxRequest)
+                        return Json(new { success = false, globalErrors = new[] { "No se encontró el participante. Intente iniciar sesión nuevamente." } });
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
 
                 participanteCompleto.area = participante.area;
                 participanteCompleto.departamento = participante.departamento;
@@ -658,6 +674,9 @@ namespace webMetics.Controllers
                 bool exito = accesoAParticipante.EditarParticipante(participanteCompleto);
                 if (!exito)
                 {
+                    if (isAjaxRequest)
+                        return StatusCode(500, new { success = false, globalErrors = new[] { "Error al guardar los datos. Intente nuevamente." } });
+
                     TempData["errorMessage"] = "Error al guardar los datos. Intente nuevamente.";
                     return RedirectToAction("CompletarCarreraYAreas");
                 }
@@ -672,13 +691,29 @@ namespace webMetics.Controllers
 
                 bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
 
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = GetPostLoginRedirectUrl(idUsuario),
+                            warnings = new[] { "Carrera guardada, pero ocurrió un error al guardar las áreas extra." }
+                        });
+
+                    return Json(new { success = true, redirectUrl = GetPostLoginRedirectUrl(idUsuario) });
+                }
+
                 TempData["successMessage"] = areasExtraGuardadas
                     ? "Información académica guardada correctamente."
                     : "Carrera guardada. No se pudieron guardar las áreas extra.";
-                return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                return DeterminarRedireccionPostLogin(idUsuario);
             }
             catch (Exception)
             {
+                if (isAjaxRequest)
+                    return StatusCode(500, new { success = false, globalErrors = new[] { "Error al procesar la solicitud. Intente nuevamente." } });
+
                 TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
                 return RedirectToAction("CompletarCarreraYAreas");
             }
@@ -777,7 +812,7 @@ namespace webMetics.Controllers
                 if (exito)
                 {
                     TempData["successMessage"] = "Grado académico guardado correctamente.";
-                    return DeterminarRedireccionPostLogin(idUsuario, GetRole());
+                    return DeterminarRedireccionPostLogin(idUsuario);
                 }
                 else
                 {
@@ -1349,10 +1384,11 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
-        /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
+        /// Construye la URL a la que redirigir al usuario tras un login o paso de completación exitoso.
+        /// Verifica en orden: participante existe, correoAlternativo, gradoAcademico, carrera.
+        /// Devuelve la URL como string para poder incluirla en respuestas JSON (AJAX).
         /// </summary>
-        private ActionResult DeterminarRedireccionPostLogin(string idUsuario, int rol)
+        private string GetPostLoginRedirectUrl(string idUsuario)
         {
             // Primero verificar si el usuario tiene un registro como participante
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
@@ -1360,21 +1396,60 @@ namespace webMetics.Controllers
             // Si NO es participante, no validar correo alternativo ni grado académico
             if (participante == null)
             {
-                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                return Url.Action("ListaGruposDisponibles", "Grupo");
             }
 
             // Si ES participante, validar correo alternativo
             if (string.IsNullOrWhiteSpace(participante.correoAlternativo))
-                return RedirectToAction("CompletarCorreoAlternativo", "Usuario");
+                return Url.Action("CompletarCorreoAlternativo", "Usuario");
 
             // Validar grado académico
             if (string.IsNullOrWhiteSpace(participante.gradoAcademico))
-                return RedirectToAction("CompletarGradoAcademico", "Usuario");
+                return Url.Action("CompletarGradoAcademico", "Usuario");
 
             if (string.IsNullOrWhiteSpace(participante.carrera))
-                return RedirectToAction("CompletarCarreraYAreas", "Usuario");
+                return Url.Action("CompletarCarreraYAreas", "Usuario");
 
-            return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            return Url.Action("ListaGruposDisponibles", "Grupo");
+        }
+
+        /// <summary>
+        /// Envuelve GetPostLoginRedirectUrl en un ActionResult para llamadas no-AJAX.
+        /// </summary>
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario)
+        {
+            return Redirect(GetPostLoginRedirectUrl(idUsuario));
+        }
+
+        /// <summary>Devuelve true si la solicitud actual es una llamada AJAX (X-Requested-With: XMLHttpRequest).</summary>
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Construye la respuesta JSON de error de validación a partir de ModelState.
+        /// Errores de campo van en fieldErrors; errores a nivel de modelo (clave "") van en globalErrors.
+        /// </summary>
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new { success = false, fieldErrors, globalErrors };
         }
     }
 }
