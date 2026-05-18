@@ -632,6 +632,14 @@ namespace webMetics.Controllers
 
             bool isAjaxRequest = IsAjaxRequest();
 
+            // [Bind] restricts which properties are populated, but [Required] on the full
+            // model still fires for unbound properties. Remove those to scope validation
+            // to only the fields this form is responsible for.
+            var boundFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { "area", "departamento", "unidadAcademica", "sede", "carrera", "areasExtra" };
+            foreach (var key in ModelState.Keys.Where(k => !boundFields.Contains(k)).ToList())
+                ModelState.Remove(key);
+
             if (!ModelState.IsValid)
             {
                 if (isAjaxRequest)
