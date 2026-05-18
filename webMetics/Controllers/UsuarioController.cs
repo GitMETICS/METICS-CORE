@@ -615,12 +615,18 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Persiste área, departamento, unidadAcademica, sede, carrera y areasExtra del participante.
+        /// Accesible para cualquier rol autenticado que también sea participante.
         /// </summary>
-        /// <param name="participante">Modelo con los campos del formulario.</param>
+        /// <param name="participante">Modelo con los campos del formulario (solo los campos del [Bind] son poblados).</param>
         /// <returns>
-        /// Llama DeterminarRedireccionPostLogin en éxito.
-        /// Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
-        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// AJAX: JSON { success, redirectUrl } en éxito; { success, warnings } si areasExtra falló.
+        /// AJAX: 400 { success, fieldErrors, globalErrors } si ModelState es inválido.
+        /// AJAX: 500 { success, globalErrors } si EditarParticipante falla o lanza excepción.
+        /// AJAX: JSON { success, globalErrors } si el participante no existe en BD.
+        /// No-AJAX: Llama DeterminarRedireccionPostLogin en éxito.
+        /// No-AJAX: Redirects to IniciarSesion si la sesión no es válida.
+        /// No-AJAX: View(participante) con ViewData["jsonDataAreas"] si ModelState es inválido.
+        /// No-AJAX: Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
         /// </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1379,7 +1385,8 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Construye la URL a la que redirigir al usuario tras un login o paso de completación exitoso.
-        /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
+        /// Verifica en orden: participante existe, correoAlternativo, gradoAcademico, carrera.
+        /// Devuelve la URL como string para poder incluirla en respuestas JSON (AJAX).
         /// </summary>
         private string GetPostLoginRedirectUrl(string idUsuario)
         {
@@ -1407,19 +1414,23 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Determina a dónde redirigir al usuario tras un login o paso de completación exitoso.
-        /// Verifica en orden: si es participante, correoAlternativo, gradoAcademico, carrera.
+        /// Envuelve GetPostLoginRedirectUrl en un ActionResult para llamadas no-AJAX.
         /// </summary>
         private ActionResult DeterminarRedireccionPostLogin(string idUsuario)
         {
             return Redirect(GetPostLoginRedirectUrl(idUsuario));
         }
 
+        /// <summary>Devuelve true si la solicitud actual es una llamada AJAX (X-Requested-With: XMLHttpRequest).</summary>
         private bool IsAjaxRequest()
         {
             return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Construye la respuesta JSON de error de validación a partir de ModelState.
+        /// Errores de campo van en fieldErrors; errores a nivel de modelo (clave "") van en globalErrors.
+        /// </summary>
         private object BuildAjaxValidationErrorResponse()
         {
             var fieldErrors = ModelState
