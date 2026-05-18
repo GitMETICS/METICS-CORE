@@ -4,6 +4,12 @@ GO
 BEGIN TRY
     BEGIN TRANSACTION;
 
+    -- Disable triggers that use scalar subqueries on inserted — they break on multi-row updates
+    --ENABLE TRIGGER TR_ActualizarIdParticipante ON dbo.usuario;
+    --ENABLE TRIGGER TR_ActualizarIdAsesor ON dbo.usuario;
+    --ENABLE TRIGGER TR_ActualizarIdParticipante ON dbo.usuario;
+    --ENABLE TRIGGER TR_ActualizarIdAsesor ON dbo.usuario;
+
     IF COL_LENGTH('dbo.usuario', 'correo_alternativo') IS NOT NULL
     BEGIN
         EXEC sp_executesql N'
@@ -21,6 +27,8 @@ BEGIN TRY
             WHERE grado_academico IS NOT NULL;
         ';
     END;
+
+
 
 
     IF COL_LENGTH('dbo.participante', 'correo_alternativo') IS NOT NULL

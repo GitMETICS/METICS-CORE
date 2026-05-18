@@ -23,17 +23,19 @@ BEGIN TRY
           AND parent_object_id = OBJECT_ID('dbo.participante')
     )
     BEGIN
-        ALTER TABLE dbo.participante
-        ADD CONSTRAINT CK_participante_grado_academico
-        CHECK (
-            grado_academico IS NULL OR
-            grado_academico IN (
-                N'Doctorado - PhD',
-                N'Maestría - MSc',
-                N'Licenciatura - Lic',
-                N'Bachillerato - Bach'
-            )
-        );
+        EXEC sp_executesql N'
+            ALTER TABLE dbo.participante
+            ADD CONSTRAINT CK_participante_grado_academico
+            CHECK (
+                grado_academico IS NULL OR
+                grado_academico IN (
+                    N''Doctorado - PhD'',
+                    N''Maestría - MSc'',
+                    N''Licenciatura - Lic'',
+                    N''Bachillerato - Bach''
+                )
+            );
+        ';
     END;
 
     COMMIT TRANSACTION;
@@ -208,3 +210,6 @@ BEGIN
     WHERE id_participante_PK = @id;
 END
 GO
+
+
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'participante' AND COLUMN_NAME IN ('correo_alternativo', 'grado_academico');
