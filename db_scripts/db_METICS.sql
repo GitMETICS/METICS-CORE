@@ -268,8 +268,7 @@ GO
 CREATE OR ALTER PROCEDURE InsertUsuario
     @id NVARCHAR(64),
 	@rol INT = 0,
-    @contrasena NVARCHAR(64),
-	@correoAlternativo NVARCHAR(64) = NULL
+    @contrasena NVARCHAR(64)
 AS
 BEGIN
 	DECLARE @salt UNIQUEIDENTIFIER=NEWID()
@@ -461,6 +460,8 @@ CREATE OR ALTER PROCEDURE InsertParticipante
     @tipoIdentificacion NVARCHAR(16) = '',
 	@numeroIdentificacion NVARCHAR(32),
     @correo NVARCHAR(64),
+    @correoAlternativo NVARCHAR(64) = NULL,
+    @gradoAcademico NVARCHAR(32) = NULL,
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
