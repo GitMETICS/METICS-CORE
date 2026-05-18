@@ -366,7 +366,7 @@
             limpiarMensajesValidacion();
 
             var $btn = $(this).find('button[type="submit"]');
-            var textoOriginal = $btn.text();
+            var textoOriginal = $btn.html();
             $btn.prop('disabled', true).text('Guardando...');
 
             $.ajax({
@@ -376,7 +376,18 @@
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 success: function (response) {
                     if (response && response.success && response.redirectUrl) {
-                        window.location.href = response.redirectUrl;
+                        var tieneWarnings = response.warnings && response.warnings.length > 0;
+                        if (tieneWarnings) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Advertencia',
+                                text: response.warnings[0]
+                            }).then(function () {
+                                window.location.href = response.redirectUrl;
+                            });
+                        } else {
+                            window.location.href = response.redirectUrl;
+                        }
                         return;
                     }
                     var tieneFieldErrors = response && response.fieldErrors && Object.keys(response.fieldErrors).length > 0;
@@ -402,7 +413,7 @@
                 },
                 complete: function () {
                     enviando = false;
-                    $btn.prop('disabled', false).text(textoOriginal);
+                    $btn.prop('disabled', false).html(textoOriginal);
                 }
             });
         });
