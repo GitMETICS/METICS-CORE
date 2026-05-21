@@ -105,22 +105,12 @@
                 <table class="table table-striped table-sm" id="tblCustomers" style="font-size: 0.9rem;">
                     <thead>
                         <tr>
-                            <th class="text-center" scope="col" style="width:2%;"></th>
-                             <th scope="col" style="width:10%;">Unidad Académica</th>
-                             <th scope="col" style="width:6%;">Nombre</th>
-                             <th scope="col" style="width:6%;">Primer<br>Apellido</th>
-                             <th scope="col" style="width:6%;">Segundo<br>Apellido</th>
-                             <th scope="col" style="width:12%;">Correo Institucional</th>
-                             <th scope="col" style="width:12%;">Correo Alternativo</th>
-                             <th scope="col" style="width:9%;">Grado Académico</th>
-                             <th class="text-center" scope="col" style="width:6%;">Total Horas<br>Inscritas</th>
-                             <th class="text-center" scope="col" style="width:7%;">Total Horas<br>Aprobadas</th>
-                             <th class="text-center" scope="col" style="width:2%;"></th>
-                             <th class="text-center" scope="col" style="width:2%;"></th>
-                             <th class="text-center" scope="col" style="width:2%;"></th>
-                             <th class="text-center" scope="col" style="width:2%;"></th>
-                             <th class="text-center" scope="col" style="width:2%;"></th>
-
+                            <th scope="col" style="width:15%;">Unidad Académica</th>
+                            <th scope="col" style="width:25%;">Nombre Completo</th>
+                            <th scope="col" style="width:25%;">Correo Institucional</th>
+                            <th class="text-center" scope="col" style="width:10%;">Hrs. Inscritas</th>
+                            <th class="text-center" scope="col" style="width:10%;">Hrs. Aprobadas</th>
+                            <th class="text-center" scope="col" style="width:15%;">Acciones</th>
                         </tr>
                     </thead>
 
@@ -135,67 +125,49 @@
                                 nombreCompleto += " " + participante.segundoApellido;
                             }
                             <tr>
-                                @if (participante.horasAprobadas >= 30)
-                                {
-                                    @if (participante.correoNotificacionEnviado != 0)
-                                    {
-                                        <td class="link-success text-center">
-                                            <i class="bi bi-bell"></i>
-                                        </td> @* Campana vacía cuando se envió el correo *@
-                                    }
-                                    else
-                                    {
-                                        <td class="link-success text-center">
-                                            @Html.ActionLink(" ", "NotificarLimiteHoras", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-success bi bi-bell-fill" })
-                                        </td>
-                                    }
-                                }
-                                else
-                                {
-                                    <td></td>
-                                }
-
                                 <td>@participante.unidadAcademica</td>
-                                <td>@participante.nombre</td>
-                                <td>@participante.primerApellido</td>
-                                <td>@participante.segundoApellido</td>
+                                <td>@nombreCompleto</td>
                                 <td>@participante.correo</td>
-                                <td>@(string.IsNullOrWhiteSpace(participante.correoAlternativo) ? "-" : participante.correoAlternativo)</td>
-                                <td>@(string.IsNullOrWhiteSpace(participante.gradoAcademico) ? "-" : participante.gradoAcademico)</td>
                                 <td class="text-center">
                                     <span>@participante.horasMatriculadas</span>
                                 </td>
                                 <td class="text-center">
                                     <span>@participante.horasAprobadas</span>
                                 </td>
-                                <td>
-                                    @Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-search" })
-                                </td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    @Html.ActionLink(" ", "CambiarCredencialesUsuario", "Usuario",
-                                             new
-                                             {
-                                                 idUsuario = participante.idParticipante,
-                                                 nombreCompleto = $"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}"
-                                             },
-                                             new { @class = "text-secondary bi bi-fingerprint" })
-                                </td>
-                                <td>
-                                    @Html.ActionLink(" ", "CambiarContrasenaAdmin", "Usuario",
-                                             new
-                                             {
-                                                 idUsuario = participante.idParticipante,
-                                                 nombreCompleto = $"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}"
-                                             },
-                                             new { @class = "text-secondary bi bi-key" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                <td class="text-center">
+                                    <div class="dropdown d-inline">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu_@participante.idParticipante" data-bs-toggle="dropdown" aria-expanded="false" title="Acciones">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu_@participante.idParticipante">
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante })">
+                                                    <i class="bi bi-eye"></i> Ver detalles
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = participante.idParticipante })">
+                                                    <i class="bi bi-pencil-square"></i> Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("CambiarCredencialesUsuario", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
+                                                    <i class="bi bi-fingerprint"></i> Credenciales
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("CambiarContrasenaAdmin", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
+                                                    <i class="bi bi-key"></i> Cambiar contraseña
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@participante.idParticipante')">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         }
