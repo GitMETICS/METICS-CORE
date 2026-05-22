@@ -68,6 +68,15 @@ CREATE TABLE participante (
     total_horas_matriculadas INT DEFAULT 0,
     total_horas_aprobadas INT DEFAULT 0,
 	correo_notificacion_enviado INT DEFAULT 0,
+	correo_alternativo NVARCHAR(64) NULL,
+	grado_academico    NVARCHAR(32) NULL,
+
+	CONSTRAINT CK_participante_grado_academico CHECK (
+		grado_academico IS NULL OR grado_academico IN (
+			N'Doctorado - PhD', N'Maestría - MSc',
+			N'Licenciatura - Lic', N'Bachillerato - Bach'
+		)
+	),
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
         ON DELETE CASCADE
@@ -486,6 +495,8 @@ BEGIN
         tipo_identificacion,
 		numero_identificacion,
         correo,
+        correo_alternativo,
+        grado_academico,
         nombre,
         apellido_1,
         apellido_2,
@@ -507,6 +518,8 @@ BEGIN
         @tipoIdentificacion,
 		@numeroIdentificacion,
         @correo,
+        NULLIF(LTRIM(RTRIM(@correoAlternativo)), ''),
+        NULLIF(LTRIM(RTRIM(@gradoAcademico)), ''),
         @nombre,
         @apellido1,
         @apellido2,
@@ -533,6 +546,8 @@ CREATE OR ALTER PROCEDURE UpdateParticipante
     @tipoIdentificacion NVARCHAR(16) = '',
     @numeroIdentificacion NVARCHAR(32),
     @correo NVARCHAR(64),
+    @correoAlternativo NVARCHAR(64) = NULL,
+    @gradoAcademico    NVARCHAR(32) = NULL,
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
@@ -555,6 +570,8 @@ BEGIN
         tipo_identificacion = @tipoIdentificacion,
         numero_identificacion = @numeroIdentificacion,
         correo = @correo,
+        correo_alternativo = NULLIF(LTRIM(RTRIM(@correoAlternativo)), ''),
+        grado_academico    = NULLIF(LTRIM(RTRIM(@gradoAcademico)), ''),
         nombre = @nombre,
         apellido_1 = @apellido1,
         apellido_2 = @apellido2,
