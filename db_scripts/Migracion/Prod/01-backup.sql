@@ -1,0 +1,8 @@
+BACKUP DATABASE [SIMETICS]
+TO DISK = N'/var/opt/mssql/backup/SIMETICS_test.bak'
+WITH FORMAT, INIT;
+
+
+RESTORE DATABASE [SIMETICS]
+FROM DISK = N'/var/opt/mssql/backup/SIMETICS_test.bak'
+WITH REPLACE;
