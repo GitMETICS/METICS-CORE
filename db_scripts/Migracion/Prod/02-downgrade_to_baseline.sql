@@ -3,7 +3,7 @@
 --
 -- Run this on a RESTORED BACKUP of the current database to
 -- simulate the pre-migration state before running
--- db_migrate_to_current.sql.
+-- 03-migrate.sql.
 --
 -- WARNING: all data in carrera, correo_alternativo,
 -- grado_academico, and participante_area_extra is discarded.
