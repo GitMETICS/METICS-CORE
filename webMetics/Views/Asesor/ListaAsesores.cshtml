@@ -1,7 +1,7 @@
-ï»¿@using webMetics.Controllers
+@using webMetics.Controllers
 
 <!--
-    Vista para mostrar la lista de todos los asesores con la informaciÃ³n personal de cada uno
+    Vista para mostrar la lista de todos los asesores con la información personal de cada uno
     Se muestran las opciones de poder eliminar, editar o crear un asesor
 -->
 
@@ -10,6 +10,81 @@
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
+
+<style>
+    .asesor-table-card {
+        background: white;
+        border: 2px solid #41ADE7;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .asesor-table-header {
+        background: #E3F3FB;
+        border-bottom: 1px solid #CCCCCC;
+        padding: 11px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    #asesorTblWrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 70vh;
+        width: 100%;
+        background: white;
+    }
+
+    #asesorTblCustomers {
+        min-width: 900px;
+    }
+
+    #asesorTblPaginacion {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 13px;
+        border-top: 1px solid #ECECEC;
+        background: white;
+    }
+
+    .asesor-icon-editar {
+        color: #0090D8;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .asesor-icon-editar:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+    .asesor-icon-eliminar {
+        color: #C0392B;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .asesor-icon-eliminar:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+</style>
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
@@ -58,49 +133,64 @@
             }
             else
             {
-                <table class="table table-striped table-sm" id="tblCustomers" style="font-size: 0.9rem;">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width:11%;">Nombre</th>
-                            <th scope="col" style="width:9%;">Primer<br>Apellido</th>
-                            <th scope="col" style="width:9%;">Segundo<br>Apellido</th>
-                            <th scope="col" style="width:13%;">Correo Institucional</th>
-                            <th scope="col" style="width:15%;">DescripciÃ³n</th>
-                            <th scope="col" style="width:6%;">TelÃ©fono</th>
-                            <th class="text-center" scope="col" style="width:2%;"></th>
-                            <th class="text-center" scope="col" style="width:2%;"></th>
-                        </tr>
-                    </thead>
+                <div class="asesor-table-card">
+                    <!-- Encabezado de tarjeta -->
+                    <div class="asesor-table-header">
+                        <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Facilitadores(as)</span>
+                        <span style="font-size: 12px; color: #555;">Listado de facilitadores(as) registrados en el sistema</span>
+                    </div>
 
-                    <tbody>
-                        @foreach (var asesor in ViewBag.Asesores)
-                        {
-                            var nombreCompleto = asesor.nombre;
-                            nombreCompleto += " " + asesor.primerApellido;
-                            if (asesor.segundoApellido != "-")
-                            {
-                                nombreCompleto += " " + asesor.segundoApellido;
-                            }
+                    <!-- Tabla con scroll responsivo -->
+                    <div id="asesorTblWrapper">
+                        <table id="asesorTblCustomers" style="border-collapse: collapse; font-size: 12px; width: 100%; background: white; margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 11%;">Nombre</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 9%;">Primer Apellido</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 9%;">Segundo Apellido</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 13%;">Correo Institucional</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">Descripción</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 6%;">Teléfono</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Editar</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Eliminar</th>
+                                </tr>
+                            </thead>
 
-                            <tr>
-                                <td>@asesor.nombre</td>
-                                <td>@asesor.primerApellido</td>
-                                <td>@asesor.segundoApellido</td>
-                                <td>@asesor.correo</td>
-                                <td>@asesor.descripcion</td>
-                                <td>@asesor.telefono</td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = asesor.idAsesor }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@asesor.idAsesor')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                            <tbody>
+                                @foreach (var asesor in ViewBag.Asesores)
+                                {
+                                    var nombreCompleto = asesor.nombre;
+                                    nombreCompleto += " " + asesor.primerApellido;
+                                    if (asesor.segundoApellido != "-")
+                                    {
+                                        nombreCompleto += " " + asesor.segundoApellido;
+                                    }
+
+                                    <tr style="background: white;">
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.nombre</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.primerApellido</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.segundoApellido</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.correo</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.descripcion</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@asesor.telefono</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                            <a href="@Url.Action("EditarAsesor", "Asesor", new { idAsesor = asesor.idAsesor })" class="asesor-icon-editar" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        </td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                            <a href="#" onclick="openAsesorDeleteModal('@asesor.idAsesor'); return false;" class="asesor-icon-eliminar" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="asesorTblPaginacion"></div>
+                </div>
             }
         </div>
     </div>
@@ -113,10 +203,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Â¿EstÃ¡ seguro de que desea eliminar a este(a) facilitador(a)?
-                    <br />
+                    ¿Está seguro de que desea eliminar a este(a) facilitador(a)?
+
                     @using (Html.BeginForm("EliminarAsesor", "Asesor"))
                     {
+                        @Html.AntiForgeryToken()
+
                         <div class="modal-footer">
                             <input type="hidden" id="idAsesor" name="idAsesor">
                             <input type="submit" class="btn btn-danger" value="Aceptar" />
@@ -136,7 +228,81 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminar(idAsesor) {
-        document.getElementById("idAsesor").value = idAsesor;
+    // Función para abrir modal de eliminación
+    function openAsesorDeleteModal(asesorId) {
+        document.getElementById("idAsesor").value = asesorId;
+        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        deleteModal.show();
     }
+
+    // Función heredada para mantener compatibilidad
+    function actualizarModalEliminar(idAsesor) {
+        openAsesorDeleteModal(idAsesor);
+    }
+</script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+<script>
+    var asesorTable = new DataTable('#asesorTblCustomers', {
+        language: {
+            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+        },
+        searching: false,
+        paging: true,
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        info: false,
+        lengthChange: false,
+        dom: 't',
+        pagingType: "simple_numbers",
+        drawCallback: function () {
+            if (!window.bootstrap?.Tooltip) return;
+            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                var existing = bootstrap.Tooltip.getInstance(this);
+                if (!existing) {
+                    new bootstrap.Tooltip(this);
+                }
+            });
+        }
+    });
+
+    // Colocar paginación manualmente en su contenedor
+    asesorTable.on('draw', function() {
+        var paginationHtml = '';
+        var pageCount = Math.ceil(asesorTable.page.info().recordsTotal / asesorTable.page.len());
+        var currentPage = asesorTable.page() + 1;
+
+        // Botón anterior
+        if (currentPage > 1) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+        }
+
+        // Números de página
+        for (var i = 1; i <= pageCount; i++) {
+            if (i === currentPage) {
+                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+            } else {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
+            }
+        }
+
+        // Botón siguiente
+        if (currentPage < pageCount) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+        }
+
+        document.getElementById('asesorTblPaginacion').innerHTML = paginationHtml;
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.bootstrap?.Tooltip) return;
+        $('#asesorTblCustomers [data-bs-toggle="tooltip"]').each(function () {
+            if (!bootstrap.Tooltip.getInstance(this)) {
+                new bootstrap.Tooltip(this);
+            }
+        });
+    });
 </script>
