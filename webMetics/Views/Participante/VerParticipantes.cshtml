@@ -400,7 +400,7 @@
                         </table>
                     </div>
 
-                    <!-- Paginación (será generada por DataTable) -->
+                    <div id="tblPaginacion" style="display: flex; justify-content: center; align-items: center; gap: 4px; padding: 13px; border-top: 1px solid #ECECEC; background: white;"></div>
                 </div>
             }
         </div>
@@ -501,7 +501,7 @@ else
         lengthMenu: [5, 10, 25, 50],
         info: false,
         lengthChange: false,
-        dom: '<"dataTables_top"t><"dataTables_bottom"p>',
+        dom: 't',
         pagingType: "simple_numbers",
         drawCallback: function () {
             if (!window.bootstrap?.Tooltip) return;
@@ -512,6 +512,34 @@ else
                 }
             });
         }
+    });
+
+    // Colocar paginación manualmente en su contenedor
+    table.on('draw', function() {
+        var paginationHtml = '';
+        var pageCount = Math.ceil(table.page.info().recordsTotal / table.page.len());
+        var currentPage = table.page() + 1;
+
+        // Botón anterior
+        if (currentPage > 1) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+        }
+
+        // Números de página
+        for (var i = 1; i <= pageCount; i++) {
+            if (i === currentPage) {
+                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+            } else {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
+            }
+        }
+
+        // Botón siguiente
+        if (currentPage < pageCount) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+        }
+
+        document.getElementById('tblPaginacion').innerHTML = paginationHtml;
     });
 
     // Conectar el selector de "Mostrar X registros" con DataTable
