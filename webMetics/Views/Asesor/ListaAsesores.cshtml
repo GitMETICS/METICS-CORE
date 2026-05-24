@@ -140,8 +140,19 @@
                         <span style="font-size: 12px; color: #555;">Listado de facilitadores(as) registrados en el sistema</span>
                     </div>
 
-                    <!-- Controles: Búsqueda -->
-                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px;">
+                    <!-- Controles: Mostrar registros y búsqueda -->
+                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
+                            <select id="asesorPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                        </div>
+
                         <div style="flex: 1; max-width: 400px;">
                             <form asp-action="BuscarAsesores" asp-controller="Asesor" method="get" style="display: flex; gap: 5px;">
                                 <input type="text" name="searchTerm" class="form-control" placeholder="Buscar facilitador(a)" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
@@ -307,6 +318,12 @@ else
         }
 
         document.getElementById('asesorTblPaginacion').innerHTML = paginationHtml;
+    });
+
+    // Conectar el selector de "Mostrar X registros" con DataTable
+    document.getElementById('asesorPageSize').addEventListener('change', function() {
+        var value = parseInt(this.value);
+        asesorTable.page.len(value).draw();
     });
 
     document.addEventListener('DOMContentLoaded', function () {
