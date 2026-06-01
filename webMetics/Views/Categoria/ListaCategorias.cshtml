@@ -1,9 +1,86 @@
-ï»¿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
     ViewBag.Title = "Niveles";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
+
+<style>
+    /* Estilos para la tabla de categorías - Diseño Moderno */
+    .categoria-table-card {
+        background: white;
+        border: 2px solid #41ADE7;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .categoria-table-header {
+        background: #E3F3FB;
+        border-bottom: 1px solid #CCCCCC;
+        padding: 11px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    #categoriaTblWrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 70vh;
+        width: 100%;
+        background: white;
+    }
+
+    #categoriaTblCustomers {
+        min-width: 700px;
+    }
+
+    #categoriaTblPaginacion {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 13px;
+        border-top: 1px solid #ECECEC;
+        background: white;
+    }
+
+    /* Estilos para iconos de acciones */
+    .categoria-icon-editar {
+        color: #0090D8;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .categoria-icon-editar:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+    .categoria-icon-eliminar {
+        color: #C0392B;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .categoria-icon-eliminar:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+</style>
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
@@ -35,67 +112,93 @@
             </div>
         }
 
-        <div class="d-flex justify-content-between mb-4">
-            <div></div>
-
-            <div class="d-flex justify-content-end">
-                <div class="mx-1">
-                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
-                </div>
+        @if (ViewBag.Categorias == null)
+        {
+            <h5 class="text-center mb-4">No hay categorías.</h5>
+            <div class="text-center">
+                @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
             </div>
-        </div>
-
-        <div class="table-responsive">
-            @if (ViewBag.Categorias == null)
-            {
-                <h5 class="text-center">No hay categorÃ­as.</h5>
-                <div class="justify-content-center m-3">
-                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+        }
+        else
+        {
+            <div class="categoria-table-card">
+                <!-- Encabezado de tarjeta -->
+                <div class="categoria-table-header">
+                    <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Niveles</span>
+                    <span style="font-size: 12px; color: #555;">Listado de niveles registrados en el sistema</span>
                 </div>
-            }
-            else
-            {
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">DescripciÃ³n</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
-                        @foreach (var categoria in ViewBag.Categorias)
-                        {
+                <!-- Controles: Mostrar registros, búsqueda y crear -->
+                <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="categoriaPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
+                        <select id="categoriaPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                            <option selected>5</option>
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                        <label for="categoriaPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                    </div>
+
+                    <div style="flex: 1; min-width: 200px; display: flex; gap: 5px;">
+                        <input type="text" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px; flex: 1; min-width: 0;" />
+                        <button onclick="buscarCategoria()" class="btn btn-sm" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px; flex-shrink: 0;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+
+                    <div style="flex-shrink: 0;">
+                        @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg", style = "font-size: 12px; padding: 4px 12px;" })
+                    </div>
+                </div>
+
+                <!-- Tabla con scroll responsivo -->
+                <div id="categoriaTblWrapper">
+                    <table id="categoriaTblCustomers" style="border-collapse: collapse; font-size: 12px; width: 100%; background: white; margin: 0;">
+                        <thead>
                             <tr>
-                                <td>@categoria.nombre</td>
-                                <td>@categoria.descripcion</td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@categoria.idCategoria')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
+                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 30%;">Nombre</th>
+                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 60%;">Descripción</th>
+                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Editar</th>
+                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Eliminar</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var categoria in ViewBag.Categorias)
+                            {
+                                <tr style="background: white;">
+                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@categoria.nombre</td>
+                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@categoria.descripcion</td>
+                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "categoria-icon-editar bi bi-pencil-square", @title = "Editar" })
+                                    </td>
+                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                        <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="categoria-icon-eliminar bi bi-trash" title="Eliminar">
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación FUERA del scroll (fija) -->
+                <div id="categoriaTblPaginacion"></div>
+            </div>
+        }
     </div>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categorÃ­a</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categoría</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Â¿EstÃ¡ seguro de que desea eliminar esta categorÃ­a?
+                    ¿Está seguro de que desea eliminar esta categoría?
                     <br />
                     @using (Html.BeginForm("EliminarCategoria", "Categoria"))
                     {
@@ -120,5 +223,114 @@ else
 <script type="text/javascript">
     function actualizarModalEliminar(idCategoria) {
         document.getElementById("idCategoria").value = idCategoria;
+        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        deleteModal.show();
     }
+
+    function buscarCategoria() {
+        // Función para búsqueda en columnas específicas (nombre y descripción)
+        var searchTerm = document.getElementById('categoriaBusqueda').value.toLowerCase().trim();
+        var rows = document.querySelectorAll('#categoriaTblCustomers tbody tr');
+
+        rows.forEach(row => {
+            var nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            var descripcion = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+            if (searchTerm === '' || nombre.includes(searchTerm) || descripcion.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Permitir búsqueda al presionar Enter
+    document.addEventListener('DOMContentLoaded', function() {
+        var busquedaInput = document.getElementById('categoriaBusqueda');
+        if (busquedaInput) {
+            busquedaInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    buscarCategoria();
+                }
+            });
+
+            // También permitir búsqueda mientras se escribe
+            busquedaInput.addEventListener('input', function() {
+                buscarCategoria();
+            });
+        }
+    });
+</script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+<script>
+    var categoriaTable = new DataTable('#categoriaTblCustomers', {
+        language: {
+            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+        },
+        searching: true,
+        paging: true,
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        info: false,
+        lengthChange: false,
+        dom: 't',
+        pagingType: "simple_numbers",
+        drawCallback: function () {
+            if (!window.bootstrap?.Tooltip) return;
+            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                var existing = bootstrap.Tooltip.getInstance(this);
+                if (!existing) {
+                    new bootstrap.Tooltip(this);
+                }
+            });
+        }
+    });
+
+    // Colocar paginación manualmente en su contenedor
+    categoriaTable.on('draw', function() {
+        var paginationHtml = '';
+        var pageCount = Math.ceil(categoriaTable.page.info().recordsTotal / categoriaTable.page.len());
+        var currentPage = categoriaTable.page() + 1;
+
+        // Botón anterior
+        if (currentPage > 1) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+        }
+
+        // Números de página
+        for (var i = 1; i <= pageCount; i++) {
+            if (i === currentPage) {
+                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+            } else {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
+            }
+        }
+
+        // Botón siguiente
+        if (currentPage < pageCount) {
+            paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+        }
+
+        document.getElementById('categoriaTblPaginacion').innerHTML = paginationHtml;
+    });
+
+    // Conectar el selector de "Mostrar X registros" con DataTable
+    document.getElementById('categoriaPageSize').addEventListener('change', function() {
+        var value = parseInt(this.value);
+        categoriaTable.page.len(value).draw();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.bootstrap?.Tooltip) return;
+        $('#categoriaTblCustomers [data-bs-toggle="tooltip"]').each(function () {
+            if (!bootstrap.Tooltip.getInstance(this)) {
+                new bootstrap.Tooltip(this);
+            }
+        });
+    });
 </script>

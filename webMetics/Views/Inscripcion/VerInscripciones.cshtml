@@ -1,437 +1,551 @@
-ï»¿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
-	ViewBag.Title = "Inscripciones";
+    ViewBag.Title = "Inscripciones";
 
-	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
+
+<style>
+    /* Estilos para la tabla de inscripciones - Diseño Moderno */
+    .inscripcion-table-card {
+        background: white;
+        border: 2px solid #41ADE7;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .inscripcion-table-header {
+        background: #E3F3FB;
+        border-bottom: 1px solid #CCCCCC;
+        padding: 11px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    #inscripcionTblWrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 70vh;
+        width: 100%;
+        background: white;
+    }
+
+    #inscripcionTblCustomers {
+        min-width: 1200px;
+    }
+
+    #inscripcionTblPaginacion {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 13px;
+        border-top: 1px solid #ECECEC;
+        background: white;
+    }
+
+    /* Estilos para iconos de acciones */
+    .inscripcion-icon-ver {
+        color: #0090D8;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .inscripcion-icon-ver:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+    .inscripcion-icon-eliminar {
+        color: #C0392B;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .inscripcion-icon-eliminar:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+    .inscripcion-icon-refresh {
+        color: #0090D8;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .inscripcion-icon-refresh:hover {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+</style>
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-	<div class="contenedor-caja container-fluid">
-		@if (urlReferrer != null)
-		{
-			<div class="d-flex justify-content-start mb-3">
-				<a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-					<i class="bi bi-arrow-left"></i>
-				</a>
-			</div>
-		}
+    <div class="contenedor-caja container-fluid">
+        @if (urlReferrer != null)
+        {
+            <div class="d-flex justify-content-start mb-3">
+                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+        }
 
-		<h1>@ViewBag.Title</h1>
-		<hr />
+        <h1>@ViewBag.Title</h1>
+        <hr />
 
-		@if (ViewBag.ErrorMessage != null)
-		{
-			<div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-				@ViewBag.ErrorMessage
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		}
-		@if (ViewBag.SuccessMessage != null)
-		{
-			<div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-				@ViewBag.SuccessMessage
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		}
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.ErrorMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                @ViewBag.SuccessMessage
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-		<div class="table-responsive" style="padding-bottom: 220px;">
+        <div class="table-responsive" style="padding-bottom: 220px;">
 
-			<div class="d-flex justify-content-between">
-				<div class="mb-3" style="width: 70%;">
-					@using (Html.BeginForm("SubirArchivoExcelInscripciones", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
-					{
-						<form>
-							<small class="ms-1 text-secondary">Subir lista de inscripciones</small>
-							<div class="mb-2 d-flex align-items-center">
-								<input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="max-width: 500px;" required>
-								<input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-							</div>
-						</form>
-					}
-					<div class="mb-4 bg-light p-3 rounded d-flex" style="max-width: 750px;">
-						<h4><i class="bi bi-exclamation-circle-fill me-2 p-2 text-secondary"></i></h4>
-						<small class="text-muted">
-							Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas:
-							<br />
-							Correo Institucional, MÃ³dulo, Grupo, Horas, Estado, Horas Completadas
-							<br />
-							@Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirInscripciones", "Inscripcion", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
-						</small>
-					</div>
-				</div>
+            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    @using (Html.BeginForm("SubirArchivoExcelInscripciones", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de inscripciones</small>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
+                            <input class="btn btn-secondary" type="submit" value="Subir" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">
+                        </div>
+                    }
+                </div>
 
-				<div class="d-flex justify-content-end">
-					<div class="mx-1">
-						@Html.ActionLink("   PDF", "ExportarTodosParticipantesPDF", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-					<div class="mx-1">
-						@Html.ActionLink("   Excel", "ExportarTodosParticipantesExcel", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-					<div class="mx-1">
-						@Html.ActionLink("   Word", "ExportarTodosParticipantesWord", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-					</div>
-				</div>
-			</div>
+                <div style="flex-shrink: 0;">
+                    <small class="text-secondary" style="display: block; margin-bottom: 8px;">Exportar datos:</small>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="@Url.Action("ExportarTodosParticipantesPDF", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">PDF</a>
+                        <a href="@Url.Action("ExportarTodosParticipantesExcel", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel</a>
+                        <a href="@Url.Action("ExportarTodosParticipantesWord", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Word</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
+                <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
+                <small class="text-muted" style="flex: 1;">
+                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas: <strong>Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas</strong>
+                    <br />
+                    <a href="@Url.Action("DescargarPlantillaSubirInscripciones", "Inscripcion")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
+                </small>
+            </div>
 
 
-			<br />
-			@if (ViewBag.ListaInscripciones == null)
-			{
-				<h5 class="text-center">No hay personas inscritas en mÃ³dulos.</h5>
 
-				<div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-					<form id="refreshForm" method="post" action="@Url.Action("CargarParticipantesPorModulos", "Participante")" class="text-center w-100">
-						<input type="hidden" name="reload" value="true" />
-						<button type="submit" class="btn btn-secondary" id="refreshButton">
-							Recargar datos
-						</button>
-					</form>
-				</div>
-			}
-			else
-			{
-				<!-- SecciÃ³n de AsignaciÃ³n de Medallas -->
-				<div class="mb-4">
-					<form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
-						<div class="card border-0 shadow-sm">
-							<div class="card-body">
-								<h5 class="card-title mb-3">
-									<i class="bi bi-award me-2"></i>AsignaciÃ³n Masiva de Medallas
-								</h5>
+            @if (ViewBag.ListaInscripciones == null)
+            {
+                <h5 class="text-center">No hay personas inscritas en módulos.</h5>
 
-								<div class="row">
-									<div class="col-md-6">
-										<label class="form-label"><b>Buscar Medalla:</b></label>
-										<div class="input-group mb-3">
-											<input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
-											<span class="input-group-text">
-												<i class="bi bi-search"></i>
-											</span>
-										</div>
+                <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
+                    <form id="refreshForm" method="post" action="@Url.Action("CargarParticipantesPorModulos", "Participante")" class="text-center w-100">
+                        <input type="hidden" name="reload" value="true" />
+                        <button type="submit" class="btn btn-secondary" id="refreshButton">
+                            Recargar datos
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <!-- Sección de Asignación de Medallas -->
+                <div class="mb-4">
+                    <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-award me-2"></i>Asignación Masiva de Medallas
+                                </h5>
 
-										<div class="mb-3" style="max-height: 150px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 8px; background-color: #f8f9fa;">
-											@if (ViewBag.TodasLasMedallas != null)
-											{
-												<div id="medalla-list" class="medalla-list-container d-flex flex-column">
-													@foreach (var medalla in ViewBag.TodasLasMedallas)
-													{
-														<div class="medalla-item">
-															<img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
-															<div class="form-check">
-																<input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
-																<label class="form-check-label" for="medallaSeleccionada">
-																	@medalla
-																</label>
-															</div>
-														</div>
-													}
-												</div>
-											}
-											else
-											{
-												<div class="medalla-list-container">
-													<p>No hay medallas disponibles.</p>
-												</div>
-											}
-										</div>
-									</div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><b>Buscar Medalla:</b></label>
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-search"></i>
+                                            </span>
+                                        </div>
 
-									<div class="col-md-6">
-										<div class="d-flex justify-content-between align-items-center mb-3">
-											<label class="form-label"><b>Participantes Seleccionados:</b></label>
-											<small class="text-muted">
-												<span id="selectedCount">0</span> seleccionados
-											</small>
-										</div>
-										<div class="d-flex gap-2">
-											<button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
-												<i class="bi bi-check-all me-1"></i>Seleccionar Todo
-											</button>
-											<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
-												<i class="bi bi-x-circle me-1"></i>Limpiar
-											</button>
-											<button type="submit" class="btn btn-success" id="btnAsignarMedallas">
-												<i class="bi bi-award me-1"></i>Asignar Medallas
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</form>
-				</div>
+                                        <div class="mb-3" style="max-height: 150px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 8px; background-color: #f8f9fa;">
+                                            @if (ViewBag.TodasLasMedallas != null)
+                                            {
+                                                <div id="medalla-list" class="medalla-list-container d-flex flex-column">
+                                                    @foreach (var medalla in ViewBag.TodasLasMedallas)
+                                                    {
+                                                        <div class="medalla-item">
+                                                            <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
+                                                                <label class="form-check-label" for="medallaSeleccionada">
+                                                                    @medalla
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="medalla-list-container">
+                                                    <p>No hay medallas disponibles.</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
 
-				<!-- Barra de bÃºsqueda y controles -->
-				<div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-					<form id="refreshForm" method="post" action="@Url.Action("VerInscripciones", "Inscripcion")">
-						<input type="hidden" name="reload" value="true" />
-						<button type="submit" class="btn btn-secondary" id="refreshButton">
-							<i class="bi bi-arrow-clockwise"></i>
-						</button>
-					</form>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="form-label"><b>Participantes Seleccionados:</b></label>
+                                            <small class="text-muted">
+                                                <span id="selectedCount">0</span> seleccionados
+                                            </small>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
+                                                <i class="bi bi-check-all me-1"></i>Seleccionar Todo
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
+                                                <i class="bi bi-x-circle me-1"></i>Limpiar
+                                            </button>
+                                            <button type="submit" class="btn btn-success" id="btnAsignarMedallas">
+                                                <i class="bi bi-award me-1"></i>Asignar Medallas
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-					<div class="w-100 ms-3">
-						<form asp-action="BuscarInscripciones" asp-controller="Inscripcion" method="get" class="input-group">
-							<input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripciÃ³n" value="@Context.Request.Query["searchTerm"]" />
-							<button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
-						</form>
-					</div>
-				</div>
+                <!-- Barra de búsqueda y controles -->
+                <div class="inscripcion-table-card">
+                    <!-- Encabezado de tarjeta -->
+                    <div class="inscripcion-table-header">
+                        <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Inscripciones</span>
+                        <span style="font-size: 12px; color: #555;">Listado de inscripciones registradas en el sistema</span>
+                    </div>
 
-				<!-- Tabla unificada -->
-				<div class="card border-0 shadow-sm">
-					<div class="table-responsive">
-						<table class="table table-hover mb-0" id="tblCustomers">
-							<thead class="table-light">
-								<tr>
-									<th scope="col" style="width: 50px;">
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
-										</div>
-									</th>
-									<th scope="col">Nombre</th>
-									<th scope="col">Primer<br>Apellido</th>
-									<th scope="col">Segundo<br>Apellido</th>
-									<th scope="col">Correo Institucional</th>
-									<th scope="col">MÃ³dulo</th>
-									<th scope="col">Estado</th>
-									<th class="text-center" scope="col" style="width: 10%">Horas<br>Inscritas</th>
-									<th class="text-center" scope="col" style="width: 10%">Horas<br>Aprobadas</th>
-									<th scope="col" style="width:3.33%"></th>
-									<th scope="col" style="width:3.33%"></th>
-								</tr>
-							</thead>
+                    <!-- Controles: Refresh y búsqueda -->
+                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <form id="refreshForm2" method="post" action="@Url.Action("VerInscripciones", "Inscripcion")" style="margin: 0;">
+                            <input type="hidden" name="reload" value="true" />
+                            <button type="submit" class="inscripcion-icon-refresh" id="refreshButton2" title="Recargar datos">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </form>
 
-							<tbody>
-								@foreach (var inscripcion in ViewBag.ListaInscripciones)
-								{
-									<tr>
-										<td>
-											<div class="form-check">
-												<input type="checkbox" class="form-check-input participant-checkbox"
-													   name="participantesSeleccionados"
-													   value="@inscripcion.participante.idParticipante"
-													   id="participante_@inscripcion.participante.idParticipante"
-													   form="formAsignarMedallas"
-													   onchange="updateSelectedCount()">
-											</div>
-										</td>
-										<td>@inscripcion.participante.nombre</td>
-										<td>@inscripcion.participante.primerApellido</td>
-										<td>@inscripcion.participante.segundoApellido</td>
-										<td>@inscripcion.participante.correo</td>
-										<td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-										<td>@inscripcion.estado</td>
-										<td class="text-center">@inscripcion.horasMatriculadas</td>
-										<td class="text-center">@inscripcion.horasAprobadas</td>
-										@* Botones *@
-										<td>
-											@Html.ActionLink("", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante },
-																				new { @class = "text-secondary bi bi-search", @title = "Ver datos del participante" })
-										</td>
-										<td>
-											<a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante')">
-												<i class="bi bi-trash"></i>
-											</a>
-										</td>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			}
-		</div>
-	</div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label for="inscripcionPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
+                            <select id="inscripcionPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <label for="inscripcionPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                        </div>
 
-	<!-- Ventana emergente de eliminaciÃ³n -->
-	<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Eliminar inscripciÃ³n</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					Â¿EstÃ¡ seguro de que desea eliminar la inscripciÃ³n de este participante?
-					<br />
-					@using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
-					{
-						@Html.AntiForgeryToken()
+                        <div style="flex: 1; max-width: 400px;">
+                            <form asp-action="BuscarInscripciones" asp-controller="Inscripcion" method="get" style="display: flex; gap: 5px;">
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
+                                <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
 
-						<div class="modal-footer">
-							<input type="hidden" id="nombreGrupo" name="nombreGrupo">
-							<input type="hidden" id="numeroGrupo" name="numeroGrupo">
-							<input type="hidden" id="idParticipante" name="idParticipante">
+                    <!-- Tabla con scroll responsivo -->
+                    <div id="inscripcionTblWrapper">
+                        <table id="inscripcionTblCustomers" style="border-collapse: collapse; font-size: 12px; width: 100%; background: white; margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 3%;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
+                                        </div>
+                                    </th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 8%;">Nombre</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 7%;">Primer Apellido</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 7%;">Segundo Apellido</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 12%;">Correo Institucional</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">Módulo</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 8%;">Estado</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 8%;">Horas Inscritas</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 8%;">Horas Aprobadas</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Ver</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Eliminar</th>
+                                </tr>
+                            </thead>
 
-							<input type="submit" class="btn btn-danger" value="Aceptar" />
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-						</div>
-					}
-				</div>
-			</div>
-		</div>
-	</div>
+                            <tbody>
+                                @foreach (var inscripcion in ViewBag.ListaInscripciones)
+                                {
+                                    <tr style="background: white;">
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input participant-checkbox"
+                                                       name="participantesSeleccionados"
+                                                       value="@inscripcion.participante.idParticipante"
+                                                       id="participante_@inscripcion.participante.idParticipante"
+                                                       form="formAsignarMedallas"
+                                                       onchange="updateSelectedCount()">
+                                            </div>
+                                        </td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.participante.nombre</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.participante.primerApellido</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.participante.segundoApellido</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.participante.correo</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@inscripcion.estado</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">@inscripcion.horasMatriculadas</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">@inscripcion.horasAprobadas</td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                            @Html.ActionLink("", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante },
+                                                                                        new { @class = "inscripcion-icon-ver bi bi-search", @title = "Ver datos del participante" })
+                                        </td>
+                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                            <a href="#" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante'); return false;" class="inscripcion-icon-eliminar bi bi-trash" title="Eliminar inscripción">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-	<!-- JavaScript para la funcionalidad de selecciÃ³n de participantes y filtro de medallas -->
-	<script>
-		function updateSelectedCount() {
-			const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
-			document.getElementById('selectedCount').textContent = checkboxes.length;
+                    <!-- Paginación FUERA del scroll (fija) -->
+                    <div id="inscripcionTblPaginacion"></div>
+                </div>
+            }
+        </div>
+    </div>
 
-			// Actualizar el estado del checkbox "Seleccionar todo"
-			const allCheckboxes = document.querySelectorAll('.participant-checkbox');
-			const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    <!-- Ventana emergente de eliminación -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar la inscripción de este participante?
+                    <br />
+                    @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
+                    {
+                        @Html.AntiForgeryToken()
 
-			if (checkboxes.length === 0) {
-				selectAllCheckbox.indeterminate = false;
-				selectAllCheckbox.checked = false;
-			} else if (checkboxes.length === allCheckboxes.length) {
-				selectAllCheckbox.indeterminate = false;
-				selectAllCheckbox.checked = true;
-			} else {
-				selectAllCheckbox.indeterminate = true;
-			}
-		}
-		// ------ Funciones para seleccionar y deseleccionar todos los participantes ------
-		function toggleAllParticipants() {
-			const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-			const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+                        <div class="modal-footer">
+                            <input type="hidden" id="nombreGrupo" name="nombreGrupo">
+                            <input type="hidden" id="numeroGrupo" name="numeroGrupo">
+                            <input type="hidden" id="idParticipante" name="idParticipante">
 
-			participantCheckboxes.forEach(checkbox => {
-				checkbox.checked = selectAllCheckbox.checked;
-			});
+                            <input type="submit" class="btn btn-danger" value="Aceptar" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
-			updateSelectedCount();
-		}
+    <!-- JavaScript para la funcionalidad de selección de participantes y filtro de medallas -->
+    <script>
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+            document.getElementById('selectedCount').textContent = checkboxes.length;
 
-		function selectAllParticipants() {
-			const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-			participantCheckboxes.forEach(checkbox => {
-				checkbox.checked = true;
-			});
-			updateSelectedCount();
-		}
+            // Actualizar el estado del checkbox "Seleccionar todo"
+            const allCheckboxes = document.querySelectorAll('.participant-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
-		function clearAllParticipants() {
-			const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-			participantCheckboxes.forEach(checkbox => {
-				checkbox.checked = false;
-			});
-			updateSelectedCount();
-		}
-		// ---------------------------
+            if (checkboxes.length === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (checkboxes.length === allCheckboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+        // ------ Funciones para seleccionar y deseleccionar todos los participantes ------
+        function toggleAllParticipants() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 
-		// Inicializar el contador al cargar la pÃ¡gina
-		document.addEventListener('DOMContentLoaded', function() {
-			updateSelectedCount();
-		});
+            participantCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
 
-		// FunciÃ³n existente para filtrar medallas
-				function filterMedals() {
-			var input, filter, medallaList, medallas, i, txtValue;
+            updateSelectedCount();
+        }
 
-			// --- Debugging Start ---
-			console.log("--- filterMedals function called ---");
-			// --- Debugging End ---
+        function selectAllParticipants() {
+            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
-			input = document.getElementById("medalla-search");
+            participantCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
 
-			// --- Debugging Start ---
-			if (!input) {
-				console.error("ERROR: Element with ID 'medalla-search' not found.");
-				return; // Exit function if input element isn't found
-			}
-			// --- Debugging End ---
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+            updateSelectedCount();
+        }
 
-			filter = input.value.toUpperCase();
+        function clearAllParticipants() {
+            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
-			// --- Debugging Start ---
-			console.log("Input value (raw):", input.value);
-			console.log("Filter value (toUpperCase):", filter);
-			// --- Debugging End ---
+            participantCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
 
-			medallaList = document.getElementById("medalla-list");
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+            updateSelectedCount();
+        }
 
-			// --- Debugging Start ---
-			if (!medallaList) {
-				console.error("ERROR: Element with ID 'medalla-list' not found.");
-				return; // Exit function if medallaList element isn't found
-			}
-			console.log("Medal list element found:", medallaList);
-			// --- Debugging End ---
+        // ------ Función para filtrar medallas ------
+        function filterMedals() {
+            const searchInput = document.getElementById('medalla-search').value.toLowerCase();
+            const medalItems = document.querySelectorAll('.medalla-item');
 
-			medallas = medallaList.getElementsByClassName("medalla-item");
+            medalItems.forEach(item => {
+                const label = item.querySelector('.form-check-label').textContent.toLowerCase();
+                if (label.includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
-			// --- Debugging Start ---
-			console.log("Number of 'medalla-item' elements found:", medallas.length);
-			if (medallas.length === 0) {
-				console.warn("WARNING: No elements with class 'medalla-item' found inside 'medalla-list'. Check your HTML structure.");
-			}
-			// --- Debugging End ---
+        function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
+            document.getElementById("nombreGrupo").value = nombreGrupo;
+            document.getElementById("numeroGrupo").value = numeroGrupo;
+            document.getElementById("idParticipante").value = idParticipante;
+            var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+            deleteModal.show();
+        }
 
-			for (i = 0; i < medallas.length; i++) {
-				txtValue = medallas[i].textContent || medallas[i].innerText;
+        function actualizarModalEliminar(nombreGrupo, numeroGrupo, idParticipante) {
+            actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante);
+        }
+    </script>
 
-				// --- Debugging Start ---
-				console.log("--- Processing medal item (index " + i + ") ---");
-				console.log("Original text content of medalla-item:", medallas[i].textContent);
-				console.log("Normalized text value for comparison (txtValue):", txtValue);
-				console.log("txtValue.toUpperCase():", txtValue.toUpperCase());
-				console.log("Does '" + txtValue.toUpperCase() + "' contain '" + filter + "'?", txtValue.toUpperCase().indexOf(filter) > -1);
-				// --- Debugging End ---
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
-				if (txtValue.toUpperCase().indexOf(filter) > -1) {
-					medallas[i].style.display = "";
+    <script>
+        var inscripcionTable = new DataTable('#inscripcionTblCustomers', {
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+            },
+            searching: false,
+            paging: true,
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: "simple_numbers",
+            drawCallback: function () {
+                if (!window.bootstrap?.Tooltip) return;
+                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                    var existing = bootstrap.Tooltip.getInstance(this);
+                    if (!existing) {
+                        new bootstrap.Tooltip(this);
+                    }
+                });
+            }
+        });
 
-					// --- Debugging Start ---
-					console.log("  -> Match! Setting display to '' (showing).");
-					// --- Debugging End ---
-				} else {
-					medallas[i].style.display = "none";
-					// --- Debugging Start ---
-					console.log("  -> No match. Setting display to 'none' (hiding).");
-					// --- Debugging End ---
-				}
-			}
-			// --- Debugging Start ---
-			console.log("--- filterMedals function finished ---");
-			// --- Debugging End ---
-		}
-	</script>
+        // Colocar paginación manualmente en su contenedor
+        inscripcionTable.on('draw', function() {
+            var paginationHtml = '';
+            var pageCount = Math.ceil(inscripcionTable.page.info().recordsTotal / inscripcionTable.page.len());
+            var currentPage = inscripcionTable.page() + 1;
+
+            // Botón anterior
+            if (currentPage > 1) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="inscripcionTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+            }
+
+            // Números de página
+            for (var i = 1; i <= pageCount; i++) {
+                if (i === currentPage) {
+                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+                } else {
+                    paginationHtml += '<a href="#" class="paginate_button" onclick="inscripcionTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
+                }
+            }
+
+            // Botón siguiente
+            if (currentPage < pageCount) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="inscripcionTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+            }
+
+            document.getElementById('inscripcionTblPaginacion').innerHTML = paginationHtml;
+        });
+
+        // Conectar el selector de "Mostrar X registros" con DataTable
+        document.getElementById('inscripcionPageSize').addEventListener('change', function() {
+            var value = parseInt(this.value);
+            inscripcionTable.page.len(value).draw();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.bootstrap?.Tooltip) return;
+            $('#inscripcionTblCustomers [data-bs-toggle="tooltip"]').each(function () {
+                if (!bootstrap.Tooltip.getInstance(this)) {
+                    new bootstrap.Tooltip(this);
+                }
+            });
+        });
+    </script>
 }
 else
 {
-	<script>
-		window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
-	</script>
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
 }
-
-<script type="text/javascript">
-	function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
-		document.getElementById("nombreGrupo").value = nombreGrupo;
-		document.getElementById("numeroGrupo").value = numeroGrupo;
-		document.getElementById("idParticipante").value = idParticipante;
-	}
-</script>
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
-<script>
-	var table = new DataTable('#tblCustomers', {
-		language: {
-			url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-		},
-		"searching": false
-	});
-</script>
-
-<script>
-	document.getElementById('refreshButton').addEventListener('click', function (event) {
-		event.preventDefault();
-		document.getElementById('refreshForm').submit(); 
-	});
-</script>

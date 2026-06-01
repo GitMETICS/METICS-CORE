@@ -255,50 +255,39 @@
 
         <div class="table-responsive" style="padding-bottom: 220px;">
 
-            <div class="d-flex justify-content-between">
-                <div class="mb-3" style="width: 70%;">
+            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
                     @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
-                        <form>
-                            <small class="ms-1 text-secondary">Subir lista de participantes</small>
-                            <div class="mb-2 d-flex align-items-center">
-                                <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="max-width: 500px;" required>
-                                <input class="btn btn-secondary ms-2" type="submit" value="Subir archivo">
-                            </div>
-                        </form>
+                        <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de participantes</small>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
+                            <input class="btn btn-secondary" type="submit" value="Subir" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">
+                        </div>
                     }
-                    <div class="mb-4 bg-light p-3 rounded d-flex" style="max-width: 750px;">
-                        <h4><i class="bi bi-exclamation-circle-fill me-2 p-2 text-secondary"></i></h4>
-                        <small class="text-muted">
-                            Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas:
-                            <br />
-                            Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas
-                            <br />
-                            @Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirParticipantes", "Participante", new { }, new { @class = "btn btn-small btn-outline-secondary mt-2" })
-                        </small>
-                    </div>
                 </div>
 
-                <div class="d-flex justify-content-end">
-                    <div class="mx-1">
-                        @Html.ActionLink("   PDF", "ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                    </div>
-                    <div class="mx-1">
-                        @Html.ActionLink("   Excel (1)", "ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                    </div>
-                    <div class="mx-1">
-                        @Html.ActionLink("   Excel (2)", "ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                    </div>
-                    <div class="mx-1">
-                        @Html.ActionLink("   Word", "ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download" })
-                    </div>
-                    <div class="mx-1">
-                        @Html.ActionLink("   Agregar", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
+                <div style="flex-shrink: 0;">
+                    <small class="text-secondary" style="display: block; margin-bottom: 8px;">Exportar datos:</small>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="@Url.Action("ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">PDF</a>
+                        <a href="@Url.Action("ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 1</a>
+                        <a href="@Url.Action("ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 2</a>
+                        <a href="@Url.Action("ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Word</a>
                     </div>
                 </div>
             </div>
 
-            
+            <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
+                <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
+                <small class="text-muted" style="flex: 1;">
+                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas</strong>
+                    <br />
+                    <a href="@Url.Action("DescargarPlantillaSubirParticipantes", "Participante")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
+                </small>
+            </div>
+
+
 
             @if (ViewBag.ListaParticipantes == null)
             {
@@ -313,26 +302,32 @@
                         <span style="font-size: 12px; color: #555;">Listado de participantes registrados en el sistema</span>
                     </div>
 
-                    <!-- Controles: Mostrar registros y búsqueda -->
-                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
-                            <select id="pageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
-                                <option selected>5</option>
-                                <option>10</option>
-                                <option>25</option>
-                                <option>50</option>
-                            </select>
-                            <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                    <!-- Controles: Mostrar registros, búsqueda y crear -->
+                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
+                                <select id="pageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                </select>
+                                <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                            </div>
+
+                            <div style="flex: 1; max-width: 400px;">
+                                <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" style="display: flex; gap: 5px;">
+                                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
+                                    <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
-                        <div style="flex: 1; max-width: 400px;">
-                            <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" style="display: flex; gap: 5px;">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
-                                <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </form>
+                        <div style="flex-shrink: 0;">
+                            @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus", style = "font-size: 12px; padding: 4px 12px;" })
                         </div>
                     </div>
 
