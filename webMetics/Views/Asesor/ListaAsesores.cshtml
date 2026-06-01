@@ -116,16 +116,6 @@
             </div>
         }
 
-        <div class="d-flex justify-content-between mb-4">
-            <div></div>
-
-            <div class="d-flex justify-content-end">
-                <div class="mx-1">
-                    @Html.ActionLink("   Agregar", "CrearAsesor", "Asesor", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
-                </div>
-            </div>
-        </div>
-
         <div class="table-responsive">
             @if (ViewBag.Asesores == null)
             {
@@ -140,26 +130,32 @@
                         <span style="font-size: 12px; color: #555;">Listado de facilitadores(as) registrados en el sistema</span>
                     </div>
 
-                    <!-- Controles: Mostrar registros y búsqueda -->
-                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
-                            <select id="asesorPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
-                                <option selected>5</option>
-                                <option>10</option>
-                                <option>25</option>
-                                <option>50</option>
-                            </select>
-                            <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                    <!-- Controles: Mostrar registros, búsqueda y crear -->
+                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
+                                <select id="asesorPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                </select>
+                                <label for="asesorPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                            </div>
+
+                            <div style="flex: 1; max-width: 400px;">
+                                <form asp-action="BuscarAsesores" asp-controller="Asesor" method="get" style="display: flex; gap: 5px;">
+                                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar facilitador(a)" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
+                                    <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
-                        <div style="flex: 1; max-width: 400px;">
-                            <form asp-action="BuscarAsesores" asp-controller="Asesor" method="get" style="display: flex; gap: 5px;">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar facilitador(a)" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
-                                <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </form>
+                        <div style="flex-shrink: 0;">
+                            @Html.ActionLink("  Crear Facilitador(a)", "CrearAsesor", "Asesor", new { }, new { @class = "btn btn-primary bi bi-plus-lg", style = "font-size: 12px; padding: 4px 12px;" })
                         </div>
                     </div>
 
