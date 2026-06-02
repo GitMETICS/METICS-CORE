@@ -1,7 +1,7 @@
 @using webMetics.Controllers
 
 <!--
-    Vista para mostrar la lista de todos los asesores con la información personal de cada uno
+    Vista para mostrar la lista de todos los asesores con la informaciÃ³n personal de cada uno
     Se muestran las opciones de poder eliminar, editar o crear un asesor
 -->
 
@@ -130,7 +130,7 @@
                         <span style="font-size: 12px; color: #555;">Listado de facilitadores(as) registrados en el sistema</span>
                     </div>
 
-                    <!-- Controles: Mostrar registros, búsqueda y crear -->
+                    <!-- Controles: Mostrar registros, bÃºsqueda y crear -->
                     <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: space-between;">
                         <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 6px;">
@@ -168,8 +168,8 @@
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 9%;">Primer Apellido</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 9%;">Segundo Apellido</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 13%;">Correo Institucional</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">Descripción</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 6%;">Teléfono</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">DescripciÃ³n</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 6%;">TelÃ©fono</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Editar</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;">Eliminar</th>
                                 </tr>
@@ -222,7 +222,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar a este(a) facilitador(a)?
+                    Â¿EstÃ¡ seguro de que desea eliminar a este(a) facilitador(a)?
 
                     @using (Html.BeginForm("EliminarAsesor", "Asesor"))
                     {
@@ -247,14 +247,14 @@ else
 }
 
 <script type="text/javascript">
-    // Función para abrir modal de eliminación
+    // FunciÃ³n para abrir modal de eliminaciÃ³n
     function openAsesorDeleteModal(asesorId) {
         document.getElementById("idAsesor").value = asesorId;
         var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         deleteModal.show();
     }
 
-    // Función heredada para mantener compatibilidad
+    // FunciÃ³n heredada para mantener compatibilidad
     function actualizarModalEliminar(idAsesor) {
         openAsesorDeleteModal(idAsesor);
     }
@@ -265,65 +265,80 @@ else
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
 <script>
-    var asesorTable = new DataTable('#asesorTblCustomers', {
-        language: {
-            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-        },
-        searching: false,
-        paging: true,
-        pageLength: 5,
-        lengthMenu: [5, 10, 25, 50],
-        info: false,
-        lengthChange: false,
-        dom: 't',
-        pagingType: "simple_numbers",
-        drawCallback: function () {
-            if (!window.bootstrap?.Tooltip) return;
-            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                var existing = bootstrap.Tooltip.getInstance(this);
-                if (!existing) {
-                    new bootstrap.Tooltip(this);
+    var asesorTableElement = document.getElementById('asesorTblCustomers');
+    var asesorTablePageSize = document.getElementById('asesorPageSize');
+    var asesorTablePagination = document.getElementById('asesorTblPaginacion');
+    var asesorTable;
+
+    if (asesorTableElement) {
+        asesorTable = new DataTable('#asesorTblCustomers', {
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+            },
+            searching: false,
+            paging: true,
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: "simple_numbers",
+            drawCallback: function () {
+                if (!window.bootstrap?.Tooltip) return;
+                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                    var existing = bootstrap.Tooltip.getInstance(this);
+                    if (!existing) {
+                        new bootstrap.Tooltip(this);
+                    }
+                });
+            }
+        });
+
+        function renderAsesorPagination() {
+            if (!asesorTablePagination) return;
+
+            var paginationHtml = '';
+            var pageInfo = asesorTable.page.info();
+            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
+            var currentPage = pageInfo.page + 1;
+
+            if (pageCount <= 1) {
+                asesorTablePagination.innerHTML = '';
+                return;
+            }
+
+            if (currentPage > 1) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+            }
+
+            for (var i = 1; i <= pageCount; i++) {
+                if (i === currentPage) {
+                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+                } else {
+                    paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
                 }
+            }
+
+            if (currentPage < pageCount) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+            }
+
+            asesorTablePagination.innerHTML = paginationHtml;
+        }
+
+        asesorTable.on('draw', renderAsesorPagination);
+        renderAsesorPagination();
+
+        if (asesorTablePageSize) {
+            asesorTablePageSize.addEventListener('change', function() {
+                var value = parseInt(this.value);
+                asesorTable.page.len(value).draw();
             });
         }
-    });
-
-    // Colocar paginación manualmente en su contenedor
-    asesorTable.on('draw', function() {
-        var paginationHtml = '';
-        var pageCount = Math.ceil(asesorTable.page.info().recordsTotal / asesorTable.page.len());
-        var currentPage = asesorTable.page() + 1;
-
-        // Botón anterior
-        if (currentPage > 1) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-        }
-
-        // Números de página
-        for (var i = 1; i <= pageCount; i++) {
-            if (i === currentPage) {
-                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-            } else {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-            }
-        }
-
-        // Botón siguiente
-        if (currentPage < pageCount) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="asesorTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-        }
-
-        document.getElementById('asesorTblPaginacion').innerHTML = paginationHtml;
-    });
-
-    // Conectar el selector de "Mostrar X registros" con DataTable
-    document.getElementById('asesorPageSize').addEventListener('change', function() {
-        var value = parseInt(this.value);
-        asesorTable.page.len(value).draw();
-    });
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (!window.bootstrap?.Tooltip) return;
+        if (!asesorTableElement || !window.bootstrap?.Tooltip) return;
         $('#asesorTblCustomers [data-bs-toggle="tooltip"]').each(function () {
             if (!bootstrap.Tooltip.getInstance(this)) {
                 new bootstrap.Tooltip(this);

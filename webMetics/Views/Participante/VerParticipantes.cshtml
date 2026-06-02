@@ -486,65 +486,80 @@ else
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
 <script>
-    var table = new DataTable('#tblCustomers', {
-        language: {
-            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-        },
-        searching: false,
-        paging: true,
-        pageLength: 5,
-        lengthMenu: [5, 10, 25, 50],
-        info: false,
-        lengthChange: false,
-        dom: 't',
-        pagingType: "simple_numbers",
-        drawCallback: function () {
-            if (!window.bootstrap?.Tooltip) return;
-            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                var existing = bootstrap.Tooltip.getInstance(this);
-                if (!existing) {
-                    new bootstrap.Tooltip(this);
+    var participanteTableElement = document.getElementById('tblCustomers');
+    var tablePageSize = document.getElementById('pageSize');
+    var tablePagination = document.getElementById('tblPaginacion');
+    var table;
+
+    if (participanteTableElement) {
+        table = new DataTable('#tblCustomers', {
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+            },
+            searching: false,
+            paging: true,
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: "simple_numbers",
+            drawCallback: function () {
+                if (!window.bootstrap?.Tooltip) return;
+                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                    var existing = bootstrap.Tooltip.getInstance(this);
+                    if (!existing) {
+                        new bootstrap.Tooltip(this);
+                    }
+                });
+            }
+        });
+
+        function renderParticipantePagination() {
+            if (!tablePagination) return;
+
+            var paginationHtml = '';
+            var pageInfo = table.page.info();
+            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
+            var currentPage = pageInfo.page + 1;
+
+            if (pageCount <= 1) {
+                tablePagination.innerHTML = '';
+                return;
+            }
+
+            if (currentPage > 1) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+            }
+
+            for (var i = 1; i <= pageCount; i++) {
+                if (i === currentPage) {
+                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+                } else {
+                    paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
                 }
+            }
+
+            if (currentPage < pageCount) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+            }
+
+            tablePagination.innerHTML = paginationHtml;
+        }
+
+        table.on('draw', renderParticipantePagination);
+        renderParticipantePagination();
+
+        if (tablePageSize) {
+            tablePageSize.addEventListener('change', function() {
+                var value = parseInt(this.value);
+                table.page.len(value).draw();
             });
         }
-    });
-
-    // Colocar paginación manualmente en su contenedor
-    table.on('draw', function() {
-        var paginationHtml = '';
-        var pageCount = Math.ceil(table.page.info().recordsTotal / table.page.len());
-        var currentPage = table.page() + 1;
-
-        // Botón anterior
-        if (currentPage > 1) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-        }
-
-        // Números de página
-        for (var i = 1; i <= pageCount; i++) {
-            if (i === currentPage) {
-                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-            } else {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-            }
-        }
-
-        // Botón siguiente
-        if (currentPage < pageCount) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-        }
-
-        document.getElementById('tblPaginacion').innerHTML = paginationHtml;
-    });
-
-    // Conectar el selector de "Mostrar X registros" con DataTable
-    document.getElementById('pageSize').addEventListener('change', function() {
-        var value = parseInt(this.value);
-        table.page.len(value).draw();
-    });
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (!window.bootstrap?.Tooltip) return;
+        if (!participanteTableElement || !window.bootstrap?.Tooltip) return;
         $('#tblCustomers [data-bs-toggle="tooltip"]').each(function () {
             if (!bootstrap.Tooltip.getInstance(this)) {
                 new bootstrap.Tooltip(this);

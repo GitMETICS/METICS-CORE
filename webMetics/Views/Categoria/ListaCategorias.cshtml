@@ -6,7 +6,7 @@
 }
 
 <style>
-    /* Estilos para la tabla de categorías - Diseño Moderno */
+    /* Estilos para la tabla de categorÃ­as - DiseÃ±o Moderno */
     .categoria-table-card {
         background: white;
         border: 2px solid #41ADE7;
@@ -114,7 +114,7 @@
 
         @if (ViewBag.Categorias == null)
         {
-            <h5 class="text-center mb-4">No hay categorías.</h5>
+            <h5 class="text-center mb-4">No hay categorÃ­as.</h5>
             <div class="text-center">
                 @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
             </div>
@@ -128,7 +128,7 @@
                     <span style="font-size: 12px; color: #555;">Listado de niveles registrados en el sistema</span>
                 </div>
 
-                <!-- Controles: Mostrar registros, búsqueda y crear -->
+                <!-- Controles: Mostrar registros, bÃºsqueda y crear -->
                 <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <label for="categoriaPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
@@ -159,7 +159,7 @@
                         <thead>
                             <tr>
                                 <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 30%;">Nombre</th>
-                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 60%;">Descripción</th>
+                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 60%;">DescripciÃ³n</th>
                                 <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Editar</th>
                                 <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Eliminar</th>
                             </tr>
@@ -184,7 +184,7 @@
                     </table>
                 </div>
 
-                <!-- Paginación FUERA del scroll (fija) -->
+                <!-- PaginaciÃ³n FUERA del scroll (fija) -->
                 <div id="categoriaTblPaginacion"></div>
             </div>
         }
@@ -194,11 +194,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categoría</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categorÃ­a</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta categoría?
+                    Â¿EstÃ¡ seguro de que desea eliminar esta categorÃ­a?
                     <br />
                     @using (Html.BeginForm("EliminarCategoria", "Categoria"))
                     {
@@ -228,23 +228,13 @@ else
     }
 
     function buscarCategoria() {
-        // Función para búsqueda en columnas específicas (nombre y descripción)
-        var searchTerm = document.getElementById('categoriaBusqueda').value.toLowerCase().trim();
-        var rows = document.querySelectorAll('#categoriaTblCustomers tbody tr');
+        var searchInput = document.getElementById('categoriaBusqueda');
+        if (!searchInput || !categoriaTable) return;
 
-        rows.forEach(row => {
-            var nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-            var descripcion = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-
-            if (searchTerm === '' || nombre.includes(searchTerm) || descripcion.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        categoriaTable.search(searchInput.value.trim()).draw();
     }
 
-    // Permitir búsqueda al presionar Enter
+    // Permitir bÃºsqueda al presionar Enter
     document.addEventListener('DOMContentLoaded', function() {
         var busquedaInput = document.getElementById('categoriaBusqueda');
         if (busquedaInput) {
@@ -255,7 +245,7 @@ else
                 }
             });
 
-            // También permitir búsqueda mientras se escribe
+            // TambiÃ©n permitir bÃºsqueda mientras se escribe
             busquedaInput.addEventListener('input', function() {
                 buscarCategoria();
             });
@@ -268,65 +258,80 @@ else
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
 <script>
-    var categoriaTable = new DataTable('#categoriaTblCustomers', {
-        language: {
-            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-        },
-        searching: true,
-        paging: true,
-        pageLength: 5,
-        lengthMenu: [5, 10, 25, 50],
-        info: false,
-        lengthChange: false,
-        dom: 't',
-        pagingType: "simple_numbers",
-        drawCallback: function () {
-            if (!window.bootstrap?.Tooltip) return;
-            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                var existing = bootstrap.Tooltip.getInstance(this);
-                if (!existing) {
-                    new bootstrap.Tooltip(this);
+    var categoriaTableElement = document.getElementById('categoriaTblCustomers');
+    var categoriaTablePageSize = document.getElementById('categoriaPageSize');
+    var categoriaTablePagination = document.getElementById('categoriaTblPaginacion');
+    var categoriaTable;
+
+    if (categoriaTableElement) {
+        categoriaTable = new DataTable('#categoriaTblCustomers', {
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+            },
+            searching: true,
+            paging: true,
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: "simple_numbers",
+            drawCallback: function () {
+                if (!window.bootstrap?.Tooltip) return;
+                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                    var existing = bootstrap.Tooltip.getInstance(this);
+                    if (!existing) {
+                        new bootstrap.Tooltip(this);
+                    }
+                });
+            }
+        });
+
+        function renderCategoriaPagination() {
+            if (!categoriaTablePagination) return;
+
+            var paginationHtml = '';
+            var pageInfo = categoriaTable.page.info();
+            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
+            var currentPage = pageInfo.page + 1;
+
+            if (pageCount <= 1) {
+                categoriaTablePagination.innerHTML = '';
+                return;
+            }
+
+            if (currentPage > 1) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+            }
+
+            for (var i = 1; i <= pageCount; i++) {
+                if (i === currentPage) {
+                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+                } else {
+                    paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
                 }
+            }
+
+            if (currentPage < pageCount) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+            }
+
+            categoriaTablePagination.innerHTML = paginationHtml;
+        }
+
+        categoriaTable.on('draw', renderCategoriaPagination);
+        renderCategoriaPagination();
+
+        if (categoriaTablePageSize) {
+            categoriaTablePageSize.addEventListener('change', function() {
+                var value = parseInt(this.value);
+                categoriaTable.page.len(value).draw();
             });
         }
-    });
-
-    // Colocar paginación manualmente en su contenedor
-    categoriaTable.on('draw', function() {
-        var paginationHtml = '';
-        var pageCount = Math.ceil(categoriaTable.page.info().recordsTotal / categoriaTable.page.len());
-        var currentPage = categoriaTable.page() + 1;
-
-        // Botón anterior
-        if (currentPage > 1) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-        }
-
-        // Números de página
-        for (var i = 1; i <= pageCount; i++) {
-            if (i === currentPage) {
-                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-            } else {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-            }
-        }
-
-        // Botón siguiente
-        if (currentPage < pageCount) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-        }
-
-        document.getElementById('categoriaTblPaginacion').innerHTML = paginationHtml;
-    });
-
-    // Conectar el selector de "Mostrar X registros" con DataTable
-    document.getElementById('categoriaPageSize').addEventListener('change', function() {
-        var value = parseInt(this.value);
-        categoriaTable.page.len(value).draw();
-    });
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (!window.bootstrap?.Tooltip) return;
+        if (!categoriaTableElement || !window.bootstrap?.Tooltip) return;
         $('#categoriaTblCustomers [data-bs-toggle="tooltip"]').each(function () {
             if (!bootstrap.Tooltip.getInstance(this)) {
                 new bootstrap.Tooltip(this);

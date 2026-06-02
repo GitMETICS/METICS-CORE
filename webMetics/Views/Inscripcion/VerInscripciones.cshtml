@@ -6,7 +6,7 @@
 }
 
 <style>
-    /* Estilos para la tabla de inscripciones - Diseño Moderno */
+    /* Estilos para la tabla de inscripciones - DiseÃ±o Moderno */
     .inscripcion-table-card {
         background: white;
         border: 2px solid #41ADE7;
@@ -158,7 +158,7 @@
             <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
                 <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
                 <small class="text-muted" style="flex: 1;">
-                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas: <strong>Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas</strong>
+                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas: <strong>Correo Institucional, MÃ³dulo, Grupo, Horas, Estado, Horas Completadas</strong>
                     <br />
                     <a href="@Url.Action("DescargarPlantillaSubirInscripciones", "Inscripcion")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
                 </small>
@@ -168,7 +168,7 @@
 
             @if (ViewBag.ListaInscripciones == null)
             {
-                <h5 class="text-center">No hay personas inscritas en módulos.</h5>
+                <h5 class="text-center">No hay personas inscritas en mÃ³dulos.</h5>
 
                 <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
                     <form id="refreshForm" method="post" action="@Url.Action("CargarParticipantesPorModulos", "Participante")" class="text-center w-100">
@@ -181,13 +181,13 @@
             }
             else
             {
-                <!-- Sección de Asignación de Medallas -->
+                <!-- SecciÃ³n de AsignaciÃ³n de Medallas -->
                 <div class="mb-4">
                     <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title mb-3">
-                                    <i class="bi bi-award me-2"></i>Asignación Masiva de Medallas
+                                    <i class="bi bi-award me-2"></i>AsignaciÃ³n Masiva de Medallas
                                 </h5>
 
                                 <div class="row">
@@ -252,7 +252,7 @@
                     </form>
                 </div>
 
-                <!-- Barra de búsqueda y controles -->
+                <!-- Barra de bÃºsqueda y controles -->
                 <div class="inscripcion-table-card">
                     <!-- Encabezado de tarjeta -->
                     <div class="inscripcion-table-header">
@@ -260,7 +260,7 @@
                         <span style="font-size: 12px; color: #555;">Listado de inscripciones registradas en el sistema</span>
                     </div>
 
-                    <!-- Controles: Refresh y búsqueda -->
+                    <!-- Controles: Refresh y bÃºsqueda -->
                     <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <form id="refreshForm2" method="post" action="@Url.Action("VerInscripciones", "Inscripcion")" style="margin: 0;">
                             <input type="hidden" name="reload" value="true" />
@@ -282,7 +282,7 @@
 
                         <div style="flex: 1; max-width: 400px;">
                             <form asp-action="BuscarInscripciones" asp-controller="Inscripcion" method="get" style="display: flex; gap: 5px;">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripciÃ³n" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
                                 <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
                                     <i class="bi bi-search"></i>
                                 </button>
@@ -304,7 +304,7 @@
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 7%;">Primer Apellido</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 7%;">Segundo Apellido</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 12%;">Correo Institucional</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">Módulo</th>
+                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 15%;">MÃ³dulo</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 8%;">Estado</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 8%;">Horas Inscritas</th>
                                     <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 8%;">Horas Aprobadas</th>
@@ -340,7 +340,7 @@
                                                                                         new { @class = "inscripcion-icon-ver bi bi-search", @title = "Ver datos del participante" })
                                         </td>
                                         <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
-                                            <a href="#" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante'); return false;" class="inscripcion-icon-eliminar bi bi-trash" title="Eliminar inscripción">
+                                            <a href="#" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante'); return false;" class="inscripcion-icon-eliminar bi bi-trash" title="Eliminar inscripciÃ³n">
                                             </a>
                                         </td>
                                     </tr>
@@ -349,23 +349,23 @@
                         </table>
                     </div>
 
-                    <!-- Paginación FUERA del scroll (fija) -->
+                    <!-- PaginaciÃ³n FUERA del scroll (fija) -->
                     <div id="inscripcionTblPaginacion"></div>
                 </div>
             }
         </div>
     </div>
 
-    <!-- Ventana emergente de eliminación -->
+    <!-- Ventana emergente de eliminaciÃ³n -->
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar inscripciÃ³n</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Está seguro de que desea eliminar la inscripción de este participante?
+                    Â¿EstÃ¡ seguro de que desea eliminar la inscripciÃ³n de este participante?
                     <br />
                     @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
                     {
@@ -385,7 +385,7 @@
         </div>
     </div>
 
-    <!-- JavaScript para la funcionalidad de selección de participantes y filtro de medallas -->
+    <!-- JavaScript para la funcionalidad de selecciÃ³n de participantes y filtro de medallas -->
     <script>
         function updateSelectedCount() {
             const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
@@ -443,7 +443,7 @@
             updateSelectedCount();
         }
 
-        // ------ Función para filtrar medallas ------
+        // ------ FunciÃ³n para filtrar medallas ------
         function filterMedals() {
             const searchInput = document.getElementById('medalla-search').value.toLowerCase();
             const medalItems = document.querySelectorAll('.medalla-item');
@@ -476,7 +476,13 @@
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
     <script>
-        var inscripcionTable = new DataTable('#inscripcionTblCustomers', {
+    var inscripcionTableElement = document.getElementById('inscripcionTblCustomers');
+    var inscripcionTablePageSize = document.getElementById('inscripcionPageSize');
+    var inscripcionTablePagination = document.getElementById('inscripcionTblPaginacion');
+    var inscripcionTable;
+
+    if (inscripcionTableElement) {
+        inscripcionTable = new DataTable('#inscripcionTblCustomers', {
             language: {
                 url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
             },
@@ -499,18 +505,23 @@
             }
         });
 
-        // Colocar paginación manualmente en su contenedor
-        inscripcionTable.on('draw', function() {
-            var paginationHtml = '';
-            var pageCount = Math.ceil(inscripcionTable.page.info().recordsTotal / inscripcionTable.page.len());
-            var currentPage = inscripcionTable.page() + 1;
+        function renderInscripcionPagination() {
+            if (!inscripcionTablePagination) return;
 
-            // Botón anterior
+            var paginationHtml = '';
+            var pageInfo = inscripcionTable.page.info();
+            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
+            var currentPage = pageInfo.page + 1;
+
+            if (pageCount <= 1) {
+                inscripcionTablePagination.innerHTML = '';
+                return;
+            }
+
             if (currentPage > 1) {
                 paginationHtml += '<a href="#" class="paginate_button" onclick="inscripcionTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
             }
 
-            // Números de página
             for (var i = 1; i <= pageCount; i++) {
                 if (i === currentPage) {
                     paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
@@ -519,29 +530,33 @@
                 }
             }
 
-            // Botón siguiente
             if (currentPage < pageCount) {
                 paginationHtml += '<a href="#" class="paginate_button" onclick="inscripcionTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
             }
 
-            document.getElementById('inscripcionTblPaginacion').innerHTML = paginationHtml;
-        });
+            inscripcionTablePagination.innerHTML = paginationHtml;
+        }
 
-        // Conectar el selector de "Mostrar X registros" con DataTable
-        document.getElementById('inscripcionPageSize').addEventListener('change', function() {
-            var value = parseInt(this.value);
-            inscripcionTable.page.len(value).draw();
-        });
+        inscripcionTable.on('draw', renderInscripcionPagination);
+        renderInscripcionPagination();
 
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!window.bootstrap?.Tooltip) return;
-            $('#inscripcionTblCustomers [data-bs-toggle="tooltip"]').each(function () {
-                if (!bootstrap.Tooltip.getInstance(this)) {
-                    new bootstrap.Tooltip(this);
-                }
+        if (inscripcionTablePageSize) {
+            inscripcionTablePageSize.addEventListener('change', function() {
+                var value = parseInt(this.value);
+                inscripcionTable.page.len(value).draw();
             });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!inscripcionTableElement || !window.bootstrap?.Tooltip) return;
+        $('#inscripcionTblCustomers [data-bs-toggle="tooltip"]').each(function () {
+            if (!bootstrap.Tooltip.getInstance(this)) {
+                new bootstrap.Tooltip(this);
+            }
         });
-    </script>
+    });
+</script>
 }
 else
 {

@@ -1,12 +1,12 @@
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "¡reas de Competencia";
+    ViewBag.Title = "√Åreas de Competencia";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 <style>
-    /* Estilos para la tabla de temas - DiseÒo Moderno */
+    /* Estilos para la tabla de temas - Dise√±o Moderno */
     .tema-table-card {
         background: white;
         border: 2px solid #41ADE7;
@@ -116,7 +116,7 @@
         {
             <h5 class="text-center mb-4">No hay temas.</h5>
             <div class="text-center">
-                @Html.ActionLink("  Crear ¡rea de Competencia", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                @Html.ActionLink("  Crear √Årea de Competencia", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
             </div>
         }
         else
@@ -124,11 +124,11 @@
             <div class="tema-table-card">
                 <!-- Encabezado de tarjeta -->
                 <div class="tema-table-header">
-                    <span style="font-weight: bold; font-size: 14px; color: #204C6F;">¡reas de Competencia</span>
-                    <span style="font-size: 12px; color: #555;">Listado de ·reas de competencia registradas en el sistema</span>
+                    <span style="font-weight: bold; font-size: 14px; color: #204C6F;">√Åreas de Competencia</span>
+                    <span style="font-size: 12px; color: #555;">Listado de √°reas de competencia registradas en el sistema</span>
                 </div>
 
-                <!-- Controles: Mostrar registros, b˙squeda y crear -->
+                <!-- Controles: Mostrar registros, b√∫squeda y crear -->
                 <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <div style="display: flex; align-items: center; gap: 6px;">
@@ -143,7 +143,7 @@
                         </div>
 
                         <div style="flex: 1; min-width: 200px; display: flex; gap: 5px;">
-                            <input type="text" id="temaBusqueda" class="form-control" placeholder="Buscar ·rea de competencia" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px; flex: 1; min-width: 0;" />
+                            <input type="text" id="temaBusqueda" class="form-control" placeholder="Buscar √°rea de competencia" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px; flex: 1; min-width: 0;" />
                             <button onclick="buscarTema()" class="btn btn-sm" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px; flex-shrink: 0;">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -151,7 +151,7 @@
                     </div>
 
                     <div style="flex-shrink: 0;">
-                        @Html.ActionLink("  Crear ¡rea", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg", style = "font-size: 12px; padding: 4px 12px;" })
+                        @Html.ActionLink("  Crear √Årea", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg", style = "font-size: 12px; padding: 4px 12px;" })
                     </div>
                 </div>
 
@@ -184,7 +184,7 @@
                     </table>
                 </div>
 
-                <!-- PaginaciÛn FUERA del scroll (fija) -->
+                <!-- Paginaci√≥n FUERA del scroll (fija) -->
                 <div id="temaTblPaginacion"></div>
             </div>
         }
@@ -194,11 +194,11 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar ·rea de competencia</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar √Årea de competencia</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    øEst· seguro de que desea eliminar esta ·rea de competencia?
+                    ¬øEst√° seguro de que desea eliminar esta √°rea de competencia?
                     <br />
                     @using (Html.BeginForm("EliminarTema", "Tema"))
                     {
@@ -228,22 +228,13 @@ else
     }
 
     function buscarTema() {
-        // FunciÛn para b˙squeda en columnas especÌficas (nombre)
-        var searchTerm = document.getElementById('temaBusqueda').value.toLowerCase().trim();
-        var rows = document.querySelectorAll('#temaTblCustomers tbody tr');
+        var searchInput = document.getElementById('temaBusqueda');
+        if (!searchInput || !temaTable) return;
 
-        rows.forEach(row => {
-            var nombre = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-
-            if (searchTerm === '' || nombre.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        temaTable.search(searchInput.value.trim()).draw();
     }
 
-    // Permitir b˙squeda al presionar Enter
+    // Permitir b√∫squeda al presionar Enter
     document.addEventListener('DOMContentLoaded', function() {
         var busquedaInput = document.getElementById('temaBusqueda');
         if (busquedaInput) {
@@ -254,7 +245,7 @@ else
                 }
             });
 
-            // TambiÈn permitir b˙squeda mientras se escribe
+            // Tambi√©n permitir b√∫squeda mientras se escribe
             busquedaInput.addEventListener('input', function() {
                 buscarTema();
             });
@@ -267,65 +258,80 @@ else
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
 <script>
-    var temaTable = new DataTable('#temaTblCustomers', {
-        language: {
-            url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-        },
-        searching: false,
-        paging: true,
-        pageLength: 5,
-        lengthMenu: [5, 10, 25, 50],
-        info: false,
-        lengthChange: false,
-        dom: 't',
-        pagingType: "simple_numbers",
-        drawCallback: function () {
-            if (!window.bootstrap?.Tooltip) return;
-            $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                var existing = bootstrap.Tooltip.getInstance(this);
-                if (!existing) {
-                    new bootstrap.Tooltip(this);
+    var temaTableElement = document.getElementById('temaTblCustomers');
+    var temaTablePageSize = document.getElementById('temaPageSize');
+    var temaTablePagination = document.getElementById('temaTblPaginacion');
+    var temaTable;
+
+    if (temaTableElement) {
+        temaTable = new DataTable('#temaTblCustomers', {
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+            },
+            searching: true,
+            paging: true,
+            pageLength: 5,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: "simple_numbers",
+            drawCallback: function () {
+                if (!window.bootstrap?.Tooltip) return;
+                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
+                    var existing = bootstrap.Tooltip.getInstance(this);
+                    if (!existing) {
+                        new bootstrap.Tooltip(this);
+                    }
+                });
+            }
+        });
+
+        function renderTemaPagination() {
+            if (!temaTablePagination) return;
+
+            var paginationHtml = '';
+            var pageInfo = temaTable.page.info();
+            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
+            var currentPage = pageInfo.page + 1;
+
+            if (pageCount <= 1) {
+                temaTablePagination.innerHTML = '';
+                return;
+            }
+
+            if (currentPage > 1) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
+            }
+
+            for (var i = 1; i <= pageCount; i++) {
+                if (i === currentPage) {
+                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
+                } else {
+                    paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
                 }
+            }
+
+            if (currentPage < pageCount) {
+                paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
+            }
+
+            temaTablePagination.innerHTML = paginationHtml;
+        }
+
+        temaTable.on('draw', renderTemaPagination);
+        renderTemaPagination();
+
+        if (temaTablePageSize) {
+            temaTablePageSize.addEventListener('change', function() {
+                var value = parseInt(this.value);
+                temaTable.page.len(value).draw();
             });
         }
-    });
-
-    // Colocar paginaciÛn manualmente en su contenedor
-    temaTable.on('draw', function() {
-        var paginationHtml = '';
-        var pageCount = Math.ceil(temaTable.page.info().recordsTotal / temaTable.page.len());
-        var currentPage = temaTable.page() + 1;
-
-        // BotÛn anterior
-        if (currentPage > 1) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-        }
-
-        // N˙meros de p·gina
-        for (var i = 1; i <= pageCount; i++) {
-            if (i === currentPage) {
-                paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-            } else {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-            }
-        }
-
-        // BotÛn siguiente
-        if (currentPage < pageCount) {
-            paginationHtml += '<a href="#" class="paginate_button" onclick="temaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-        }
-
-        document.getElementById('temaTblPaginacion').innerHTML = paginationHtml;
-    });
-
-    // Conectar el selector de "Mostrar X registros" con DataTable
-    document.getElementById('temaPageSize').addEventListener('change', function() {
-        var value = parseInt(this.value);
-        temaTable.page.len(value).draw();
-    });
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (!window.bootstrap?.Tooltip) return;
+        if (!temaTableElement || !window.bootstrap?.Tooltip) return;
         $('#temaTblCustomers [data-bs-toggle="tooltip"]').each(function () {
             if (!bootstrap.Tooltip.getInstance(this)) {
                 new bootstrap.Tooltip(this);
