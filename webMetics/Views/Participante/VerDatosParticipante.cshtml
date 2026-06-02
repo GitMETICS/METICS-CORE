@@ -3,6 +3,24 @@
     ViewBag.Title = "Módulos del Participante";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    var volverController = "Inscripcion";
+    var volverAction = "VerInscripciones";
+    object volverRouteValues = new { };
+    var volverTexto = "Regresar";
+
+    if (ViewBag.IdGrupo != null)
+    {
+        volverController = "Participante";
+        volverAction = "ListaParticipantes";
+        volverRouteValues = new { idGrupo = ViewBag.IdGrupo };
+        volverTexto = "Regresar a Módulo";
+    }
+    else if (!string.IsNullOrWhiteSpace(urlReferrer) &&
+             urlReferrer.Contains("/Participante/VerParticipantes", StringComparison.OrdinalIgnoreCase))
+    {
+        volverController = "Participante";
+        volverAction = "VerParticipantes";
+    }
 }
 
 <style>
@@ -30,6 +48,84 @@
     max-height: 200px;
     margin-bottom: 5px;
     }
+
+    .participante-detalle-card {
+        background: white;
+        border: 2px solid #41ADE7;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .participante-detalle-header {
+        background: #E3F3FB;
+        border-bottom: 1px solid #CCCCCC;
+        padding: 11px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .participante-detalle-wrapper {
+        overflow-x: auto;
+        width: 100%;
+        background: white;
+    }
+
+    .participante-detalle-table {
+        border-collapse: collapse;
+        font-size: 12px;
+        width: 100%;
+        min-width: 1100px;
+        background: white;
+        margin: 0;
+    }
+
+    .participante-detalle-table th {
+        background: #ECECEC;
+        border: 1px solid #CCCCCC;
+        padding: 9px;
+        font-weight: bold;
+        white-space: nowrap;
+        color: #333;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .participante-detalle-table td {
+        border: 1px solid #CCCCCC;
+        padding: 8px 9px;
+        vertical-align: top;
+    }
+
+    .participante-detalle-table .detalle-label {
+        width: 16%;
+        background: #F9F9F9;
+        color: #204C6F;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .participante-detalle-table .detalle-value {
+        width: 34%;
+    }
+
+    .detalle-empty {
+        color: #777;
+    }
+
+    .detalle-badge {
+        display: inline-block;
+        background: #E3F3FB;
+        border: 1px solid #41ADE7;
+        border-radius: 2px;
+        color: #204C6F;
+        font-size: 12px;
+        margin: 2px 4px 2px 0;
+        padding: 2px 6px;
+    }
 </style>
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
@@ -38,18 +134,9 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                @if (ViewBag.IdGrupo != null)
-                {
-                    <a class="text-dark fs-4" href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })">
-                        <i class="bi bi-arrow-left"> </i>
-                    </a>
-                }
-                else
-                {
-                    <a class="text-dark fs-4" href="@Url.Action("VerInscripciones", "Inscripcion")">
-                        <i class="bi bi-arrow-left"> </i>
-                    </a>
-                }
+                <a class="text-dark fs-4" href="@Url.Action(volverAction, volverController, volverRouteValues)">
+                    <i class="bi bi-arrow-left"> </i>
+                </a>
             </div>
         }
 
@@ -178,80 +265,118 @@
                 var nombreCompleto = ViewBag.Participante.nombre;
                 nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
-                <table class="table table-striped mt-3">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre Completo</th>
-                            <th scope="col">Correo Institucional</th>
-                            <th scope="col">Módulos Inscritos</th>
-                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Inscritas</th>
-                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
-                        </tr>
-                    </thead>
+                if (ViewBag.Participante.segundoApellido != "-")
+                {
+                    nombreCompleto += " " + ViewBag.Participante.segundoApellido;
+                }
 
-                    <tbody class="align-middle">
-                        @if (ViewBag.Participante.segundoApellido != "-")
-                        {
-                            nombreCompleto += " " + ViewBag.Participante.segundoApellido;
-                        }
+                var participante = ViewBag.Participante;
+                var areasParticipante = participante.areasExtra as List<string> ?? new List<string>();
+                string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+                string NotificationStatus(int value) => value != 0 ? "Enviada" : "No enviada";
 
-                        <tr>
-                            <td class="">
-                                <span>@nombreCompleto</span>
-                            </td>
+                <div class="participante-detalle-card">
+                    <div class="participante-detalle-header">
+                        <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Datos del participante</span>
+                        <span style="font-size: 12px; color: #555;">Información completa registrada en el sistema</span>
+                    </div>
 
-                            <td class="">
-                                <span>@ViewBag.Participante.idParticipante</span>
-                            </td>
-
-                            <td class="">
-                                @foreach (var inscripcion in ViewBag.Inscripciones)
-                                {
-                                    <div class="my-2"><i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
-                                }
-                            </td>
-
-                            <td class="text-center">
-                                <span>@(ViewBag.Participante.horasMatriculadas)</span>
-                            </td>
-
-                            <td class="text-center">
-                                <span>@ViewBag.Participante.horasAprobadas</span>
-                            </td>
-                        </tr>
-                        @* NUEVA FILA — Carrera y Áreas Extra *@
-                        <tr style="background-color:#f8f9fa;">
-                            <td colspan="2">
-                                <span class="text-muted small">Carrera: </span>
-                                @if (string.IsNullOrWhiteSpace(ViewBag.Participante.carrera))
-                                {
-                                    <span class="badge bg-warning text-dark">Sin actualizar</span>
-                                }
-                                else
-                                {
-                                    <strong>@ViewBag.Participante.carrera</strong>
-                                }
-                            </td>
-                            <td colspan="3">
-                                <span class="text-muted small">Áreas Extra: </span>
-                                @{
-                                    var areasParticipante = ViewBag.Participante.areasExtra as List<string> ?? new List<string>();
-                                }
-                                @if (!areasParticipante.Any())
-                                {
-                                    <span class="text-muted">Ninguna</span>
-                                }
-                                else
-                                {
-                                    foreach (var area in areasParticipante)
-                                    {
-                                        <span class="badge bg-primary me-1">@area</span>
-                                    }
-                                }
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <div class="participante-detalle-wrapper">
+                        <table class="participante-detalle-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="4">Información personal y académica</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="detalle-label">Nombre completo</td>
+                                    <td class="detalle-value">@nombreCompleto</td>
+                                    <td class="detalle-label">Correo institucional</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.correo)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Correo alternativo</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.correoAlternativo)</td>
+                                    <td class="detalle-label">Grado académico</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.gradoAcademico)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Tipo de identificación</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.tipoIdentificacion)</td>
+                                    <td class="detalle-label">Número de identificación</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.numeroIdentificacion)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Área principal</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.area)</td>
+                                    <td class="detalle-label">Áreas extra</td>
+                                    <td class="detalle-value">
+                                        @if (!areasParticipante.Any())
+                                        {
+                                            <span class="detalle-empty">Ninguna</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var area in areasParticipante)
+                                            {
+                                                <span class="detalle-badge">@area</span>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Facultad o departamento</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.departamento)</td>
+                                    <td class="detalle-label">Unidad académica</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.unidadAcademica)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Sede y recinto</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.sede)</td>
+                                    <td class="detalle-label">Carrera</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.carrera)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Tipo de participante</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.tipoParticipante)</td>
+                                    <td class="detalle-label">Condición</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.condicion)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Teléfono</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.telefono)</td>
+                                    <td class="detalle-label">Identificador</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.idParticipante)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Total horas inscritas</td>
+                                    <td class="detalle-value">@participante.horasMatriculadas</td>
+                                    <td class="detalle-label">Total horas aprobadas</td>
+                                    <td class="detalle-value">@participante.horasAprobadas</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Notificación de límite de horas</td>
+                                    <td class="detalle-value">@NotificationStatus(participante.correoNotificacionEnviado)</td>
+                                    <td class="detalle-label">Módulos inscritos</td>
+                                    <td class="detalle-value">
+                                        @if (ViewBag.Inscripciones == null)
+                                        {
+                                            <span class="detalle-empty">Ninguno</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var inscripcion in ViewBag.Inscripciones)
+                                            {
+                                                <div>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
                 <table class="w-100">
                     <tbody>
@@ -324,13 +449,7 @@
             }
             <hr />
             <div class="d-flex my-4 justify-content-center">
-                @if (ViewBag.IdGrupo != null)
-                {
-                    <a href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })" class="btn btn-secondary btn-block">Regresar a Módulo</a>
-                }
-                else {
-                    <a href="@Url.Action("VerInscripciones", "Inscripcion")" class="btn btn-secondary btn-block">Regresar</a>
-                }
+                <a href="@Url.Action(volverAction, volverController, volverRouteValues)" class="btn btn-secondary btn-block">@volverTexto</a>
             </div>
         </div>
 
