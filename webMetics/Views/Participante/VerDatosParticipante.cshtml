@@ -126,6 +126,98 @@
         margin: 2px 4px 2px 0;
         padding: 2px 6px;
     }
+
+    .modulos-detalle-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .modulos-detalle-card {
+        background: white;
+        border: 1px solid #CCCCCC;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .modulo-detalle-toggle {
+        align-items: center;
+        background: #F9F9F9;
+        border: 0;
+        border-bottom: 1px solid #CCCCCC;
+        color: #204C6F;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        padding: 11px 14px;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modulo-detalle-toggle:hover {
+        background: #E3F3FB;
+    }
+
+    .modulo-detalle-title {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .modulo-detalle-name {
+        color: #204C6F;
+        font-size: 13px;
+        font-weight: bold;
+        line-height: 1.35;
+    }
+
+    .modulo-detalle-status {
+        background: white;
+        border: 1px solid #CCCCCC;
+        border-radius: 2px;
+        color: #333;
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 3px 7px;
+    }
+
+    .modulo-detalle-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .modulo-detalle-table {
+        background: white;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin: 0;
+        min-width: 980px;
+        width: 100%;
+    }
+
+    .modulo-detalle-table th {
+        background: #ECECEC;
+        border: 1px solid #CCCCCC;
+        color: #333;
+        font-weight: bold;
+        padding: 9px;
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .modulo-detalle-table td {
+        border: 1px solid #CCCCCC;
+        padding: 8px 9px;
+        vertical-align: middle;
+    }
+
+    .modulo-detalle-table .form-control {
+        font-size: 12px;
+        max-width: 125px;
+    }
 </style>
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
@@ -378,74 +470,66 @@
                     </div>
                 </div>
 
-                <table class="w-100">
-                    <tbody>
-                        @if (ViewBag.Inscripciones != null)
+                @if (ViewBag.Inscripciones != null)
+                {
+                    <div class="modulos-detalle-list">
+                        @foreach (var inscripcion in ViewBag.Inscripciones)
                         {
-                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                            {
-                                <tr data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" class="accordion-toggle">
-                                    <td colspan="8" class="text-center">
-                                        <a href="#" class="btn btn-link">Ver Detalles de @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</a>
-                                    </td>
-                                </tr>
+                            <div class="modulos-detalle-card">
+                                <button class="modulo-detalle-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" aria-expanded="false" aria-controls="detalle-@inscripcion.idInscripcion">
+                                    <span class="modulo-detalle-title">
+                                        <i class="bi bi-chevron-down"></i>
+                                        <span class="modulo-detalle-name">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</span>
+                                    </span>
+                                    <span class="modulo-detalle-status">@inscripcion.estado</span>
+                                </button>
 
-                                <tr>
-                                    <td colspan="8" class="hiddenRow">
-                                        <div id="detalle-@inscripcion.idInscripcion" class="collapse in">
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="" scope="col" style="width:20%;">Nombre Completo</th>
-                                                        <th class="" scope="col" style="width:20%;">Módulo</th>
-                                                        <th class="" scope="col" style="width:7.5%;">Estado</th>
+                                <div id="detalle-@inscripcion.idInscripcion" class="collapse">
+                                    <div class="modulo-detalle-wrapper">
+                                        <table class="modulo-detalle-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" style="width:20%;">Nombre Completo</th>
+                                                    <th scope="col" style="width:20%;">Módulo</th>
+                                                    <th scope="col" style="width:7.5%;">Estado</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
+                                                    <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
+                                                    <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
+                                                    <th class="text-center" scope="col" style="width: 3.33%;"></th>
+                                                </tr>
+                                            </thead>
 
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
-                                                        <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
-                                                        <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
-                                                        <th class="text-center" scope="col" style="width: 3.33%;"></th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody class="align-middle">
-                                                    <tr>
-                                                        <td class="">@nombreCompleto</td>
-                                                        <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                                        <td class="">@inscripcion.estado</td>
-
-                                                        <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
-                                                        <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
-                                                        @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
-                                                        {
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <input type="number" min="0" class="form-control" style="max-width: 125px;" name="horasAprobadas">
-                                                                </div>
-                                                            </td>
-                                                            <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <input type="number" min="0" , max="100" class="form-control" style="max-width: 125px;" name="calificacion" id="calificacion">
-                                                                </div>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <button type="submit" class="m-1 btn btn-secondary bi bi-check-lg"></button>
-                                                                </div>
-                                                            </td>
-                                                        }
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                                            <tbody class="align-middle">
+                                                <tr>
+                                                    <td>@nombreCompleto</td>
+                                                    <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                                    <td>@inscripcion.estado</td>
+                                                    <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
+                                                    <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
+                                                    @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
+                                                    {
+                                                        <td class="text-center">
+                                                            <input type="number" min="0" class="form-control mx-auto" name="horasAprobadas">
+                                                        </td>
+                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
+                                                        <td class="text-center">
+                                                            <input type="number" min="0" , max="100" class="form-control mx-auto" name="calificacion" id="calificacion">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="submit" class="btn btn-secondary bi bi-check-lg" title="Guardar"></button>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         }
-                    </tbody>
-                </table>
+                    </div>
+                }
             }
             <hr />
             <div class="d-flex my-4 justify-content-center">
