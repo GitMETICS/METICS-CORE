@@ -27,16 +27,24 @@
     }
 
     .action-menu {
-        position: absolute;
-        right: 0;
-        top: 35px;
+        position: fixed;
         background: white;
         border: 1px solid #CCCCCC;
-        z-index: 100;
+        z-index: 2000;
         min-width: 180px;
         box-shadow: 2px 4px 10px rgba(0,0,0,0.14);
         border-radius: 2px;
         display: none;
+    }
+
+    .action-menu.is-open {
+        display: block;
+    }
+
+    .action-menu-divider {
+        border: none;
+        border-top: 1px solid #ECECEC;
+        margin: 3px 0;
     }
 
     .action-menu a {
@@ -378,25 +386,25 @@
                                             <span>@participante.horasAprobadas</span>
                                         </td>
                                         <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
-                                            <div style="display: inline-block; position: relative;">
-                                                <button type="button" id="dropdownMenu_@participante.idParticipante" style="background: none; border: 1px solid #CCCCCC; cursor: pointer; padding: 5px 9px; color: #204C6F; line-height: 1; display: inline-flex; align-items: center; border-radius: 2px; min-height: 30px; font-size: 14px;" onclick="toggleActionMenu('@participante.idParticipante')" title="Acciones">
+                                            <div style="display: inline-block;">
+                                                <button type="button" id="dropdownMenu_@participante.idParticipante" class="action-menu-btn" onclick="toggleActionMenu('@participante.idParticipante', event)" title="Acciones">
                                                     <i class="bi bi-three-dots-vertical" style="width: 16px; height: 16px;"></i>
                                                 </button>
-                                                <div id="menu_@participante.idParticipante" style="position: absolute; right: 0; top: 35px; background: white; border: 1px solid #CCCCCC; z-index: 100; min-width: 180px; box-shadow: 2px 4px 10px rgba(0,0,0,0.14); display: none; border-radius: 2px;">
-                                                    <a href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante })" style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 12px; color: #333; cursor: pointer; text-decoration: none; border: none; background: none; width: 100%; text-align: left;">
+                                                <div id="menu_@participante.idParticipante" class="action-menu">
+                                                    <a href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante })">
                                                         <i class="bi bi-eye" style="width: 14px; height: 14px; color: #0090D8;"></i> Ver detalles
                                                     </a>
-                                                    <a href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = participante.idParticipante })" style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 12px; color: #333; cursor: pointer; text-decoration: none; border: none; background: none; width: 100%; text-align: left;">
+                                                    <a href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = participante.idParticipante })">
                                                         <i class="bi bi-pencil-square" style="width: 14px; height: 14px; color: #0090D8;"></i> Editar
                                                     </a>
-                                                    <a href="@Url.Action("CambiarCredencialesUsuario", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })" style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 12px; color: #333; cursor: pointer; text-decoration: none; border: none; background: none; width: 100%; text-align: left;">
+                                                    <a href="@Url.Action("CambiarCredencialesUsuario", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
                                                         <i class="bi bi-fingerprint" style="width: 14px; height: 14px; color: #0090D8;"></i> Credenciales
                                                     </a>
-                                                    <a href="@Url.Action("CambiarContrasenaAdmin", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })" style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 12px; color: #333; cursor: pointer; text-decoration: none; border: none; background: none; width: 100%; text-align: left;">
+                                                    <a href="@Url.Action("CambiarContrasenaAdmin", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
                                                         <i class="bi bi-key" style="width: 14px; height: 14px; color: #0090D8;"></i> Cambiar contraseña
                                                     </a>
-                                                    <div style="border: none; border-top: 1px solid #ECECEC; margin: 3px 0;"></div>
-                                                    <a href="#" onclick="openDeleteModal('@participante.idParticipante'); return false;" style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 12px; color: #C0392B; cursor: pointer; text-decoration: none; border: none; background: none; width: 100%; text-align: left;">
+                                                    <div class="action-menu-divider"></div>
+                                                    <a href="#" class="delete-option" onclick="openDeleteModal('@participante.idParticipante'); return false;">
                                                         <i class="bi bi-trash" style="width: 14px; height: 14px;"></i> Eliminar
                                                     </a>
                                                 </div>
@@ -448,32 +456,73 @@ else
 }
 
 <script type="text/javascript">
-    // Menú de acciones personalizado
-    function toggleActionMenu(participanteId) {
-        var menu = document.getElementById('menu_' + participanteId);
-        var allMenus = document.querySelectorAll('[id^="menu_"]');
-
-        allMenus.forEach(function(m) {
-            if (m.id !== 'menu_' + participanteId) {
-                m.style.display = 'none';
-            }
+    function closeActionMenus() {
+        document.querySelectorAll('[id^="menu_"]').forEach(function(menu) {
+            menu.classList.remove('is-open');
+            menu.style.left = '';
+            menu.style.top = '';
         });
+    }
 
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'block';
-        } else {
-            menu.style.display = 'none';
+    function positionActionMenu(menu, button) {
+        var buttonRect = button.getBoundingClientRect();
+        var margin = 8;
+        var gap = 6;
+
+        menu.style.visibility = 'hidden';
+        menu.classList.add('is-open');
+
+        var menuRect = menu.getBoundingClientRect();
+        var left = buttonRect.right - menuRect.width;
+        var top = buttonRect.bottom + gap;
+
+        if (left < margin) {
+            left = margin;
+        }
+
+        if (left + menuRect.width > window.innerWidth - margin) {
+            left = window.innerWidth - menuRect.width - margin;
+        }
+
+        if (top + menuRect.height > window.innerHeight - margin) {
+            top = buttonRect.top - menuRect.height - gap;
+        }
+
+        if (top < margin) {
+            top = margin;
+        }
+
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+        menu.style.visibility = 'visible';
+    }
+
+    // Menú de acciones personalizado
+    function toggleActionMenu(participanteId, event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        var menu = document.getElementById('menu_' + participanteId);
+        var button = document.getElementById('dropdownMenu_' + participanteId);
+        var wasOpen = menu.classList.contains('is-open');
+
+        closeActionMenus();
+
+        if (!wasOpen) {
+            positionActionMenu(menu, button);
         }
     }
 
     // Cerrar menú al hacer clic fuera
     document.addEventListener('click', function(event) {
         if (!event.target.closest('[id^="menu_"]') && !event.target.closest('[id^="dropdownMenu_"]')) {
-            document.querySelectorAll('[id^="menu_"]').forEach(function(menu) {
-                menu.style.display = 'none';
-            });
+            closeActionMenus();
         }
     });
+
+    document.addEventListener('scroll', closeActionMenus, true);
+    window.addEventListener('resize', closeActionMenus);
 
     // Función para abrir modal de eliminación
     function openDeleteModal(participanteId) {
