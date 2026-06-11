@@ -16,6 +16,12 @@
 
     <!-- jQuery se carga una sola vez en el head para que esté disponible en todas las vistas (DataTables, etc.) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- DataTables se carga una sola vez (versión 1.13.x) para todas las vistas de listado.
+         El helper compartido MeticsTable vive en site.js. -->
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body>
     <div style="background-color: #095998; height: 95px;">
