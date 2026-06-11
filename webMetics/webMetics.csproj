@@ -25,13 +25,11 @@
   <ItemGroup>
     <None Include="Views\Asesor\CrearAsesor.cshtml" />
     <None Include="Views\Asesor\EditarAsesor.cshtml" />
-    <None Include="Views\Asesor\ListaAsesores.cshtml" />
     <None Include="Views\Calificaciones\EditarCalificacion.cshtml" />
     <None Include="Views\Calificaciones\ExportarCalificaciones.cshtml" />
     <None Include="Views\Calificaciones\VerCalificaciones.cshtml" />
     <None Include="Views\Categoria\CrearCategoria.cshtml" />
     <None Include="Views\Categoria\EditarCategoria.cshtml" />
-    <None Include="Views\Categoria\ListaCategorias.cshtml" />
     <None Include="Views\Grupo\CrearGrupo.cshtml" />
     <None Include="Views\Grupo\EditarAdjunto.cshtml" />
     <None Include="Views\Grupo\EditarGrupo.cshtml" />

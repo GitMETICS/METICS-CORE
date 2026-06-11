@@ -33,3 +33,378 @@
 .hiddenRow {
     padding: 0 !important;
 }
+
+/* ===================================================================
+   Componentes compartidos de tablas de administración
+   (tarjeta + tabla con borde + paginación personalizada).
+   Reemplazan los estilos en línea y los bloques <style> duplicados
+   que antes vivían en cada vista de listado.
+   =================================================================== */
+
+:root {
+    --metics-blue: #41ADE7;
+    --metics-blue-light: #E3F3FB;
+    --metics-navy: #204C6F;
+    --metics-cyan: #0090D8;
+    --metics-red: #C0392B;
+    --metics-border: #CCCCCC;
+    --metics-border-light: #ECECEC;
+    --metics-input-border: #BFBFBF;
+}
+
+/* --- Tarjeta contenedora --- */
+.table-card {
+    background: white;
+    border: 2px solid var(--metics-blue);
+    border-radius: 4px;
+    margin-top: 20px;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.table-card-header {
+    background: var(--metics-blue-light);
+    border-bottom: 1px solid var(--metics-border);
+    padding: 11px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.table-card-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--metics-navy);
+}
+
+.table-card-desc {
+    font-size: 12px;
+    color: #555;
+}
+
+/* --- Barra de controles (mostrar registros / búsqueda / crear) --- */
+.table-toolbar {
+    padding: 14px 14px 10px 14px;
+    background: white;
+    border-bottom: 1px solid var(--metics-border-light);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.table-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.table-pagesize {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-pagesize label {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.table-pagesize select {
+    padding: 4px 6px;
+    border: 1px solid var(--metics-input-border);
+    background: white;
+    font-size: 12px;
+    border-radius: 2px;
+}
+
+.table-search {
+    display: flex;
+    gap: 5px;
+    flex: 1;
+    max-width: 400px;
+    min-width: 200px;
+}
+
+.table-search .form-control {
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--metics-input-border);
+    border-radius: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.table-search .btn {
+    background: white;
+    border: 1px solid var(--metics-input-border);
+    color: #333;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.table-search .btn:hover {
+    background: #F5F5F5;
+    border-color: var(--metics-input-border);
+    color: #333;
+}
+
+/* Botón pequeño (p. ej. "Crear"/"Agregar") dentro de la barra de controles */
+.btn-table-sm {
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+/* --- Tabla con scroll responsivo --- */
+.table-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 70vh;
+    width: 100%;
+    background: white;
+}
+
+.data-table {
+    border-collapse: collapse;
+    font-size: 12px;
+    width: 100%;
+    background: white;
+    margin: 0;
+}
+
+.data-table thead th {
+    background: var(--metics-border-light);
+    border: 1px solid var(--metics-border);
+    padding: 9px;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #333;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.data-table tbody td {
+    border: 1px solid var(--metics-border);
+    padding: 8px 9px;
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    background: white;
+}
+
+.data-table--striped tbody tr:nth-child(odd) {
+    background: #F7F7F7;
+}
+
+.data-table--striped tbody tr:nth-child(even) {
+    background: white;
+}
+
+/* --- Paginación personalizada (fuera del scroll) --- */
+.table-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 13px;
+    border-top: 1px solid var(--metics-border-light);
+    background: white;
+}
+
+.page-btn {
+    background: white;
+    border: 1px solid var(--metics-border);
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #333;
+    font-family: Arial, sans-serif;
+    border-radius: 2px;
+    margin: 0 2px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.page-btn:hover {
+    background: #F5F5F5;
+    border-color: var(--metics-border);
+    color: #333;
+}
+
+.page-btn.current {
+    background: var(--metics-navy);
+    color: white;
+    border-color: var(--metics-navy);
+}
+
+.page-btn.current:hover {
+    background: var(--metics-navy);
+    color: white;
+    border-color: var(--metics-navy);
+}
+
+.page-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Iconos de acción (editar / eliminar / ver / refrescar) --- */
+.icon-action {
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.icon-action:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.icon-edit,
+.icon-view {
+    color: var(--metics-cyan);
+}
+
+.icon-delete {
+    color: var(--metics-red);
+}
+
+/* --- Menú de acciones desplegable (lista de participantes) --- */
+.action-menu-btn {
+    background: none;
+    border: 1px solid var(--metics-border);
+    cursor: pointer;
+    padding: 5px 9px;
+    color: var(--metics-navy);
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 2px;
+    min-height: 30px;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.action-menu-btn:hover {
+    background-color: #F5F5F5;
+}
+
+.action-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid var(--metics-border);
+    z-index: 2000;
+    min-width: 180px;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.14);
+    border-radius: 2px;
+    display: none;
+}
+
+.action-menu.is-open {
+    display: block;
+}
+
+.action-menu-divider {
+    border: none;
+    border-top: 1px solid var(--metics-border-light);
+    margin: 3px 0;
+}
+
+.action-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.action-menu a:hover {
+    background-color: #F5F5F5;
+}
+
+.action-menu a.delete-option {
+    color: var(--metics-red);
+}
+
+/* --- Overrides para la paginación nativa de DataTables
+   (la usa ListaParticipantes, que conserva su menú de longitud y "Todos") --- */
+.dataTables_wrapper {
+    background: white;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_paginate {
+    color: #333;
+    font-size: 12px;
+    padding: 10px 15px;
+}
+
+.dataTables_wrapper .dataTables_length {
+    border-bottom: 1px solid var(--metics-border-light);
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--metics-border);
+    border-radius: 2px;
+    color: #333;
+    font-size: 12px;
+    margin: 0 6px;
+    padding: 4px 8px;
+}
+
+.dataTables_wrapper .dataTables_info {
+    display: none;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    align-items: center;
+    border-top: 1px solid var(--metics-border-light);
+    display: flex;
+    float: none;
+    justify-content: center;
+    text-align: center;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border: 1px solid var(--metics-border) !important;
+    border-radius: 2px !important;
+    color: #333 !important;
+    margin-left: 4px;
+    padding: 6px 11px !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--metics-navy) !important;
+    border-color: var(--metics-navy) !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current * {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}

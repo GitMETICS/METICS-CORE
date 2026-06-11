@@ -4,6 +4,106 @@
 	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
+<style>
+	/* La tarjeta, encabezado, barra de controles y búsqueda usan las clases
+	   compartidas .table-card / .table-toolbar / .table-search (site.css).
+	   Aquí solo quedan los estilos propios de esta tabla. */
+	.grupo-participantes-wrapper {
+		background: white;
+		overflow-x: auto;
+		width: 100%;
+	}
+
+	#tblCustomers {
+		border-collapse: collapse;
+		font-size: 12px;
+		margin: 0 !important;
+		width: 100% !important;
+	}
+
+	#tblCustomers thead th {
+		background: #ECECEC;
+		border: 1px solid #CCCCCC;
+		color: #333;
+		font-weight: bold;
+		padding: 9px 9px;
+		vertical-align: middle;
+		white-space: nowrap;
+	}
+
+	#tblCustomers tbody td {
+		border: 1px solid #CCCCCC;
+		padding: 8px 9px;
+		vertical-align: middle;
+	}
+
+	#tblCustomers tbody tr:nth-child(odd) {
+		background: #F7F7F7;
+	}
+
+	#tblCustomers tbody tr:nth-child(even) {
+		background: white;
+	}
+
+	#tblCustomers .form-check {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		margin: 0;
+		min-height: 20px;
+	}
+
+	#tblCustomers .btn-sm {
+		border-radius: 2px;
+		line-height: 1;
+		min-height: 30px;
+	}
+
+	.grupo-action-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		justify-content: center;
+	}
+
+	.grupo-action-btn {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: 2px;
+		color: #0090D8;
+		cursor: pointer;
+		display: inline-flex;
+		font-size: 14px;
+		height: 30px;
+		justify-content: center;
+		line-height: 1;
+		min-width: 30px;
+		padding: 5px 8px;
+		text-decoration: none;
+	}
+
+	.grupo-action-btn:hover {
+		background: transparent;
+		color: #0090D8;
+	}
+
+	.grupo-action-delete {
+		color: #C0392B;
+		text-decoration: none;
+	}
+
+	.grupo-action-delete:hover {
+		color: #C0392B;
+	}
+
+	.grupo-participantes-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 16px;
+	}
+</style>
+
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
 	<div class="contenedor-caja container-fluid">
@@ -192,22 +292,23 @@
 					</div>
 				</div>
 
-				<!-- Barra de búsqueda-->
-				<div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-					<div class="w-100">
-						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="input-group" id="formBuscarParticipantesDelGrupo">
+				<!-- SECCIÓN: Tabla de Participantes -->
+				<div class="table-card mb-3">
+					<div class="table-card-header">
+						<span class="table-card-title">Participantes</span>
+						<span class="table-card-desc">Listado de participantes inscritos en el módulo</span>
+					</div>
+
+					<div class="table-toolbar">
+						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="table-search" id="formBuscarParticipantesDelGrupo">
 							<input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
-							<button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
+							<button class="btn" type="submit"><i class="bi bi-search"></i></button>
 						</form>
 						<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" form="formBuscarParticipantesDelGrupo">
 					</div>
-				</div>
 
-				<!-- SECCIÓN: Tabla de Participantes -->
-				<div class="card border-0 shadow-sm mb-3">
-					<div class="card-body p-0">
-						<div class="table-responsive">
-							<table class="table table-striped mb-0" id="tblCustomers">
+					<div class="grupo-participantes-wrapper">
+							<table class="table mb-0" id="tblCustomers">
 								<thead>
 									<tr>
 										<th class="text-center p-2" style="width:40px;">
@@ -307,20 +408,20 @@
 												</form>
 											</td>
 											<td class="text-center p-2">
-												<div class="d-flex gap-1 justify-content-center flex-wrap">
-													<button type="button" class="btn btn-sm btn-outline-primary" title="Editar Horas" onclick="editarHoras('@participante.idParticipante')">
+												<div class="grupo-action-list">
+													<button type="button" class="grupo-action-btn" title="Editar Horas" onclick="editarHoras('@participante.idParticipante')">
 														<i class="bi bi-pencil"></i>
 													</button>
-													<button type="button" class="btn btn-sm btn-outline-primary" title="Editar Calificación" onclick="editarCalificacion('@participante.idParticipante')">
+													<button type="button" class="grupo-action-btn" title="Editar Calificación" onclick="editarCalificacion('@participante.idParticipante')">
 														<i class="bi bi-pencil-square"></i>
 													</button>
-													@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "btn btn-sm btn-outline-secondary bi bi-search", title = "Ver Detalles" })
+													@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "grupo-action-btn bi bi-search", title = "Ver Detalles" })
 												</div>
 											</td>
 											@if (ViewBag.Role == 1)
 											{
 												<td class="text-center p-2">
-													<a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
+													<a href="#" class="grupo-action-delete" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
 														<i class="bi bi-trash"></i>
 													</a>
 												</td>
@@ -329,32 +430,18 @@
 									}
 								</tbody>
 							</table>
-						</div>
 					</div>
 				</div>
 
-				<!-- Controles de Paginación -->
-				<div class="d-flex justify-content-between align-items-center mb-3">
-					<div>
-						<label class="me-2">Mostrar</label>
-						<select id="tblCustomers_length" class="form-select" style="width: auto; display: inline-block;">
-							<option value="10">10</option>
-							<option value="25">25</option>
-							<option value="50">50</option>
-							<option value="-1">Todos</option>
-						</select>
-						<span class="ms-2">registros</span>
-					</div>
-					<div>
-						@if (ViewBag.Role == 1)
-						{
-							<a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-sm">Regresar</a>
-						}
-						else if (ViewBag.Role == 2)
-						{
-							<a href="@Url.Action("MisModulos", "Asesor")" class="btn btn-secondary btn-sm">Regresar</a>
-						}
-					</div>
+				<div class="grupo-participantes-actions mb-3">
+					@if (ViewBag.Role == 1)
+					{
+						<a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-sm">Regresar</a>
+					}
+					else if (ViewBag.Role == 2)
+					{
+						<a href="@Url.Action("MisModulos", "Asesor")" class="btn btn-secondary btn-sm">Regresar</a>
+					}
 				</div>
 			}
 		</div>
@@ -769,17 +856,16 @@ else
 	}
 </script>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
 <script>
+	// DataTables y jQuery se cargan una sola vez en _Layout. Esta tabla conserva
+	// la paginación nativa de DataTables (menú de longitud + "Todos").
 	var table = new DataTable('#tblCustomers', {
 		language: {
-			url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+			url: METICS_DT_LANG,
 		},
 		"searching": false,
 		"pageLength": -1,
-		"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+		"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+		"dom": '<"grupo-datatables-top"l>t<"grupo-datatables-bottom"p>'
 	});
 </script>

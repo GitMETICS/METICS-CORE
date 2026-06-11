@@ -115,19 +115,57 @@ namespace webMetics.Controllers
             }
         }
 
-        /// <summary>Muestra el formulario de edición de categoría.</summary>
+        /// <summary>Muestra el formulario precargado con los datos de la categoría para su edición.</summary>
+        /// <param name="idCategoria">ID de la categoría a editar.</param>
         /// <returns>
-        /// View: EditarCategoria — ViewData["Categorias"] (SelectListItem), ViewBag.Role, ViewBag.Id.
+        /// View: EditarCategoria (model: CategoriaModel) — ViewData["Categorias"] (SelectListItem),
+        /// ViewBag.Role, ViewBag.Id.
         /// </returns>
         /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
-        public ActionResult EditarCategoria()
+        public ActionResult EditarCategoria(int idCategoria)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
+            CategoriaModel categoria = accesoACategoria.ObtenerCategoria(idCategoria);
+
             ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
 
-            return View();
+            return View(categoria);
+        }
+
+        /// <summary>Procesa el formulario de edición de categoría.</summary>
+        /// <param name="categoria">Datos actualizados de la categoría.</param>
+        /// <returns>
+        /// Redirects to ListaCategorias on success. Sets TempData["successMessage"] or
+        /// TempData["errorMessage"]. Returns View EditarCategoria with model on failure.
+        /// </returns>
+        /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
+        [HttpPost]
+        public ActionResult EditarCategoria(CategoriaModel categoria)
+        {
+            try
+            {
+                ViewBag.Role = GetRole();
+                ViewBag.Id = GetId();
+
+                bool exito = accesoACategoria.EditarCategoria(categoria);
+                if (exito)
+                {
+                    TempData["successMessage"] = "Se editó el nivel.";
+                    return RedirectToAction("ListaCategorias");
+                }
+
+                ViewBag.ErrorMessage = "No se pudo editar el nivel.";
+                ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+
+                return View(categoria);
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "No se pudo editar el nivel.";
+                return RedirectToAction("ListaCategorias");
+            }
         }
 
         /// <summary>Elimina una categoría del sistema.</summary>

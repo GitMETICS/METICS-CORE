@@ -93,8 +93,8 @@ namespace webMetics.Handlers
         public bool EditarCategoria(CategoriaModel categoria)
         {
             string consulta =
-                "UPDATE tema SET nombre = @nombre, descripcion = @descripcion" +
-                "WHERE id_categoria_PK, @idCategoria";
+                "UPDATE categoria SET nombre = @nombre, descripcion = @descripcion " +
+                "WHERE id_categoria_PK = @idCategoria";
 
             ConexionMetics.Open();
 
