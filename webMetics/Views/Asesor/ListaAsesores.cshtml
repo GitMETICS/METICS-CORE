@@ -67,10 +67,10 @@
                                 <label for="asesorPageSize">registros</label>
                             </div>
 
-                            <form asp-action="BuscarAsesores" asp-controller="Asesor" method="get" class="table-search">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar facilitador(a)" value="@Context.Request.Query["searchTerm"]" />
-                                <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-                            </form>
+                            <div class="table-search">
+                                <input type="text" id="asesorBusqueda" class="form-control" placeholder="Buscar facilitador(a)" />
+                                <button type="button" class="btn"><i class="bi bi-search"></i></button>
+                            </div>
                         </div>
 
                         <div>
@@ -181,6 +181,7 @@ else
         tableId: 'asesorTblCustomers',
         pageSizeId: 'asesorPageSize',
         paginationId: 'asesorTblPaginacion',
-        searching: false
+        searching: true,
+        searchInputId: 'asesorBusqueda'
     });
 </script>
