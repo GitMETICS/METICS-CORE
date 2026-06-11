@@ -5,83 +5,6 @@
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<style>
-    /* Estilos para la tabla de categorías - Diseño Moderno */
-    .categoria-table-card {
-        background: white;
-        border: 2px solid #41ADE7;
-        border-radius: 4px;
-        margin-top: 20px;
-        overflow: hidden;
-        max-width: 100%;
-    }
-
-    .categoria-table-header {
-        background: #E3F3FB;
-        border-bottom: 1px solid #CCCCCC;
-        padding: 11px 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    #categoriaTblWrapper {
-        overflow-x: auto;
-        overflow-y: auto;
-        max-height: 70vh;
-        width: 100%;
-        background: white;
-    }
-
-    #categoriaTblCustomers {
-        min-width: 700px;
-    }
-
-    #categoriaTblPaginacion {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        padding: 13px;
-        border-top: 1px solid #ECECEC;
-        background: white;
-    }
-
-    /* Estilos para iconos de acciones */
-    .categoria-icon-editar {
-        color: #0090D8;
-        text-decoration: none;
-        font-size: 14px;
-        cursor: pointer;
-        transition: opacity 0.2s ease, transform 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .categoria-icon-editar:hover {
-        opacity: 0.8;
-        transform: scale(1.1);
-    }
-
-    .categoria-icon-eliminar {
-        color: #C0392B;
-        text-decoration: none;
-        font-size: 14px;
-        cursor: pointer;
-        transition: opacity 0.2s ease, transform 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .categoria-icon-eliminar:hover {
-        opacity: 0.8;
-        transform: scale(1.1);
-    }
-</style>
-
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
     <div class="contenedor-caja container-fluid">
@@ -121,62 +44,58 @@
         }
         else
         {
-            <div class="categoria-table-card">
-                <!-- Encabezado de tarjeta -->
-                <div class="categoria-table-header">
-                    <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Niveles</span>
-                    <span style="font-size: 12px; color: #555;">Listado de niveles registrados en el sistema</span>
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span class="table-card-title">Niveles</span>
+                    <span class="table-card-desc">Listado de niveles registrados en el sistema</span>
                 </div>
 
-                <!-- Controles: Mostrar registros, búsqueda y crear -->
-                <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <label for="categoriaPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
-                        <select id="categoriaPageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
-                            <option selected>5</option>
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
-                        </select>
-                        <label for="categoriaPageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                <div class="table-toolbar">
+                    <div class="table-toolbar-group">
+                        <div class="table-pagesize">
+                            <label for="categoriaPageSize">Mostrar</label>
+                            <select id="categoriaPageSize">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <label for="categoriaPageSize">registros</label>
+                        </div>
+
+                        <div class="table-search">
+                            <input type="text" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" />
+                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
+                        </div>
                     </div>
 
-                    <div style="flex: 1; min-width: 200px; display: flex; gap: 5px;">
-                        <input type="text" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px; flex: 1; min-width: 0;" />
-                        <button onclick="buscarCategoria()" class="btn btn-sm" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px; flex-shrink: 0;">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-
-                    <div style="flex-shrink: 0;">
-                        @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg", style = "font-size: 12px; padding: 4px 12px;" })
+                    <div>
+                        @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
                     </div>
                 </div>
 
-                <!-- Tabla con scroll responsivo -->
-                <div id="categoriaTblWrapper">
-                    <table id="categoriaTblCustomers" style="border-collapse: collapse; font-size: 12px; width: 100%; background: white; margin: 0;">
+                <div class="table-scroll">
+                    <table id="categoriaTblCustomers" class="data-table" style="min-width: 700px;">
                         <thead>
                             <tr>
-                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 30%;">Nombre</th>
-                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 60%;">Descripción</th>
-                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Editar</th>
-                                <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 5%;">Eliminar</th>
+                                <th scope="col" style="width: 30%;">Nombre</th>
+                                <th scope="col" style="width: 60%;">Descripción</th>
+                                <th scope="col" class="text-center" style="width: 5%;">Editar</th>
+                                <th scope="col" class="text-center" style="width: 5%;">Eliminar</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @foreach (var categoria in ViewBag.Categorias)
                             {
-                                <tr style="background: white;">
-                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@categoria.nombre</td>
-                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@categoria.descripcion</td>
-                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
-                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "categoria-icon-editar bi bi-pencil-square", @title = "Editar" })
+                                <tr>
+                                    <td>@categoria.nombre</td>
+                                    <td>@categoria.descripcion</td>
+                                    <td class="text-center">
+                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
                                     </td>
-                                    <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
-                                        <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="categoria-icon-eliminar bi bi-trash" title="Eliminar">
-                                        </a>
+                                    <td class="text-center">
+                                        <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
                                     </td>
                                 </tr>
                             }
@@ -184,8 +103,7 @@
                     </table>
                 </div>
 
-                <!-- Paginación FUERA del scroll (fija) -->
-                <div id="categoriaTblPaginacion"></div>
+                <div id="categoriaTblPaginacion" class="table-pagination"></div>
             </div>
         }
     </div>
@@ -227,114 +145,11 @@ else
         deleteModal.show();
     }
 
-    function buscarCategoria() {
-        var searchInput = document.getElementById('categoriaBusqueda');
-        if (!searchInput || !categoriaTable) return;
-
-        categoriaTable.search(searchInput.value.trim()).draw();
-    }
-
-    // Permitir búsqueda al presionar Enter
-    document.addEventListener('DOMContentLoaded', function() {
-        var busquedaInput = document.getElementById('categoriaBusqueda');
-        if (busquedaInput) {
-            busquedaInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    buscarCategoria();
-                }
-            });
-
-            // También permitir búsqueda mientras se escribe
-            busquedaInput.addEventListener('input', function() {
-                buscarCategoria();
-            });
-        }
-    });
-</script>
-
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
-<script>
-    var categoriaTableElement = document.getElementById('categoriaTblCustomers');
-    var categoriaTablePageSize = document.getElementById('categoriaPageSize');
-    var categoriaTablePagination = document.getElementById('categoriaTblPaginacion');
-    var categoriaTable;
-
-    if (categoriaTableElement) {
-        categoriaTable = new DataTable('#categoriaTblCustomers', {
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-            },
-            searching: true,
-            paging: true,
-            pageLength: 5,
-            lengthMenu: [5, 10, 25, 50],
-            info: false,
-            lengthChange: false,
-            dom: 't',
-            pagingType: "simple_numbers",
-            drawCallback: function () {
-                if (!window.bootstrap?.Tooltip) return;
-                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                    var existing = bootstrap.Tooltip.getInstance(this);
-                    if (!existing) {
-                        new bootstrap.Tooltip(this);
-                    }
-                });
-            }
-        });
-
-        function renderCategoriaPagination() {
-            if (!categoriaTablePagination) return;
-
-            var paginationHtml = '';
-            var pageInfo = categoriaTable.page.info();
-            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
-            var currentPage = pageInfo.page + 1;
-
-            if (pageCount <= 1) {
-                categoriaTablePagination.innerHTML = '';
-                return;
-            }
-
-            if (currentPage > 1) {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-            }
-
-            for (var i = 1; i <= pageCount; i++) {
-                if (i === currentPage) {
-                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-                } else {
-                    paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-                }
-            }
-
-            if (currentPage < pageCount) {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="categoriaTable.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-            }
-
-            categoriaTablePagination.innerHTML = paginationHtml;
-        }
-
-        categoriaTable.on('draw', renderCategoriaPagination);
-        renderCategoriaPagination();
-
-        if (categoriaTablePageSize) {
-            categoriaTablePageSize.addEventListener('change', function() {
-                var value = parseInt(this.value);
-                categoriaTable.page.len(value).draw();
-            });
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        if (!categoriaTableElement || !window.bootstrap?.Tooltip) return;
-        $('#categoriaTblCustomers [data-bs-toggle="tooltip"]').each(function () {
-            if (!bootstrap.Tooltip.getInstance(this)) {
-                new bootstrap.Tooltip(this);
-            }
-        });
+    MeticsTable.init({
+        tableId: 'categoriaTblCustomers',
+        pageSizeId: 'categoriaPageSize',
+        paginationId: 'categoriaTblPaginacion',
+        searching: true,
+        searchInputId: 'categoriaBusqueda'
     });
 </script>
