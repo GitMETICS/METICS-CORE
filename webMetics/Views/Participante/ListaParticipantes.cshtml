@@ -5,74 +5,9 @@
 }
 
 <style>
-	.grupo-participantes-table-card {
-		background: white;
-		border: 2px solid #41ADE7;
-		border-radius: 4px;
-		margin-top: 20px;
-		overflow: hidden;
-	}
-
-	.grupo-participantes-table-header {
-		align-items: center;
-		background: #E3F3FB;
-		border-bottom: 1px solid #CCCCCC;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		padding: 11px 15px;
-	}
-
-	.grupo-participantes-table-title {
-		color: #204C6F;
-		font-size: 14px;
-		font-weight: bold;
-	}
-
-	.grupo-participantes-table-desc {
-		color: #555;
-		font-size: 12px;
-	}
-
-	.grupo-participantes-toolbar {
-		align-items: center;
-		background: white;
-		border-bottom: 1px solid #ECECEC;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 15px;
-		padding: 13px 15px;
-	}
-
-	.grupo-participantes-search {
-		display: flex;
-		flex: 1;
-		gap: 5px;
-		max-width: 400px;
-	}
-
-	.grupo-participantes-search .form-control {
-		border: 1px solid #BFBFBF;
-		border-radius: 2px;
-		font-size: 12px;
-		padding: 4px 8px;
-	}
-
-	.grupo-participantes-search .btn {
-		background: white;
-		border: 1px solid #BFBFBF;
-		border-radius: 2px;
-		color: #333;
-		font-size: 12px;
-		padding: 4px 10px;
-	}
-
-	.grupo-participantes-search .btn:hover {
-		background: #F5F5F5;
-		border-color: #BFBFBF;
-		color: #333;
-	}
-
+	/* La tarjeta, encabezado, barra de controles y búsqueda usan las clases
+	   compartidas .table-card / .table-toolbar / .table-search (site.css).
+	   Aquí solo quedan los estilos propios de esta tabla. */
 	.grupo-participantes-wrapper {
 		background: white;
 		overflow-x: auto;
@@ -160,70 +95,6 @@
 
 	.grupo-action-delete:hover {
 		color: #C0392B;
-	}
-
-	.dataTables_wrapper {
-		background: white;
-	}
-
-	.dataTables_wrapper .dataTables_length,
-	.dataTables_wrapper .dataTables_paginate {
-		color: #333;
-		font-size: 12px;
-		padding: 10px 15px;
-	}
-
-	.dataTables_wrapper .dataTables_length {
-		border-bottom: 1px solid #ECECEC;
-	}
-
-	.dataTables_wrapper .dataTables_length select {
-		border: 1px solid #CCCCCC;
-		border-radius: 2px;
-		color: #333;
-		font-size: 12px;
-		margin: 0 6px;
-		padding: 4px 8px;
-	}
-
-	.dataTables_wrapper .dataTables_info {
-		display: none;
-	}
-
-	.dataTables_wrapper .dataTables_paginate {
-		align-items: center;
-		border-top: 1px solid #ECECEC;
-		display: flex;
-		float: none;
-		justify-content: center;
-		text-align: center;
-	}
-
-	.dataTables_wrapper .dataTables_paginate .paginate_button {
-		border: 1px solid #CCCCCC !important;
-		border-radius: 2px !important;
-		color: #333 !important;
-		margin-left: 4px;
-		padding: 6px 11px !important;
-	}
-
-	.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-		background: #204C6F !important;
-		border-color: #204C6F !important;
-		color: #FFFFFF !important;
-		-webkit-text-fill-color: #FFFFFF !important;
-	}
-
-	.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-		background: #204C6F !important;
-		border-color: #204C6F !important;
-		color: #FFFFFF !important;
-		-webkit-text-fill-color: #FFFFFF !important;
-	}
-
-	.dataTables_wrapper .dataTables_paginate .paginate_button.current * {
-		color: #FFFFFF !important;
-		-webkit-text-fill-color: #FFFFFF !important;
 	}
 
 	.grupo-participantes-actions {
@@ -422,14 +293,14 @@
 				</div>
 
 				<!-- SECCIÓN: Tabla de Participantes -->
-				<div class="grupo-participantes-table-card mb-3">
-					<div class="grupo-participantes-table-header">
-						<span class="grupo-participantes-table-title">Participantes</span>
-						<span class="grupo-participantes-table-desc">Listado de participantes inscritos en el módulo</span>
+				<div class="table-card mb-3">
+					<div class="table-card-header">
+						<span class="table-card-title">Participantes</span>
+						<span class="table-card-desc">Listado de participantes inscritos en el módulo</span>
 					</div>
 
-					<div class="grupo-participantes-toolbar">
-						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="grupo-participantes-search" id="formBuscarParticipantesDelGrupo">
+					<div class="table-toolbar">
+						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="table-search" id="formBuscarParticipantesDelGrupo">
 							<input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
 							<button class="btn" type="submit"><i class="bi bi-search"></i></button>
 						</form>
@@ -985,14 +856,12 @@ else
 	}
 </script>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
 <script>
+	// DataTables y jQuery se cargan una sola vez en _Layout. Esta tabla conserva
+	// la paginación nativa de DataTables (menú de longitud + "Todos").
 	var table = new DataTable('#tblCustomers', {
 		language: {
-			url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
+			url: METICS_DT_LANG,
 		},
 		"searching": false,
 		"pageLength": -1,

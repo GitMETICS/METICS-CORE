@@ -49,25 +49,8 @@
     margin-bottom: 5px;
     }
 
-    .participante-detalle-card {
-        background: white;
-        border: 2px solid #41ADE7;
-        border-radius: 4px;
-        margin-top: 20px;
-        overflow: hidden;
-        max-width: 100%;
-    }
-
-    .participante-detalle-header {
-        background: #E3F3FB;
-        border-bottom: 1px solid #CCCCCC;
-        padding: 11px 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
+    /* La tarjeta y su encabezado usan las clases compartidas
+       .table-card / .table-card-header (site.css). */
     .participante-detalle-wrapper {
         overflow-x: auto;
         width: 100%;
@@ -367,10 +350,10 @@
                 string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
                 string NotificationStatus(int value) => value != 0 ? "Enviada" : "No enviada";
 
-                <div class="participante-detalle-card">
-                    <div class="participante-detalle-header">
-                        <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Datos del participante</span>
-                        <span style="font-size: 12px; color: #555;">Información completa registrada en el sistema</span>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <span class="table-card-title">Datos del participante</span>
+                        <span class="table-card-desc">Información completa registrada en el sistema</span>
                     </div>
 
                     <div class="participante-detalle-wrapper">
