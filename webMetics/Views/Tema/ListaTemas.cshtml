@@ -1,4 +1,4 @@
-﻿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
     ViewBag.Title = "Áreas de Competencia";
 
@@ -35,61 +35,82 @@
             </div>
         }
 
-        <div class="d-flex justify-content-between mb-4">
-            <div></div>
-
-            <div class="d-flex justify-content-end">
-                <div class="mx-1">
-                    @Html.ActionLink("  Crear", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
-                </div>
+        @if (ViewBag.Temas == null)
+        {
+            <h5 class="text-center mb-4">No hay temas.</h5>
+            <div class="text-center">
+                @Html.ActionLink("  Crear Área de Competencia", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
             </div>
-        </div>
-
-        <div class="table-responsive">
-            @if (ViewBag.Temas == null)
-            {
-                <h5 class="text-center">No hay temas.</h5>
-                <div class="justify-content-center m-3">
-                    @Html.ActionLink("  Crear", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+        }
+        else
+        {
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span class="table-card-title">Áreas de Competencia</span>
+                    <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
                 </div>
-            }
-            else
-            {
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
-                        @foreach (var tema in ViewBag.Temas)
-                        {
+                <div class="table-toolbar">
+                    <div class="table-toolbar-group">
+                        <div class="table-pagesize">
+                            <label for="temaPageSize">Mostrar</label>
+                            <select id="temaPageSize">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <label for="temaPageSize">registros</label>
+                        </div>
+
+                        <div class="table-search">
+                            <input type="text" id="temaBusqueda" class="form-control" placeholder="Buscar área de competencia" />
+                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        @Html.ActionLink("  Crear Área", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table id="temaTblCustomers" class="data-table" style="min-width: 600px;">
+                        <thead>
                             <tr>
-                                <td>@tema.nombre</td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarTema", "Tema", new { idTema = tema.idTema }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@tema.idTema')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
+                                <th scope="col" style="width: 85%;">Nombre</th>
+                                <th scope="col" class="text-center" style="width: 7.5%;">Editar</th>
+                                <th scope="col" class="text-center" style="width: 7.5%;">Eliminar</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var tema in ViewBag.Temas)
+                            {
+                                <tr>
+                                    <td>@tema.nombre</td>
+                                    <td class="text-center">
+                                        @Html.ActionLink("", "EditarTema", "Tema", new { idTema = tema.idTema }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="#" onclick="actualizarModalEliminar('@tema.idTema'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="temaTblPaginacion" class="table-pagination"></div>
+            </div>
+        }
     </div>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar área de competencia</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Área de competencia</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -118,5 +139,15 @@ else
 <script type="text/javascript">
     function actualizarModalEliminar(idTema) {
         document.getElementById("idTema").value = idTema;
+        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        deleteModal.show();
     }
+
+    MeticsTable.init({
+        tableId: 'temaTblCustomers',
+        pageSizeId: 'temaPageSize',
+        paginationId: 'temaTblPaginacion',
+        searching: true,
+        searchInputId: 'temaBusqueda'
+    });
 </script>

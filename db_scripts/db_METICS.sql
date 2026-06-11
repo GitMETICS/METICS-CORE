@@ -22,6 +22,7 @@ CREATE TABLE correo_notificacion (
 --Creación de la tabla usuario
 CREATE TABLE usuario (
 	id_usuario_PK NVARCHAR(64) PRIMARY KEY NOT NULL,
+	correo_alternativo NVARCHAR(64) NULL,
 	rol_FK INT FOREIGN KEY REFERENCES rol(rol_PK) ON DELETE NO ACTION DEFAULT 0,
 	hash_contrasena BINARY(64) NOT NULL,
 	salt UNIQUEIDENTIFIER,
@@ -63,11 +64,32 @@ CREATE TABLE participante (
     departamento NVARCHAR(512) NOT NULL,
     unidad_academica NVARCHAR(512) NOT NULL,
     sede NVARCHAR(512),
+    carrera NVARCHAR(512),
     total_horas_matriculadas INT DEFAULT 0,
     total_horas_aprobadas INT DEFAULT 0,
 	correo_notificacion_enviado INT DEFAULT 0,
+	correo_alternativo NVARCHAR(64) NULL,
+	grado_academico    NVARCHAR(32) NULL,
+
+	CONSTRAINT CK_participante_grado_academico CHECK (
+		grado_academico IS NULL OR grado_academico IN (
+			N'Doctorado - PhD', N'Maestría - MSc',
+			N'Licenciatura - Lic', N'Bachillerato - Bach'
+		)
+	),
 
     FOREIGN KEY (id_usuario_FK) REFERENCES usuario(id_usuario_PK)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+--Creación de la tabla para áreas extra de participantes
+CREATE TABLE participante_area_extra (
+    id_participante_FK NVARCHAR(64) NOT NULL,
+    area_extra NVARCHAR(256) NOT NULL,
+
+    PRIMARY KEY (id_participante_FK, area_extra),
+    FOREIGN KEY (id_participante_FK) REFERENCES participante(id_participante_PK)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -260,8 +282,8 @@ AS
 BEGIN
 	DECLARE @salt UNIQUEIDENTIFIER=NEWID()
 
-    INSERT INTO usuario (id_usuario_PK, rol_FK, hash_contrasena, salt)
-    VALUES(@id, @rol, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
+    INSERT INTO usuario (id_usuario_PK, correo_alternativo, rol_FK, hash_contrasena, salt)
+    VALUES(@id, @correoAlternativo, @rol, HASHBYTES('SHA2_512', @contrasena + CAST(@salt AS NVARCHAR(36))), @salt)
 END
 
 GO
@@ -347,7 +369,7 @@ CREATE OR ALTER PROCEDURE InsertAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(512) = '',
+    @unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(512) = ''
 AS
 BEGIN
@@ -394,7 +416,7 @@ CREATE OR ALTER PROCEDURE UpdateAsesor
     @apellido2 NVARCHAR(64) = '',
     @descripcion NVARCHAR(512) = '',
     @telefono NVARCHAR(64) = '',
-	@unidadAcademica NVARCHAR(512) = '',
+    @unidadAcademica NVARCHAR(512) = '',
 	@sede NVARCHAR(64) = ''
 AS
 BEGIN
@@ -447,6 +469,8 @@ CREATE OR ALTER PROCEDURE InsertParticipante
     @tipoIdentificacion NVARCHAR(16) = '',
 	@numeroIdentificacion NVARCHAR(32),
     @correo NVARCHAR(64),
+    @correoAlternativo NVARCHAR(64) = NULL,
+    @gradoAcademico NVARCHAR(32) = NULL,
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
@@ -457,6 +481,7 @@ CREATE OR ALTER PROCEDURE InsertParticipante
     @departamento NVARCHAR(512) = '',
     @unidadAcademica NVARCHAR(512) = '',
     @sede NVARCHAR(512) = '',
+	@carrera NVARCHAR(512) = '',
 	@horasMatriculadas INT = 0,
 	@horasAprobadas INT = 0
 AS
@@ -470,6 +495,8 @@ BEGIN
         tipo_identificacion,
 		numero_identificacion,
         correo,
+        correo_alternativo,
+        grado_academico,
         nombre,
         apellido_1,
         apellido_2,
@@ -480,6 +507,7 @@ BEGIN
         departamento,
 		unidad_academica,
 		sede,
+		carrera,
 		total_horas_matriculadas,
 		total_horas_aprobadas
     )
@@ -490,6 +518,8 @@ BEGIN
         @tipoIdentificacion,
 		@numeroIdentificacion,
         @correo,
+        NULLIF(LTRIM(RTRIM(@correoAlternativo)), ''),
+        NULLIF(LTRIM(RTRIM(@gradoAcademico)), ''),
         @nombre,
         @apellido1,
         @apellido2,
@@ -500,9 +530,12 @@ BEGIN
         @departamento,
 		@unidadAcademica,
 		@sede,
+		@carrera,
 		@horasMatriculadas,
 		@horasAprobadas
     );
+
+    SELECT @@ROWCOUNT AS FilasAfectadas;
 END
 
 GO
@@ -513,6 +546,8 @@ CREATE OR ALTER PROCEDURE UpdateParticipante
     @tipoIdentificacion NVARCHAR(16) = '',
     @numeroIdentificacion NVARCHAR(32),
     @correo NVARCHAR(64),
+    @correoAlternativo NVARCHAR(64) = NULL,
+    @gradoAcademico    NVARCHAR(32) = NULL,
     @nombre NVARCHAR(64),
     @apellido1 NVARCHAR(64),
     @apellido2 NVARCHAR(64) = '',
@@ -523,6 +558,7 @@ CREATE OR ALTER PROCEDURE UpdateParticipante
     @departamento NVARCHAR(512) = '',
     @unidadAcademica NVARCHAR(512) = '',
     @sede NVARCHAR(512) = '',
+    @carrera NVARCHAR(512) = '',
     @horasMatriculadas INT = 0,
     @horasAprobadas INT = 0
 AS
@@ -534,6 +570,8 @@ BEGIN
         tipo_identificacion = @tipoIdentificacion,
         numero_identificacion = @numeroIdentificacion,
         correo = @correo,
+        correo_alternativo = NULLIF(LTRIM(RTRIM(@correoAlternativo)), ''),
+        grado_academico    = NULLIF(LTRIM(RTRIM(@gradoAcademico)), ''),
         nombre = @nombre,
         apellido_1 = @apellido1,
         apellido_2 = @apellido2,
@@ -544,11 +582,14 @@ BEGIN
         departamento = @departamento,
         unidad_academica = @unidadAcademica,
         sede = @sede,
+        carrera = @carrera,
         total_horas_matriculadas = @horasMatriculadas,
         total_horas_aprobadas = @horasAprobadas
     WHERE
         id_usuario_FK = @idUsuario
         AND id_participante_PK = @idParticipante;
+
+    SELECT @@ROWCOUNT;
 END
 
 GO
@@ -967,7 +1008,7 @@ EXEC InsertUsuario
 	@contrasena = N'4fG7hJ2kL9';
 
 EXEC InsertAsesor 
-    @idUsuario = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
+    @idUsuario = N'MARIA.ENRIQUEZ@ucr.ac.cr',
     @idAsesor = N'MARIA.ENRIQUEZ@ucr.ac.cr', 
     @tipoIdentificacion = N'Cédula', 
     @numeroIdentificacion = N'1-1070-0400', 
@@ -975,7 +1016,7 @@ EXEC InsertAsesor
     @nombre = N'María Ileana', 
     @apellido1 = N'Enriquez', 
     @apellido2 = N'Barrantes',
-	@unidadAcademica = N'METICS',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Asesora docente en METICS.'
 
@@ -991,9 +1032,9 @@ EXEC InsertAsesor
     @numeroIdentificacion = N'1-1520-0692', 
     @correo = N'jose.elizondosalas@ucr.ac.cr', 
     @nombre = N'Jose Antonio', 
-    @apellido1 = N'Elizondo', 
+    @apellido1 = N'Elizondo',
     @apellido2 = N'Salas',
-	@unidadAcademica = N'METICS',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productor audiovisual y asesor docente en METICS.'
 
@@ -1011,7 +1052,7 @@ EXEC InsertAsesor
     @nombre = N'Orlando Daniel', 
     @apellido1 = N'Gómez', 
     @apellido2 = N'Arias',
-	@unidadAcademica = N'METICS',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Gestor de Tecnologías de Información en METICS.'
 
@@ -1029,7 +1070,7 @@ EXEC InsertAsesor
     @nombre = N'Aarón Elí', 
     @apellido1 = N'Mena', 
     @apellido2 = N'Araya',
-	@unidadAcademica = N'METICS',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Director de METICS, Profesor Catedrático de la Escuela de Ciencias de la Comunicación Colectiva.'
 
@@ -1047,7 +1088,7 @@ EXEC InsertAsesor
     @nombre = N'Brenda Lidis', 
     @apellido1 = N'Alfaro', 
     @apellido2 = N'González',
-	@unidadAcademica = N'METICS',
+    @unidadAcademica = N'METICS',
 	@sede = N'Sede Rodrigo Facio',
 	@descripcion = N'Productora audiovisual y asesora docente en METICS.'
 

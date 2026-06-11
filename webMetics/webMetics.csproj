@@ -25,13 +25,11 @@
   <ItemGroup>
     <None Include="Views\Asesor\CrearAsesor.cshtml" />
     <None Include="Views\Asesor\EditarAsesor.cshtml" />
-    <None Include="Views\Asesor\ListaAsesores.cshtml" />
     <None Include="Views\Calificaciones\EditarCalificacion.cshtml" />
     <None Include="Views\Calificaciones\ExportarCalificaciones.cshtml" />
     <None Include="Views\Calificaciones\VerCalificaciones.cshtml" />
     <None Include="Views\Categoria\CrearCategoria.cshtml" />
     <None Include="Views\Categoria\EditarCategoria.cshtml" />
-    <None Include="Views\Categoria\ListaCategorias.cshtml" />
     <None Include="Views\Grupo\CrearGrupo.cshtml" />
     <None Include="Views\Grupo\EditarAdjunto.cshtml" />
     <None Include="Views\Grupo\EditarGrupo.cshtml" />
@@ -62,23 +60,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.20.0" />
     <PackageReference Include="EPPlus" Version="7.1.3" />
     <PackageReference Include="HtmlTextWriter" Version="3.0.1" />
-    <PackageReference Include="itext7" Version="8.0.4" />
-    <PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.4" />
+    <PackageReference Include="itext" Version="9.6.0" />
+    <PackageReference Include="itext.bouncy-castle-adapter" Version="9.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.Build" Version="18.4.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.5" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="8.0.6" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
-    <PackageReference Include="MimeKit" Version="4.7.1" />
+    <PackageReference Include="MimeKit" Version="4.15.1" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPOI" Version="2.7.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,64 @@
+@model webMetics.Models.UsuarioModel
+@{
+    ViewBag.Title = "Completar Información - Correo Alternativo";
+}
+
+<div class="contenedor-caja container-fluid">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-lg" style="border: none; border-radius: 15px;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h1 class="mb-2">Actualización Requerida</h1>
+                        <p class="text-muted">Para continuar, complete su correo alternativo</p>
+                    </div>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error:</strong> @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Éxito:</strong> @ViewBag.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @using (Html.BeginForm("CompletarCorreoAlternativo", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <p class="mb-0">
+                                <strong>Correo Institucional:</strong><br />
+                                <span class="text-secondary">@Model.correo</span>
+                            </p>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.correoAlternativo, new { @class = "form-label fw-bold" })
+                            <small class="d-block mb-2 text-muted">Este es un campo adicional para mejorar la comunicación</small>
+                            @Html.TextBoxFor(m => m.correoAlternativo, new { @class = "form-control", @type = "email", @placeholder = "ejemplo@correo.com", @maxlength = "64", @autocomplete = "off", @required = "required", style = "border-radius: 8px; padding: 12px 15px; font-size: 16px;" })
+                            @Html.ValidationMessageFor(m => m.correoAlternativo, "", new { @class = "text-danger small mt-2" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" style="border-radius: 8px; font-weight: 500; padding: 12px; font-size: 16px;">
+                                <i class="bi bi-check-circle me-2"></i>Guardar y Continuar
+                            </button>
+                        </div>
+
+                        <p class="text-center text-muted small mt-3">
+                            Puede usar cualquier dirección de correo válida.
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

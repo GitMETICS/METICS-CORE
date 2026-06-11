@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using webMetics.Helpers;
 
 namespace webMetics.Models
 {
@@ -22,17 +23,31 @@ namespace webMetics.Models
         [Display(Name = "Correo institucional")]
         public required string correo { get; set; }
 
+        [EmailAddress(ErrorMessage = "El correo alternativo debe ser válido.")]
+        [Required(ErrorMessage = "Es necesario ingresar un correo alternativo.")]
+        [CorreoAlternativoDiferente("correo", ErrorMessage = "El correo alternativo debe ser diferente del correo institucional.")]
+        [Display(Name = "Correo alternativo")]
+        public string? correoAlternativo { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar un grado académico.")]
+        [Display(Name = "Grado Académico")]
+        public string? gradoAcademico { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar un tipo de identificación.")]
         [Display(Name = "Tipo de identificación")]
         public string? tipoIdentificacion { get; set; }
 
         [RegularExpression(@"^((\d-\d{4}-\d{4})|(\d{9}))$", ErrorMessage = "Debe seguir alguno de los siguientes formatos: 0-0000-0000 o 123456789.")]
+        [Required(ErrorMessage = "Es necesario ingresar un número de identificación.")]
         [Display(Name = "Número de identificación")]
         public string? numeroIdentificacion { get; set; }
 
-        [Required(ErrorMessage = "Es necesario ingresar el Área Académica.")]
-        [Display(Name = "Área")]
+        [Required(ErrorMessage = "Es necesario ingresar el Área Académica principal.")]
+        [Display(Name = "Área principal")]
         public string? area { get; set; }
+
+        [Display(Name = "Áreas extra")]
+        public List<string> areasExtra { get; set; } = new List<string>();
 
         [Required(ErrorMessage = "Es necesario ingresar una Facultad o Departamento.")]
         [Display(Name = "Facultad o Departamento")]
@@ -69,6 +84,10 @@ namespace webMetics.Models
         public int correoNotificacionEnviado { get; set; }
 
         public List<GrupoModel>? gruposInscritos { get; set; }
+
+        [Required(ErrorMessage = "Es necesario ingresar una Carrera.")]
+        [Display(Name = "Carrera")]
+        public string? carrera { get; set; }
     }
     public enum TipoIdentificacion
     {

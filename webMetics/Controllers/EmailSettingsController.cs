@@ -2,8 +2,17 @@
 using NETCore.MailKit.Core;
 using Newtonsoft.Json.Linq;
 using System;
+using Microsoft.AspNetCore.Mvc;
+using webMetics.Handlers;
 
-public class EmailSettingsController : Controller
+namespace webMetics.Controllers
+{
+    /// <summary>
+    /// Permite a los administradores habilitar/deshabilitar el envío de correos electrónicos y
+    /// configurar el correo de notificación para el límite de horas. Los cambios se persisten
+    /// en <c>appsettings.json</c>.
+    /// </summary>
+    public class EmailSettingsController : Controller
 {
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
@@ -20,6 +29,7 @@ public class EmailSettingsController : Controller
         accesoAInscripcion = new InscripcionHandler(environment, configuration);
     }
 
+    /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
     private int GetRole()
     {
         int role = 0;
@@ -32,6 +42,7 @@ public class EmailSettingsController : Controller
         return role;
     }
 
+    /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
     private string GetId()
     {
         string id = "";
@@ -44,6 +55,13 @@ public class EmailSettingsController : Controller
         return id;
     }
 
+    /// <summary>Muestra la pantalla de configuración de correo electrónico con el estado actual del envío.</summary>
+    /// <returns>
+    /// View: Index (model: bool — isEnabled) —
+    /// ViewBag.CorreoNotificacion, ViewBag.Role, ViewBag.Id,
+    /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+    /// </returns>
+    /// <remarks>Handlers: InscripcionHandler. Role required: Admin (1).</remarks>
     public IActionResult Index()
     {
         ViewBag.Id = GetId();
@@ -58,6 +76,16 @@ public class EmailSettingsController : Controller
         return View(_isEmailEnabled);
     }
 
+    /// <summary>
+    /// Habilita o deshabilita el envío de correos electrónicos y persiste el cambio en
+    /// <c>appsettings.json</c>.
+    /// </summary>
+    /// <param name="isEnabled"><c>true</c> para habilitar el envío; <c>false</c> para deshabilitarlo.</param>
+    /// <returns>
+    /// Redirects to Index. Sets TempData["successMessage"] si se habilitó o
+    /// TempData["errorMessage"] si se deshabilitó.
+    /// </returns>
+    /// <remarks>Role required: Admin (1).</remarks>
     [HttpPost]
     public IActionResult ToggleEmailSending(bool isEnabled)
     {
@@ -79,6 +107,7 @@ public class EmailSettingsController : Controller
         return RedirectToAction("Index");
     }
 
+    /// <summary>Persiste el valor de <c>EmailSettings:IsEnabled</c> en el archivo <c>appsettings.json</c>.</summary>
     private void SaveSettingsToJsonFile()
     {
         // Path to the appsettings.json file
@@ -98,6 +127,15 @@ public class EmailSettingsController : Controller
         System.IO.File.WriteAllText(filePath, output);
     }
 
+    /// <summary>
+    /// Crea o actualiza el correo de notificación utilizado cuando un participante alcanza el límite de horas.
+    /// </summary>
+    /// <param name="correoLimiteHoras">Dirección de correo electrónico de notificación.</param>
+    /// <returns>
+    /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
+    /// EmailSettings/Index. Sets TempData["successMessage"] on success or TempData["errorMessage"].
+    /// </returns>
+    /// <remarks>Handlers: InscripcionHandler. Role required: Admin (1).</remarks>
     [HttpPost]
     public ActionResult UpdateNotificationEmail(string correoLimiteHoras)
     {
@@ -125,4 +163,5 @@ public class EmailSettingsController : Controller
 
         return RedirectToAction("Index", "EmailSettings");
     }
+}
 }

@@ -60,24 +60,29 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
-                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@telefono", participante.telefono);
-                command.Parameters.AddWithValue("@area", participante.area);
-                command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", participante.sede);
+                command.Parameters.AddWithValue("@correoAlternativo", participante.correoAlternativo ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@gradoAcademico", participante.gradoAcademico ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
+                command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@area", participante.area ?? string.Empty);
+                command.Parameters.AddWithValue("@departamento", participante.departamento ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica ?? string.Empty);
+                command.Parameters.AddWithValue("@sede", participante.sede ?? string.Empty);
+                command.Parameters.AddWithValue("@carrera", participante.carrera ?? string.Empty);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    object? resultado = command.ExecuteScalar();
+                    int filasAfectadas = resultado != null ? Convert.ToInt32(resultado) : 0;
+                    exito = filasAfectadas >= 1;
                 }
                 catch (Exception ex)
                 {
@@ -124,24 +129,29 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idParticipante", participante.idParticipante);
                 command.Parameters.AddWithValue("@nombre", participante.nombre);
                 command.Parameters.AddWithValue("@apellido1", participante.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", participante.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", participante.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", participante.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", participante.correo);
-                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante);
-                command.Parameters.AddWithValue("@condicion", participante.condicion);
-                command.Parameters.AddWithValue("@telefono", participante.telefono);
-                command.Parameters.AddWithValue("@area", participante.area);
-                command.Parameters.AddWithValue("@departamento", participante.departamento);
-                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica);
-                command.Parameters.AddWithValue("@sede", participante.sede);
+                command.Parameters.AddWithValue("@correoAlternativo", participante.correoAlternativo ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@gradoAcademico", participante.gradoAcademico ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@tipoParticipante", participante.tipoParticipante ?? string.Empty);
+                command.Parameters.AddWithValue("@condicion", participante.condicion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", participante.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@area", participante.area ?? string.Empty);
+                command.Parameters.AddWithValue("@departamento", participante.departamento ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", participante.unidadAcademica ?? string.Empty);
+                command.Parameters.AddWithValue("@sede", participante.sede ?? string.Empty);
+                command.Parameters.AddWithValue("@carrera", participante.carrera ?? string.Empty);
                 command.Parameters.AddWithValue("@horasMatriculadas", participante.horasMatriculadas);
                 command.Parameters.AddWithValue("@horasAprobadas", participante.horasAprobadas);
 
                 try
                 {
                     ConexionMetics.Open();
-                    exito = command.ExecuteNonQuery() >= 1;
+                    object? resultado = command.ExecuteScalar();
+                    int filasAfectadas = resultado != null ? Convert.ToInt32(resultado) : 0;
+                    exito = filasAfectadas >= 1;
                 }
                 catch (Exception ex)
                 {
@@ -183,6 +193,8 @@ namespace webMetics.Handlers
                                 tipoIdentificacion = reader["tipo_identificacion"].ToString(),
                                 numeroIdentificacion = reader["numero_identificacion"].ToString(),
                                 correo = reader["correo"].ToString(),
+                                correoAlternativo = reader["correo_alternativo"] != DBNull.Value ? reader["correo_alternativo"].ToString() : null,
+                                gradoAcademico = reader["grado_academico"] != DBNull.Value ? reader["grado_academico"].ToString() : null,
                                 tipoParticipante = reader["tipo_participante"].ToString(),
                                 condicion = reader["condicion"].ToString(),
                                 telefono = reader["telefono"].ToString(),
@@ -190,6 +202,7 @@ namespace webMetics.Handlers
                                 departamento = reader["departamento"].ToString(),
                                 unidadAcademica = reader["unidad_academica"].ToString(),
                                 sede = reader["sede"].ToString(),
+                                carrera = reader["carrera"].ToString(),
                                 horasAprobadas = reader.GetInt32(reader.GetOrdinal("total_horas_aprobadas")),
                                 horasMatriculadas = reader.GetInt32(reader.GetOrdinal("total_horas_matriculadas")),
                                 correoNotificacionEnviado = reader.GetInt32(reader.GetOrdinal("correo_notificacion_enviado")),
@@ -207,8 +220,349 @@ namespace webMetics.Handlers
                 }
             }
 
+            // Obtener áreas extra
+            if (participante != null)
+            {
+                participante.areasExtra = GetAreasExtraByParticipante(idParticipante);
+            }
+
             return participante;
         }
+
+        public List<string> GetAreasExtraByParticipante(string idParticipante)
+        {
+            var areasExtra = new List<string>();
+            var areasExtraSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            const string consulta = "SELECT area_extra FROM participante_area_extra WHERE id_participante_FK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+
+                using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
+
+                    using (var reader = comandoConsulta.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string? areaExtra = reader["area_extra"]?.ToString();
+                            if (!string.IsNullOrWhiteSpace(areaExtra) && areasExtraSet.Add(areaExtra))
+                            {
+                                areasExtra.Add(areaExtra);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener áreas extra: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return areasExtra;
+        }
+
+        public Dictionary<string, List<string>> GetAreasExtraParticipantes()
+        {
+            var sets = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            const string consulta = "SELECT id_participante_FK, area_extra FROM participante_area_extra;";
+
+            try
+            {
+                ConexionMetics.Open();
+
+                using (SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics))
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string? id = reader["id_participante_FK"]?.ToString();
+                        string? area = reader["area_extra"]?.ToString();
+
+                        if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(area))
+                            continue;
+
+                        if (!sets.TryGetValue(id, out var set))
+                            sets[id] = set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                        set.Add(area);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener áreas extra en batch: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return sets.ToDictionary(kv => kv.Key, kv => kv.Value.ToList(), StringComparer.OrdinalIgnoreCase);
+        }
+
+        private string ObtenerCorreoAlternativoUsuario(string idUsuario)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                            ? reader["correo_alternativo"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        public bool GuardarAreasExtraParticipante(string idParticipante, List<string> areasExtra)
+        {
+            if (string.IsNullOrWhiteSpace(idParticipante))
+            {
+                return false;
+            }
+
+            bool exito = true;
+
+            try
+            {
+                ConexionMetics.Open();
+                using SqlTransaction transaction = ConexionMetics.BeginTransaction();
+
+                try
+                {
+                    using (var commandDelete = new SqlCommand(
+                        "DELETE FROM participante_area_extra WHERE id_participante_FK = @idParticipante",
+                        ConexionMetics, transaction))
+                    {
+                        commandDelete.Parameters.AddWithValue("@idParticipante", idParticipante);
+                        commandDelete.ExecuteNonQuery();
+                    }
+
+                    foreach (string areaExtra in areasExtra)
+                    {
+                        using var commandInsert = new SqlCommand(
+                            "INSERT INTO participante_area_extra (id_participante_FK, area_extra) VALUES (@idParticipante, @areaExtra)",
+                            ConexionMetics, transaction);
+
+                        commandInsert.Parameters.AddWithValue("@idParticipante", idParticipante);
+                        commandInsert.Parameters.AddWithValue("@areaExtra", areaExtra);
+                        commandInsert.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in GuardarAreasExtraParticipante: {ex.Message}");
+                    transaction.Rollback();
+                    exito = false;
+                }
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Actualiza el correo alternativo de un participante directamente en la tabla participante.
+        /// </summary>
+        public bool ActualizarCorreoAlternativoParticipante(string idParticipante, string correoAlternativo)
+        {
+            bool exito = false;
+            string consulta = "UPDATE participante SET correo_alternativo = @correoAlternativo WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comando.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+                    exito = comando.ExecuteNonQuery() >= 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar correo alternativo en participante: {ex.Message}");
+                exito = false;
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Actualiza el grado académico de un participante directamente en la tabla participante.
+        /// </summary>
+        public bool ActualizarGradoAcademicoParticipante(string idParticipante, string gradoAcademico)
+        {
+            bool exito = false;
+            string consulta = "UPDATE participante SET grado_academico = @gradoAcademico WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    comando.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
+                    exito = comando.ExecuteNonQuery() >= 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar grado académico en participante: {ex.Message}");
+                exito = false;
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return exito;
+        }
+
+        /// <summary>
+        /// Obtiene el correo alternativo de un participante desde la tabla participante.
+        /// </summary>
+        public string ObtenerCorreoAlternativoParticipante(string idParticipante)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM participante WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    using (var reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                                ? reader["correo_alternativo"].ToString()
+                                : null;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo del participante: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        /// <summary>
+        /// Obtiene el grado académico de un participante desde la tabla participante.
+        /// </summary>
+        public string ObtenerGradoAcademicoParticipante(string idParticipante)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM participante WHERE id_participante_PK = @idParticipante;";
+
+            try
+            {
+                ConexionMetics.Open();
+                using (SqlCommand comando = new SqlCommand(consulta, ConexionMetics))
+                {
+                    comando.Parameters.AddWithValue("@idParticipante", idParticipante);
+                    using (var reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            gradoAcademico = reader["grado_academico"] != DBNull.Value
+                                ? reader["grado_academico"].ToString()
+                                : null;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico del participante: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
+        private string ObtenerGradoAcademicoUsuario(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
 
         /*// Método async para obtener un participante específico según su ID
         public async Task<ParticipanteModel> ObtenerParticipanteAsync(string idParticipante)
@@ -217,7 +571,7 @@ namespace webMetics.Handlers
 
             using (SqlCommand command = new SqlCommand("SelectParticipante", ConexionMetics))
             {
-                command.CommandType = CommandType.StoredProcedure;
+
                 command.Parameters.AddWithValue("@id", idParticipante);
 
                 try
@@ -440,17 +794,22 @@ namespace webMetics.Handlers
                 departamento = Convert.ToString(filaParticipante["departamento"]),
                 unidadAcademica = Convert.ToString(filaParticipante["unidad_academica"]),
                 sede = Convert.ToString(filaParticipante["sede"]),
+                carrera = filaParticipante.Table.Columns.Contains("carrera") ? Convert.ToString(filaParticipante["carrera"]) : string.Empty,
                 horasMatriculadas = Convert.ToInt32(filaParticipante["total_horas_matriculadas"]),
                 horasAprobadas = Convert.ToInt32(filaParticipante["total_horas_aprobadas"]),
                 correoNotificacionEnviado = Convert.ToInt32(filaParticipante["correo_notificacion_enviado"]),
-                gruposInscritos = new List<GrupoModel>()
+                gruposInscritos = new List<GrupoModel>(),
+                correoAlternativo = filaParticipante.Table.Columns.Contains("correo_alternativo") ? 
+                    (filaParticipante["correo_alternativo"] != DBNull.Value ? Convert.ToString(filaParticipante["correo_alternativo"]) : null) : null,
+                gradoAcademico = filaParticipante.Table.Columns.Contains("grado_academico") ? 
+                    (filaParticipante["grado_academico"] != DBNull.Value ? Convert.ToString(filaParticipante["grado_academico"]) : null) : null
             };
 
             return info;
         }
 
 
-        // Método para obtener una lista de todos los participantes
+
         public List<ParticipanteModel> ObtenerListaParticipantes()
         {
             string consulta = "SELECT * FROM participante";
@@ -913,8 +1272,6 @@ namespace webMetics.Handlers
                             }
                             else
                             {
-                                // Si no hay secciones, agregar una cadena vacía a la lista de secciones
-                                seccionesList.Add("");
                                 break;
                             }
                         }
@@ -923,6 +1280,54 @@ namespace webMetics.Handlers
                 }
             }
             return seccionesList;
+        }
+        public List<string> GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
+        {
+            JObject jsonObject = (JObject)GetJsonFile();
+            JArray areasArray = (JArray)jsonObject["areas"];
+            List<string> carrerasList = new List<string>();
+
+            foreach (JObject areaObject in areasArray)
+            {
+                string currentAreaName = (string)areaObject["name"];
+                if (!string.Equals(currentAreaName, areaName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                JArray departamentosArray = (JArray)areaObject["departamentos"];
+                foreach (JObject departamentoObject in departamentosArray)
+                {
+                    string currentDepartamentoName = (string)departamentoObject["name"];
+                    if (!string.Equals(currentDepartamentoName, departamentoName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    JArray seccionesArray = (JArray)departamentoObject["secciones"];
+                    if (seccionesArray != null)
+                    {
+                        foreach (JObject seccionObject in seccionesArray)
+                        {
+                            string currentSeccionName = (string)seccionObject["name"];
+                            if (string.Equals(currentSeccionName, unidadAcademica, StringComparison.OrdinalIgnoreCase))
+                            {
+                                JObject carrerasObj = (JObject)seccionObject["carreras"];
+                                if (carrerasObj != null && carrerasObj[sede] != null)
+                                {
+                                    JArray carrerasArray = (JArray)carrerasObj[sede];
+                                    foreach (var carrera in carrerasArray)
+                                    {
+                                        carrerasList.Add((string)carrera);
+                                    }
+                                }
+                                return carrerasList;
+                            }
+                        }
+                    }
+                }
+            }
+            return carrerasList;
         }
     }
 }

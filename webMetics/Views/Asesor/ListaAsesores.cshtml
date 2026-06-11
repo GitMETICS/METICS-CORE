@@ -1,4 +1,4 @@
-﻿@using webMetics.Controllers
+@using webMetics.Controllers
 
 <!--
     Vista para mostrar la lista de todos los asesores con la información personal de cada uno
@@ -41,16 +41,6 @@
             </div>
         }
 
-        <div class="d-flex justify-content-between mb-4">
-            <div></div>
-
-            <div class="d-flex justify-content-end">
-                <div class="mx-1">
-                    @Html.ActionLink("   Agregar", "CrearAsesor", "Asesor", new { }, new { @class = "btn btn-primary bi bi-person-plus" })
-                </div>
-            </div>
-        </div>
-
         <div class="table-responsive">
             @if (ViewBag.Asesores == null)
             {
@@ -58,49 +48,86 @@
             }
             else
             {
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Primer<br>Apellido</th>
-                            <th scope="col">Segundo<br>Apellido</th>
-                            <th scope="col">Correo Institucional</th>
-                            <th scope="col">Descripción</th>
-                            <th scope="col" style="width:10%;">Teléfono</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                        </tr>
-                    </thead>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <span class="table-card-title">Facilitadores(as)</span>
+                        <span class="table-card-desc">Listado de facilitadores(as) registrados en el sistema</span>
+                    </div>
 
-                    <tbody>
-                        @foreach (var asesor in ViewBag.Asesores)
-                        {
-                            var nombreCompleto = asesor.nombre;
-                            nombreCompleto += " " + asesor.primerApellido;
-                            if (asesor.segundoApellido != "-")
-                            {
-                                nombreCompleto += " " + asesor.segundoApellido;
-                            }
+                    <div class="table-toolbar">
+                        <div class="table-toolbar-group">
+                            <div class="table-pagesize">
+                                <label for="asesorPageSize">Mostrar</label>
+                                <select id="asesorPageSize">
+                                    <option selected>5</option>
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                </select>
+                                <label for="asesorPageSize">registros</label>
+                            </div>
 
-                            <tr>
-                                <td>@asesor.nombre</td>
-                                <td>@asesor.primerApellido</td>
-                                <td>@asesor.segundoApellido</td>
-                                <td>@asesor.correo</td>
-                                <td>@asesor.descripcion</td>
-                                <td>@asesor.telefono</td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = asesor.idAsesor }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@asesor.idAsesor')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                            <div class="table-search">
+                                <input type="text" id="asesorBusqueda" class="form-control" placeholder="Buscar facilitador(a)" />
+                                <button type="button" class="btn"><i class="bi bi-search"></i></button>
+                            </div>
+                        </div>
+
+                        <div>
+                            @Html.ActionLink("  Crear Facilitador(a)", "CrearAsesor", "Asesor", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
+                        </div>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table id="asesorTblCustomers" class="data-table" style="min-width: 900px;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 11%;">Nombre</th>
+                                    <th scope="col" style="width: 9%;">Primer Apellido</th>
+                                    <th scope="col" style="width: 9%;">Segundo Apellido</th>
+                                    <th scope="col" style="width: 13%;">Correo Institucional</th>
+                                    <th scope="col" style="width: 15%;">Descripción</th>
+                                    <th scope="col" style="width: 6%;">Teléfono</th>
+                                    <th scope="col" class="text-center" style="width: 4%;">Editar</th>
+                                    <th scope="col" class="text-center" style="width: 4%;">Eliminar</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var asesor in ViewBag.Asesores)
+                                {
+                                    var nombreCompleto = asesor.nombre;
+                                    nombreCompleto += " " + asesor.primerApellido;
+                                    if (asesor.segundoApellido != "-")
+                                    {
+                                        nombreCompleto += " " + asesor.segundoApellido;
+                                    }
+
+                                    <tr>
+                                        <td>@asesor.nombre</td>
+                                        <td>@asesor.primerApellido</td>
+                                        <td>@asesor.segundoApellido</td>
+                                        <td>@asesor.correo</td>
+                                        <td>@asesor.descripcion</td>
+                                        <td>@asesor.telefono</td>
+                                        <td class="text-center">
+                                            <a href="@Url.Action("EditarAsesor", "Asesor", new { idAsesor = asesor.idAsesor })" class="icon-action icon-edit" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="#" onclick="openAsesorDeleteModal('@asesor.idAsesor'); return false;" class="icon-action icon-delete" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="asesorTblPaginacion" class="table-pagination"></div>
+                </div>
             }
         </div>
     </div>
@@ -114,9 +141,11 @@
                 </div>
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar a este(a) facilitador(a)?
-                    <br />
+
                     @using (Html.BeginForm("EliminarAsesor", "Asesor"))
                     {
+                        @Html.AntiForgeryToken()
+
                         <div class="modal-footer">
                             <input type="hidden" id="idAsesor" name="idAsesor">
                             <input type="submit" class="btn btn-danger" value="Aceptar" />
@@ -136,7 +165,23 @@ else
 }
 
 <script type="text/javascript">
-    function actualizarModalEliminar(idAsesor) {
-        document.getElementById("idAsesor").value = idAsesor;
+    // Función para abrir modal de eliminación
+    function openAsesorDeleteModal(asesorId) {
+        document.getElementById("idAsesor").value = asesorId;
+        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        deleteModal.show();
     }
+
+    // Función heredada para mantener compatibilidad
+    function actualizarModalEliminar(idAsesor) {
+        openAsesorDeleteModal(idAsesor);
+    }
+
+    MeticsTable.init({
+        tableId: 'asesorTblCustomers',
+        pageSizeId: 'asesorPageSize',
+        paginationId: 'asesorTblPaginacion',
+        searching: true,
+        searchInputId: 'asesorBusqueda'
+    });
 </script>

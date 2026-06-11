@@ -1,4 +1,4 @@
-﻿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
     ViewBag.Title = "Niveles";
 
@@ -35,56 +35,77 @@
             </div>
         }
 
-        <div class="d-flex justify-content-between mb-4">
-            <div></div>
-
-            <div class="d-flex justify-content-end">
-                <div class="mx-1">
-                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
-                </div>
+        @if (ViewBag.Categorias == null)
+        {
+            <h5 class="text-center mb-4">No hay categorías.</h5>
+            <div class="text-center">
+                @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
             </div>
-        </div>
-
-        <div class="table-responsive">
-            @if (ViewBag.Categorias == null)
-            {
-                <h5 class="text-center">No hay categorías.</h5>
-                <div class="justify-content-center m-3">
-                    @Html.ActionLink("  Crear", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+        }
+        else
+        {
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span class="table-card-title">Niveles</span>
+                    <span class="table-card-desc">Listado de niveles registrados en el sistema</span>
                 </div>
-            }
-            else
-            {
-                <table class="table table-striped" id="tblCustomers">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Descripción</th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                            <th class="text-center" scope="col" style="width:3.33%;"></th>
-                        </tr>
-                    </thead>
 
-                    <tbody>
-                        @foreach (var categoria in ViewBag.Categorias)
-                        {
+                <div class="table-toolbar">
+                    <div class="table-toolbar-group">
+                        <div class="table-pagesize">
+                            <label for="categoriaPageSize">Mostrar</label>
+                            <select id="categoriaPageSize">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                            <label for="categoriaPageSize">registros</label>
+                        </div>
+
+                        <div class="table-search">
+                            <input type="text" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" />
+                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table id="categoriaTblCustomers" class="data-table" style="min-width: 700px;">
+                        <thead>
                             <tr>
-                                <td>@categoria.nombre</td>
-                                <td>@categoria.descripcion</td>
-                                <td>
-                                    @Html.ActionLink(" ", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "text-secondary bi bi-pencil-square" })
-                                </td>
-                                <td>
-                                    <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@categoria.idCategoria')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
+                                <th scope="col" style="width: 30%;">Nombre</th>
+                                <th scope="col" style="width: 60%;">Descripción</th>
+                                <th scope="col" class="text-center" style="width: 5%;">Editar</th>
+                                <th scope="col" class="text-center" style="width: 5%;">Eliminar</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var categoria in ViewBag.Categorias)
+                            {
+                                <tr>
+                                    <td>@categoria.nombre</td>
+                                    <td>@categoria.descripcion</td>
+                                    <td class="text-center">
+                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="categoriaTblPaginacion" class="table-pagination"></div>
+            </div>
+        }
     </div>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
@@ -120,5 +141,15 @@ else
 <script type="text/javascript">
     function actualizarModalEliminar(idCategoria) {
         document.getElementById("idCategoria").value = idCategoria;
+        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+        deleteModal.show();
     }
+
+    MeticsTable.init({
+        tableId: 'categoriaTblCustomers',
+        pageSizeId: 'categoriaPageSize',
+        paginationId: 'categoriaTblPaginacion',
+        searching: true,
+        searchInputId: 'categoriaBusqueda'
+    });
 </script>

@@ -73,6 +73,74 @@ namespace webMetics.Handlers
             return asesor;
         }
 
+        private string ObtenerCorreoAlternativoUsuario(string idUsuario)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                            ? reader["correo_alternativo"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        private string ObtenerGradoAcademicoUsuario(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
         public List<SelectListItem> ObtenerListaSeleccionAsesores()
         {
             List<AsesorModel> asesores = ObtenerAsesores();
@@ -165,12 +233,14 @@ namespace webMetics.Handlers
                 command.Parameters.AddWithValue("@idAsesor", asesor.idAsesor);
                 command.Parameters.AddWithValue("@nombre", asesor.nombre);
                 command.Parameters.AddWithValue("@apellido1", asesor.primerApellido);
-                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido);
-                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion);
-                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion);
+                command.Parameters.AddWithValue("@apellido2", asesor.segundoApellido ?? string.Empty);
+                command.Parameters.AddWithValue("@tipoIdentificacion", asesor.tipoIdentificacion ?? string.Empty);
+                command.Parameters.AddWithValue("@numeroIdentificacion", asesor.numeroIdentificacion ?? string.Empty);
                 command.Parameters.AddWithValue("@correo", asesor.correo);
-                command.Parameters.AddWithValue("@descripcion", asesor.descripcion);
-                command.Parameters.AddWithValue("@telefono", asesor.telefono);
+                command.Parameters.AddWithValue("@descripcion", asesor.descripcion ?? string.Empty);
+                command.Parameters.AddWithValue("@telefono", asesor.telefono ?? string.Empty);
+                command.Parameters.AddWithValue("@unidadAcademica", string.Empty);
+                command.Parameters.AddWithValue("@sede", string.Empty);
 
                 try
                 {

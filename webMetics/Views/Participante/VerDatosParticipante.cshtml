@@ -3,6 +3,24 @@
     ViewBag.Title = "Módulos del Participante";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    var volverController = "Inscripcion";
+    var volverAction = "VerInscripciones";
+    object volverRouteValues = new { };
+    var volverTexto = "Regresar";
+
+    if (ViewBag.IdGrupo != null)
+    {
+        volverController = "Participante";
+        volverAction = "ListaParticipantes";
+        volverRouteValues = new { idGrupo = ViewBag.IdGrupo };
+        volverTexto = "Regresar a Módulo";
+    }
+    else if (!string.IsNullOrWhiteSpace(urlReferrer) &&
+             urlReferrer.Contains("/Participante/VerParticipantes", StringComparison.OrdinalIgnoreCase))
+    {
+        volverController = "Participante";
+        volverAction = "VerParticipantes";
+    }
 }
 
 <style>
@@ -30,6 +48,159 @@
     max-height: 200px;
     margin-bottom: 5px;
     }
+
+    /* La tarjeta y su encabezado usan las clases compartidas
+       .table-card / .table-card-header (site.css). */
+    .participante-detalle-wrapper {
+        overflow-x: auto;
+        width: 100%;
+        background: white;
+    }
+
+    .participante-detalle-table {
+        border-collapse: collapse;
+        font-size: 12px;
+        width: 100%;
+        min-width: 1100px;
+        background: white;
+        margin: 0;
+    }
+
+    .participante-detalle-table th {
+        background: #ECECEC;
+        border: 1px solid #CCCCCC;
+        padding: 9px;
+        font-weight: bold;
+        white-space: nowrap;
+        color: #333;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .participante-detalle-table td {
+        border: 1px solid #CCCCCC;
+        padding: 8px 9px;
+        vertical-align: top;
+    }
+
+    .participante-detalle-table .detalle-label {
+        width: 16%;
+        background: #F9F9F9;
+        color: #204C6F;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .participante-detalle-table .detalle-value {
+        width: 34%;
+    }
+
+    .detalle-empty {
+        color: #777;
+    }
+
+    .detalle-badge {
+        display: inline-block;
+        background: #E3F3FB;
+        border: 1px solid #41ADE7;
+        border-radius: 2px;
+        color: #204C6F;
+        font-size: 12px;
+        margin: 2px 4px 2px 0;
+        padding: 2px 6px;
+    }
+
+    .modulos-detalle-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .modulos-detalle-card {
+        background: white;
+        border: 1px solid #CCCCCC;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .modulo-detalle-toggle {
+        align-items: center;
+        background: #F9F9F9;
+        border: 0;
+        border-bottom: 1px solid #CCCCCC;
+        color: #204C6F;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        padding: 11px 14px;
+        text-align: left;
+        width: 100%;
+    }
+
+    .modulo-detalle-toggle:hover {
+        background: #E3F3FB;
+    }
+
+    .modulo-detalle-title {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .modulo-detalle-name {
+        color: #204C6F;
+        font-size: 13px;
+        font-weight: bold;
+        line-height: 1.35;
+    }
+
+    .modulo-detalle-status {
+        background: white;
+        border: 1px solid #CCCCCC;
+        border-radius: 2px;
+        color: #333;
+        flex-shrink: 0;
+        font-size: 12px;
+        padding: 3px 7px;
+    }
+
+    .modulo-detalle-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .modulo-detalle-table {
+        background: white;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin: 0;
+        min-width: 980px;
+        width: 100%;
+    }
+
+    .modulo-detalle-table th {
+        background: #ECECEC;
+        border: 1px solid #CCCCCC;
+        color: #333;
+        font-weight: bold;
+        padding: 9px;
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .modulo-detalle-table td {
+        border: 1px solid #CCCCCC;
+        padding: 8px 9px;
+        vertical-align: middle;
+    }
+
+    .modulo-detalle-table .form-control {
+        font-size: 12px;
+        max-width: 125px;
+    }
 </style>
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
@@ -38,18 +209,9 @@
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
-                @if (ViewBag.IdGrupo != null)
-                {
-                    <a class="text-dark fs-4" href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })">
-                        <i class="bi bi-arrow-left"> </i>
-                    </a>
-                }
-                else
-                {
-                    <a class="text-dark fs-4" href="@Url.Action("VerInscripciones", "Inscripcion")">
-                        <i class="bi bi-arrow-left"> </i>
-                    </a>
-                }
+                <a class="text-dark fs-4" href="@Url.Action(volverAction, volverController, volverRouteValues)">
+                    <i class="bi bi-arrow-left"> </i>
+                </a>
             </div>
         }
 
@@ -178,128 +340,183 @@
                 var nombreCompleto = ViewBag.Participante.nombre;
                 nombreCompleto += " " + ViewBag.Participante.primerApellido;
 
-                <table class="table table-striped mt-3">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nombre Completo</th>
-                            <th scope="col">Correo Institucional</th>
-                            <th scope="col">Módulos Inscritos</th>
-                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Inscritas</th>
-                            <th class="text-center" scope="col" style="width: 10%">Total Horas<br>Aprobadas</th>
-                        </tr>
-                    </thead>
+                if (ViewBag.Participante.segundoApellido != "-")
+                {
+                    nombreCompleto += " " + ViewBag.Participante.segundoApellido;
+                }
 
-                    <tbody class="align-middle">
-                        @if (ViewBag.Participante.segundoApellido != "-")
-                        {
-                            nombreCompleto += " " + ViewBag.Participante.segundoApellido;
-                        }
+                var participante = ViewBag.Participante;
+                var areasParticipante = participante.areasExtra as List<string> ?? new List<string>();
+                string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+                string NotificationStatus(int value) => value != 0 ? "Enviada" : "No enviada";
 
-                        <tr>
-                            <td class="">
-                                <span>@nombreCompleto</span>
-                            </td>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <span class="table-card-title">Datos del participante</span>
+                        <span class="table-card-desc">Información completa registrada en el sistema</span>
+                    </div>
 
-                            <td class="">
-                                <span>@ViewBag.Participante.idParticipante</span>
-                            </td>
-
-                            <td class="">
-                                @foreach (var inscripcion in ViewBag.Inscripciones)
-                                {
-                                    <div class="my-2"><i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
-                                }
-                            </td>
-
-                            <td class="text-center">
-                                <span>@(ViewBag.Participante.horasMatriculadas)</span>
-                            </td>
-
-                            <td class="text-center">
-                                <span>@ViewBag.Participante.horasAprobadas</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <table class="w-100">
-                    <tbody>
-                        @if (ViewBag.Inscripciones != null)
-                        {
-                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                            {
-                                <tr data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" class="accordion-toggle">
-                                    <td colspan="8" class="text-center">
-                                        <a href="#" class="btn btn-link">Ver Detalles de @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</a>
-                                    </td>
-                                </tr>
-
+                    <div class="participante-detalle-wrapper">
+                        <table class="participante-detalle-table">
+                            <thead>
                                 <tr>
-                                    <td colspan="8" class="hiddenRow">
-                                        <div id="detalle-@inscripcion.idInscripcion" class="collapse in">
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="" scope="col" style="width:20%;">Nombre Completo</th>
-                                                        <th class="" scope="col" style="width:20%;">Módulo</th>
-                                                        <th class="" scope="col" style="width:7.5%;">Estado</th>
-
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
-                                                        <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
-                                                        <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
-                                                        <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
-                                                        <th class="text-center" scope="col" style="width: 3.33%;"></th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody class="align-middle">
-                                                    <tr>
-                                                        <td class="">@nombreCompleto</td>
-                                                        <td class="">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                                        <td class="">@inscripcion.estado</td>
-
-                                                        <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
-                                                        <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
-                                                        @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
-                                                        {
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <input type="number" min="0" class="form-control" style="max-width: 125px;" name="horasAprobadas">
-                                                                </div>
-                                                            </td>
-                                                            <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <input type="number" min="0" , max="100" class="form-control" style="max-width: 125px;" name="calificacion" id="calificacion">
-                                                                </div>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <div class="my-2 align-items-center justify-content-start d-lg-flex">
-                                                                    <button type="submit" class="m-1 btn btn-secondary bi bi-check-lg"></button>
-                                                                </div>
-                                                            </td>
-                                                        }
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                    <th colspan="4">Información personal y académica</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="detalle-label">Nombre completo</td>
+                                    <td class="detalle-value">@nombreCompleto</td>
+                                    <td class="detalle-label">Correo institucional</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.correo)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Correo alternativo</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.correoAlternativo)</td>
+                                    <td class="detalle-label">Grado académico</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.gradoAcademico)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Tipo de identificación</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.tipoIdentificacion)</td>
+                                    <td class="detalle-label">Número de identificación</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.numeroIdentificacion)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Área principal</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.area)</td>
+                                    <td class="detalle-label">Áreas extra</td>
+                                    <td class="detalle-value">
+                                        @if (!areasParticipante.Any())
+                                        {
+                                            <span class="detalle-empty">Ninguna</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var area in areasParticipante)
+                                            {
+                                                <span class="detalle-badge">@area</span>
+                                            }
+                                        }
                                     </td>
                                 </tr>
-                            }
+                                <tr>
+                                    <td class="detalle-label">Facultad o departamento</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.departamento)</td>
+                                    <td class="detalle-label">Unidad académica</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.unidadAcademica)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Sede y recinto</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.sede)</td>
+                                    <td class="detalle-label">Carrera</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.carrera)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Tipo de participante</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.tipoParticipante)</td>
+                                    <td class="detalle-label">Condición</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.condicion)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Teléfono</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.telefono)</td>
+                                    <td class="detalle-label">Identificador</td>
+                                    <td class="detalle-value">@ValueOrDash(participante.idParticipante)</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Total horas inscritas</td>
+                                    <td class="detalle-value">@participante.horasMatriculadas</td>
+                                    <td class="detalle-label">Total horas aprobadas</td>
+                                    <td class="detalle-value">@participante.horasAprobadas</td>
+                                </tr>
+                                <tr>
+                                    <td class="detalle-label">Notificación de límite de horas</td>
+                                    <td class="detalle-value">@NotificationStatus(participante.correoNotificacionEnviado)</td>
+                                    <td class="detalle-label">Módulos inscritos</td>
+                                    <td class="detalle-value">
+                                        @if (ViewBag.Inscripciones == null)
+                                        {
+                                            <span class="detalle-empty">Ninguno</span>
+                                        }
+                                        else
+                                        {
+                                            foreach (var inscripcion in ViewBag.Inscripciones)
+                                            {
+                                                <div>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</div>
+                                            }
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (ViewBag.Inscripciones != null)
+                {
+                    <div class="modulos-detalle-list">
+                        @foreach (var inscripcion in ViewBag.Inscripciones)
+                        {
+                            <div class="modulos-detalle-card">
+                                <button class="modulo-detalle-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" aria-expanded="false" aria-controls="detalle-@inscripcion.idInscripcion">
+                                    <span class="modulo-detalle-title">
+                                        <i class="bi bi-chevron-down"></i>
+                                        <span class="modulo-detalle-name">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</span>
+                                    </span>
+                                    <span class="modulo-detalle-status">@inscripcion.estado</span>
+                                </button>
+
+                                <div id="detalle-@inscripcion.idInscripcion" class="collapse">
+                                    <div class="modulo-detalle-wrapper">
+                                        <table class="modulo-detalle-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" style="width:20%;">Nombre Completo</th>
+                                                    <th scope="col" style="width:20%;">Módulo</th>
+                                                    <th scope="col" style="width:7.5%;">Estado</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Inscritas</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Horas<br>Aprobadas</th>
+                                                    <th class="text-center" scope="col" style="width: 15%;">Aprobar<br>Horas</th>
+                                                    <th class="text-center" scope="col" style="width: 7.5%;">Calificación</th>
+                                                    <th class="text-center" scope="col" style="width: 15%;">Editar<br>Calificación</th>
+                                                    <th class="text-center" scope="col" style="width: 3.33%;"></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody class="align-middle">
+                                                <tr>
+                                                    <td>@nombreCompleto</td>
+                                                    <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                                    <td>@inscripcion.estado</td>
+                                                    <td class="text-center">@((inscripcion.horasMatriculadas ?? 0))</td>
+                                                    <td class="text-center">@((inscripcion.horasAprobadas ?? 0))</td>
+                                                    @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
+                                                    {
+                                                        <td class="text-center">
+                                                            <input type="number" min="0" class="form-control mx-auto" name="horasAprobadas">
+                                                        </td>
+                                                        <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
+                                                        <td class="text-center">
+                                                            <input type="number" min="0" , max="100" class="form-control mx-auto" name="calificacion" id="calificacion">
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="submit" class="btn btn-secondary bi bi-check-lg" title="Guardar"></button>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         }
-                    </tbody>
-                </table>
+                    </div>
+                }
             }
             <hr />
             <div class="d-flex my-4 justify-content-center">
-                @if (ViewBag.IdGrupo != null)
-                {
-                    <a href="@Url.Action("ListaParticipantes", "Participante", new { idGrupo = ViewBag.IdGrupo })" class="btn btn-secondary btn-block">Regresar a Módulo</a>
-                }
-                else {
-                    <a href="@Url.Action("VerInscripciones", "Inscripcion")" class="btn btn-secondary btn-block">Regresar</a>
-                }
+                <a href="@Url.Action(volverAction, volverController, volverRouteValues)" class="btn btn-secondary btn-block">@volverTexto</a>
             </div>
         </div>
 

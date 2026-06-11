@@ -14,6 +14,13 @@ namespace webMetics.Handlers
 
         }
 
+        /// <summary>
+        /// Crea un nuevo usuario en la base de datos utilizando el procedimiento almacenado "InsertUsuario".
+        /// </summary>
+        /// <param name="id">Correo institucional del usuario, que también se usará como su identificador único.</param>
+        /// <param name="contrasena">Contraseña del usuario, que se almacenará en la base de datos.</param>
+        /// <param name="rol">Rol del usuario, representado como un entero (0 para participante, 1 para administrador). Por defecto es 0.</param>
+        /// <returns>true si el usuario se creó exitosamente; false en caso contrario.</returns>
         public bool CrearUsuario(string id, string contrasena, int rol = 0)
         {
             bool exito = false;
@@ -30,8 +37,9 @@ namespace webMetics.Handlers
                     ConexionMetics.Open();
                     exito = command.ExecuteNonQuery() >= 1;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine($"Error in CrearUsuario: {ex.Message}");
                     exito = false;
                 }
                 finally
@@ -216,6 +224,126 @@ namespace webMetics.Handlers
 
             SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
             comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public string ObtenerCorreoAlternativo(string idUsuario)
+        {
+            string correoAlternativo = null;
+            string consulta = "SELECT correo_alternativo FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        correoAlternativo = reader["correo_alternativo"] != DBNull.Value
+                            ? reader["correo_alternativo"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener correo alternativo: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return correoAlternativo;
+        }
+
+        public string ObtenerGradoAcademico(string idUsuario)
+        {
+            string gradoAcademico = null;
+            string consulta = "SELECT grado_academico FROM usuario WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+            try
+            {
+                using (var reader = comandoConsulta.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        gradoAcademico = reader["grado_academico"] != DBNull.Value
+                            ? reader["grado_academico"].ToString()
+                            : null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al obtener grado académico: {ex.Message}");
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return gradoAcademico;
+        }
+
+        public bool ActualizarCorreoAlternativoYGradoAcademico(string idUsuario, string correoAlternativo, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo, grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo ?? (object)DBNull.Value);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico ?? (object)DBNull.Value);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public bool ActualizarCorreoAlternativo(string idUsuario, string correoAlternativo)
+        {
+            string consulta = "UPDATE usuario SET correo_alternativo = @correoAlternativo WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@correoAlternativo", correoAlternativo);
+
+            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
+
+            ConexionMetics.Close();
+
+            return exito;
+        }
+
+        public bool ActualizarGradoAcademico(string idUsuario, string gradoAcademico)
+        {
+            string consulta = "UPDATE usuario SET grado_academico = @gradoAcademico WHERE id_usuario_PK = @idUsuario;";
+
+            ConexionMetics.Open();
+
+            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
+            comandoConsulta.Parameters.AddWithValue("@gradoAcademico", gradoAcademico);
 
             bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
 

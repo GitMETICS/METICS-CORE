@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
 
-/* 
- * Controlador del proceso de login y logout del sistema
- */
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador para la gestión de sesión y credenciales de usuario.
+    /// Cubre inicio/cierre de sesión, registro de nuevos usuarios, cambio de contraseña,
+    /// gestión de correo alternativo y consulta de la bitácora de accesos.
+    /// </summary>
     public class UsuarioController : Controller
     {
         // Controladores y Handlers utilizados en el controlador
@@ -39,7 +41,11 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
-        // Método para mostrar la vista de inicio de sesión
+        /// <summary>Muestra el formulario de inicio de sesión.</summary>
+        /// <returns>
+        /// View: IniciarSesion —
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage (desde TempData).
+        /// </returns>
         public ActionResult IniciarSesion()
         {
             if (TempData["errorMessage"] != null)
@@ -54,7 +60,22 @@ namespace webMetics.Controllers
             return View("IniciarSesion");
         }
 
-        // Método para procesar el inicio de sesión cuando se envía el formulario de inicio de sesión
+        /// <summary>
+        /// Procesa el formulario de inicio de sesión. Si las credenciales son válidas, crea las cookies
+        /// de sesión y redirige según los datos de perfil pendientes.
+        /// Registra el intento (EXITO / FRACASO) en la bitácora de accesos.
+        /// </summary>
+        /// <param name="usuario">Modelo con correo institucional y contraseña.</param>
+        /// <returns>
+        /// Redirects to Grupo/ListaGruposDisponibles on success.
+        /// Redirects to IniciarSesion on failure; sets TempData["errorMessage"].
+        /// View: IniciarSesion con errores de validación si ModelState es inválido.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Sets cookies: USUARIOAUTORIZADO (protegido), rolUsuario, idUsuario.
+        /// Redirect logic is determined by DeterminarRedireccionPostLogin.
+        /// </remarks>
         [HttpPost]
         public ActionResult IniciarSesion(LoginModel usuario)
         {
@@ -64,17 +85,12 @@ namespace webMetics.Controllers
 
                 if (usuarioAutorizado != null)
                 {
-                    // La autenticación fue exitosa.
-                    // 1. Llama al método para insertar el registro de acceso.
-                    // Se usa el ID del usuario autorizado.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuarioAutorizado.id, "EXITO");
 
-                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                    return DeterminarRedireccionPostLogin(usuarioAutorizado.id);
                 }
                 else
                 {
-                    // La autenticación falló.
-                    // 1. Llama al método para insertar el registro de acceso.
                     // Se usa el correo proporcionado para identificar al usuario que intentó el acceso.
                     accesoAUsuario.InsertarAccesoUsuarioBitacora(usuario.id, "FRACASO");
 
@@ -88,7 +104,12 @@ namespace webMetics.Controllers
             }
         }
 
-        // Método para mostrar el formulario para crear un nuevo usuario
+        /// <summary>Muestra el formulario de auto-registro de nuevos usuarios.</summary>
+        /// <returns>
+        /// View: FormularioRegistro —
+        /// ViewData["jsonDataAreas"] (jerarquía de áreas UCR).
+        /// </returns>
+        /// <remarks>Handlers: ParticipanteHandler (para cargar áreas).</remarks>
         public ActionResult FormularioRegistro()
         {
             // Obtener datos necesarios para llenar las opciones del formulario (áreas)
@@ -96,7 +117,19 @@ namespace webMetics.Controllers
             return View();
         }
 
-        // Método para procesar el formulario de creación de usuario con los datos ingresados
+        /// <summary>
+        /// Procesa el formulario de auto-registro. Crea el usuario, el participante asociado y envía
+        /// la contraseña temporal por correo.
+        /// </summary>
+        /// <param name="usuario">Modelo con los datos del nuevo usuario.</param>
+        /// <returns>
+        /// View: ParticipanteRegistrado on success —
+        /// ViewBag.Correo, ViewBag.Titulo, ViewBag.Message.
+        /// View: FormularioRegistro con errores si ModelState es inválido o la creación falla.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler, AsesorHandler (vía CrearUsuario).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult FormularioRegistro(UsuarioModel usuario)
@@ -130,7 +163,14 @@ namespace webMetics.Controllers
             return View(usuario);
         }
 
-        // Método para crear un usuario y hacer match con la base de datos si ya hay un participante con los mismos datos.
+        /// <summary>
+        /// Crea un usuario y su participante asociado. Si el admin había pre-registrado al usuario,
+        /// actualiza sus datos y asigna rol de asesor si corresponde; de lo contrario crea un registro nuevo.
+        /// </summary>
+        /// <param name="usuario">Modelo con los datos del usuario a crear.</param>
+        /// <param name="contrasena">Contraseña temporal generada para el usuario.</param>
+        /// <returns><c>true</c> si la operación fue exitosa; <c>false</c> si el usuario ya existe o hubo un error.</returns>
+        /// <remarks>Handlers: UsuarioHandler, ParticipanteHandler, AsesorHandler.</remarks>
         private bool CrearUsuario(UsuarioModel usuario, string contrasena)
         {
             bool exito = false;
@@ -149,6 +189,7 @@ namespace webMetics.Controllers
                     tipoIdentificacion = usuario.tipoIdentificacion,
                     numeroIdentificacion = usuario.numeroIdentificacion,
                     correo = usuario.correo,
+                    correoAlternativo = usuario.correoAlternativo,
                     tipoParticipante = usuario.tipoParticipante,
                     condicion = usuario.condicion,
                     telefono = usuario.telefono,
@@ -207,7 +248,7 @@ namespace webMetics.Controllers
                 {
                     if (!accesoAUsuario.ExisteUsuario(usuario.id))
                     {
-                        accesoAUsuario.CrearUsuario(usuario.id, contrasena);
+                        accesoAUsuario.CrearUsuario(usuario.id, contrasena, 0);
 
                         if (!accesoAParticipante.ExisteParticipante(usuario.id))
                         {
@@ -240,7 +281,14 @@ namespace webMetics.Controllers
             return exito;
         }
 
-        // Método para autenticar el usuario y realizar el inicio de sesión
+        /// <summary>
+        /// Autentica al usuario y, si es válido, escribe las cookies de sesión
+        /// (USUARIOAUTORIZADO protegida, rolUsuario, idUsuario).
+        /// Admins tienen sesión de 120 minutos; otros usuarios 20 minutos.
+        /// </summary>
+        /// <param name="usuario">Modelo con id (correo) y contraseña.</param>
+        /// <returns>El <see cref="LoginModel"/> del usuario autenticado, o <c>null</c> si las credenciales son incorrectas.</returns>
+        /// <remarks>Handlers: UsuarioHandler.</remarks>
         private LoginModel AutenticarUsuario(LoginModel usuario)
         {
             LoginModel usuarioAutorizado = null;
@@ -287,6 +335,21 @@ namespace webMetics.Controllers
             return usuarioAutorizado;
         }
 
+        /// <summary>
+        /// Muestra la página de perfil del usuario con sesión iniciada. El contenido varía según el rol:
+        /// participante ve inscripciones y medallas; asesor ve sus grupos y, si también es participante, sus inscripciones.
+        /// </summary>
+        /// <returns>
+        /// View: InformacionPersonal —
+        /// ViewBag.Usuario (UsuarioModel), ViewBag.Participante, ViewBag.Inscripciones,
+        /// ViewBag.ListaGrupos, ViewBag.Medallas (rol 0);
+        /// ViewBag.Asesor, ViewBag.ListaGruposAsesor (rol 2);
+        /// ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler, GrupoHandler, AsesorHandler.
+        /// Role required: Any (autenticado).
+        /// </remarks>
         public ActionResult InformacionPersonal()
         {
             const int RolUsuarioParticipante = 0;
@@ -315,6 +378,8 @@ namespace webMetics.Controllers
                         tipoIdentificacion = participante.tipoIdentificacion,
                         numeroIdentificacion = participante.numeroIdentificacion,
                         correo = participante.correo,
+                        correoAlternativo = participante.correoAlternativo,
+                        gradoAcademico = participante.gradoAcademico,
                         tipoParticipante = participante.tipoParticipante,
                         condicion = participante.condicion,
                         telefono = participante.telefono,
@@ -375,7 +440,10 @@ namespace webMetics.Controllers
             return View();
         }
 
-        // Método para cerrar la sesión del usuario
+        /// <summary>
+        /// Cierra la sesión eliminando las cookies de autenticación y redirige a la pantalla de login.
+        /// </summary>
+        /// <returns>Redirects to IniciarSesion.</returns>
         public ActionResult CerrarSesion()
         {
             // Eliminar datos del usuario
@@ -386,12 +454,384 @@ namespace webMetics.Controllers
             return RedirectToAction("IniciarSesion");
         }
 
+        /// <summary>
+        /// Muestra el formulario para que el usuario ingrese su correo alternativo tras el primer inicio de sesión.
+        /// Redirige a IniciarSesion si no hay sesión activa.
+        /// </summary>
+        /// <returns>
+        /// View: CompletarCorreoAlternativo con el modelo UsuarioModel (id, nombre, correo) —
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, AsesorHandler.
+        /// Role required: Any (autenticado, sin correo alternativo).
+        /// </remarks>
+        public ActionResult CompletarCorreoAlternativo()
+        {
+            // Validar que el usuario esté logueado
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
+            UsuarioModel usuario = new UsuarioModel()
+            {
+                id = idUsuario,
+                nombre = participante?.nombre ?? asesor?.nombre ?? "Usuario",
+                primerApellido = participante?.primerApellido ?? asesor?.primerApellido ?? "",
+                correo = idUsuario // El correo es el ID del usuario
+            };
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View(usuario);
+        }
+
+        /// <summary>
+        /// Persiste el correo alternativo del participante en la tabla participante.
+        /// </summary>
+        /// <param name="usuario">Modelo que contiene el correoAlternativo.</param>
+        /// <returns>
+        /// Redirects based on role via DeterminarRedireccionPostLogin on success; sets TempData["successMessage"].
+        /// Redirects to CompletarCorreoAlternativo on error; sets TempData["errorMessage"].
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Any (autenticado).
+        /// </remarks>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarCorreoAlternativo(UsuarioModel usuario)
+        {
+            string idUsuario = GetId();
+
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Verificar que el usuario sea participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+            {
+                TempData["errorMessage"] = "No tienes registro como participante.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario.correoAlternativo))
+            {
+                TempData["errorMessage"] = "Es necesario ingresar un correo alternativo.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            // Validar que correo alternativo sea diferente del correo institucional
+            if (idUsuario.Equals(usuario.correoAlternativo, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["errorMessage"] = "El correo alternativo debe ser diferente del correo institucional.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            // Validar que sea un email válido
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(usuario.correoAlternativo);
+                if (!addr.Address.Equals(usuario.correoAlternativo))
+                {
+                    TempData["errorMessage"] = "El correo alternativo no es válido.";
+                    return RedirectToAction("CompletarCorreoAlternativo");
+                }
+            }
+            catch
+            {
+                TempData["errorMessage"] = "El correo alternativo no es válido.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+
+            try
+            {
+                // Actualizar correoAlternativo en participante
+                bool exito = accesoAParticipante.ActualizarCorreoAlternativoParticipante(idUsuario, usuario.correoAlternativo);
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Correo alternativo guardado correctamente.";
+                    return DeterminarRedireccionPostLogin(idUsuario);
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al guardar el correo alternativo. Intente nuevamente.";
+                    return RedirectToAction("CompletarCorreoAlternativo");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CompletarCorreoAlternativo POST: {ex.Message}");
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarCorreoAlternativo");
+            }
+        }
+
+        /// <summary>
+        /// Muestra el formulario para que un participante ingrese su área, departamento,
+        /// unidad académica, sede, carrera y áreas extra tras el inicio de sesión.
+        /// Redirige a IniciarSesion si no hay sesión activa.
+        /// </summary>
+        /// <returns>
+        /// View: CompletarCarreraYAreas con ParticipanteModel —
+        /// ViewData["jsonDataAreas"] (lista de áreas UCR).
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to IniciarSesion si la sesión no es válida.
+        /// </returns>
+        public ActionResult CompletarCarreraYAreas()
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+
+            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+
+            if (TempData["errorMessage"] != null)
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            if (TempData["successMessage"] != null)
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+
+            return View(participante);
+        }
+
+        /// <summary>
+        /// Persiste área, departamento, unidadAcademica, sede, carrera y areasExtra del participante.
+        /// Accesible para cualquier rol autenticado que también sea participante.
+        /// </summary>
+        /// <param name="participante">Modelo con los campos del formulario (solo los campos del [Bind] son poblados).</param>
+        /// <returns>
+        /// AJAX: JSON { success, redirectUrl } en éxito; { success, warnings } si areasExtra falló.
+        /// AJAX: 400 { success, fieldErrors, globalErrors } si ModelState es inválido.
+        /// AJAX: 500 { success, globalErrors } si EditarParticipante falla o lanza excepción.
+        /// AJAX: JSON { success, globalErrors } si el participante no existe en BD.
+        /// No-AJAX: Llama DeterminarRedireccionPostLogin en éxito.
+        /// No-AJAX: Redirects to IniciarSesion si la sesión no es válida.
+        /// No-AJAX: View(participante) con ViewData["jsonDataAreas"] si ModelState es inválido.
+        /// No-AJAX: Redirects to CompletarCarreraYAreas con TempData["errorMessage"] en error.
+        /// </returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarCarreraYAreas([Bind("area,departamento,unidadAcademica,sede,carrera,areasExtra")] ParticipanteModel participante)
+        {
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+                return RedirectToAction("IniciarSesion");
+
+            bool isAjaxRequest = IsAjaxRequest();
+
+            // [Bind] restricts which properties are populated, but [Required] on the full
+            // model still fires for unbound properties. Remove those to scope validation
+            // to only the fields this form is responsible for.
+            var boundFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                { "area", "departamento", "unidadAcademica", "sede", "carrera", "areasExtra" };
+            foreach (var key in ModelState.Keys.Where(k => !boundFields.Contains(k)).ToList())
+                ModelState.Remove(key);
+
+            if (!ModelState.IsValid)
+            {
+                if (isAjaxRequest)
+                    return BadRequest(BuildAjaxValidationErrorResponse());
+
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View(participante);
+            }
+
+            try
+            {
+                ParticipanteModel participanteCompleto = accesoAParticipante.ObtenerParticipante(idUsuario);
+                if (participanteCompleto == null)
+                {
+                    if (isAjaxRequest)
+                        return Json(new { success = false, globalErrors = new[] { "No se encontró el participante. Intente iniciar sesión nuevamente." } });
+                    return RedirectToAction("ListaGruposDisponibles", "Grupo");
+                }
+
+                participanteCompleto.area = participante.area;
+                participanteCompleto.departamento = participante.departamento;
+                participanteCompleto.unidadAcademica = participante.unidadAcademica;
+                participanteCompleto.sede = participante.sede;
+                participanteCompleto.carrera = participante.carrera;
+
+                bool exito = accesoAParticipante.EditarParticipante(participanteCompleto);
+                if (!exito)
+                {
+                    if (isAjaxRequest)
+                        return StatusCode(500, new { success = false, globalErrors = new[] { "Error al guardar los datos. Intente nuevamente." } });
+
+                    TempData["errorMessage"] = "Error al guardar los datos. Intente nuevamente.";
+                    return RedirectToAction("CompletarCarreraYAreas");
+                }
+
+                var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+                List<string> areasExtraFiltradas = (participante.areasExtra ?? new List<string>())
+                    .Where(a => !string.IsNullOrWhiteSpace(a))
+                    .Where(a => areasValidas.Contains(a))
+                    .Where(a => !string.Equals(a, participanteCompleto.area, StringComparison.OrdinalIgnoreCase))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(idUsuario, areasExtraFiltradas);
+
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = GetPostLoginRedirectUrl(idUsuario),
+                            warnings = new[] { "Carrera guardada, pero ocurrió un error al guardar las áreas extra." }
+                        });
+
+                    return Json(new { success = true, redirectUrl = GetPostLoginRedirectUrl(idUsuario) });
+                }
+
+                TempData["successMessage"] = areasExtraGuardadas
+                    ? "Información académica guardada correctamente."
+                    : "Carrera guardada. No se pudieron guardar las áreas extra.";
+                return DeterminarRedireccionPostLogin(idUsuario);
+            }
+            catch (Exception)
+            {
+                if (isAjaxRequest)
+                    return StatusCode(500, new { success = false, globalErrors = new[] { "Error al procesar la solicitud. Intente nuevamente." } });
+
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarCarreraYAreas");
+            }
+        }
+
+        /// <summary>
+        /// Muestra el formulario (solo para admins) para cambiar el correo/id y contraseña de otro usuario.
+        /// </summary>
+        /// <param name="idUsuario">Correo institucional del usuario a modificar.</param>
+        /// <param name="nombreCompleto">Nombre completo a mostrar en la vista.</param>
+        /// <returns>
+        /// View: CambiarCredencialesUsuario con el modelo NewLoginModel —
+        /// ViewBag.NombreCompleto, ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Grupo/ListaGruposDisponibles si idUsuario es vacío.
+        /// Redirects to CerrarSesion si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
+        // Método GET para mostrar el formulario de completar grado académico
+        public ActionResult CompletarGradoAcademico()
+        {
+            // Validar que el usuario esté logueado
+            string idUsuario = GetId();
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Obtener datos del participante o asesor para llenar nombre y apellido
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+
+            // Crear modelo para la vista
+            UsuarioModel usuario = new UsuarioModel()
+            {
+                id = idUsuario,
+                nombre = participante?.nombre ?? asesor?.nombre ?? "Usuario",
+                primerApellido = participante?.primerApellido ?? asesor?.primerApellido ?? "",
+                correo = idUsuario // El correo es el ID del usuario
+            };
+
+            if (TempData["errorMessage"] != null)
+            {
+                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
+            }
+            if (TempData["successMessage"] != null)
+            {
+                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
+            }
+
+            return View(usuario);
+        }
+
+        // Método POST para guardar el grado académico
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CompletarGradoAcademico(UsuarioModel usuario)
+        {
+            string idUsuario = GetId();
+
+            if (string.IsNullOrEmpty(idUsuario))
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            // Verificar que el usuario sea participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (participante == null)
+            {
+                TempData["errorMessage"] = "No tienes registro como participante.";
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
+            }
+
+            // Validar que el campo gradoAcademico no esté vacío
+            if (string.IsNullOrWhiteSpace(usuario.gradoAcademico))
+            {
+                TempData["errorMessage"] = "Es necesario ingresar un grado académico.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+
+            // Validar que sea una opción válida
+            var opcionesValidas = new List<string> { "Doctorado - PhD", "Maestría - MSc", "Licenciatura - Lic", "Bachillerato - Bach" };
+            if (!opcionesValidas.Contains(usuario.gradoAcademico))
+            {
+                TempData["errorMessage"] = "Seleccione un grado académico válido.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+
+            try
+            {
+                // Actualizar grado académico en la tabla participante
+                bool exito = accesoAParticipante.ActualizarGradoAcademicoParticipante(idUsuario, usuario.gradoAcademico);
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Grado académico guardado correctamente.";
+                    return DeterminarRedireccionPostLogin(idUsuario);
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Error al guardar el grado académico. Intente nuevamente.";
+                    return RedirectToAction("CompletarGradoAcademico");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CompletarGradoAcademico POST: {ex.Message}");
+                TempData["errorMessage"] = "Error al procesar la solicitud. Intente nuevamente.";
+                return RedirectToAction("CompletarGradoAcademico");
+            }
+        }
+
         public ActionResult CambiarCredencialesUsuario(string idUsuario, string nombreCompleto)
         {
-            // Ensure the current user is an admin
             if (GetRole() == 1)
             {
-                // Validate the user ID to be changed
                 if (!string.IsNullOrEmpty(idUsuario))
                 {
                     int rolUsuario = 0;
@@ -434,10 +874,22 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Procesa el cambio de credenciales de un usuario realizado por el administrador.
+        /// Opcionalmente envía la nueva contraseña por correo.
+        /// </summary>
+        /// <param name="usuario">Modelo con oldId, id, nuevaContrasena, confirmarContrasena, rol y enviarPorCorreo.</param>
+        /// <returns>
+        /// Redirects to CambiarCredencialesUsuario on success or failure; sets TempData["successMessage"] o TempData["errorMessage"].
+        /// Redirects to CerrarSesion si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler, AsesorHandler (vía EditarIdUsuario).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult CambiarCredencialesUsuario(NewLoginModel usuario)
         {
-            // Ensure only admins can perform this action
             if (GetRole() == 1)
             {
                 if (string.IsNullOrWhiteSpace(usuario.id))
@@ -478,6 +930,10 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Actualiza las credenciales (id y contraseña) de un usuario y, según su rol,
+        /// actualiza también el registro de participante o asesor asociado.
+        /// </summary>
         private void EditarIdUsuario(NewLoginModel usuario)
         {
             accesoAUsuario.CrearUsuario(usuario.id, usuario.confirmarContrasena, usuario.role);
@@ -493,10 +949,9 @@ namespace webMetics.Controllers
             }
 
             accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.confirmarContrasena);
-
-            // accesoAUsuario.EliminarUsuario(usuario.oldId);
         }
 
+        /// <summary>Actualiza el id y correo del participante al nuevo id del usuario.</summary>
         private void EditarIdParticipante(NewLoginModel usuario)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
@@ -510,6 +965,10 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Actualiza el id del asesor: crea un nuevo registro con el nuevo id, transfiere sus grupos y elimina el anterior.
+        /// También actualiza el participante asociado vía EditarIdParticipante.
+        /// </summary>
         private void EditarIdAsesor(NewLoginModel usuario)
         {
             EditarIdParticipante(usuario);
@@ -544,6 +1003,16 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Muestra el formulario para que el usuario cambie su propia contraseña.
+        /// Valida que la cookie USUARIOAUTORIZADO corresponda al usuario sesionado.
+        /// </summary>
+        /// <returns>
+        /// View: CambiarContrasena con el modelo NewLoginModel —
+        /// ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to CerrarSesion si la sesión no es válida.
+        /// </returns>
+        /// <remarks>Role required: Any (autenticado).</remarks>
         public ActionResult CambiarContrasena()
         {
             string idUsuario = string.Empty;
@@ -580,6 +1049,17 @@ namespace webMetics.Controllers
         }
 
 
+        /// <summary>
+        /// Procesa el cambio de contraseña del propio usuario, verificando primero la contraseña actual.
+        /// </summary>
+        /// <param name="usuario">Modelo con contrasena (actual), nuevaContrasena y confirmarContrasena.</param>
+        /// <returns>
+        /// Redirects to CambiarContrasena. Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Any (autenticado).
+        /// </remarks>
         [HttpPost]
         public ActionResult CambiarContrasena(NewLoginModel usuario)
         {
@@ -604,6 +1084,22 @@ namespace webMetics.Controllers
             return RedirectToAction("CambiarContrasena", new { id = GetId() });
         }
 
+        /// <summary>
+        /// Muestra el formulario (solo para admins) para restablecer la contraseña de cualquier usuario.
+        /// </summary>
+        /// <param name="idUsuario">Correo institucional del usuario cuya contraseña se restablecerá.</param>
+        /// <param name="nombreCompleto">Nombre completo a mostrar en la vista.</param>
+        /// <returns>
+        /// View: CambiarContrasenaAdmin con el modelo NewLoginModel —
+        /// ViewBag.Usuario (ParticipanteModel), ViewBag.NombreCompleto,
+        /// ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Participante/VerParticipantes si idUsuario es vacío.
+        /// Redirects to CerrarSesion si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult CambiarContrasenaAdmin(string idUsuario, string nombreCompleto)
         {
             // Ensure the current user is an admin
@@ -650,6 +1146,19 @@ namespace webMetics.Controllers
             return RedirectToAction("CerrarSesion");
         }
 
+        /// <summary>
+        /// Procesa el restablecimiento de contraseña de otro usuario por parte del administrador,
+        /// sin requerir la contraseña actual. Opcionalmente notifica al usuario por correo.
+        /// </summary>
+        /// <param name="usuario">Modelo con id, rol, nuevaContrasena, confirmarContrasena y enviarPorCorreo.</param>
+        /// <returns>
+        /// Redirects to CambiarContrasenaAdmin. Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// Redirects to CerrarSesion si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult CambiarContrasenaAdmin(NewLoginModel usuario)
         {
@@ -682,6 +1191,16 @@ namespace webMetics.Controllers
             return RedirectToAction("CerrarSesion");
         }
 
+        /// <summary>Muestra la bitácora de todos los accesos al sistema (sin filtro de fecha ni usuario).</summary>
+        /// <returns>
+        /// View: VerBitacoraAccesos —
+        /// ViewBag.BitacoraAccesos (List&lt;BitacoraAcceso&gt;), ViewBag.Id, ViewBag.Role,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult VerBitacoraAccesos()
         {
             int role = GetRole();
@@ -699,7 +1218,19 @@ namespace webMetics.Controllers
             return View();
         }
 
-        // Acción para ver la bitácora completa de un usuario
+        /// <summary>
+        /// Muestra la bitácora de accesos de un usuario específico para los últimos N días.
+        /// </summary>
+        /// <param name="idUsuario">Correo institucional del usuario a consultar.</param>
+        /// <param name="diasAtras">Cantidad de días hacia atrás a incluir (predeterminado: 30).</param>
+        /// <returns>
+        /// View: VerBitacoraAccesos —
+        /// ViewBag.BitacoraAccesos, ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpGet]
         public ActionResult VerBitacoraAccesoUsuario(string idUsuario, int diasAtras = 30)
         {
@@ -720,7 +1251,21 @@ namespace webMetics.Controllers
             return View("VerBitacoraAccesos");
         }
 
-        // Acción para ver la bitácora filtrada por fecha y estado
+        /// <summary>
+        /// Muestra la bitácora de accesos filtrada por rango de fechas y/o estado (EXITO / FRACASO).
+        /// Si fechaDesde es null se usa 1 semana atrás; si fechaHasta es null se usa la fecha actual.
+        /// </summary>
+        /// <param name="fechaDesde">Fecha inicial del rango (formato string compatible con SQL).</param>
+        /// <param name="fechaHasta">Fecha final del rango.</param>
+        /// <param name="estadoAcceso">Filtro de estado: "EXITO", "FRACASO" o null para todos.</param>
+        /// <returns>
+        /// View: VerBitacoraAccesos —
+        /// ViewBag.BitacoraAccesos, ViewBag.Id, ViewBag.Role, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpGet]
         public ActionResult VerBitacoraAccesoPorFecha(string fechaDesde, string fechaHasta, string estadoAcceso)
         {
@@ -742,7 +1287,16 @@ namespace webMetics.Controllers
             return View("VerBitacoraAccesos");
         }
 
-        // Acción para ver el último acceso de un usuario
+        /// <summary>Muestra el último acceso registrado en la bitácora para un usuario específico.</summary>
+        /// <param name="idUsuario">Correo institucional del usuario.</param>
+        /// <returns>
+        /// View: VerBitacoraAccesos —
+        /// ViewBag.BitacoraAccesos (lista con un solo elemento), ViewBag.Id, ViewBag.Role.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpGet]
         public ActionResult VerBitacoraUltimoAccesoUsuario(string idUsuario)
         {
@@ -767,7 +1321,7 @@ namespace webMetics.Controllers
         }
 
 
-        // Método para enviar confirmación de registro al usuario
+        /// <summary>Envía al nuevo usuario un correo con su contraseña temporal de registro.</summary>
         private async Task<IActionResult> EnviarCorreoRegistro(string correo, string contrasena)
         {
             string subject = "Registro en el SISTEMA DE INSCRIPCIONES METICS";
@@ -779,6 +1333,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>Envía al usuario un correo notificándole que el admin cambió su contraseña.</summary>
         private async Task<IActionResult> EnviarContrasenaAdmin(string correo, string contrasena)
         {
             string subject = "Cambio de contraseña en el SISTEMA DE INSCRIPCIONES METICS";
@@ -790,6 +1345,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>Genera una contraseña aleatoria de 10 caracteres alfanuméricos y con símbolos especiales.</summary>
         private string GenerateRandomPassword()
         {
             int length = 10;
@@ -801,6 +1357,7 @@ namespace webMetics.Controllers
             return password;
         }
 
+        /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -813,6 +1370,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario actual desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -823,6 +1381,75 @@ namespace webMetics.Controllers
             }
 
             return id;
+        }
+
+        /// <summary>
+        /// Construye la URL a la que redirigir al usuario tras un login o paso de completación exitoso.
+        /// Verifica en orden: participante existe, correoAlternativo, gradoAcademico, carrera.
+        /// Devuelve la URL como string para poder incluirla en respuestas JSON (AJAX).
+        /// </summary>
+        private string GetPostLoginRedirectUrl(string idUsuario)
+        {
+            // Primero verificar si el usuario tiene un registro como participante
+            ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+
+            // Si NO es participante, no validar correo alternativo ni grado académico
+            if (participante == null)
+            {
+                return Url.Action("ListaGruposDisponibles", "Grupo");
+            }
+
+            // Si ES participante, validar correo alternativo
+            if (string.IsNullOrWhiteSpace(participante.correoAlternativo))
+                return Url.Action("CompletarCorreoAlternativo", "Usuario");
+
+            // Validar grado académico
+            if (string.IsNullOrWhiteSpace(participante.gradoAcademico))
+                return Url.Action("CompletarGradoAcademico", "Usuario");
+
+            if (string.IsNullOrWhiteSpace(participante.carrera))
+                return Url.Action("CompletarCarreraYAreas", "Usuario");
+
+            return Url.Action("ListaGruposDisponibles", "Grupo");
+        }
+
+        /// <summary>
+        /// Envuelve GetPostLoginRedirectUrl en un ActionResult para llamadas no-AJAX.
+        /// </summary>
+        private ActionResult DeterminarRedireccionPostLogin(string idUsuario)
+        {
+            return Redirect(GetPostLoginRedirectUrl(idUsuario));
+        }
+
+        /// <summary>Devuelve true si la solicitud actual es una llamada AJAX (X-Requested-With: XMLHttpRequest).</summary>
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Construye la respuesta JSON de error de validación a partir de ModelState.
+        /// Errores de campo van en fieldErrors; errores a nivel de modelo (clave "") van en globalErrors.
+        /// </summary>
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new { success = false, fieldErrors, globalErrors };
         }
     }
 }

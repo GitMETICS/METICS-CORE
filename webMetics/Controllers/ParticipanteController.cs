@@ -22,6 +22,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace webMetics.Controllers
 {
+    /// <summary>
+    /// Controlador para la entidad Participante (funcionario UCR).
+    /// Gestiona la visualización, búsqueda, alta, edición y eliminación de participantes,
+    /// la asignación de medallas, importación masiva desde Excel, exportaciones en PDF/Word/Excel
+    /// y la recuperación de contraseña.
+    /// </summary>
     public class ParticipanteController : Controller
     {
         private protected UsuarioHandler accesoAUsuario;
@@ -47,6 +53,22 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
+        /// <summary>
+        /// Muestra la lista de participantes inscritos en un grupo específico.
+        /// </summary>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <returns>
+        /// View: ListaParticipantes —
+        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo,
+        /// ViewBag.ListaParticipantes (List&lt;ParticipanteModel&gt;),
+        /// ViewBag.Inscripciones, ViewBag.TodasLasMedallas,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Grupo/ListaGruposDisponibles on exception.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult ListaParticipantes(int idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -82,7 +104,20 @@ namespace webMetics.Controllers
             }
         }
 
-        /* Método para ver todos los participantes y sus horas matriculadas y aprobadas (administrador) */
+        /// <summary>
+        /// Muestra todos los participantes del sistema con sus horas matriculadas y aprobadas,
+        /// incluyendo los grupos en los que cada uno está inscrito.
+        /// </summary>
+        /// <returns>
+        /// View: VerParticipantes —
+        /// ViewBag.ListaParticipantes (List&lt;ParticipanteModel&gt; con gruposInscritos cargados),
+        /// ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, GrupoHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult VerParticipantes()
         {
             ViewBag.Role = GetRole();
@@ -117,6 +152,19 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Filtra y muestra participantes cuyo nombre, apellidos, correo, unidad académica u horas
+        /// contengan el término de búsqueda. Reutiliza la vista VerParticipantes.
+        /// </summary>
+        /// <param name="searchTerm">Texto libre para filtrar participantes.</param>
+        /// <returns>
+        /// View: VerParticipantes —
+        /// ViewBag.ListaParticipantes (filtrada), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public IActionResult BuscarParticipantes(string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -145,11 +193,22 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Método para buscar participantes inscritos en un grupo específico
+        /// Filtra los participantes inscritos en un grupo por nombre, apellidos, correo o unidad académica.
+        /// Reutiliza la vista ListaParticipantes.
         /// </summary>
-        /// <param name="idGrupo"></param>
-        /// <param name="searchTerm"></param>
-        /// <returns></returns>
+        /// <param name="idGrupo">Identificador del grupo.</param>
+        /// <param name="searchTerm">Texto libre para filtrar participantes del grupo.</param>
+        /// <returns>
+        /// View: ListaParticipantes —
+        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo,
+        /// ViewBag.ListaParticipantes (filtrada), ViewBag.Inscripciones, ViewBag.TodasLasMedallas,
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// Redirects to Grupo/ListaGruposDisponibles on exception.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public IActionResult BuscarParticipantesDelGrupo(int idGrupo, string searchTerm)
         {
             ViewBag.Role = GetRole();
@@ -200,11 +259,19 @@ namespace webMetics.Controllers
 
 
         /// <summary>
-        /// Asigna medallas a un participante específico.
+        /// Asigna una o varias medallas a un participante específico.
+        /// Solo agrega las medallas que el participante aún no posee.
         /// </summary>
         /// <param name="idParticipante">Identificador del participante.</param>
-        /// <param name="selectedMedallas">Medallas seleccionadas para asignar.</param>
-        /// <returns></returns>
+        /// <param name="selectedMedallas">Lista de nombres de medallas a asignar.</param>
+        /// <returns>
+        /// Redirects to VerDatosParticipante. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// Redirects to VerDatosParticipante with TempData["errorMessage"] si el rol no es Admin (1).
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
         {
@@ -244,6 +311,19 @@ namespace webMetics.Controllers
             return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
         }
 
+        /// <summary>
+        /// Asigna una medalla a múltiples participantes a la vez desde la lista o una vista de grupo.
+        /// </summary>
+        /// <param name="nombreMedalla">Nombre de la medalla a asignar.</param>
+        /// <param name="participantesSeleccionados">Lista de IDs de participantes que recibirán la medalla.</param>
+        /// <returns>
+        /// Redirects to la URL referente (Referer) si existe; de lo contrario a Grupo/ListaGruposDisponibles.
+        /// Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
         {
@@ -278,6 +358,19 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
+        /// <summary>
+        /// Importa participantes desde un archivo Excel. Por cada fila crea un usuario y un participante
+        /// si aún no existen, enviando la contraseña generada por correo.
+        /// </summary>
+        /// <param name="file">Archivo Excel (.xlsx) con columnas: Unidad Académica, Nombre, Primer Apellido,
+        /// Segundo Apellido, Correo Institucional, Horas Aprobadas.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler (vía IngresarParticipante).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
@@ -346,6 +439,16 @@ namespace webMetics.Controllers
 
 
 
+        /// <summary>
+        /// Envía un correo de notificación al responsable de METICS cuando el participante supera 30 horas aprobadas
+        /// y marca el envío en la base de datos.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <returns>Redirects to VerParticipantes.</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler (para obtener correo destino).
+        /// Role required: Admin (1).
+        /// </remarks>
         public IActionResult NotificarLimiteHoras(string idParticipante)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
@@ -378,6 +481,7 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes");
         }
 
+        /// <summary>Envía un correo al responsable cuando un participante supera el límite de 30 horas aprobadas.</summary>
         private async Task<IActionResult> EnviarCorreoNotificacion(string idParticipante)
         {
             string subject = "Notificación Límite de Horas Aprobadas - SISTEMA DE INSCRIPCIONES METICS";
@@ -388,110 +492,131 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Genera y descarga un PDF en formato A2 con la lista de participantes y sus módulos inscritos.
+        /// Aplica el mismo filtro de búsqueda de texto que VerParticipantes.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/pdf) — "Lista_de_Participantes_Módulos.pdf".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
-            // Obtener la lista de participantes e inscripciones
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
+            try
             {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
+                // Obtener la lista de participantes e inscripciones
+                List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
-            // Crear el archivo PDF
-            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Participantes_Módulos.pdf");
-            PdfWriter writer = new PdfWriter(filePath);
-            PdfDocument pdf = new PdfDocument(writer);
-
-            // Definir tamaño de página más grande (A2 o A3)
-            PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
-            iText.Layout.Document document = new iText.Layout.Document(pdf, pageSize);
-
-            // Establecer fuente en negrita para encabezado
-            PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
-            PdfFont regularFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
-
-            // Crear encabezado del documento
-            Paragraph header = new Paragraph("Lista de Participantes y Módulos")
-                .SetFont(boldFont)
-                .SetFontSize(14)
-                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
-                .SetMarginBottom(20);
-            document.Add(header);
-
-            // Crear la tabla (9 columnas)
-            iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 3, 2, 2 });
-            table.SetWidth(UnitValue.CreatePercentValue(100));
-
-            // Agregar encabezados de la tabla con estilo
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
-            foreach (var headerText in headers)
-            {
-                table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
-                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
-                    .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY));
-            }
-
-            // Rellenar la tabla con los datos
-            foreach (var participante in participantes)
-            {
-                // Obtener las inscripciones del participante
-                var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
-
-                if (inscripcionesParticipante.Any())
+                // Filtrar la lista si se ha ingresado un término de búsqueda
+                if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    foreach (var inscripcion in inscripcionesParticipante)
-                    {
-                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
+                    participantes = participantes.Where(p =>
+                        p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
+                }
 
-                        // Datos del módulo
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.horasAprobadas.ToString()).SetFont(regularFont).SetFontSize(9)));
-                        table.AddCell(new Cell().Add(new Paragraph(inscripcion.calificacion.ToString()).SetFont(regularFont).SetFontSize(9)));
+                using var memoryStream = new MemoryStream();
+                using var writer = new PdfWriter(memoryStream);
+                using var pdf = new PdfDocument(writer);
+                using var document = new iText.Layout.Document(pdf, PageSize.A2);
+
+                PdfFont boldFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA_BOLD);
+                PdfFont regularFont = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
+
+                Paragraph header = new Paragraph("Lista de Participantes y Módulos")
+                    .SetFont(boldFont)
+                    .SetFontSize(14)
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetMarginBottom(20);
+                document.Add(header);
+
+                iText.Layout.Element.Table table = new iText.Layout.Element.Table(new float[] { 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 3, 2, 2 });
+                table.SetWidth(UnitValue.CreatePercentValue(100));
+
+                string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Correo Alternativo", "Grado Académico", "Condición", "Unidad académica", "Carrera", "Áreas Extra", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+                foreach (var headerText in headers)
+                {
+                    table.AddHeaderCell(new Cell().Add(new Paragraph(headerText).SetFont(boldFont).SetFontSize(10))
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY));
+                }
+
+                foreach (var participante in participantes)
+                {
+                    var inscripcionesParticipante = inscripciones.Where(i => i.idParticipante == participante.idParticipante).ToList();
+                    string areasStr = areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                        ? string.Join(", ", areas)
+                        : "";
+
+                    if (inscripcionesParticipante.Any())
+                    {
+                        foreach (var inscripcion in inscripcionesParticipante)
+                        {
+                            table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.correoAlternativo ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.gradoAcademico ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.nombreGrupo).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.horasAprobadas.ToString()).SetFont(regularFont).SetFontSize(9)));
+                            table.AddCell(new Cell().Add(new Paragraph(inscripcion.calificacion.ToString()).SetFont(regularFont).SetFontSize(9)));
+                        }
+                    }
+                    else
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph((participante.nombre ?? "") + " " + (participante.primerApellido ?? "") + " " + (participante.segundoApellido ?? "")).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.correoAlternativo ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.gradoAcademico ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.condicion ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.carrera ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(areasStr).SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph(participante.telefono ?? "").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
+                        table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
                     }
                 }
-                else
-                {
-                    // Si no tiene inscripciones, rellenar con "N/A"
-                    table.AddCell(new Cell().Add(new Paragraph(participante.numeroIdentificacion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.idParticipante).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.condicion).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.unidadAcademica).SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph(participante.telefono).SetFont(regularFont).SetFontSize(9)));
 
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                    table.AddCell(new Cell().Add(new Paragraph("N/A").SetFont(regularFont).SetFontSize(9)));
-                }
+                document.Add(table);
+                document.Close();
+
+                return File(memoryStream.ToArray(), "application/pdf", "Lista_de_Participantes_Módulos.pdf");
             }
-
-            // Añadir la tabla al documento
-            document.Add(table);
-
-            // Cerrar el documento
-            document.Close();
-
-            // Devolver el archivo PDF 
-            string fileName = "Lista_de_Participantes_Módulos.pdf";
-            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error exporting PDF: {ex.Message}");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo PDF.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
+        /// <summary>
+        /// Genera y descarga un documento Word (.docx) con la lista de participantes y sus módulos inscritos.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.wordprocessingml.document) — "Lista_de_Participantes_Módulos.docx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesWord(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -527,30 +652,34 @@ namespace webMetics.Controllers
             titleRun.AddBreak(); // Salto de línea después del título
 
             // Crear tabla con el número de participantes y columnas para los módulos
-            XWPFTable table = wordDoc.CreateTable(participantes.Count + 1, 9); // +1 para la fila de encabezado
+            XWPFTable table = wordDoc.CreateTable(1, 11);
 
             // Ajustar los anchos de columna (simulando margen)
             table.SetColumnWidth(0, 750);  // Ajustar más ancho para la columna de identificación
             table.SetColumnWidth(1, 1000);  // Ancho de columna de nombre
             table.SetColumnWidth(2, 1500);  // Columna de correo
-            table.SetColumnWidth(3, 750);  // Columna de condición
-            table.SetColumnWidth(4, 1500);  // Columna de unidad académica
-            table.SetColumnWidth(5, 750);  // Columna de teléfono
-            table.SetColumnWidth(6, 1500);  // Nombre del módulo
-            table.SetColumnWidth(7, 750);  // Horas aprobadas
-            table.SetColumnWidth(8, 750);  // Nota del módulo
+            table.SetColumnWidth(3, 1500);  // Columna de correo alternativo
+            table.SetColumnWidth(4, 1000);  // Columna de grado académico
+            table.SetColumnWidth(5, 750);  // Columna de condición
+            table.SetColumnWidth(6, 1500);  // Columna de unidad académica
+            table.SetColumnWidth(7, 750);  // Columna de teléfono
+            table.SetColumnWidth(8, 1500);  // Nombre del módulo
+            table.SetColumnWidth(9, 750);  // Horas aprobadas
+            table.SetColumnWidth(10, 750);  // Nota del módulo
 
             // Estilo para el encabezado
             var headerRow = table.GetRow(0);
             headerRow.GetCell(0).SetText("Identificación");
             headerRow.GetCell(1).SetText("Nombre del participante");
             headerRow.GetCell(2).SetText("Correo institucional");
-            headerRow.GetCell(3).SetText("Condición");
-            headerRow.GetCell(4).SetText("Unidad académica");
-            headerRow.GetCell(5).SetText("Teléfono");
-            headerRow.GetCell(6).SetText("Módulo");
-            headerRow.GetCell(7).SetText("Horas aprobadas");
-            headerRow.GetCell(8).SetText("Calificación del módulo");
+            headerRow.GetCell(3).SetText("Correo alternativo");
+            headerRow.GetCell(4).SetText("Grado académico");
+            headerRow.GetCell(5).SetText("Condición");
+            headerRow.GetCell(6).SetText("Unidad académica");
+            headerRow.GetCell(7).SetText("Teléfono");
+            headerRow.GetCell(8).SetText("Módulo");
+            headerRow.GetCell(9).SetText("Horas aprobadas");
+            headerRow.GetCell(10).SetText("Calificación del módulo");
 
             // Rellenar la tabla con los datos de los participantes e inscripciones
             int rowIndex = 1; // Comenzar después del encabezado
@@ -569,14 +698,16 @@ namespace webMetics.Controllers
                         row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
                         row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                         row.GetCell(2).SetText(participante.idParticipante.ToString());
-                        row.GetCell(3).SetText(participante.condicion.ToString());
-                        row.GetCell(4).SetText(participante.unidadAcademica);
-                        row.GetCell(5).SetText(participante.telefono.ToString());
+                        row.GetCell(3).SetText(participante.correoAlternativo ?? "");
+                        row.GetCell(4).SetText(participante.gradoAcademico ?? "");
+                        row.GetCell(5).SetText(participante.condicion.ToString());
+                        row.GetCell(6).SetText(participante.unidadAcademica);
+                        row.GetCell(7).SetText(participante.telefono.ToString());
 
                         // Información del módulo
-                        row.GetCell(6).SetText(inscripcion.nombreGrupo);
-                        row.GetCell(7).SetText(inscripcion.horasAprobadas.ToString());
-                        row.GetCell(8).SetText(inscripcion.calificacion.ToString());
+                        row.GetCell(8).SetText(inscripcion.nombreGrupo);
+                        row.GetCell(9).SetText(inscripcion.horasAprobadas.ToString());
+                        row.GetCell(10).SetText(inscripcion.calificacion.ToString());
 
                         rowIndex++;
                     }
@@ -589,13 +720,15 @@ namespace webMetics.Controllers
                     row.GetCell(0).SetText(participante.numeroIdentificacion.ToString());
                     row.GetCell(1).SetText(participante.nombre + " " + participante.primerApellido + " " + participante.segundoApellido);
                     row.GetCell(2).SetText(participante.idParticipante.ToString());
-                    row.GetCell(3).SetText(participante.condicion.ToString());
-                    row.GetCell(4).SetText(participante.unidadAcademica);
-                    row.GetCell(5).SetText(participante.telefono.ToString());
+                    row.GetCell(3).SetText(participante.correoAlternativo ?? "");
+                    row.GetCell(4).SetText(participante.gradoAcademico ?? "");
+                    row.GetCell(5).SetText(participante.condicion.ToString());
+                    row.GetCell(6).SetText(participante.unidadAcademica);
+                    row.GetCell(7).SetText(participante.telefono.ToString());
 
-                    row.GetCell(6).SetText("N/A");
-                    row.GetCell(7).SetText("N/A");
                     row.GetCell(8).SetText("N/A");
+                    row.GetCell(9).SetText("N/A");
+                    row.GetCell(10).SetText("N/A");
 
                     rowIndex++;
                 }
@@ -608,6 +741,16 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
+        /// <summary>
+        /// Genera y descarga un Excel (.xlsx) con la lista completa de participantes y todos sus módulos inscritos
+        /// (columnas: identificación, nombre, correo, condición, unidad académica, teléfono, módulo, horas, calificación).
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Participantes_Módulos.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesExcel(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -656,7 +799,7 @@ namespace webMetics.Controllers
 
             // Crear el encabezado de la tabla
             IRow rowHeaders = sheet.CreateRow(3);
-            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
+            string[] headers = { "Identificación", "Nombre del participante", "Correo institucional", "Correo Alternativo", "Grado Académico", "Condición", "Unidad académica", "Teléfono", "Módulo", "Horas aprobadas", "Calificación del módulo" };
 
             for (int i = 0; i < headers.Length; i++)
             {
@@ -682,17 +825,19 @@ namespace webMetics.Controllers
                         row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
                         row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
                         row.CreateCell(2).SetCellValue(participante.idParticipante);
-                        row.CreateCell(3).SetCellValue(participante.condicion);
-                        row.CreateCell(4).SetCellValue(participante.unidadAcademica);
-                        row.CreateCell(5).SetCellValue(participante.telefono);
+                        row.CreateCell(3).SetCellValue(participante.correoAlternativo ?? "");
+                        row.CreateCell(4).SetCellValue(participante.gradoAcademico ?? "");
+                        row.CreateCell(5).SetCellValue(participante.condicion);
+                        row.CreateCell(6).SetCellValue(participante.unidadAcademica);
+                        row.CreateCell(7).SetCellValue(participante.telefono);
 
                         // Completar los datos del módulo
-                        row.CreateCell(6).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
-                        row.CreateCell(7).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
-                        row.CreateCell(8).SetCellValue(inscripcion.calificacion); // Nota del módulo
+                        row.CreateCell(8).SetCellValue(inscripcion.nombreGrupo); // Nombre del módulo
+                        row.CreateCell(9).SetCellValue(inscripcion.horasAprobadas); // Horas aprobadas
+                        row.CreateCell(10).SetCellValue(inscripcion.calificacion); // Nota del módulo
 
                         // Aplicar estilo al cuerpo
-                        for (int i = 0; i < 9; i++)
+                        for (int i = 0; i < 11; i++)
                         {
                             row.GetCell(i).CellStyle = bodyStyle;
                         }
@@ -708,15 +853,17 @@ namespace webMetics.Controllers
                     row.CreateCell(0).SetCellValue(participante.numeroIdentificacion);
                     row.CreateCell(1).SetCellValue($"{participante.nombre} {participante.primerApellido} {participante.segundoApellido}");
                     row.CreateCell(2).SetCellValue(participante.idParticipante);
-                    row.CreateCell(3).SetCellValue(participante.condicion);
-                    row.CreateCell(4).SetCellValue(participante.unidadAcademica);
-                    row.CreateCell(5).SetCellValue(participante.telefono);
-                    row.CreateCell(6).SetCellValue("N/A");
-                    row.CreateCell(7).SetCellValue("N/A");
+                    row.CreateCell(3).SetCellValue(participante.correoAlternativo ?? "");
+                    row.CreateCell(4).SetCellValue(participante.gradoAcademico ?? "");
+                    row.CreateCell(5).SetCellValue(participante.condicion);
+                    row.CreateCell(6).SetCellValue(participante.unidadAcademica);
+                    row.CreateCell(7).SetCellValue(participante.telefono);
                     row.CreateCell(8).SetCellValue("N/A");
+                    row.CreateCell(9).SetCellValue("N/A");
+                    row.CreateCell(10).SetCellValue("N/A");
 
                     // Aplicar estilo al cuerpo
-                    for (int i = 0; i < 9; i++)
+                    for (int i = 0; i < 11; i++)
                     {
                         row.GetCell(i).CellStyle = bodyStyle;
                     }
@@ -741,6 +888,17 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Genera y descarga un Excel (.xlsx) simplificado con totales de horas por participante
+        /// (columnas: unidad académica, nombre, apellidos, correo, total horas inscritas, total horas aprobadas).
+        /// Soporta filtrado opcional igual que ExportarParticipantesExcel.
+        /// </summary>
+        /// <param name="searchTerm">Texto opcional para filtrar participantes antes de exportar.</param>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Lista_de_Participantes_Módulos.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ExportarParticipantesExcel2(string? searchTerm)
         {
             try
@@ -749,15 +907,14 @@ namespace webMetics.Controllers
                 List<ParticipanteModel> participantes;
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
-                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm); // Assuming this method exists
+                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm) ?? [];
                 }
                 else
                 {
                     participantes = accesoAParticipante.ObtenerListaParticipantes();
                 }
 
-                // Optimized Inscripciones retrieval if needed.
-                List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+                var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
                 // Excel Workbook Setup
                 XSSFWorkbook workbook = new XSSFWorkbook();
@@ -782,7 +939,7 @@ namespace webMetics.Controllers
                 bodyStyle.BorderRight = BorderStyle.Thin;
 
                 // Headers
-                string[] headers = { "Unidad Académica", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Total Horas Inscritas", "Total Horas Aprobadas" };
+                string[] headers = { "Unidad Académica", "Carrera", "Áreas Extra", "Nombre", "Primer Apellido", "Segundo Apellido", "Correo Institucional", "Correo Alternativo", "Grado Académico", "Total Horas Inscritas", "Total Horas Aprobadas" };
                 IRow headerRow = sheet.CreateRow(3);
 
                 for (int i = 0; i < headers.Length; i++)
@@ -798,12 +955,19 @@ namespace webMetics.Controllers
                 {
                     IRow dataRow = sheet.CreateRow(rowNumber++);
                     dataRow.CreateCell(0).SetCellValue(participante.unidadAcademica);
-                    dataRow.CreateCell(1).SetCellValue(participante.nombre);
-                    dataRow.CreateCell(2).SetCellValue(participante.primerApellido);
-                    dataRow.CreateCell(3).SetCellValue(participante.segundoApellido);
-                    dataRow.CreateCell(4).SetCellValue(participante.correo); // changed from idParticipante to correo
-                    dataRow.CreateCell(5).SetCellValue(participante.horasMatriculadas);
-                    dataRow.CreateCell(6).SetCellValue(participante.horasAprobadas);
+                    dataRow.CreateCell(1).SetCellValue(participante.carrera ?? "");
+                    dataRow.CreateCell(2).SetCellValue(
+                        areasExtraMap.TryGetValue(participante.idParticipante, out var areas) && areas.Count > 0
+                            ? string.Join(", ", areas)
+                            : "");
+                    dataRow.CreateCell(3).SetCellValue(participante.nombre);
+                    dataRow.CreateCell(4).SetCellValue(participante.primerApellido);
+                    dataRow.CreateCell(5).SetCellValue(participante.segundoApellido);
+                    dataRow.CreateCell(6).SetCellValue(participante.correo);
+                    dataRow.CreateCell(7).SetCellValue(participante.correoAlternativo ?? "");
+                    dataRow.CreateCell(8).SetCellValue(participante.gradoAcademico ?? "");
+                    dataRow.CreateCell(9).SetCellValue(participante.horasMatriculadas);
+                    dataRow.CreateCell(10).SetCellValue(participante.horasAprobadas);
 
                     for (int i = 0; i < headers.Length; i++)
                     {
@@ -830,10 +994,20 @@ namespace webMetics.Controllers
             {
                 // Basic error handling (log or return an error view)
                 Console.WriteLine($"Error exporting Excel: {ex.Message}");
-                return Content("An error occurred while exporting the Excel file.");
+                TempData["errorMessage"] = "Ocurrió un error al generar el archivo Excel.";
+                return RedirectToAction("VerParticipantes");
             }
         }
 
+        /// <summary>
+        /// Genera y descarga la plantilla Excel (.xlsx) para la importación masiva de participantes.
+        /// Columnas: Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas.
+        /// </summary>
+        /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Plantilla_Lista_Participantes.xlsx".</returns>
+        /// <remarks>
+        /// Handlers: ninguno.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
             // Creamos el archivo de Excel
@@ -867,6 +1041,22 @@ namespace webMetics.Controllers
             return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
+        /// <summary>
+        /// Muestra el perfil completo de un participante: datos personales, inscripciones y medallas.
+        /// Para asesores (rol 2) solo muestra las inscripciones en grupos que el asesor imparte.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <param name="idGrupo">Opcional. Si se provee, se guarda en ViewBag.IdGrupo para el botón "Volver al grupo".</param>
+        /// <returns>
+        /// View: VerDatosParticipante —
+        /// ViewBag.Participante (ParticipanteModel), ViewBag.Inscripciones, ViewBag.Medallas,
+        /// ViewBag.TodasMedallas, ViewBag.IdGrupo (opcional),
+        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, InscripcionHandler, GrupoHandler (solo rol 2).
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         public ActionResult VerDatosParticipante(string idParticipante, int? idGrupo)
         {
             ViewBag.Role = GetRole();
@@ -908,62 +1098,207 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Muestra el formulario vacío para agregar manualmente un nuevo participante.
+        /// </summary>
+        /// <returns>
+        /// View: FormularioParticipante —
+        /// ViewData["jsonDataAreas"] (JSON de la jerarquía de áreas UCR),
+        /// ViewBag.Id, ViewBag.Role.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult FormularioParticipante()
         {
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
 
-            ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
-            return View("FormularioParticipante");
+            try
+            {
+                ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
+                return View("FormularioParticipante");
+            }
+            catch
+            {
+                TempData["errorMessage"] = "Error al cargar el formulario de participante.";
+                return RedirectToAction("VerParticipantes");
+            }
         }
 
+        /// <summary>
+        /// Procesa el formulario de alta manual de un participante.
+        /// Crea usuario y participante si no existen, enviando contraseña por correo.
+        /// </summary>
+        /// <param name="participante">Modelo con los datos del nuevo participante.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes on success or error; sets TempData["successMessage"] o TempData["errorMessage"].
+        /// View: FormularioParticipante con errores de validación si ModelState es inválido.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, ParticipanteHandler (vía IngresarParticipante).
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
+            bool isAjaxRequest = IsAjaxRequest();
 
-            if (ModelState.IsValid)
+            ValidarAreasExtra(participante);
+
+            if (!ModelState.IsValid)
             {
-                participante.idParticipante = participante.correo;
-                try
+                if (isAjaxRequest)
                 {
-                    IngresarParticipante(participante);
-
-                    TempData["successMessage"] = "Participante agregado.";
-                }
-                catch
-                {
-                    TempData["errorMessage"] = "Error al agregar al participante.";
+                    return BadRequest(BuildAjaxValidationErrorResponse());
                 }
 
-                return RedirectToAction("VerParticipantes");
-            }
-            else
-            {
                 ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                 return View("FormularioParticipante", participante);
             }
+
+            participante.idParticipante = participante.correo;
+
+            try
+            {
+                bool exito = IngresarParticipante(participante);
+
+                if (isAjaxRequest)
+                {
+                    if (exito)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = Url.Action("VerParticipantes", "Participante")
+                        });
+                    }
+
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Participante creado, pero ocurrió un error al guardar las áreas extra."
+                    });
+                }
+
+                if (exito)
+                {
+                    TempData["successMessage"] = "Participante agregado.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Participante creado, pero ocurrió un error al guardar las áreas extra.";
+                }
+            }
+            catch
+            {
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Error al agregar al participante."
+                    });
+                }
+
+                TempData["errorMessage"] = "Error al agregar al participante.";
+            }
+
+            return RedirectToAction("VerParticipantes");
         }
 
-        private void IngresarParticipante(ParticipanteModel participante)
+        /// <summary>
+        /// Registra un nuevo participante en el sistema.
+        /// Si el usuario no existe, crea una cuenta con una contraseña generada aleatoriamente
+        /// y la envía por correo. Si el participante no existe, lo crea.
+        /// </summary>
+        /// <param name="participante">Modelo con los datos del participante a registrar.</param>
+        private bool IngresarParticipante(ParticipanteModel participante)
         {
             if (!accesoAUsuario.ExisteUsuario(participante.idParticipante))
             {
                 string contrasena = GenerateRandomPassword();
 
-                accesoAUsuario.CrearUsuario(participante.idParticipante, contrasena);
+                
+                accesoAUsuario.CrearUsuario(
+                    participante.idParticipante,
+                    contrasena,
+                    0);
+
                 EnviarContrasenaPorCorreo(participante.idParticipante, contrasena);
             }
 
             if (!accesoAParticipante.ExisteParticipante(participante.idParticipante))
             {
-                accesoAParticipante.CrearParticipante(participante);
+                bool participanteCreado = accesoAParticipante.CrearParticipante(participante);
+
+                if (participanteCreado)
+                {
+                    List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                    return accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+                }
+
+                return false;
             }
+
+            return true;
+        }
+
+        private void ValidarAreasExtra(ParticipanteModel participante)
+        {
+            if (participante.areasExtra == null || participante.areasExtra.Count == 0)
+            {
+                return;
+            }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            bool contieneInvalida = participante.areasExtra
+                .Any(area => !areasValidas.Contains(area));
+
+            if (contieneInvalida)
+            {
+                ModelState.AddModelError(nameof(ParticipanteModel.areasExtra), "Se detectaron áreas extra inválidas.");
+            }
+            }
+
+        private List<string> FiltrarAreasExtraValidas(List<string>? areasExtraSeleccionadas, string? areaPrincipal)
+        {
+            if (areasExtraSeleccionadas == null || areasExtraSeleccionadas.Count == 0)
+            {
+                return new List<string>();
+        }
+
+            var areasValidas = new HashSet<string>(accesoAParticipante.GetAllAreas(), StringComparer.OrdinalIgnoreCase);
+
+            return areasExtraSeleccionadas
+                .Where(area => !string.IsNullOrWhiteSpace(area))
+                .Where(area => areasValidas.Contains(area))
+                .Where(area => !string.Equals(area, areaPrincipal, StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
 
 
-        // Método de la vista del formulario para editar a un participante
+        /// <summary>
+        /// Muestra el formulario de edición de un participante con sus datos actuales
+        /// y la jerarquía de áreas/departamentos/secciones preseleccionada.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante a editar.</param>
+        /// <returns>
+        /// View: EditarParticipante con el modelo ParticipanteModel —
+        /// ViewData["jsonDataAreas"], ViewData["jsonDataDepartamentos"], ViewData["jsonDataUnidadesAcademicas"],
+        /// ViewBag.Role, ViewBag.Id.
+        /// Redirects to VerParticipantes on error; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EditarParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -982,60 +1317,171 @@ namespace webMetics.Controllers
             }
             catch
             {
-                TempData["Message"] = "Ocurrió un error al obtener los datos solicitados.";
+                TempData["errorMessage"] = "Ocurrió un error al obtener los datos solicitados.";
                 return RedirectToAction("VerParticipantes");
             }
         }
 
-        // Método de la vista del formulario con los datos necesarios del modelo para editar a un asesor
+        /// <summary>
+        /// Persiste la edición de los datos de un participante. Si el participante también es asesor,
+        /// sincroniza los datos en la tabla de asesores.
+        /// </summary>
+        /// <param name="participante">Modelo con los datos actualizados del participante.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes on success; sets TempData["successMessage"].
+        /// View: EditarParticipante con errores si ModelState es inválido.
+        /// Redirects to VerParticipantes on exception; sets TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarParticipante(ParticipanteModel participante)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
+            bool isAjaxRequest = IsAjaxRequest();
+
+            ValidarAreasExtra(participante);
 
             try
             {
-                if (ModelState.IsValid)
+                // Validar que correo alternativo sea diferente del correo institucional
+                if (!string.IsNullOrWhiteSpace(participante.correoAlternativo) &&
+                    !string.IsNullOrWhiteSpace(participante.correo) &&
+                    participante.correo.Equals(participante.correoAlternativo, StringComparison.OrdinalIgnoreCase))
                 {
-                    participante.idParticipante = participante.correo;
-                    accesoAParticipante.EditarParticipante(participante);
+                    ModelState.AddModelError("correoAlternativo", "El correo alternativo debe ser diferente del correo institucional.");
+                }
 
-                    AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
-                    if (asesorAsociado != null)
+                if (!ModelState.IsValid)
+                {
+                    if (isAjaxRequest)
                     {
-                        asesorAsociado.nombre = participante.nombre;
-                        asesorAsociado.primerApellido = participante.primerApellido;
-                        asesorAsociado.segundoApellido = participante.segundoApellido;
-                        asesorAsociado.correo = participante.correo;
-                        asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
-                        asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
-                        asesorAsociado.telefono = participante.telefono;
-
-                        accesoAAsesor.EditarAsesor(asesorAsociado);
+                        return BadRequest(BuildAjaxValidationErrorResponse());
                     }
 
-                    TempData["successMessage"] = "Los datos fueron guardados.";
-                    return RedirectToAction("VerParticipantes", "Participante");
-                }
-                else
-                {
                     ViewData["jsonDataAreas"] = accesoAParticipante.GetAllAreas();
                     ViewData["jsonDataDepartamentos"] = accesoAParticipante.GetDepartamentosByArea(participante.area);
                     ViewData["jsonDataUnidadesAcademicas"] = accesoAParticipante.GetSeccionesByDepartamento(participante.area, participante.departamento);
 
                     return View("EditarParticipante", participante);
                 }
+
+                participante.idParticipante = participante.correo;
+
+                bool participanteEditado = accesoAParticipante.EditarParticipante(participante);
+                if (!participanteEditado)
+                {
+                    throw new Exception("No se pudo actualizar la información del participante.");
+                }
+
+                List<string> areasExtra = FiltrarAreasExtraValidas(participante.areasExtra, participante.area);
+                bool areasExtraGuardadas = accesoAParticipante.GuardarAreasExtraParticipante(participante.idParticipante, areasExtra);
+
+                AsesorModel asesorAsociado = accesoAAsesor.ObtenerAsesor(participante.idParticipante);
+                if (asesorAsociado != null)
+                {
+                    asesorAsociado.nombre = participante.nombre;
+                    asesorAsociado.primerApellido = participante.primerApellido;
+                    asesorAsociado.segundoApellido = participante.segundoApellido;
+                    asesorAsociado.correo = participante.correo;
+                    asesorAsociado.tipoIdentificacion = participante.tipoIdentificacion;
+                    asesorAsociado.numeroIdentificacion = participante.numeroIdentificacion;
+                    asesorAsociado.telefono = participante.telefono;
+
+                    accesoAAsesor.EditarAsesor(asesorAsociado);
+                }
+
+                if (isAjaxRequest)
+                {
+                    if (!areasExtraGuardadas)
+                    {
+                        return StatusCode(500, new
+                        {
+                            success = false,
+                            message = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra."
+                        });
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl = Url.Action("VerParticipantes", "Participante")
+                    });
+                }
+
+                if (areasExtraGuardadas)
+                {
+                    TempData["successMessage"] = "Los datos fueron guardados.";
+                }
+                else
+                {
+                    TempData["errorMessage"] = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra.";
+                }
+
+                return RedirectToAction("VerParticipantes", "Participante");
             }
             catch
             {
-                TempData["Message"] = "Ocurrió un error al editar los datos.";
+                if (isAjaxRequest)
+                {
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "Ocurrió un error al editar los datos."
+                    });
+                }
+
+                TempData["errorMessage"] = "Ocurrió un error al editar los datos.";
                 return RedirectToAction("VerParticipantes", "Participante");
             }
         }
 
-        /* Método para que un administrador elimine un participante */
+        private bool IsAjaxRequest()
+        {
+            return string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private object BuildAjaxValidationErrorResponse()
+        {
+            var fieldErrors = ModelState
+                .Where(entry => entry.Value != null && entry.Value.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage) ? "Valor inválido." : error.ErrorMessage)
+                        .ToList());
+
+            var globalErrors = new List<string>();
+
+            if (fieldErrors.TryGetValue(string.Empty, out var modelLevelErrors))
+            {
+                globalErrors.AddRange(modelLevelErrors);
+                fieldErrors.Remove(string.Empty);
+            }
+
+            return new
+            {
+                success = false,
+                fieldErrors,
+                globalErrors
+            };
+        }
+
+        /// <summary>
+        /// Elimina el participante y su cuenta de usuario del sistema.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante a eliminar.</param>
+        /// <returns>
+        /// Redirects to VerParticipantes. Sets TempData["successMessage"] or TempData["errorMessage"].
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, UsuarioHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult EliminarParticipante(string idParticipante)
         {
@@ -1057,7 +1503,15 @@ namespace webMetics.Controllers
             return RedirectToAction("VerParticipantes", "Participante");
         }
 
-        // Muestra un modal con info del participante
+        /// <summary>
+        /// Devuelve la vista parcial del modal con los grupos inscritos de un participante.
+        /// </summary>
+        /// <param name="idParticipante">Correo institucional del participante.</param>
+        /// <returns>PartialView: _Modal — ViewBag.ListaGrupos, ViewBag.IdParticipante.</returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Admin (1) o Asesor (2).
+        /// </remarks>
         [HttpPost]
         public ActionResult DisplayModal(string idParticipante)
         {
@@ -1070,7 +1524,7 @@ namespace webMetics.Controllers
             return PartialView("_Modal");
         }
 
-        // Métodos AJAX para obtener tipos de participantes, departamentos y secciones según el área seleccionada en el formulario
+        /// <summary>Devuelve la lista de tipos de participante definidos en el enum TipoDeParticipantes.</summary>
         [HttpGet]
         public JsonResult GetTiposParticipante(string tipoParticipante)
         {
@@ -1080,77 +1534,104 @@ namespace webMetics.Controllers
             return Json(tipoDeParticipantesLista);
         }
 
+        /// <summary>Devuelve los departamentos disponibles para un área UCR, consultando dataAreas.json vía ParticipanteHandler.</summary>
         [HttpGet]
-        public JsonResult GetDepartamentosByArea(string areaName)
+        public IActionResult GetDepartamentosByArea(string areaName)
         {
-            List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
-            return Json(departamentos);
-        }
-
-        [HttpGet]
-        public JsonResult GetSeccionesByDepartamento(string areaName, string departamentoName)
-        {
-            List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
-            return Json(secciones);
-        }
-
-        [HttpGet]
-        public static List<SelectListItem> GetAreas()
-        {
-            return new List<SelectListItem>
+            try
             {
-                new SelectListItem { Text = "Área de Artes y Letras" },
-                new SelectListItem { Text = "Área de Ciencias Agroalimentarias" },
-                new SelectListItem { Text = "Área de Ciencias Básicas" },
-                new SelectListItem { Text = "Área de Ciencias Sociales" },
-                new SelectListItem { Text = "Área de Ingeniería" },
-                new SelectListItem { Text = "Área de Salud" },
-                new SelectListItem { Text = "Sistema de Educación General" },
-                new SelectListItem { Text = "Sistema de Estudios de Posgrado" },
-                new SelectListItem { Text = "Sedes Regionales" },
-                new SelectListItem { Text = "Oficinas Administrativas" },
-                new SelectListItem { Text = "Otros" }
-            };
-        }
-
-        [HttpGet]
-        public JsonResult GetAllAreasData()
-        {
-            var allAreas = GetAreas().Select(x => x.Text).ToList();
-            var departamentosByArea = new Dictionary<string, List<string>>();
-            var seccionesByDepartamento = new Dictionary<string, List<string>>();
-
-            // Iterar por todas las areas para obtener departamentos y secciones
-            foreach (var areaName in allAreas)
-            {
-                var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
-                departamentosByArea[areaName] = departamentos;
-
-                // Para cada departamento, obtener las secciones
-                foreach (var departamentoName in departamentos)
-                {
-                    var key = $"{areaName}|{departamentoName}";
-                    var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
-                    seccionesByDepartamento[key] = secciones;
-                }
+                List<string> departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                return Json(departamentos);
             }
-
-            var allData = new
+            catch
             {
-                areas = allAreas,
-                departamentosByArea,
-                seccionesByDepartamento
-            };
-
-            return Json(allData);
+                return StatusCode(500);
+            }
         }
 
+        /// <summary>Devuelve las secciones/unidades académicas disponibles para un área y departamento UCR.</summary>
+        [HttpGet]
+        public IActionResult GetSeccionesByDepartamento(string areaName, string departamentoName)
+        {
+            try
+            {
+                List<string> secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                return Json(secciones);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+
+        /// <summary>
+        /// Devuelve en JSON la estructura completa de áreas, departamentos y secciones UCR
+        /// para poblar los desplegables del formulario de participante.
+        /// </summary>
+        [HttpGet]
+        public IActionResult GetAllAreasData()
+        {
+            try
+            {
+                var allAreas = accesoAParticipante.GetAllAreas();
+                var departamentosByArea = new Dictionary<string, List<string>>();
+                var seccionesByDepartamento = new Dictionary<string, List<string>>();
+                var carrerasBySeccionAndSede = new Dictionary<string, Dictionary<string, List<string>>>();
+
+                foreach (var areaName in allAreas)
+                {
+                    var departamentos = accesoAParticipante.GetDepartamentosByArea(areaName);
+                    departamentosByArea[areaName] = departamentos;
+
+                    foreach (var departamentoName in departamentos)
+                    {
+                        var key = $"{areaName}|{departamentoName}";
+                        var secciones = accesoAParticipante.GetSeccionesByDepartamento(areaName, departamentoName);
+                        seccionesByDepartamento[key] = secciones;
+                    }
+                }
+
+                return Json(new
+                {
+                    areas = allAreas,
+                    departamentosByArea,
+                    seccionesByDepartamento,
+                    carrerasBySeccionAndSede
+                });
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        /// <summary>Devuelve las carreras disponibles para una sección/unidad académica y sede UCR.</summary>
+        [HttpGet]
+        public IActionResult GetCarrerasBySeccionAndSede(string areaName, string departamentoName, string unidadAcademica, string sede)
+        {
+            if (string.IsNullOrEmpty(areaName) || string.IsNullOrEmpty(departamentoName) || string.IsNullOrEmpty(unidadAcademica) || string.IsNullOrEmpty(sede))
+                return Json(new List<string>());
+
+            try
+            {
+                var carreras = accesoAParticipante.GetCarrerasBySeccionAndSede(areaName, departamentoName, unidadAcademica, sede);
+                return Json(carreras);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+        /// <summary>Wrapper JSON que delega en el método estático GetDepartamento para retornar departamentos por área.</summary>
         [HttpGet]
         public JsonResult GetDepartamentoJSON(string areaName)
         {
             return Json(GetDepartamento(areaName));
         }
 
+        /// <summary>Devuelve la lista de departamentos/facultades para un área UCR como SelectListItem (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetDepartamento(string value)
         {
@@ -1212,6 +1693,7 @@ namespace webMetics.Controllers
             }
             return departamentos;
         }
+        /// <summary>Devuelve la lista de unidades académicas/escuelas para un departamento/facultad UCR (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetUnidades(string value)
         {
@@ -1437,6 +1919,7 @@ namespace webMetics.Controllers
             return unidades;
         }
 
+        /// <summary>Devuelve la lista de sedes y recintos UCR como SelectListItem agrupados por sede (datos estáticos).</summary>
         [HttpGet]
         public static List<SelectListItem> GetSedes()
         {
@@ -1454,7 +1937,7 @@ namespace webMetics.Controllers
 
             sedes.Add(new SelectListItem() { Text = "Ciudad Universitaria Rodrigo Facio", Group = group1 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Golfito", Group = group2 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Limón", Group = group3 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Limón", Group = group3 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Siquirres", Group = group3 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Liberia", Group = group4 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Santa Cruz", Group = group4 });
@@ -1463,13 +1946,14 @@ namespace webMetics.Controllers
             sedes.Add(new SelectListItem() { Text = "Recinto de Guápiles", Group = group5 });
             sedes.Add(new SelectListItem() { Text = "Recinto de San Ramón", Group = group6 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Tacáres", Group = group6 });
-            sedes.Add(new SelectListItem() { Text = "Recinto en Alajuela", Group = group7 });
+            sedes.Add(new SelectListItem() { Text = "Recinto de Alajuela", Group = group7 });
             sedes.Add(new SelectListItem() { Text = "Recinto de Puntarenas", Group = group8 });
 
 
             return sedes;
         }
 
+        /// <summary>Busca el índice (base-1) de una columna en la primera fila del worksheet, ignorando acentos y mayúsculas.</summary>
         private int GetColumnIndex(ExcelWorksheet worksheet, string columnName)
         {
             // Normalize and remove accents from the input column name
@@ -1490,7 +1974,7 @@ namespace webMetics.Controllers
             throw new Exception($"Column '{columnName}' not found");
         }
 
-        // Helper method to remove accents (diacritics)
+        /// <summary>Elimina diacríticos (acentos) de un texto normalizando a Unicode FormD.</summary>
         private string RemoveAccents(string text)
         {
             return string.Concat(text.Normalize(NormalizationForm.FormD)
@@ -1498,7 +1982,7 @@ namespace webMetics.Controllers
                 .Normalize(NormalizationForm.FormC);
         }
 
-        // Método para enviar confirmación de registro al usuario
+        /// <summary>Envía al nuevo participante un correo con su contraseña temporal.</summary>
         private async Task<IActionResult> EnviarContrasenaPorCorreo(string correo, string contrasena)
         {
             string subject = "Nuevo Usuario en el SISTEMA DE INSCRIPCIONES METICS";
@@ -1510,6 +1994,7 @@ namespace webMetics.Controllers
             return Ok();
         }
 
+        /// <summary>Genera una contraseña aleatoria de 10 caracteres alfanuméricos.</summary>
         private string GenerateRandomPassword()
         {
             int length = 10;
@@ -1521,6 +2006,7 @@ namespace webMetics.Controllers
             return password;
         }
 
+        /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -1533,6 +2019,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario actual desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
@@ -1544,11 +2031,26 @@ namespace webMetics.Controllers
 
             return id;
         }
+
+        /// <summary>Muestra el formulario de recuperación de contraseña.</summary>
+        /// <returns>View: FormularioRecuperarContrasena.</returns>
         public ActionResult FormularioRecuperarContrasena()
         {
             return View("FormularioRecuperarContrasena");
         }
 
+        /// <summary>
+        /// Genera una nueva contraseña aleatoria para el participante y la envía por correo.
+        /// </summary>
+        /// <param name="participante">Modelo que contiene el correo institucional del participante.</param>
+        /// <returns>
+        /// View: FormularioRecuperarContrasena —
+        /// ViewBag.SuccessMessage o ViewBag.ErrorMessage según resultado.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: ParticipanteHandler, UsuarioHandler.
+        /// Role required: Any (autoservicio).
+        /// </remarks>
         [HttpPost]
         public async Task<IActionResult> RecuperarContrasena(ParticipanteModel participante)
         {

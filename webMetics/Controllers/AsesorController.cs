@@ -2,14 +2,14 @@
 using webMetics.Handlers;
 using webMetics.Models;
 
-/* 
- * Controlador de la entidad Asesor
- * Los asesores son los profesores a cargo de impartir el grupo
- * En esta clase se puede retornar todos los asesores, editar, agregar y eliminar algun asesor 
- */
 namespace webMetics.Controllers
 {
-    // Controlador para gestionar las operaciones relacionadas con los asesores
+    /// <summary>
+    /// Gestiona las operaciones sobre la entidad Asesor (facilitadores). Permite listar, crear,
+    /// editar y eliminar asesores, así como que el propio asesor consulte los módulos que tiene
+    /// asignados. Al editar el correo de un asesor se propaga el cambio de ID al usuario, al
+    /// participante (si existe) y a los grupos asignados.
+    /// </summary>
     public class AsesorController : Controller
     {
         private protected UsuarioHandler accesoAUsuario;
@@ -35,6 +35,21 @@ namespace webMetics.Controllers
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
         }
 
+        /// <summary>
+        /// Muestra la lista de módulos (grupos) asociados al asesor autenticado, adaptando el
+        /// contenido según el rol del usuario (Admin ve todos, Asesor ve solo los suyos,
+        /// Participante ve los disponibles no inscritos).
+        /// </summary>
+        /// <returns>
+        /// View: MisModulos —
+        /// ViewBag.ListaGrupos, ViewBag.ParticipantesEnGrupos, ViewBag.GruposInscritos (rol 0),
+        /// ViewBag.IdParticipante, ViewBag.DateNow, ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler, InscripcionHandler.
+        /// Role required: Any (comportamiento varía según rol 0, 1, 2).
+        /// </remarks>
         public ActionResult MisModulos()
         {
             const int RolUsuarioParticipante = 0;
@@ -96,6 +111,19 @@ namespace webMetics.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Filtra la lista de grupos del asesor autenticado según un término de búsqueda y devuelve
+        /// la vista MisModulos con los resultados.
+        /// </summary>
+        /// <param name="searchTerm">Texto para filtrar por nombre, descripción, asesor, categoría, modalidad, lugar o temas del grupo.</param>
+        /// <returns>
+        /// View: MisModulos —
+        /// ViewBag.ListaGrupos (filtrada), ViewBag.Role, ViewBag.Id.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: GrupoHandler.
+        /// Role required: Asesor (2).
+        /// </remarks>
         public IActionResult BuscarGrupos(string searchTerm)
         {
             int rolUsuario = GetRole();
@@ -125,7 +153,17 @@ namespace webMetics.Controllers
             return View("MisModulos");
         }
 
-        /* Método de la vista ListaAsesores que muestra todos los asesores */
+        /// <summary>
+        /// Muestra el listado completo de asesores registrados en el sistema.
+        /// </summary>
+        /// <returns>
+        /// View: ListaAsesores —
+        /// ViewBag.Asesores, ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: AsesorHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult ListaAsesores()
         {
             ViewBag.Role = GetRole();
@@ -145,7 +183,18 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /* Método de la vista del formulario para crear un asesor */
+        /// <summary>
+        /// Muestra el formulario para registrar un nuevo asesor.
+        /// </summary>
+        /// <returns>
+        /// View: CrearAsesor —
+        /// ViewData["Temas"] (SelectListItem), ViewBag.Role, ViewBag.Id,
+        /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: TemaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult CrearAsesor()
         {
             ViewBag.Role = GetRole();
@@ -165,7 +214,20 @@ namespace webMetics.Controllers
             return View();
         }
 
-        // Método para procesar el formulario con los datos necesarios para crear un asesor
+        /// <summary>
+        /// Procesa el formulario de creación de asesor. Crea el usuario asociado si no existe
+        /// (con la contraseña indicada) y luego registra al asesor.
+        /// </summary>
+        /// <param name="asesor">Datos del asesor, incluyendo correo (usado como ID), contraseña y confirmación.</param>
+        /// <returns>
+        /// Redirects to ListaAsesores on success/duplicate. Sets TempData["successMessage"] or
+        /// TempData["errorMessage"]. Returns View CrearAsesor with validation errors if ModelState
+        /// is invalid or las contraseñas no coinciden.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: UsuarioHandler, AsesorHandler, TemaHandler.
+        /// Role required: Admin (1).
+        /// </remarks>
         [HttpPost]
         public ActionResult AgregarAsesor(AsesorModel asesor)
         {
@@ -223,7 +285,19 @@ namespace webMetics.Controllers
         }
 
 
-        // Método de la vista del formulario para editar a un asesor
+        /// <summary>
+        /// Muestra el formulario precargado con los datos del asesor para su edición.
+        /// </summary>
+        /// <param name="idAsesor">Correo/ID del asesor a editar.</param>
+        /// <returns>
+        /// View: EditarAsesor (model: AsesorModel) —
+        /// ViewData["Temas"] (SelectListItem), ViewBag.Role, ViewBag.Id.
+        /// Redirects to ListaAsesores with TempData["errorMessage"] si ocurre un error.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: AsesorHandler, TemaHandler.
+        /// Role required: Admin (1) o el propio Asesor (2).
+        /// </remarks>
         public ActionResult EditarAsesor(string idAsesor)
         {
             ViewBag.Role = GetRole();
@@ -242,6 +316,21 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Procesa el formulario de edición de asesor. Si el Admin cambia el correo, propaga el
+        /// cambio de ID al usuario, participante (si existe) y grupos asociados. Sincroniza además
+        /// los datos personales en el registro de participante si existe.
+        /// </summary>
+        /// <param name="asesor">Datos actualizados del asesor, incluyendo el ID original y el nuevo correo.</param>
+        /// <returns>
+        /// Admin: Redirects to ListaAsesores with TempData["successMessage"] on success, or
+        /// TempData["errorMessage"] on error. Asesor: Redirects to Usuario/InformacionPersonal.
+        /// Returns View EditarAsesor si ModelState inválido o contraseñas no coinciden.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: AsesorHandler, UsuarioHandler, ParticipanteHandler, GrupoHandler.
+        /// Role required: Admin (1) o el propio Asesor (2).
+        /// </remarks>
         [HttpPost]
         public ActionResult ActualizarAsesor(AsesorModel asesor)
         {
@@ -273,7 +362,7 @@ namespace webMetics.Controllers
 
                             if (asesor.idAsesor != asesor.correo)
                             {
-                                EditarIdUsuario(usuario);
+                                CrearUsuario(usuario);
                             }
 
                             accesoAUsuario.EditarUsuario(usuario.id, usuario.role, usuario.nuevaContrasena);
@@ -328,7 +417,8 @@ namespace webMetics.Controllers
             }
         }
 
-        private bool EditarIdUsuario(NewLoginModel usuario)
+        /// <summary>Crea un nuevo usuario con el nuevo ID, migra los registros dependientes y elimina el antiguo usuario.</summary>
+        private bool CrearUsuario(NewLoginModel usuario)
         {
             bool exito = accesoAUsuario.CrearUsuario(usuario.id, usuario.nuevaContrasena, usuario.role);
 
@@ -347,6 +437,7 @@ namespace webMetics.Controllers
             return exito;
         }
 
+        /// <summary>Actualiza el ID del registro de participante asociado al antiguo correo del asesor.</summary>
         private void EditarIdParticipante(NewLoginModel usuario)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(usuario.oldId);
@@ -360,6 +451,7 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>Migra el registro de asesor al nuevo ID: crea el asesor con el nuevo correo, reasigna los grupos y elimina el registro antiguo.</summary>
         private void EditarIdAsesor(NewLoginModel usuario)
         {
             EditarIdParticipante(usuario);
@@ -394,6 +486,18 @@ namespace webMetics.Controllers
             }
         }
 
+        /// <summary>
+        /// Elimina un asesor del sistema si no tiene grupos activos (visibles) asignados.
+        /// </summary>
+        /// <param name="idAsesor">Correo/ID del asesor a eliminar.</param>
+        /// <returns>
+        /// Redirects to ListaAsesores. Sets TempData["successMessage"] on success or
+        /// TempData["errorMessage"] si el asesor tiene grupos asignados o ocurre un error.
+        /// </returns>
+        /// <remarks>
+        /// Handlers: AsesorHandler, GrupoHandler (vía PuedeEliminarAsesor).
+        /// Role required: Admin (1).
+        /// </remarks>
         public ActionResult EliminarAsesor(string idAsesor)
         {
             ViewBag.Role = GetRole();
@@ -420,7 +524,12 @@ namespace webMetics.Controllers
             return RedirectToAction("ListaAsesores");
         }
 
-        // Método para verificar si un asesor puede ser eliminado
+        /// <summary>
+        /// Verifica si un asesor puede ser eliminado comprobando que no tenga grupos activos (visibles).
+        /// </summary>
+        /// <param name="idAsesor">Correo/ID del asesor.</param>
+        /// <returns><c>true</c> si el asesor no tiene grupos visibles asignados; <c>false</c> en caso contrario.</returns>
+        /// <remarks>Handlers: GrupoHandler.</remarks>
         public bool PuedeEliminarAsesor(string idAsesor)
         {
             bool eliminar = true;
@@ -441,6 +550,7 @@ namespace webMetics.Controllers
             return eliminar;
         }
 
+        /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>
         private int GetRole()
         {
             int role = 0;
@@ -453,6 +563,7 @@ namespace webMetics.Controllers
             return role;
         }
 
+        /// <summary>Obtiene el identificador del usuario autenticado desde la cookie "idUsuario".</summary>
         private string GetId()
         {
             string id = "";
