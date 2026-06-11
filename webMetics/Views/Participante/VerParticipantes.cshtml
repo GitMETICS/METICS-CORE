@@ -1,234 +1,9 @@
-﻿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
     ViewBag.Title = "Participantes";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
-
-<style>
-    /* Estilos para la tabla de participantes - Opción C */
-    .action-menu-btn {
-        background: none;
-        border: 1px solid #CCCCCC;
-        cursor: pointer;
-        padding: 5px 9px;
-        color: #204C6F;
-        line-height: 1;
-        display: inline-flex;
-        align-items: center;
-        border-radius: 2px;
-        min-height: 30px;
-        font-size: 14px;
-        transition: background-color 0.2s ease;
-    }
-
-    .action-menu-btn:hover {
-        background-color: #F5F5F5;
-    }
-
-    .action-menu {
-        position: fixed;
-        background: white;
-        border: 1px solid #CCCCCC;
-        z-index: 2000;
-        min-width: 180px;
-        box-shadow: 2px 4px 10px rgba(0,0,0,0.14);
-        border-radius: 2px;
-        display: none;
-    }
-
-    .action-menu.is-open {
-        display: block;
-    }
-
-    .action-menu-divider {
-        border: none;
-        border-top: 1px solid #ECECEC;
-        margin: 3px 0;
-    }
-
-    .action-menu a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 9px 14px;
-        font-size: 12px;
-        color: #333;
-        cursor: pointer;
-        text-decoration: none;
-        border: none;
-        background: none;
-        width: 100%;
-        text-align: left;
-        transition: background-color 0.2s ease;
-    }
-
-    .action-menu a:hover {
-        background-color: #F5F5F5;
-    }
-
-    .action-menu a.delete-option {
-        color: #C0392B;
-    }
-
-    .table-card {
-        background: white;
-        border: 2px solid #41ADE7;
-        border-radius: 4px;
-        margin-top: 20px;
-    }
-
-    .table-card-header {
-        background: #E3F3FB;
-        border-bottom: 1px solid #CCCCCC;
-        padding: 11px 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .table-card-header-title {
-        font-weight: bold;
-        font-size: 14px;
-        color: #204C6F;
-    }
-
-    .table-card-header-desc {
-        font-size: 12px;
-        color: #555;
-    }
-
-    .table-controls {
-        padding: 14px 14px 10px 14px;
-        background: white;
-        border-bottom: 1px solid #ECECEC;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .table-row-striped:nth-child(even) {
-        background-color: #F9F9F9;
-    }
-
-    /* Estilos para paginación de DataTable */
-    .dataTables_wrapper {
-        background: transparent;
-    }
-
-    .dataTables_wrapper .dataTables_top {
-        background: white;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        border: none;
-    }
-
-    .dataTables_wrapper .dataTables_bottom {
-        background: white;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        border-top: 1px solid #ECECEC;
-    }
-
-    .dataTables_paginate {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        padding: 13px;
-        margin: 0;
-        background: white;
-    }
-
-    .dataTables_paginate .paginate_button {
-        background: white;
-        border: 1px solid #CCCCCC;
-        padding: 5px 12px;
-        font-size: 12px;
-        cursor: pointer;
-        color: #333;
-        font-family: Arial;
-        border-radius: 2px;
-        margin: 0 2px;
-        display: inline-block;
-    }
-
-    .dataTables_paginate .paginate_button:hover {
-        background: #F5F5F5;
-        border-color: #CCCCCC;
-    }
-
-    .dataTables_paginate .paginate_button.current {
-        background: #204C6F;
-        color: white;
-        border-color: #204C6F;
-    }
-
-    .dataTables_paginate .paginate_button.current:hover {
-        background: #204C6F;
-        color: white;
-        border-color: #204C6F;
-    }
-
-    .dataTables_paginate .paginate_button.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background: white;
-        color: #999;
-    }
-
-    .dataTables_paginate .paginate_button.disabled:hover {
-        background: white;
-        color: #999;
-        border-color: #CCCCCC;
-    }
-
-    .paginacion {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        padding: 13px;
-        border-top: 1px solid #ECECEC;
-    }
-
-    .paginacion .paginate_button {
-        background: white;
-        border: 1px solid #CCCCCC;
-        padding: 5px 12px;
-        font-size: 12px;
-        cursor: pointer;
-        color: #333;
-        font-family: Arial;
-        border-radius: 2px;
-        margin: 0 2px;
-    }
-
-    .paginacion .paginate_button:hover {
-        background: #F5F5F5;
-        border-color: #CCCCCC;
-    }
-
-    .paginacion .paginate_button.current {
-        background: #204C6F;
-        color: white;
-        border-color: #204C6F;
-    }
-
-    .paginacion .paginate_button.current:hover {
-        background: #204C6F;
-        color: white;
-        border-color: #204C6F;
-    }
-
-    .paginacion .paginate_button.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-</style>
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
@@ -302,53 +77,47 @@
             }
             else
             {
-                <div style="background: white; border: 2px solid #41ADE7; border-radius: 4px; margin-top: 20px;">
-                    <!-- Encabezado de tarjeta -->
-                    <div style="background: #E3F3FB; border-bottom: 1px solid #CCCCCC; padding: 11px 15px; display: flex; align-items: center; gap: 10px;">
-                        <span style="font-weight: bold; font-size: 14px; color: #204C6F;">Participantes</span>
-                        <span style="font-size: 12px; color: #555;">Listado de participantes registrados en el sistema</span>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <span class="table-card-title">Participantes</span>
+                        <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
                     </div>
 
-                    <!-- Controles: Mostrar registros, búsqueda y crear -->
-                    <div style="padding: 14px 14px 10px 14px; background: white; border-bottom: 1px solid #ECECEC; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">Mostrar</label>
-                                <select id="pageSize" style="padding: 4px 6px; border: 1px solid #BFBFBF; background: white; font-size: 12px; border-radius: 2px;">
+                    <div class="table-toolbar">
+                        <div class="table-toolbar-group">
+                            <div class="table-pagesize">
+                                <label for="pageSize">Mostrar</label>
+                                <select id="pageSize">
                                     <option selected>5</option>
                                     <option>10</option>
                                     <option>25</option>
                                     <option>50</option>
                                 </select>
-                                <label for="pageSize" style="font-size: 12px; color: #333; white-space: nowrap;">registros</label>
+                                <label for="pageSize">registros</label>
                             </div>
 
-                            <div style="flex: 1; max-width: 400px;">
-                                <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" style="display: flex; gap: 5px;">
-                                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" style="font-size: 12px; padding: 4px 8px; border: 1px solid #BFBFBF; border-radius: 2px;" />
-                                    <button class="btn btn-sm" type="submit" style="background: white; border: 1px solid #BFBFBF; color: #333; font-size: 12px; padding: 4px 10px; border-radius: 2px;">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="table-search">
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
+                                <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                            </form>
                         </div>
 
-                        <div style="flex-shrink: 0;">
-                            @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus", style = "font-size: 12px; padding: 4px 12px;" })
+                        <div>
+                            @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus btn-table-sm" })
                         </div>
                     </div>
 
-                    <div style="overflow-x: auto; overflow-y: auto; max-height: 70vh; width: 100%; background: white;">
-                        <table id="tblCustomers" style="border-collapse: collapse; font-size: 12px; width: 100%; background: white; margin: 0; min-width: 800px;">
+                    <div class="table-scroll">
+                        <table id="tblCustomers" class="data-table" style="min-width: 800px;">
                             <thead>
                                 <tr>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 4%;"></th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 14%;">Unidad Académica</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 24%;">Nombre Completo</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: left; width: 23%;">Correo Institucional</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 10%;">Hrs. Inscritas</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 10%;">Hrs. Aprobadas</th>
-                                    <th scope="col" style="background: #ECECEC; border: 1px solid #CCCCCC; padding: 9px 9px; font-weight: bold; white-space: nowrap; color: #333; text-align: center; width: 15%;">Acciones</th>
+                                    <th scope="col" class="text-center" style="width: 4%;"></th>
+                                    <th scope="col" style="width: 14%;">Unidad Académica</th>
+                                    <th scope="col" style="width: 24%;">Nombre Completo</th>
+                                    <th scope="col" style="width: 23%;">Correo Institucional</th>
+                                    <th scope="col" class="text-center" style="width: 10%;">Hrs. Inscritas</th>
+                                    <th scope="col" class="text-center" style="width: 10%;">Hrs. Aprobadas</th>
+                                    <th scope="col" class="text-center" style="width: 15%;">Acciones</th>
                                 </tr>
                             </thead>
 
@@ -362,8 +131,8 @@
                                     {
                                         nombreCompleto += " " + participante.segundoApellido;
                                     }
-                                    <tr style="background: white;">
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                    <tr>
+                                        <td class="text-center">
                                             @if (participante.horasAprobadas >= 30)
                                             {
                                                 if (participante.correoNotificacionEnviado != 0)
@@ -376,36 +145,36 @@
                                                 }
                                             }
                                         </td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@participante.unidadAcademica</td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@nombreCompleto</td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle;">@participante.correo</td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                        <td>@participante.unidadAcademica</td>
+                                        <td>@nombreCompleto</td>
+                                        <td>@participante.correo</td>
+                                        <td class="text-center">
                                             <span>@participante.horasMatriculadas</span>
                                         </td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                        <td class="text-center">
                                             <span>@participante.horasAprobadas</span>
                                         </td>
-                                        <td style="border: 1px solid #CCCCCC; padding: 8px 9px; vertical-align: middle; text-align: center;">
+                                        <td class="text-center">
                                             <div style="display: inline-block;">
                                                 <button type="button" id="dropdownMenu_@participante.idParticipante" class="action-menu-btn" onclick="toggleActionMenu('@participante.idParticipante', event)" title="Acciones">
-                                                    <i class="bi bi-three-dots-vertical" style="width: 16px; height: 16px;"></i>
+                                                    <i class="bi bi-three-dots-vertical"></i>
                                                 </button>
                                                 <div id="menu_@participante.idParticipante" class="action-menu">
                                                     <a href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante })">
-                                                        <i class="bi bi-eye" style="width: 14px; height: 14px; color: #0090D8;"></i> Ver detalles
+                                                        <i class="bi bi-eye" style="color: #0090D8;"></i> Ver detalles
                                                     </a>
                                                     <a href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = participante.idParticipante })">
-                                                        <i class="bi bi-pencil-square" style="width: 14px; height: 14px; color: #0090D8;"></i> Editar
+                                                        <i class="bi bi-pencil-square" style="color: #0090D8;"></i> Editar
                                                     </a>
                                                     <a href="@Url.Action("CambiarCredencialesUsuario", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
-                                                        <i class="bi bi-fingerprint" style="width: 14px; height: 14px; color: #0090D8;"></i> Credenciales
+                                                        <i class="bi bi-fingerprint" style="color: #0090D8;"></i> Credenciales
                                                     </a>
                                                     <a href="@Url.Action("CambiarContrasenaAdmin", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
-                                                        <i class="bi bi-key" style="width: 14px; height: 14px; color: #0090D8;"></i> Cambiar contraseña
+                                                        <i class="bi bi-key" style="color: #0090D8;"></i> Cambiar contraseña
                                                     </a>
                                                     <div class="action-menu-divider"></div>
                                                     <a href="#" class="delete-option" onclick="openDeleteModal('@participante.idParticipante'); return false;">
-                                                        <i class="bi bi-trash" style="width: 14px; height: 14px;"></i> Eliminar
+                                                        <i class="bi bi-trash"></i> Eliminar
                                                     </a>
                                                 </div>
                                             </div>
@@ -416,7 +185,7 @@
                         </table>
                     </div>
 
-                    <div id="tblPaginacion" style="display: flex; justify-content: center; align-items: center; gap: 4px; padding: 13px; border-top: 1px solid #ECECEC; background: white;"></div>
+                    <div id="tblPaginacion" class="table-pagination"></div>
                 </div>
             }
         </div>
@@ -535,90 +304,11 @@ else
     function actualizarModalEliminar(idParticipante) {
         openDeleteModal(idParticipante);
     }
-</script>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-
-<script>
-    var participanteTableElement = document.getElementById('tblCustomers');
-    var tablePageSize = document.getElementById('pageSize');
-    var tablePagination = document.getElementById('tblPaginacion');
-    var table;
-
-    if (participanteTableElement) {
-        table = new DataTable('#tblCustomers', {
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.1.7/i18n/es-ES.json',
-            },
-            searching: false,
-            paging: true,
-            pageLength: 5,
-            lengthMenu: [5, 10, 25, 50],
-            info: false,
-            lengthChange: false,
-            dom: 't',
-            pagingType: "simple_numbers",
-            drawCallback: function () {
-                if (!window.bootstrap?.Tooltip) return;
-                $(this.api().rows({ page: 'current' }).nodes()).find('[data-bs-toggle="tooltip"]').each(function () {
-                    var existing = bootstrap.Tooltip.getInstance(this);
-                    if (!existing) {
-                        new bootstrap.Tooltip(this);
-                    }
-                });
-            }
-        });
-
-        function renderParticipantePagination() {
-            if (!tablePagination) return;
-
-            var paginationHtml = '';
-            var pageInfo = table.page.info();
-            var pageCount = Math.ceil(pageInfo.recordsDisplay / pageInfo.length);
-            var currentPage = pageInfo.page + 1;
-
-            if (pageCount <= 1) {
-                tablePagination.innerHTML = '';
-                return;
-            }
-
-            if (currentPage > 1) {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (currentPage - 2) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&laquo;</a>';
-            }
-
-            for (var i = 1; i <= pageCount; i++) {
-                if (i === currentPage) {
-                    paginationHtml += '<span class="paginate_button current" style="background: #204C6F; color: white; border: 1px solid #204C6F; padding: 5px 12px; font-size: 12px; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block;">' + i + '</span>';
-                } else {
-                    paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + (i - 1) + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">' + i + '</a>';
-                }
-            }
-
-            if (currentPage < pageCount) {
-                paginationHtml += '<a href="#" class="paginate_button" onclick="table.page(' + currentPage + ').draw(false); return false;" style="background: white; border: 1px solid #CCCCCC; padding: 5px 12px; font-size: 12px; cursor: pointer; color: #333; font-family: Arial; border-radius: 2px; margin: 0 2px; display: inline-block; text-decoration: none;">&raquo;</a>';
-            }
-
-            tablePagination.innerHTML = paginationHtml;
-        }
-
-        table.on('draw', renderParticipantePagination);
-        renderParticipantePagination();
-
-        if (tablePageSize) {
-            tablePageSize.addEventListener('change', function() {
-                var value = parseInt(this.value);
-                table.page.len(value).draw();
-            });
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        if (!participanteTableElement || !window.bootstrap?.Tooltip) return;
-        $('#tblCustomers [data-bs-toggle="tooltip"]').each(function () {
-            if (!bootstrap.Tooltip.getInstance(this)) {
-                new bootstrap.Tooltip(this);
-            }
-        });
+    MeticsTable.init({
+        tableId: 'tblCustomers',
+        pageSizeId: 'pageSize',
+        paginationId: 'tblPaginacion',
+        searching: false
     });
 </script>
