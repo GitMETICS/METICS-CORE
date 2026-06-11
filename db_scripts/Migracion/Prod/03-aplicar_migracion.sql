@@ -1,23 +1,23 @@
 -- ============================================================
--- METICS migration: base schema → current
+-- Migración de METICS: esquema base → actual
 --
--- Applies all post-baseline changes to the participante table:
---   1. carrera column
---   2. participante_area_extra junction table
---   3. correo_alternativo column
---   4. grado_academico column + CHECK constraint
---   5. InsertParticipante / UpdateParticipante / SelectParticipante
---      stored procedures — full parameter list, explicit column list
+-- Aplica todos los cambios posteriores a la base inicial en la tabla participante:
+--   1. columna carrera
+--   2. tabla de unión participante_area_extra
+--   3. columna correo_alternativo
+--   4. columna grado_academico + restricción CHECK
+--   5. procedimientos almacenados InsertParticipante / UpdateParticipante /
+--      SelectParticipante — lista completa de parámetros, lista explícita de columnas
 --
--- Idempotent: safe to run on any state between the baseline
--- db_METICS.sql and the current schema.
+-- Idempotente: seguro de ejecutar en cualquier estado entre la base
+-- inicial db_METICS.sql y el esquema actual.
 -- ============================================================
 
 SET XACT_ABORT ON;
 GO
 
 -- ----------------------------------------------------------
--- Schema changes (DDL inside a transaction for atomicity)
+-- Cambios de esquema (DDL dentro de una transacción para garantizar atomicidad)
 -- ----------------------------------------------------------
 BEGIN TRY
     BEGIN TRANSACTION;
@@ -74,7 +74,7 @@ BEGIN TRY
     END;
 
     COMMIT TRANSACTION;
-    PRINT 'Schema migration completed successfully.';
+    PRINT 'Migración de esquema completada exitosamente.';
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
@@ -83,7 +83,7 @@ END CATCH;
 GO
 
 -- ----------------------------------------------------------
--- Stored procedures (CREATE OR ALTER is inherently idempotent)
+-- Procedimientos almacenados (CREATE OR ALTER es idempotente por naturaleza)
 -- ----------------------------------------------------------
 
 CREATE OR ALTER PROCEDURE InsertParticipante
