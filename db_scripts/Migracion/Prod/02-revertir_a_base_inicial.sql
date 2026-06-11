@@ -1,13 +1,14 @@
 -- ============================================================
--- METICS test helper: downgrade to db_METICS.sql baseline
+-- Utilidad de prueba de METICS: revertir a la base inicial db_METICS.sql
 --
--- Run this on a RESTORED BACKUP of the current database to
--- simulate the pre-migration state before running
--- 03-migrate.sql.
+-- Ejecutar esto sobre un RESPALDO RESTAURADO de la base de datos
+-- actual para simular el estado previo a la migración antes de
+-- ejecutar 03-aplicar_migracion.sql.
 --
--- WARNING: all data in carrera, correo_alternativo,
--- grado_academico, and participante_area_extra is discarded.
--- Only run this on a test/copy database, never on production.
+-- ADVERTENCIA: se descartan todos los datos de carrera,
+-- correo_alternativo, grado_academico y participante_area_extra.
+-- Ejecutar esto únicamente en una base de datos de prueba/copia,
+-- nunca en producción.
 -- ============================================================
 
 SET XACT_ABORT ON;
@@ -16,11 +17,11 @@ GO
 BEGIN TRY
     BEGIN TRANSACTION;
 
-    -- participante_area_extra must go first (FK child of participante)
+    -- participante_area_extra debe ir primero (hijo con FK de participante)
     IF OBJECT_ID('dbo.participante_area_extra', 'U') IS NOT NULL
         DROP TABLE dbo.participante_area_extra;
 
-    -- Drop participante CHECK constraint before its column
+    -- Eliminar la restricción CHECK de participante antes que su columna
     IF EXISTS (
         SELECT 1 FROM sys.check_constraints
         WHERE name = 'CK_participante_grado_academico'
@@ -37,7 +38,7 @@ BEGIN TRY
     IF COL_LENGTH('dbo.participante', 'carrera') IS NOT NULL
         EXEC sp_executesql N'ALTER TABLE dbo.participante DROP COLUMN carrera;';
 
-    -- usuario columns (added in the intermediate design, may or may not be present)
+    -- columnas de usuario (agregadas en el diseño intermedio, pueden o no estar presentes)
     IF EXISTS (
         SELECT 1 FROM sys.check_constraints
         WHERE name = 'CK_usuario_grado_academico'
@@ -52,7 +53,7 @@ BEGIN TRY
         EXEC sp_executesql N'ALTER TABLE dbo.usuario DROP COLUMN grado_academico;';
 
     COMMIT TRANSACTION;
-    PRINT 'Downgrade to baseline schema completed.';
+    PRINT 'Reversión al esquema base completada.';
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
@@ -60,7 +61,7 @@ BEGIN CATCH
 END CATCH;
 GO
 
--- Revert stored procedures to baseline form (no carrera, no new fields)
+-- Revertir los procedimientos almacenados a su forma base (sin carrera, sin campos nuevos)
 CREATE OR ALTER PROCEDURE InsertParticipante
     @idUsuario            NVARCHAR(64),
     @idParticipante       NVARCHAR(64),
