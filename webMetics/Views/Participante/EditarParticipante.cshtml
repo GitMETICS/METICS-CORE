@@ -144,7 +144,12 @@
                         </div>
                         <div class="form-group mt-1">
                             @Html.LabelFor(participanteModel => participanteModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.carrera, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una carrera...", new { @class = "form-control", id = "carreraDropdown" })
+                            <select id="carreraDropdown" class="form-control">
+                                <option value="">Seleccione una carrera...</option>
+                            </select>
+                            <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
+                                   maxlength="512" placeholder="Escriba el nombre de su carrera" />
+                            @Html.HiddenFor(participanteModel => participanteModel.carrera)
                             @Html.ValidationMessageFor(participanteModel => participanteModel.carrera, "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group mt-1">
@@ -319,6 +324,19 @@ else
         $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
     }
 
+    var CARRERA_OTRA = '__OTRA__';
+
+    function sincronizarCarrera() {
+        var seleccion = $('#carreraDropdown').val();
+        if (seleccion === CARRERA_OTRA) {
+            $('#carreraPersonalizada').removeClass('d-none');
+            $('#carrera').val($('#carreraPersonalizada').val().trim());
+        } else {
+            $('#carreraPersonalizada').addClass('d-none').val('');
+            $('#carrera').val(seleccion || '');
+        }
+    }
+
     function actualizarAreasExtraDisponibles() {
         var areaPrincipal = $('#areaDropdown').val();
 
@@ -399,18 +417,28 @@ else
     function setCarreras(carreras, carreraSeleccionada) {
         resetCarreras();
 
-        if (!carreras || carreras.length === 0) {
-            $('#carreraDropdown').append('<option value="">No hay carreras disponibles para esta combinación</option>');
-            return;
-        }
-
-        $.each(carreras, function (index, value) {
+        $.each(carreras || [], function (index, value) {
             $('#carreraDropdown').append('<option value="' + value + '">' + value + '</option>');
         });
 
-        if (carreraSeleccionada) {
+        // Always offer a custom option
+        $('#carreraDropdown').append('<option value="' + CARRERA_OTRA + '">Otra (no está en la lista)</option>');
+
+        var enLista = carreraSeleccionada &&
+            $.grep(carreras || [], function (c) { return c === carreraSeleccionada; }).length > 0;
+
+        if (enLista) {
             $('#carreraDropdown').val(carreraSeleccionada);
+        } else if (carreraSeleccionada) {
+            // Saved value not in the list → treat as custom
+            $('#carreraDropdown').val(CARRERA_OTRA);
+            $('#carreraPersonalizada').val(carreraSeleccionada);
+        } else if (!carreras || carreras.length === 0) {
+            // No careers for this combination → default straight to custom entry
+            $('#carreraDropdown').val(CARRERA_OTRA);
         }
+
+        sincronizarCarrera();
     }
 
     function actualizarCarreras(carreraSeleccionada) {
@@ -493,6 +521,11 @@ else
 
         $('#seccionDropdown, #sedeDropdown').on('change', function () {
             actualizarCarreras(null);
+        });
+
+        $('#carreraDropdown').on('change', sincronizarCarrera);
+        $('#carreraPersonalizada').on('input', function () {
+            $('#carrera').val($(this).val().trim());
         });
 
         $form.on('submit', function (event) {
