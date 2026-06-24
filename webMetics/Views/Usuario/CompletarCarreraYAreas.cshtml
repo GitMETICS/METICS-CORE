@@ -172,6 +172,8 @@
 
     function resetCarreras() {
         $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
+        $('#carreraPersonalizada').addClass('d-none').val('');
+        $('#carrera').val('');
     }
 
     var CARRERA_OTRA = '__OTRA__';
