@@ -31,8 +31,16 @@ WHERE SPECIFIC_NAME IN ('InsertParticipante', 'UpdateParticipante')
 ORDER BY SPECIFIC_NAME, ORDINAL_POSITION;
 -- Esperado: 6 filas (2 SP × 3 parámetros cada uno)
 
+-- IMPORTANTE: las pruebas 5 y 6 usan BEGIN TRAN ... ROLLBACK en lugar de
+-- INSERT ... DELETE. Un DELETE sobre participante dispara el trigger
+-- TR_EliminarParticipante, que borra de usuario la fila cuyo id coincide
+-- con id_usuario_FK del participante eliminado (cascada destructiva).
+-- El ROLLBACK revierte el INSERT de forma atómica SIN ejecutar ningún
+-- DELETE, por lo que el trigger nunca se activa y ningún usuario real se borra.
+
 -- 5. La restricción CHECK efectivamente rechaza valores inválidos
 BEGIN TRY
+    BEGIN TRANSACTION;
     INSERT INTO dbo.participante
         (id_usuario_FK, id_participante_PK, nombre, apellido_1, correo,
          area, departamento, unidad_academica, grado_academico)
@@ -40,16 +48,18 @@ BEGIN TRY
         ('admin.admin@ucr.ac.cr', '__verify_test__', 'T', 'T', 'test@ucr.ac.cr',
          'A', 'D', 'U', 'VALOR_INVALIDO');
 
-    -- Si llegamos aquí la restricción no se activó — limpiar y reportar la falla
-    DELETE FROM dbo.participante WHERE id_participante_PK = '__verify_test__';
+    -- Si llegamos aquí la restricción no se activó — revertir y reportar la falla
+    ROLLBACK TRANSACTION;
     PRINT 'CHECK 5: FAIL — la restricción no rechazó un grado_academico inválido';
 END TRY
 BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
     PRINT 'CHECK 5: OK — la restricción rechazó correctamente un valor de grado_academico inválido';
 END CATCH;
 
 -- 6. Se acepta un valor válido de grado_academico
 BEGIN TRY
+    BEGIN TRANSACTION;
     INSERT INTO dbo.participante
         (id_usuario_FK, id_participante_PK, nombre, apellido_1, correo,
          area, departamento, unidad_academica, grado_academico)
@@ -57,10 +67,12 @@ BEGIN TRY
         ('admin.admin@ucr.ac.cr', '__verify_test__', 'T', 'T', 'test@ucr.ac.cr',
          'A', 'D', 'U', N'Licenciatura - Lic');
 
-    DELETE FROM dbo.participante WHERE id_participante_PK = '__verify_test__';
+    -- Revertir el INSERT SIN ejecutar DELETE (evita el trigger TR_EliminarParticipante)
+    ROLLBACK TRANSACTION;
     PRINT 'CHECK 6: OK — se aceptó un valor válido de grado_academico';
 END TRY
 BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
     PRINT 'CHECK 6: FAIL — un valor válido de grado_academico fue rechazado inesperadamente: ' + ERROR_MESSAGE();
 END CATCH;
 
