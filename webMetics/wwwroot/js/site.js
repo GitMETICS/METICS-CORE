@@ -42,6 +42,13 @@ var MeticsTable = (function () {
         return link;
     }
 
+    function makePaginationEllipsis() {
+        var span = document.createElement('span');
+        span.className = 'page-btn disabled';
+        span.textContent = '...';
+        return span;
+    }
+
     function renderPagination(table, container) {
         if (!container) return;
 
@@ -57,8 +64,37 @@ var MeticsTable = (function () {
             container.appendChild(makePageButton('«', currentPage - 2, table, false));
         }
 
-        for (var i = 1; i <= pageCount; i++) {
-            container.appendChild(makePageButton(String(i), i - 1, table, i === currentPage));
+        if (pageCount <= 7) {
+            for (var page = 1; page <= pageCount; page++) {
+                container.appendChild(makePageButton(String(page), page - 1, table, page === currentPage));
+            }
+        } else {
+            container.appendChild(makePageButton('1', 0, table, currentPage === 1));
+
+            var startPage = Math.max(2, currentPage - 2);
+            var endPage = Math.min(pageCount - 1, currentPage + 2);
+
+            if (currentPage <= 4) {
+                startPage = 2;
+                endPage = 5;
+            } else if (currentPage >= pageCount - 3) {
+                startPage = pageCount - 4;
+                endPage = pageCount - 1;
+            }
+
+            if (startPage > 2) {
+                container.appendChild(makePaginationEllipsis());
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                container.appendChild(makePageButton(String(i), i - 1, table, i === currentPage));
+            }
+
+            if (endPage < pageCount - 1) {
+                container.appendChild(makePaginationEllipsis());
+            }
+
+            container.appendChild(makePageButton(String(pageCount), pageCount - 1, table, currentPage === pageCount));
         }
 
         if (currentPage < pageCount) {
