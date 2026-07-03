@@ -1,6 +1,6 @@
-@model webMetics.Models.UsuarioModel
+Ôªø@model webMetics.Models.UsuarioModel
 @{
-    ViewBag.Title = "Completar InformaciÛn - Grado AcadÈmico";
+    ViewBag.Title = "Completar Informaci√≥n - Grado Acad√©mico";
 }
 
 <div class="contenedor-caja container-fluid">
@@ -9,8 +9,8 @@
             <div class="card shadow-lg" style="border: none; border-radius: 15px;">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <h1 class="mb-2">ActualizaciÛn Requerida</h1>
-                        <p class="text-muted">Para continuar, complete su grado acadÈmico</p>
+                        <h1 class="mb-2">Actualizaci√≥n Requerida</h1>
+                        <p class="text-muted">Para continuar, complete su grado acad√©mico</p>
                     </div>
 
                     @if (ViewBag.ErrorMessage != null)
@@ -24,7 +24,7 @@
                     @if (ViewBag.SuccessMessage != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong>…xito:</strong> @ViewBag.SuccessMessage
+                            <strong>√âxito:</strong> @ViewBag.SuccessMessage
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
@@ -42,14 +42,14 @@
 
                         <div class="form-group mb-4">
                             @Html.LabelFor(m => m.gradoAcademico, new { @class = "form-label fw-bold" }) <a style="color:red;font-size:22px">*</a>
-                            <small class="d-block mb-2 text-muted">Seleccione su grado acadÈmico m·ximo</small>
+                            <small class="d-block mb-2 text-muted">Seleccione su grado acad√©mico m√°ximo</small>
                             @Html.DropDownListFor(m => m.gradoAcademico, new SelectList(new List<string> 
                             { 
                                 "Doctorado - PhD", 
-                                "MaestrÌa - MSc", 
+                                "Maestr√≠a - MSc", 
                                 "Licenciatura - Lic", 
                                 "Bachillerato - Bach" 
-                            }), "Seleccione su grado acadÈmico...", new { @class = "form-control", @required = "required", style = "border-radius: 8px; padding: 12px 15px; font-size: 16px;" })
+                            }), "Seleccione su grado acad√©mico...", new { @class = "form-control", @required = "required", style = "border-radius: 8px; padding: 12px 15px; font-size: 16px;" })
                             @Html.ValidationMessageFor(m => m.gradoAcademico, "", new { @class = "text-danger small mt-2" })
                         </div>
 
@@ -60,7 +60,7 @@
                         </div>
 
                         <p class="text-center text-muted small mt-3">
-                            Este dato es importante para conocer el perfil acadÈmico de nuestros participantes.
+                            Este dato es importante para conocer el perfil acad√©mico de nuestros participantes.
                         </p>
                     }
                 </div>

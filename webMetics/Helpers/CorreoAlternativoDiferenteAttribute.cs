@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+Ôªøusing System.ComponentModel.DataAnnotations;
 
 namespace webMetics.Helpers
 {
@@ -32,7 +32,7 @@ namespace webMetics.Helpers
 
             var correoValue = correoProperty.GetValue(validationContext.ObjectInstance)?.ToString();
 
-            // Si el correo institucional est· vacÌo, pasar
+            // Si el correo institucional est√° vac√≠o, pasar
             if (string.IsNullOrWhiteSpace(correoValue))
             {
                 return ValidationResult.Success;

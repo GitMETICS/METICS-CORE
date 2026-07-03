@@ -1,6 +1,6 @@
-@model webMetics.Models.UsuarioModel
+锘緻model webMetics.Models.UsuarioModel
 @{
-    ViewBag.Title = "Completar Informaci髇 - Correo Alternativo";
+    ViewBag.Title = "Completar Informaci贸n - Correo Alternativo";
 }
 
 <div class="contenedor-caja container-fluid">
@@ -9,7 +9,7 @@
             <div class="card shadow-lg" style="border: none; border-radius: 15px;">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <h1 class="mb-2">Actualizaci髇 Requerida</h1>
+                        <h1 class="mb-2">Actualizaci贸n Requerida</h1>
                         <p class="text-muted">Para continuar, complete su correo alternativo</p>
                     </div>
 
@@ -24,7 +24,7 @@
                     @if (ViewBag.SuccessMessage != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong>蓌ito:</strong> @ViewBag.SuccessMessage
+                            <strong>脡xito:</strong> @ViewBag.SuccessMessage
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
@@ -42,7 +42,7 @@
 
                         <div class="form-group mb-4">
                             @Html.LabelFor(m => m.correoAlternativo, new { @class = "form-label fw-bold" })
-                            <small class="d-block mb-2 text-muted">Este es un campo adicional para mejorar la comunicaci髇</small>
+                            <small class="d-block mb-2 text-muted">Este es un campo adicional para mejorar la comunicaci贸n</small>
                             @Html.TextBoxFor(m => m.correoAlternativo, new { @class = "form-control", @type = "email", @placeholder = "ejemplo@correo.com", @maxlength = "64", @autocomplete = "off", @required = "required", style = "border-radius: 8px; padding: 12px 15px; font-size: 16px;" })
                             @Html.ValidationMessageFor(m => m.correoAlternativo, "", new { @class = "text-danger small mt-2" })
                         </div>
@@ -54,7 +54,7 @@
                         </div>
 
                         <p class="text-center text-muted small mt-3">
-                            Puede usar cualquier direcci髇 de correo v醠ida.
+                            Puede usar cualquier direcci贸n de correo v谩lida.
                         </p>
                     }
                 </div>
