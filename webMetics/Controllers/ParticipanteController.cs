@@ -449,7 +449,7 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler (para obtener correo destino).
         /// Role required: Admin (1).
         /// </remarks>
-        public IActionResult NotificarLimiteHoras(string idParticipante)
+        public async Task<IActionResult> NotificarLimiteHoras(string idParticipante)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
@@ -457,10 +457,9 @@ namespace webMetics.Controllers
             {
                 try
                 {
-                    EnviarCorreoNotificacion(idParticipante);
-                    bool exito = accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante);
+                    bool correoEnviado = await EnviarCorreoNotificacion(idParticipante);
 
-                    if (exito)
+                    if (correoEnviado && accesoAParticipante.ActualizarCorreoNotificacionEnviadoParticipante(idParticipante))
                     {
                         TempData["successMessage"] = "Se envió el correo de notificación.";
                     }
@@ -476,20 +475,17 @@ namespace webMetics.Controllers
                 }
             }
 
-            bool enviado = accesoAParticipante.ObtenerCorreoNotificacionEnviadoParticipante(idParticipante);
-
             return RedirectToAction("VerParticipantes");
         }
 
         /// <summary>Envía un correo al responsable cuando un participante supera el límite de 30 horas aprobadas.</summary>
-        private async Task<IActionResult> EnviarCorreoNotificacion(string idParticipante)
+        private async Task<bool> EnviarCorreoNotificacion(string idParticipante)
         {
             string subject = "Notificación Límite de Horas Aprobadas - SISTEMA DE INSCRIPCIONES METICS";
             string message = $"El usuario con correo institucional {idParticipante} ha superado las 30 horas aprobadas en el SISTEMA DE COMPETENCIAS DIGITALES PARA LA DOCENCIA - METICS.";
             string receiver = accesoAInscripcion.ObtenerCorreoLimiteHoras() ?? "soporte.metics@ucr.ac.cr";
 
-            await _emailService.SendEmailAsync(receiver, subject, message);
-            return Ok();
+            return await _emailService.SendEmailAsync(receiver, subject, message);
         }
 
         /// <summary>

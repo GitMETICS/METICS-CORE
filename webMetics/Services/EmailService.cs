@@ -9,11 +9,11 @@ public class EmailService
         _configuration = configuration;
     }
 
-    public async Task SendEmailAsync(string to, string subject, string body, byte[] attachmentData = null, string fileName = null)
+    public async Task<bool> SendEmailAsync(string to, string subject, string body, byte[] attachmentData = null, string fileName = null)
     {
         bool isEnabled = _configuration.GetValue<bool>("EmailSettings:IsEnabled");
 
-        if (!isEnabled) return;
+        if (!isEnabled) return false;
 
         var message = new MimeMessage();
 
@@ -51,12 +51,14 @@ public class EmailService
         using (var client = new MailKit.Net.Smtp.SmtpClient())
         {
             // Configurar el cliente SMTP para el servidor de correo de la UCR
-            client.Connect("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
-            client.Authenticate(from.Address, _configuration["EmailSettings:Password"]);
+            await client.ConnectAsync("smtp.ucr.ac.cr", 587); // Se utiliza el puerto 587 para enviar correos
+            await client.AuthenticateAsync(from.Address, _configuration["EmailSettings:Password"]);
 
-            client.Send(message);
+            await client.SendAsync(message);
 
-            client.Disconnect(true);
+            await client.DisconnectAsync(true);
         }
+
+        return true;
     }
 }
