@@ -97,6 +97,16 @@
                                 <button type="submit" class="btn btn-primary btn-block">Acceder</button>
                             </div>
                         }
+
+                        @if (ViewBag.SsoEnabled == true)
+                        {
+                            <div class="text-center my-3 text-muted" style="font-size: 0.85rem;">— o —</div>
+                            <div class="text-center">
+                                <a href="@Url.Action("IniciarSesionUCR", "Usuario")" class="btn btn-outline-secondary btn-block">
+                                    <i class="fas fa-university"></i>&nbsp; Iniciar sesión con UCR
+                                </a>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div class="card-footer text-center pt-2 pb-3" style="background-color: #333333; color: #fff; margin-bottom: 30px;">

@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
+using webMetics.Services.Sso;
 
 namespace webMetics.Controllers
 {
@@ -25,13 +28,17 @@ namespace webMetics.Controllers
         private readonly IConfiguration _configuration;
         private readonly IDataProtectionProvider _protector;
         private readonly EmailService _emailService;
+        private readonly UcrSsoService _ssoService;
+        private readonly UcrSsoOptions _ssoOptions;
 
-        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector, EmailService emailService)
+        public UsuarioController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider protector, EmailService emailService, UcrSsoService ssoService, UcrSsoOptions ssoOptions)
         {
             _environment = environment;
             _configuration = configuration;
             _protector = protector;
             _emailService = emailService;
+            _ssoService = ssoService;
+            _ssoOptions = ssoOptions;
 
             cookiesController = new CookiesController(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
@@ -56,6 +63,8 @@ namespace webMetics.Controllers
             {
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
+
+            ViewBag.SsoEnabled = _ssoOptions.Enabled;
 
             return View("IniciarSesion");
         }
@@ -299,32 +308,8 @@ namespace webMetics.Controllers
                 {
                     usuarioAutorizado = accesoAUsuario.ObtenerUsuario(usuario.id);
 
-                    int rolUsuario = usuarioAutorizado.rol;
-                    string idUsuario = usuarioAutorizado.id;
-
-                    int minutos = 20;
-                    if (rolUsuario == 1)
-                    {
-                        minutos = 120;
-                    }
-
-                    IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
-                    string idEncriptado = protector.Protect(idUsuario);
-
-                    Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
-
-                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
-
-                    Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddMinutes(minutos)
-                    });
+                    int minutos = usuarioAutorizado.rol == 1 ? 120 : 20;
+                    EstablecerCookiesSesion(usuarioAutorizado.id, usuarioAutorizado.rol, minutos);
                 }
             }
             catch (Exception ex)
@@ -333,6 +318,68 @@ namespace webMetics.Controllers
             }
 
             return usuarioAutorizado;
+        }
+
+        /// <summary>
+        /// Escribe las tres cookies de sesión que usa la aplicación:
+        /// USUARIOAUTORIZADO (id protegido con DataProtection), rolUsuario y idUsuario.
+        /// Es el puente común entre el login por contraseña y el login por SSO.
+        /// </summary>
+        private void EstablecerCookiesSesion(string idUsuario, int rolUsuario, int minutos)
+        {
+            IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
+            string idEncriptado = protector.Protect(idUsuario);
+
+            var opciones = new CookieOptions { Expires = DateTime.Now.AddMinutes(minutos) };
+
+            Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, opciones);
+            Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), opciones);
+            Response.Cookies.Append("idUsuario", idUsuario, opciones);
+        }
+
+        /// <summary>
+        /// Inicia el flujo de autenticación con el SSO de la UCR (OIDC).
+        /// Redirige al IdP y, tras autenticarse, el usuario regresa a <see cref="SsoCallback"/>.
+        /// </summary>
+        [HttpGet]
+        public IActionResult IniciarSesionUCR()
+        {
+            if (!_ssoOptions.Enabled)
+            {
+                TempData["errorMessage"] = "El inicio de sesión con UCR no está disponible en este momento.";
+                return RedirectToAction("IniciarSesion");
+            }
+
+            var propiedades = new AuthenticationProperties { RedirectUri = Url.Action("SsoCallback") };
+            return Challenge(propiedades, "oidc");
+        }
+
+        /// <summary>
+        /// Punto de retorno tras un inicio de sesión por SSO exitoso. Resuelve (o aprovisiona)
+        /// al usuario a partir de los claims del IdP, escribe las cookies de sesión de la app,
+        /// registra el acceso en la bitácora y encamina al usuario por el flujo de completación de perfil.
+        /// </summary>
+        [HttpGet]
+        public IActionResult SsoCallback()
+        {
+            if (!_ssoOptions.Enabled)
+            {
+                return RedirectToAction("IniciarSesion");
+            }
+
+            SsoLoginResult resultado = _ssoService.ResolveLogin(User);
+
+            if (!resultado.Success)
+            {
+                accesoAUsuario.InsertarAccesoUsuarioBitacora(_ssoService.ExtractEmail(User) ?? "SSO-DESCONOCIDO", "FRACASO");
+                TempData["errorMessage"] = resultado.ErrorMessage;
+                return RedirectToAction("IniciarSesion");
+            }
+
+            EstablecerCookiesSesion(resultado.Id!, resultado.Rol, resultado.CookieMinutes);
+            accesoAUsuario.InsertarAccesoUsuarioBitacora(resultado.Id!, "EXITO");
+
+            return DeterminarRedireccionPostLogin(resultado.Id!);
         }
 
         /// <summary>
@@ -444,12 +491,20 @@ namespace webMetics.Controllers
         /// Cierra la sesión eliminando las cookies de autenticación y redirige a la pantalla de login.
         /// </summary>
         /// <returns>Redirects to IniciarSesion.</returns>
-        public ActionResult CerrarSesion()
+        public IActionResult CerrarSesion()
         {
             // Eliminar datos del usuario
             Response.Cookies.Delete("USUARIOAUTORIZADO");
             Response.Cookies.Delete("rolUsuario");
             Response.Cookies.Delete("idUsuario");
+
+            // Si la sesión se abrió por SSO (existe una cookie de autenticación de ASP.NET),
+            // cerrar también la sesión federada en el IdP de la UCR.
+            if (_ssoOptions.Enabled && (User.Identity?.IsAuthenticated ?? false))
+            {
+                var propiedades = new AuthenticationProperties { RedirectUri = Url.Action("IniciarSesion") };
+                return SignOut(propiedades, CookieAuthenticationDefaults.AuthenticationScheme, "oidc");
+            }
 
             return RedirectToAction("IniciarSesion");
         }

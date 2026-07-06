@@ -397,3 +397,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 webMetics/webMetics.csproj.lscache
+
+# DataProtection keys (do not commit)
+webMetics/keys/
+keys/
