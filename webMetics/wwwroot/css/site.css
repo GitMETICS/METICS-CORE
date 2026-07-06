@@ -6,6 +6,264 @@
     color: black;
 }
 
+.metics-tabs-navbar {
+    background: #f4f4f4;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 54px;
+    padding: 0;
+    position: relative;
+    z-index: 1030;
+}
+
+.metics-tabs-container {
+    align-items: stretch;
+    gap: 12px;
+    min-height: 54px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.metics-tabs-collapse {
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.metics-tabs-left,
+.metics-tabs-right,
+.metics-tabs-nav {
+    align-items: stretch;
+    display: flex;
+}
+
+.metics-tabs-left {
+    min-width: 0;
+}
+
+.metics-tabs-right {
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.metics-tabs-nav {
+    gap: 4px;
+    min-width: 0;
+}
+
+.metics-tab,
+.metics-settings-tab,
+.metics-account {
+    align-items: center;
+    display: flex;
+    min-height: 54px;
+    position: relative;
+}
+
+.metics-tabs-navbar .nav-link {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #1f2937;
+    display: inline-flex;
+    font-size: 14px;
+    gap: 8px;
+    height: 40px;
+    line-height: 1;
+    padding: 0 13px;
+    position: relative;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.metics-tabs-navbar .nav-link:hover,
+.metics-tabs-navbar .nav-link:focus {
+    background: #f8fafc;
+    border-color: #ebeff4;
+    color: #111827;
+}
+
+.metics-tabs-navbar .metics-tab.active > .nav-link {
+    background: #eef4fb;
+    color: #095998;
+    font-weight: 600;
+}
+
+.metics-tabs-navbar .metics-tab.active > .nav-link::before {
+    background: #095998;
+    border: 0;
+    border-radius: 999px;
+    bottom: -7px;
+    content: "";
+    height: 2px;
+    left: 10px;
+    margin: 0;
+    position: absolute;
+    right: 10px;
+    top: auto;
+    transform: none;
+    width: auto;
+}
+
+.metics-tabs-navbar .dropdown-toggle::after {
+    color: #6b7280;
+    margin-left: 2px;
+}
+
+.metics-icon-tab {
+    justify-content: center;
+    padding: 0;
+    width: 40px;
+}
+
+.metics-tabs-navbar .bi {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.metics-tabs-menu {
+    border: 1px solid #d7dce2;
+    border-radius: 6px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    font-size: 14px;
+    margin-top: 0;
+    min-width: 220px;
+    padding: 4px 0;
+    z-index: 1040;
+}
+
+.metics-tabs-menu .dropdown-item {
+    color: #111827;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+.metics-tabs-menu .dropdown-item:hover,
+.metics-tabs-menu .dropdown-item:focus {
+    background: #f3f6fa !important;
+    color: #111827 !important;
+}
+
+.metics-tabs-menu .dropdown-divider {
+    border-top-color: #e5e7eb;
+    margin: 4px 0;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 992px) {
+    .metics-tabs-navbar .dropdown {
+        position: relative;
+    }
+
+    .metics-tabs-navbar .dropdown > .metics-tabs-menu {
+        left: 0 !important;
+        right: auto !important;
+        top: calc(100% - 1px) !important;
+        transform: none !important;
+    }
+
+    .metics-tabs-navbar .dropdown > .dropdown-menu-end.metics-tabs-menu {
+        left: auto !important;
+        right: 0 !important;
+    }
+
+    .metics-tabs-navbar .dropdown:hover > .metics-tabs-menu,
+    .metics-tabs-navbar .dropdown:focus-within > .metics-tabs-menu {
+        display: block;
+    }
+}
+
+.metics-create-module {
+    align-items: center;
+    border: 0;
+    border-radius: 4px;
+    display: inline-flex;
+    font-size: 14px;
+    gap: 8px;
+    height: 34px;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+
+.metics-create-module::before {
+    margin-right: 8px;
+}
+
+.metics-account-link {
+    background: transparent;
+}
+
+.metics-account .dropdown-menu {
+    min-width: 200px;
+}
+
+.metics-logout {
+    color: #b91c1c !important;
+}
+
+.metics-tabs-toggler {
+    align-self: center;
+    border-color: #d7dce2;
+    margin: 8px 0;
+}
+
+@media (max-width: 991.98px) {
+    .metics-tabs-container {
+        align-items: center;
+        padding-bottom: 8px;
+        padding-top: 8px;
+    }
+
+    .metics-tabs-collapse {
+        align-items: stretch;
+        gap: 10px;
+        padding-top: 8px;
+    }
+
+    .metics-tabs-left,
+    .metics-tabs-right,
+    .metics-tabs-nav {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .metics-tabs-right {
+        gap: 8px;
+    }
+
+    .metics-tab,
+    .metics-settings-tab,
+    .metics-account {
+        min-height: auto;
+        width: 100%;
+    }
+
+    .metics-tabs-navbar .nav-link,
+    .metics-create-module {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .metics-tabs-navbar .metics-tab.active > .nav-link::before {
+        bottom: 6px;
+        height: auto;
+        left: 4px;
+        right: auto;
+        top: 6px;
+        width: 2px;
+    }
+
+    .metics-icon-tab {
+        width: 100%;
+    }
+
+    .metics-tabs-menu {
+        box-shadow: none;
+        margin-bottom: 6px;
+        width: 100%;
+    }
+}
+
 .dropdown-item:hover {
     color: black !important;
     background-color: lightgray !important;
