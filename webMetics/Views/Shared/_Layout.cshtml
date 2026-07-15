@@ -55,85 +55,162 @@
 
 
 
-    @if (ViewBag.Id != "" && ViewBag.Title != "Formulario de Registro" && ViewBag.Title != "Iniciar sesión" && ViewBag.Title != "Recuperar Contraseña" && ViewBag.Title != "Completar Información - Correo Alternativo" && ViewBag.Title != "Completar Información - Grado Académico")
-    {
-        <nav class="navbar navbar-expand-lg navbar-custom">
-            <div class="container-fluid">
+    @{
+        string navUserId = Convert.ToString(ViewBag.Id) ?? "";
+        string navRoleValue = Convert.ToString(ViewBag.Role) ?? "";
+        int navRole = 0;
+        int.TryParse(navRoleValue, out navRole);
+        string currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]) ?? "";
+        string currentAction = Convert.ToString(ViewContext.RouteData.Values["action"]) ?? "";
+        bool showNav = !string.IsNullOrEmpty(navUserId)
+            && ViewBag.Title != "Formulario de Registro"
+            && ViewBag.Title != "Iniciar sesión"
+            && ViewBag.Title != "Recuperar Contraseña"
+            && ViewBag.Title != "Completar Información - Correo Alternativo"
+            && ViewBag.Title != "Completar Información - Grado Académico";
+        bool isAcademicActive = currentController == "Categoria" || (currentController == "Tema" && currentAction != "CrearTema");
+        bool isPeopleActive = currentController == "Participante" || (currentController == "Asesor" && currentAction != "MisModulos");
+        bool isInscriptionActive = currentController == "Inscripcion";
+        bool isContentActive = currentController == "Medallas"
+            || (currentController == "Tema" && currentAction == "CrearTema")
+            || (currentController == "Grupo" && currentAction == "CrearGrupo");
+        bool isHomeActive = currentController == "Grupo" && currentAction == "ListaGruposDisponibles";
+        bool isFacilitatorActive = (currentController == "Asesor" && currentAction == "MisModulos")
+            || (currentController == "Grupo" && currentAction == "CrearGrupo");
+        string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
+    }
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    @if (showNav)
+    {
+        <nav class="navbar navbar-expand-lg metics-tabs-navbar">
+            <div class="container-fluid metics-tabs-container">
+                <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse justify-content-between" id="navbarColor01">
-                    <div>
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink"
-                                   role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="collapse navbar-collapse metics-tabs-collapse" id="navbarColor01">
+                    <div class="metics-tabs-left">
+                        @if (navRole == 1)
+                        {
+                            <ul class="navbar-nav metics-tabs-nav">
+                                <li class="nav-item dropdown metics-settings-tab">
+                                    <a class="nav-link metics-icon-tab" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Configuración" aria-label="Configuración">
+                                        <i class="bi bi-gear"></i>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="settingsDropdown">
+                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item dropdown metics-tab @(isAcademicActive ? "active" : "")">
+                                    <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-list-ul"></i>
+                                        <span>Gestión académica</span>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="academicDropdown">
+                                        <li>@Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item dropdown metics-tab @(isPeopleActive ? "active" : "")">
+                                    <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-people"></i>
+                                        <span>Personas</span>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="peopleDropdown">
+                                        <li>@Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item dropdown metics-tab @(isInscriptionActive ? "active" : "")">
+                                    <a class="nav-link dropdown-toggle" href="#" id="inscriptionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-card-checklist"></i>
+                                        <span>Inscripciones</span>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="inscriptionDropdown">
+                                        <li>@Html.ActionLink("Lista de inscripciones", "VerInscripciones", "Inscripcion", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item dropdown metics-tab @(isContentActive ? "active" : "")">
+                                    <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-file-earmark-plus"></i>
+                                        <span>Contenido</span>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="contentDropdown">
+                                        <li>@Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
+                                        <i class="bi bi-house-door-fill"></i>
+                                        <span>Inicio</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        }
+                        else if (navRole == 2)
+                        {
+                            <ul class="navbar-nav metics-tabs-nav">
+                                <li class="nav-item dropdown metics-tab @(isFacilitatorActive ? "active" : "")">
+                                    <a class="nav-link dropdown-toggle" href="#" id="facilitatorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-workspace"></i>
+                                        <span>Facilitador(a)</span>
+                                    </a>
+                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="facilitatorDropdown">
+                                        <li>@Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
+                                    </ul>
+                                </li>
+
+                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
+                                        <i class="bi bi-house-door-fill"></i>
+                                        <span>Inicio</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul class="navbar-nav metics-tabs-nav">
+                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
+                                        <i class="bi bi-house-door-fill"></i>
+                                        <span>Inicio</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        }
+                    </div>
+
+                    <div class="metics-tabs-right">
+                        @if (navRole == 1 || navRole == 2)
+                        {
+                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-secondary metics-create-module bi bi-plus-lg" })
+                        }
+
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown metics-account">
+                                <a class="nav-link dropdown-toggle metics-account-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-circle"></i>
+                                    <span>@roleLabel</span>
                                 </a>
 
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                    <li>
-                                        @Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item" })
-                                    </li>
-                                    <li>
-                                        @Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item" })
-                                    </li>
-                                    @if (ViewBag.Role == 1)
-                                    {
-                                        
-                                    }
+                                <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
+                                    <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item" })</li>
+                                    <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item" })</li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        @Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item" })
-                                    </li>
+                                    <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item metics-logout" })</li>
                                 </ul>
                             </li>
-                            @if (ViewBag.Role == 1)
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Administrador</a>
-                                    <div class="dropdown-menu">
-                                        @Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Lista de inscripciones", "VerInscripciones", "Inscripcion", new { }, new { @class = "dropdown-item" })
-                                        <hr class="dropdown-divider">
-                                        @Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
-                                        <hr class="dropdown-divider">
-                                        @Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item" })
-                                        <hr class="dropdown-divider">
-                                        @Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item" })
-                                    </div>
-                                </li>
-                            }
-                            @if (ViewBag.Role == 2)
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Facilitador(a)</a>
-                                    <div class="dropdown-menu">
-                                        @Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item" })
-                                        @Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })
-                                    </div>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                @Html.ActionLink(" ", "ListaGruposDisponibles", "Grupo", new { }, new { @class = "nav-link active bi bi-house-door-fill" })
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <ul class="navbar-nav me-auto">
-                            @if (ViewBag.Role == 1 || ViewBag.Role == 2)
-                        {
-                            <li class="nav-item">
-                                    @Html.ActionLink("      Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "bi bi-plus-lg btn btn-secondary" })
-                            </li>
-                        }
                         </ul>
                     </div>
                 </div>
