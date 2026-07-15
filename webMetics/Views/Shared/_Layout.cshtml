@@ -73,9 +73,10 @@
         bool isInscriptionActive = currentController == "Inscripcion";
         bool isContentActive = currentController == "Medallas"
             || (currentController == "Tema" && currentAction == "CrearTema")
-            || (currentController == "Grupo" && currentAction != "ListaGruposDisponibles");
+            || (currentController == "Grupo" && currentAction == "CrearGrupo");
         bool isHomeActive = currentController == "Grupo" && currentAction == "ListaGruposDisponibles";
-        bool isFacilitatorActive = currentController == "Asesor" && currentAction == "MisModulos";
+        bool isFacilitatorActive = (currentController == "Asesor" && currentAction == "MisModulos")
+            || (currentController == "Grupo" && currentAction == "CrearGrupo");
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
     }
 
