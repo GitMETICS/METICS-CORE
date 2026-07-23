@@ -107,11 +107,12 @@ var MeticsTable = (function () {
         var tableElement = document.getElementById(options.tableId);
         if (!tableElement) return null;
 
+        var initialPageLength = options.pageLength || 50;
         var table = new DataTable('#' + options.tableId, {
             language: { url: METICS_DT_LANG },
             searching: options.searching === true,
             paging: true,
-            pageLength: options.pageLength || 5,
+            pageLength: initialPageLength,
             lengthMenu: [5, 10, 25, 50],
             info: false,
             lengthChange: false,
@@ -131,6 +132,7 @@ var MeticsTable = (function () {
 
         var pageSize = options.pageSizeId ? document.getElementById(options.pageSizeId) : null;
         if (pageSize) {
+            pageSize.value = String(initialPageLength);
             pageSize.addEventListener('change', function () {
                 table.page.len(parseInt(this.value, 10)).draw();
             });
@@ -152,5 +154,57 @@ var MeticsTable = (function () {
         return table;
     }
 
-    return { init: init, initTooltips: initTooltips };
+    // Inicializa una tabla cuya búsqueda, ordenamiento y paginación se resuelven en el servidor.
+    function initServer(options) {
+        var tableElement = document.getElementById(options.tableId);
+        if (!tableElement) return null;
+
+        var table = new DataTable('#' + options.tableId, {
+            language: { url: METICS_DT_LANG },
+            processing: true,
+            serverSide: true,
+            searching: true,
+            paging: true,
+            pageLength: options.pageLength || 50,
+            lengthMenu: [5, 10, 25, 50],
+            info: false,
+            lengthChange: false,
+            dom: 't',
+            pagingType: 'simple_numbers',
+            search: { search: options.initialSearch || '' },
+            order: options.order || [[1, 'asc']],
+            ajax: {
+                url: options.ajaxUrl,
+                type: 'GET'
+            },
+            columns: options.columns,
+            columnDefs: options.columnDefs || [],
+            drawCallback: function () {
+                var api = this.api();
+                initTooltips(api.table().node());
+                if (typeof options.onDraw === 'function') {
+                    options.onDraw(api);
+                }
+            }
+        });
+
+        var pagination = options.paginationId ? document.getElementById(options.paginationId) : null;
+        if (pagination) {
+            var draw = function () { renderPagination(table, pagination); };
+            table.on('draw', draw);
+        }
+
+        var pageSize = options.pageSizeId ? document.getElementById(options.pageSizeId) : null;
+        if (pageSize) {
+            pageSize.value = String(options.pageLength || 50);
+            pageSize.addEventListener('change', function () {
+                table.page.len(parseInt(this.value, 10)).draw();
+            });
+        }
+
+        initTooltips(tableElement);
+        return table;
+    }
+
+    return { init: init, initServer: initServer, initTooltips: initTooltips };
 })();
