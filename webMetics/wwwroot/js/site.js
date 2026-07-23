@@ -107,11 +107,12 @@ var MeticsTable = (function () {
         var tableElement = document.getElementById(options.tableId);
         if (!tableElement) return null;
 
+        var initialPageLength = options.pageLength || 50;
         var table = new DataTable('#' + options.tableId, {
             language: { url: METICS_DT_LANG },
             searching: options.searching === true,
             paging: true,
-            pageLength: options.pageLength || 5,
+            pageLength: initialPageLength,
             lengthMenu: [5, 10, 25, 50],
             info: false,
             lengthChange: false,
@@ -131,6 +132,7 @@ var MeticsTable = (function () {
 
         var pageSize = options.pageSizeId ? document.getElementById(options.pageSizeId) : null;
         if (pageSize) {
+            pageSize.value = String(initialPageLength);
             pageSize.addEventListener('change', function () {
                 table.page.len(parseInt(this.value, 10)).draw();
             });
