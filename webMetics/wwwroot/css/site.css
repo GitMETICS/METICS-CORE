@@ -341,6 +341,72 @@
     color: #555;
 }
 
+/* --- Filtros del registro de accesos --- */
+.access-filter-panel {
+    background: white;
+    border: 1px solid var(--metics-border);
+    border-top: 3px solid var(--metics-blue);
+    border-radius: 4px;
+    padding: 18px 20px 20px;
+    margin-bottom: 20px;
+}
+
+.access-filter-title {
+    color: var(--metics-navy);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.access-filter-tabs {
+    border-bottom: 1px solid var(--metics-border) !important;
+    gap: 2px;
+    margin-bottom: 18px;
+}
+
+.access-filter-tabs .nav-link {
+    color: #444;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 2px 2px 0 0;
+}
+
+.access-filter-tabs .nav-link:hover {
+    background: #F5F5F5;
+    border-color: var(--metics-border-light);
+    color: var(--metics-navy);
+}
+
+.access-filter-tabs .nav-link.active {
+    background: var(--metics-blue-light);
+    border-color: var(--metics-border) var(--metics-border) white;
+    color: var(--metics-navy);
+    font-weight: 700;
+}
+
+.access-filter-content .form-label {
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.access-filter-content .form-control,
+.access-filter-content .form-select {
+    border-color: var(--metics-input-border);
+    border-radius: 2px;
+    font-size: 13px;
+    min-height: 38px;
+}
+
+.access-filter-actions {
+    border-top: 1px solid var(--metics-border-light);
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 14px;
+}
+
 /* --- Barra de controles (mostrar registros / búsqueda / crear) --- */
 .table-toolbar {
     padding: 14px 14px 10px 14px;
