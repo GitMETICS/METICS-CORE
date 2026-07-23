@@ -112,44 +112,42 @@
 
         @if (ViewBag.BitacoraAccesos != null)
         {
-            <div class="bg-white rounded overflow-hidden">
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="bg-light text-uppercase fw-semibold">
-                        <tr>
-                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">ID de Acceso</th>
-                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">ID de Usuario</th>
-                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">Fecha y Hora</th>
-                            <th scope="col" class="px-3 py-3 border-bottom border-2 border-gray-200">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var acceso in ViewBag.BitacoraAccesos)
-                        {
-                            <tr>
-                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
-                                    <p class="text-dark">@acceso.IdAccesoPK</p>
-                                </td>
-                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
-                                    <p class="text-dark">@acceso.IdUsuario</p>
-                                </td>
-                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
-                                    <p class="text-dark">@acceso.FechaHoraAcceso.ToString("yyyy-MM-dd HH:mm:ss")</p>
-                                </td>
-                                <td class="px-3 py-3 border-bottom border-gray-200 bg-white small">
-                                    <span class="badge rounded-pill @(acceso.EstadoAcceso == "EXITO" ? "text-bg-success" : "text-bg-danger")">
-                                        @acceso.EstadoAcceso
-                                    </span>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span class="table-card-title">Registro de accesos</span>
+                    <span class="table-card-desc">Historial de accesos registrados en el sistema</span>
+                </div>
 
-            <!-- Paginación -->
-            <nav aria-label="Paginación de bitácora" class="mt-3">
-                <ul id="pagination" class="pagination justify-content-center"></ul>
-            </nav>
+                <div class="table-scroll table-scroll--fit">
+                    <table id="bitacoraTblCustomers" class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 18%;">ID de Acceso</th>
+                                <th scope="col" style="width: 38%;">ID de Usuario</th>
+                                <th scope="col" style="width: 26%;">Fecha y Hora</th>
+                                <th scope="col" style="width: 18%;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var acceso in ViewBag.BitacoraAccesos)
+                            {
+                                <tr>
+                                    <td>@acceso.IdAccesoPK</td>
+                                    <td>@acceso.IdUsuario</td>
+                                    <td>@acceso.FechaHoraAcceso.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>
+                                        <span class="badge rounded-pill @(acceso.EstadoAcceso == "EXITO" ? "text-bg-success" : "text-bg-danger")">
+                                            @acceso.EstadoAcceso
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav id="pagination" class="table-pagination" aria-label="Paginación de bitácora"></nav>
+            </div>
 
             <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
             <script>
@@ -196,27 +194,30 @@
                     function updatePagination() {
                         const pages = generatePaginationNumbers(currentPage, totalPages);
 
-                        let paginationHtml = '<li class="page-item"><a class="page-link" href="#" id="prev">Anterior</a></li>';
+                        let paginationHtml = '<a class="page-btn" href="#" id="prev">«</a>';
 
                         pages.forEach(page => {
                             if (page === '...') {
-                                paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                paginationHtml += '<span class="page-btn disabled">...</span>';
                             } else {
-                                const activeClass = page === currentPage ? ' active' : '';
-                                paginationHtml += `<li class="page-item${activeClass}"><a class="page-link" href="#" data-page="${page}">${page}</a></li>`;
+                                if (page === currentPage) {
+                                    paginationHtml += `<span class="page-btn current">${page}</span>`;
+                                } else {
+                                    paginationHtml += `<a class="page-btn" href="#" data-page="${page}">${page}</a>`;
+                                }
                             }
                         });
 
-                        paginationHtml += '<li class="page-item"><a class="page-link" href="#" id="next">Siguiente</a></li>';
+                        paginationHtml += '<a class="page-btn" href="#" id="next">»</a>';
                         $('#pagination').html(paginationHtml);
 
 						// Actualizar botones de navegación
-                        $('#pagination #prev').parent().toggleClass('disabled', currentPage === 1);
-                        $('#pagination #next').parent().toggleClass('disabled', currentPage === totalPages);
+                        $('#pagination #prev').toggleClass('disabled', currentPage === 1);
+                        $('#pagination #next').toggleClass('disabled', currentPage === totalPages);
                     }
 
                     // Event handlers
-                    $('#pagination').on('click', 'a.page-link', function (e) {
+                    $('#pagination').on('click', 'a.page-btn', function (e) {
                         e.preventDefault();
 
                         if ($(this).attr('id') === 'prev') {
