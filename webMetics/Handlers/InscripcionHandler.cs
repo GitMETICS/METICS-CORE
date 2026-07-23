@@ -44,6 +44,80 @@ public class InscripcionHandler : BaseDeDatosHandler
         return inscripciones;
     }
 
+    public async Task<PagedResult<InscripcionListadoModel>> ObtenerInscripcionesPaginadasAsync(
+        int offset,
+        int pageSize,
+        string? searchTerm,
+        string sortColumn,
+        string sortDirection)
+    {
+        PagedResult<InscripcionListadoModel> resultado = new PagedResult<InscripcionListadoModel>();
+
+        using SqlCommand comando = new SqlCommand("SelectInscripcionesPaginadas", ConexionMetics)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+
+        comando.Parameters.Add("@Offset", SqlDbType.Int).Value = offset;
+        comando.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+        comando.Parameters.Add("@SearchTerm", SqlDbType.NVarChar, 512).Value =
+            string.IsNullOrWhiteSpace(searchTerm) ? DBNull.Value : searchTerm.Trim();
+        comando.Parameters.Add("@SortColumn", SqlDbType.NVarChar, 32).Value = sortColumn;
+        comando.Parameters.Add("@SortDirection", SqlDbType.NVarChar, 4).Value = sortDirection;
+
+        try
+        {
+            await ConexionMetics.OpenAsync();
+            using SqlDataReader reader = await comando.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                resultado.TotalRecords = reader.GetInt32(reader.GetOrdinal("TotalRecords"));
+            }
+
+            if (await reader.NextResultAsync() && await reader.ReadAsync())
+            {
+                resultado.FilteredRecords = reader.GetInt32(reader.GetOrdinal("FilteredRecords"));
+            }
+
+            if (await reader.NextResultAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    resultado.Items.Add(new InscripcionListadoModel
+                    {
+                        IdInscripcion = reader.GetInt32(reader.GetOrdinal("IdInscripcion")),
+                        IdParticipante = reader.GetString(reader.GetOrdinal("IdParticipante")),
+                        Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                        PrimerApellido = reader.GetString(reader.GetOrdinal("PrimerApellido")),
+                        SegundoApellido = reader.IsDBNull(reader.GetOrdinal("SegundoApellido"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("SegundoApellido")),
+                        Correo = reader.GetString(reader.GetOrdinal("Correo")),
+                        UnidadAcademica = reader.IsDBNull(reader.GetOrdinal("UnidadAcademica"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("UnidadAcademica")),
+                        NombreGrupo = reader.IsDBNull(reader.GetOrdinal("NombreGrupo"))
+                            ? null
+                            : reader.GetString(reader.GetOrdinal("NombreGrupo")),
+                        NumeroGrupo = reader.IsDBNull(reader.GetOrdinal("NumeroGrupo"))
+                            ? 0
+                            : reader.GetInt32(reader.GetOrdinal("NumeroGrupo")),
+                        Estado = reader.GetString(reader.GetOrdinal("Estado")),
+                        HorasMatriculadas = reader.GetInt32(reader.GetOrdinal("HorasMatriculadas")),
+                        HorasAprobadas = reader.GetInt32(reader.GetOrdinal("HorasAprobadas"))
+                    });
+                }
+            }
+        }
+        finally
+        {
+            ConexionMetics.Close();
+        }
+
+        return resultado;
+    }
+
     public async Task<List<InscripcionModel>> ObtenerInscripcionesAsync()
     {
         List<InscripcionModel> inscripciones = new List<InscripcionModel>();

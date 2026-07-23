@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
+using Microsoft.AspNetCore.Authorization;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.XSSF.UserModel;
@@ -105,40 +106,23 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Muestra todos los participantes del sistema con sus horas matriculadas y aprobadas,
-        /// incluyendo los grupos en los que cada uno está inscrito.
+        /// Muestra la pantalla administrativa de participantes. Las filas se cargan
+        /// posteriormente desde <see cref="ObtenerParticipantesPaginados"/>.
         /// </summary>
         /// <returns>
         /// View: VerParticipantes —
-        /// ViewBag.ListaParticipantes (List&lt;ParticipanteModel&gt; con gruposInscritos cargados),
         /// ViewBag.Role, ViewBag.Id,
         /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
         /// </returns>
         /// <remarks>
-        /// Handlers: ParticipanteHandler, GrupoHandler.
+        /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        public ActionResult VerParticipantes()
+        [Authorize(Roles = "1")]
+        public ActionResult VerParticipantes(string? searchTerm = null)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
-
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
-
-            if (participantes != null)
-            {
-                foreach (ParticipanteModel participante in participantes)
-                {
-                    string idParticipante = participante.idParticipante;
-                    participante.gruposInscritos = accesoAGrupo.ObtenerListaGruposParticipante(idParticipante);
-                }
-
-                ViewBag.ListaParticipantes = participantes;
-            }
-            else
-            {
-                ViewBag.ListaParticipantes = null;
-            }
 
             if (TempData["errorMessage"] != null)
             {
@@ -152,44 +136,68 @@ namespace webMetics.Controllers
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Roles = "1")]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ObtenerParticipantesPaginados()
+        {
+            int draw = int.TryParse(Request.Query["draw"], out int drawValue) ? Math.Max(0, drawValue) : 0;
+            int offset = int.TryParse(Request.Query["start"], out int offsetValue) ? Math.Max(0, offsetValue) : 0;
+            int requestedPageSize = int.TryParse(Request.Query["length"], out int pageSizeValue) ? pageSizeValue : 50;
+            int pageSize = new[] { 5, 10, 25, 50 }.Contains(requestedPageSize) ? requestedPageSize : 50;
+            string? searchTerm = Request.Query["search[value]"].ToString();
+
+            int sortColumnIndex = int.TryParse(Request.Query["order[0][column]"], out int columnValue)
+                ? columnValue
+                : 2;
+            string sortColumn = sortColumnIndex switch
+            {
+                1 => "unidadAcademica",
+                2 => "nombre",
+                3 => "correo",
+                4 => "horasMatriculadas",
+                5 => "horasAprobadas",
+                _ => "nombre"
+            };
+            string sortDirection = string.Equals(
+                Request.Query["order[0][dir]"],
+                "desc",
+                StringComparison.OrdinalIgnoreCase)
+                ? "desc"
+                : "asc";
+
+            PagedResult<ParticipanteListadoModel> resultado =
+                await accesoAParticipante.ObtenerParticipantesPaginadosAsync(
+                    offset,
+                    pageSize,
+                    searchTerm,
+                    sortColumn,
+                    sortDirection);
+
+            return Json(new
+            {
+                draw,
+                recordsTotal = resultado.TotalRecords,
+                recordsFiltered = resultado.FilteredRecords,
+                data = resultado.Items
+            });
+        }
+
         /// <summary>
-        /// Filtra y muestra participantes cuyo nombre, apellidos, correo, unidad académica u horas
-        /// contengan el término de búsqueda. Reutiliza la vista VerParticipantes.
+        /// Conserva la ruta de búsqueda anterior y redirige al listado paginado.
         /// </summary>
         /// <param name="searchTerm">Texto libre para filtrar participantes.</param>
         /// <returns>
-        /// View: VerParticipantes —
-        /// ViewBag.ListaParticipantes (filtrada), ViewBag.Role, ViewBag.Id.
+        /// Redirects to VerParticipantes con searchTerm.
         /// </returns>
         /// <remarks>
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public IActionResult BuscarParticipantes(string searchTerm)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            // Obtener la lista de participantes
-            var participantes = accesoAParticipante.ObtenerListaParticipantes();
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            ViewBag.ListaParticipantes = participantes;
-
-            return View("VerParticipantes");
+            return RedirectToAction(nameof(VerParticipantes), new { searchTerm });
         }
 
         /// <summary>
@@ -325,13 +333,10 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [Authorize(Roles = "1")]
+        [ValidateAntiForgeryToken]
         public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
         {
-            // Validar que solo administradores puedan asignar medallas
-            if (GetRole() != 1)  // Si no es administrador
-            {
-                TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
-            }
             try
             {
                 if (participantesSeleccionados != null && participantesSeleccionados.Any() && !string.IsNullOrEmpty(nombreMedalla))
@@ -372,6 +377,8 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [Authorize(Roles = "1")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
             if (file == null)
@@ -449,7 +456,10 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler (para obtener correo destino).
         /// Role required: Admin (1).
         /// </remarks>
-        public async Task<IActionResult> NotificarLimiteHoras(string idParticipante)
+        [HttpPost]
+        [Authorize(Roles = "1")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NotificarLimiteHoras(string idParticipante, string? searchTerm = null)
         {
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idParticipante);
 
@@ -475,7 +485,7 @@ namespace webMetics.Controllers
                 }
             }
 
-            return RedirectToAction("VerParticipantes");
+            return RedirectToAction("VerParticipantes", new { searchTerm });
         }
 
         /// <summary>Envía un correo al responsable cuando un participante supera el límite de 30 horas aprobadas.</summary>
@@ -488,6 +498,32 @@ namespace webMetics.Controllers
             return await _emailService.SendEmailAsync(receiver, subject, message);
         }
 
+        private List<ParticipanteModel> ObtenerParticipantesParaExportacion(string? searchTerm)
+        {
+            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes() ?? [];
+            string termino = searchTerm?.Trim() ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(termino))
+            {
+                participantes = participantes.Where(p =>
+                    p.unidadAcademica != null && p.unidadAcademica.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.nombre.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.primerApellido.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.segundoApellido != null && p.segundoApellido.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.correo.Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasMatriculadas.ToString().Contains(termino, StringComparison.OrdinalIgnoreCase) ||
+                    p.horasAprobadas.ToString().Contains(termino, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            return participantes
+                .OrderBy(p => p.nombre, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(p => p.primerApellido, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(p => p.segundoApellido, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(p => p.idParticipante, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         /// <summary>
         /// Genera y descarga un PDF en formato A2 con la lista de participantes y sus módulos inscritos.
         /// Aplica el mismo filtro de búsqueda de texto que VerParticipantes.
@@ -498,28 +534,15 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
             try
             {
                 // Obtener la lista de participantes e inscripciones
-                List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+                List<ParticipanteModel> participantes = ObtenerParticipantesParaExportacion(searchTerm);
                 List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
                 var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
-
-                // Filtrar la lista si se ha ingresado un término de búsqueda
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    participantes = participantes.Where(p =>
-                        p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                        p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    ).ToList();
-                }
 
                 using var memoryStream = new MemoryStream();
                 using var writer = new PdfWriter(memoryStream);
@@ -613,25 +636,12 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesWord(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<ParticipanteModel> participantes = ObtenerParticipantesParaExportacion(searchTerm);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
 
             var fileName = "Lista_de_Participantes_Módulos.docx";
 
@@ -747,25 +757,12 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesExcel(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
-            List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
+            List<ParticipanteModel> participantes = ObtenerParticipantesParaExportacion(searchTerm);
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones(); // Relación de horas aprobadas y notas
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
 
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -895,20 +892,13 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesExcel2(string? searchTerm)
         {
             try
             {
                 // Optimized Database Query (if possible)
-                List<ParticipanteModel> participantes;
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    participantes = accesoAParticipante.ObtenerListaParticipantesFiltrada(searchTerm) ?? [];
-                }
-                else
-                {
-                    participantes = accesoAParticipante.ObtenerListaParticipantes();
-                }
+                List<ParticipanteModel> participantes = ObtenerParticipantesParaExportacion(searchTerm);
 
                 var areasExtraMap = accesoAParticipante.GetAreasExtraParticipantes();
 
@@ -1004,6 +994,7 @@ namespace webMetics.Controllers
         /// Handlers: ninguno.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
             // Creamos el archivo de Excel
@@ -1106,6 +1097,7 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult FormularioParticipante()
         {
             ViewBag.Id = GetId();
@@ -1137,6 +1129,7 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
@@ -1295,6 +1288,7 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [Authorize(Roles = "1")]
         public ActionResult EditarParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -1333,6 +1327,7 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarParticipante(ParticipanteModel participante)
         {
@@ -1479,6 +1474,8 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [Authorize(Roles = "1")]
+        [ValidateAntiForgeryToken]
         public ActionResult EliminarParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
