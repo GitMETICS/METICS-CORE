@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
 using webMetics.Handlers;
 using webMetics.Models;
 
@@ -80,11 +77,11 @@ namespace webMetics.Controllers
         /// Redirect logic is determined by DeterminarRedireccionPostLogin.
         /// </remarks>
         [HttpPost]
-        public async Task<IActionResult> IniciarSesion(LoginModel usuario)
+        public ActionResult IniciarSesion(LoginModel usuario)
         {
             if (ModelState.IsValid)
             {
-                LoginModel usuarioAutorizado = await AutenticarUsuarioAsync(usuario);
+                LoginModel usuarioAutorizado = AutenticarUsuario(usuario);
 
                 if (usuarioAutorizado != null)
                 {
@@ -292,7 +289,7 @@ namespace webMetics.Controllers
         /// <param name="usuario">Modelo con id (correo) y contraseña.</param>
         /// <returns>El <see cref="LoginModel"/> del usuario autenticado, o <c>null</c> si las credenciales son incorrectas.</returns>
         /// <remarks>Handlers: UsuarioHandler.</remarks>
-        private async Task<LoginModel> AutenticarUsuarioAsync(LoginModel usuario)
+        private LoginModel AutenticarUsuario(LoginModel usuario)
         {
             LoginModel usuarioAutorizado = null;
 
@@ -311,43 +308,23 @@ namespace webMetics.Controllers
                         minutos = 120;
                     }
 
-                    DateTimeOffset expiracion = DateTimeOffset.UtcNow.AddMinutes(minutos);
-                    List<Claim> claims =
-                    [
-                        new Claim(ClaimTypes.NameIdentifier, idUsuario),
-                        new Claim(ClaimTypes.Name, idUsuario),
-                        new Claim(ClaimTypes.Role, rolUsuario.ToString())
-                    ];
-
-                    ClaimsIdentity identidad = new ClaimsIdentity(
-                        claims,
-                        CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(identidad),
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            AllowRefresh = false,
-                            ExpiresUtc = expiracion
-                        });
-
                     IDataProtector protector = _protector.CreateProtector("USUARIOAUTORIZADO");
                     string idEncriptado = protector.Protect(idUsuario);
 
-                    CookieOptions cookieOptions = new CookieOptions
+                    Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, new CookieOptions
                     {
-                        Expires = expiracion,
-                        HttpOnly = true,
-                        Secure = Request.IsHttps,
-                        SameSite = SameSiteMode.Lax,
-                        IsEssential = true
-                    };
+                        Expires = DateTime.Now.AddMinutes(minutos)
+                    });
 
-                    Response.Cookies.Append("USUARIOAUTORIZADO", idEncriptado, cookieOptions);
-                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), cookieOptions);
-                    Response.Cookies.Append("idUsuario", idUsuario, cookieOptions);
+                    Response.Cookies.Append("rolUsuario", rolUsuario.ToString(), new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddMinutes(minutos)
+                    });
+
+                    Response.Cookies.Append("idUsuario", idUsuario, new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddMinutes(minutos)
+                    });
                 }
             }
             catch (Exception ex)
@@ -467,10 +444,8 @@ namespace webMetics.Controllers
         /// Cierra la sesión eliminando las cookies de autenticación y redirige a la pantalla de login.
         /// </summary>
         /// <returns>Redirects to IniciarSesion.</returns>
-        public async Task<IActionResult> CerrarSesion()
+        public ActionResult CerrarSesion()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             // Eliminar datos del usuario
             Response.Cookies.Delete("USUARIOAUTORIZADO");
             Response.Cookies.Delete("rolUsuario");

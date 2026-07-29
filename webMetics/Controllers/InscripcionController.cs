@@ -1,6 +1,5 @@
 ﻿using webMetics.Handlers;
 using webMetics.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NPOI.XSSF.UserModel;
 using iText.Kernel.Pdf;
@@ -88,7 +87,6 @@ namespace webMetics.Controllers
         /// Handlers: InscripcionHandler, ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult VerInscripciones(bool reload = false, string? searchTerm = null)
         {
             ViewBag.Role = GetRole();
@@ -111,7 +109,6 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "1")]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> ObtenerInscripcionesPaginadas()
         {
@@ -171,7 +168,6 @@ namespace webMetics.Controllers
         /// Handlers: InscripcionHandler, ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public IActionResult BuscarInscripciones(string searchTerm)
         {
             return RedirectToAction(nameof(VerInscripciones), new { searchTerm });
@@ -188,7 +184,6 @@ namespace webMetics.Controllers
         /// Handlers: GrupoHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult FormularioInscripcion()
         {
             ViewBag.Role = GetRole();
@@ -215,7 +210,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult FormularioInscripcion(InscripcionModel inscripcion)
         {
@@ -587,7 +581,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {
@@ -643,7 +636,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarInscripcionesMasivo(List<string> participantesSeleccionados, string nombreGrupo, int numeroGrupo)
         {
@@ -828,7 +820,6 @@ namespace webMetics.Controllers
         /// </summary>
         /// <returns>FileResult (application/vnd.openxmlformats-officedocument.spreadsheetml.sheet) — "Plantilla_Inscripciones.xlsx".</returns>
         /// <remarks>Role required: Admin (1).</remarks>
-        [Authorize(Roles = "1")]
         public ActionResult DescargarPlantillaSubirInscripciones()
         {
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -869,7 +860,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubirArchivoExcelInscripciones(IFormFile file)
         {
@@ -1425,7 +1415,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarTodosParticipantesPDF(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
@@ -1520,7 +1509,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarTodosParticipantesWord(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
@@ -1615,7 +1603,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarTodosParticipantesExcel(string? searchTerm)
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();

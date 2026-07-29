@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
-using Microsoft.AspNetCore.Authorization;
 using OfficeOpenXml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NPOI.XSSF.UserModel;
@@ -118,7 +117,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult VerParticipantes(string? searchTerm = null)
         {
             ViewBag.Role = GetRole();
@@ -137,7 +135,6 @@ namespace webMetics.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "1")]
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> ObtenerParticipantesPaginados()
         {
@@ -194,7 +191,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public IActionResult BuscarParticipantes(string searchTerm)
         {
             return RedirectToAction(nameof(VerParticipantes), new { searchTerm });
@@ -333,10 +329,15 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public IActionResult AsignarMedallaMasiva(string nombreMedalla, List<string> participantesSeleccionados)
         {
+            if (GetRole() != 1)
+            {
+                TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
+                return RedirectToAction("VerParticipantes");
+            }
+
             try
             {
                 if (participantesSeleccionados != null && participantesSeleccionados.Any() && !string.IsNullOrEmpty(nombreMedalla))
@@ -377,7 +378,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubirArchivoExcelParticipantes(IFormFile file)
         {
@@ -457,7 +457,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NotificarLimiteHoras(string idParticipante, string? searchTerm = null)
         {
@@ -534,7 +533,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesPDF(string? searchTerm)
         {
             try
@@ -636,7 +634,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesWord(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -757,7 +754,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesExcel(string? searchTerm)
         {
             // Obtener la lista de participantes e inscripciones
@@ -892,7 +888,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler, InscripcionHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult ExportarParticipantesExcel2(string? searchTerm)
         {
             try
@@ -994,7 +989,6 @@ namespace webMetics.Controllers
         /// Handlers: ninguno.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult DescargarPlantillaSubirParticipantes()
         {
             // Creamos el archivo de Excel
@@ -1097,7 +1091,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult FormularioParticipante()
         {
             ViewBag.Id = GetId();
@@ -1129,7 +1122,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult FormularioParticipante(ParticipanteModel participante)
         {
@@ -1288,7 +1280,6 @@ namespace webMetics.Controllers
         /// Handlers: ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        [Authorize(Roles = "1")]
         public ActionResult EditarParticipante(string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -1327,7 +1318,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult ActualizarParticipante(ParticipanteModel participante)
         {
@@ -1474,7 +1464,6 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        [Authorize(Roles = "1")]
         [ValidateAntiForgeryToken]
         public ActionResult EliminarParticipante(string idParticipante)
         {

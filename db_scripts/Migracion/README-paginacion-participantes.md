@@ -49,8 +49,6 @@ Los scripts son idempotentes y se pueden volver a ejecutar.
 6. Confirmar que las campanas y el menu de acciones funcionen tras cambiar de pagina.
 7. Confirmar que PDF, Word y ambos Excel respeten el filtro aplicado.
 8. Probar agregar, importar y eliminar con datos de prueba.
-9. Sin iniciar sesion, confirmar que el endpoint paginado responda `401`.
-10. Con un usuario no administrador, confirmar que responda `403`.
 
 ## Reversion
 

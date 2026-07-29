@@ -35,9 +35,6 @@ Los scripts de aplicacion son idempotentes y se pueden volver a ejecutar si fuer
 - No ejecutar `db_scripts/db_METICS.sql` sobre una base existente.
 - El bloque agregado a `db_METICS.sql` esta comentado y solo sirve para preparar futuras instalaciones limpias.
 - No incluir el `appsettings.json` local en el despliegue.
-- Este cambio de seguridad no requiere columnas, tablas ni migraciones adicionales.
-- Las claves de ASP.NET Data Protection deben persistir entre reinicios y compartirse entre instancias.
-- Las sesiones creadas antes del despliegue deberan iniciar sesion nuevamente para obtener `METICS.AUTH`.
 
 ## Pruebas de humo
 
@@ -49,8 +46,6 @@ Los scripts de aplicacion son idempotentes y se pueden volver a ejecutar si fuer
 6. Verificar que PDF, Word y Excel respeten el filtro visible.
 7. Verificar seleccion de participantes al cambiar de pagina.
 8. Usar datos de prueba para validar asignacion de medallas, importacion y eliminacion.
-9. Sin iniciar sesion, confirmar que el endpoint paginado responda `401`.
-10. Con un usuario no administrador, confirmar que el endpoint y los POST administrativos respondan `403`.
 
 ## Reversion
 
