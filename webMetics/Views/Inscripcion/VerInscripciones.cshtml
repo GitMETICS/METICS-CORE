@@ -1,4 +1,5 @@
 @using webMetics.Controllers
+@using System.Text.Json
 @{
     ViewBag.Title = "Inscripciones";
 
@@ -35,12 +36,13 @@
             </div>
         }
 
-        <div class="table-responsive" style="padding-bottom: 220px;">
+        <div style="padding-bottom: 220px;">
 
             <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
                 <div style="flex: 1;">
                     @using (Html.BeginForm("SubirArchivoExcelInscripciones", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
+                        @Html.AntiForgeryToken()
                         <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de inscripciones</small>
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
                             <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
@@ -70,24 +72,11 @@
 
 
 
-            @if (ViewBag.ListaInscripciones == null)
-            {
-                <h5 class="text-center">No hay personas inscritas en módulos.</h5>
-
-                <div class="d-flex justify-content-between align-items-center mt-2 mb-4">
-                    <form id="refreshForm" method="post" action="@Url.Action("CargarParticipantesPorModulos", "Participante")" class="text-center w-100">
-                        <input type="hidden" name="reload" value="true" />
-                        <button type="submit" class="btn btn-secondary" id="refreshButton">
-                            Recargar datos
-                        </button>
-                    </form>
-                </div>
-            }
-            else
-            {
-                <!-- Sección de Asignación de Medallas -->
+            <!-- Sección de Asignación de Medallas -->
                 <div class="mb-4">
-                    <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
+                    <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" asp-antiforgery="false" id="formAsignarMedallas">
+                        @Html.AntiForgeryToken()
+                        <div id="selectedParticipantsInputs"></div>
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title mb-3">
@@ -140,7 +129,7 @@
                                         </div>
                                         <div class="d-flex gap-2">
                                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
-                                                <i class="bi bi-check-all me-1"></i>Seleccionar Todo
+                                                <i class="bi bi-check-all me-1"></i>Seleccionar página
                                             </button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
                                                 <i class="bi bi-x-circle me-1"></i>Limpiar
@@ -164,8 +153,7 @@
 
                     <div class="table-toolbar">
                         <div class="table-toolbar-group">
-                            <form id="refreshForm2" method="post" action="@Url.Action("VerInscripciones", "Inscripcion")" style="margin: 0;">
-                                <input type="hidden" name="reload" value="true" />
+                            <form id="refreshForm2" method="get" action="@Url.Action("VerInscripciones", "Inscripcion")" style="margin: 0;">
                                 <button type="submit" class="icon-action icon-view" id="refreshButton2" title="Recargar datos">
                                     <i class="bi bi-arrow-clockwise"></i>
                                 </button>
@@ -174,23 +162,23 @@
                             <div class="table-pagesize">
                                 <label for="inscripcionPageSize">Mostrar</label>
                                 <select id="inscripcionPageSize">
-                                    <option selected>5</option>
+                                    <option>5</option>
                                     <option>10</option>
                                     <option>25</option>
-                                    <option>50</option>
+                                    <option selected>50</option>
                                 </select>
                                 <label for="inscripcionPageSize">registros</label>
                             </div>
 
-                            <form asp-action="BuscarInscripciones" asp-controller="Inscripcion" method="get" class="table-search">
+                            <form asp-action="VerInscripciones" asp-controller="Inscripcion" method="get" class="table-search">
                                 <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" />
                                 <button class="btn" type="submit"><i class="bi bi-search"></i></button>
                             </form>
                         </div>
                     </div>
 
-                    <div class="table-scroll">
-                        <table id="inscripcionTblCustomers" class="data-table" style="min-width: 1200px;">
+                    <div class="table-scroll table-scroll--fit">
+                        <table id="inscripcionTblCustomers" class="data-table">
                             <thead>
                                 <tr>
                                     <th scope="col" class="text-center" style="width: 3%;">
@@ -207,48 +195,16 @@
                                     <th scope="col" class="text-center" style="width: 8%;">Horas Inscritas</th>
                                     <th scope="col" class="text-center" style="width: 8%;">Horas Aprobadas</th>
                                     <th scope="col" class="text-center" style="width: 4%;">Ver</th>
-                                    <th scope="col" class="text-center" style="width: 4%;">Eliminar</th>
+                                    <th scope="col" class="text-center" style="width: 8%;">Eliminar</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                @foreach (var inscripcion in ViewBag.ListaInscripciones)
-                                {
-                                    <tr>
-                                        <td class="text-center">
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input participant-checkbox"
-                                                       name="participantesSeleccionados"
-                                                       value="@inscripcion.participante.idParticipante"
-                                                       id="participante_@inscripcion.participante.idParticipante"
-                                                       form="formAsignarMedallas"
-                                                       onchange="updateSelectedCount()">
-                                            </div>
-                                        </td>
-                                        <td>@inscripcion.participante.nombre</td>
-                                        <td>@inscripcion.participante.primerApellido</td>
-                                        <td>@inscripcion.participante.segundoApellido</td>
-                                        <td>@inscripcion.participante.correo</td>
-                                        <td>@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
-                                        <td>@inscripcion.estado</td>
-                                        <td class="text-center">@inscripcion.horasMatriculadas</td>
-                                        <td class="text-center">@inscripcion.horasAprobadas</td>
-                                        <td class="text-center">
-                                            @Html.ActionLink("", "VerDatosParticipante", "Participante", new { idParticipante = inscripcion.participante.idParticipante },
-                                                                                        new { @class = "icon-action icon-view bi bi-search", @title = "Ver datos del participante" })
-                                        </td>
-                                        <td class="text-center">
-                                            <a href="#" onclick="actualizarModalEliminarInscripcion('@inscripcion.nombreGrupo', '@inscripcion.numeroGrupo', '@inscripcion.idParticipante'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar inscripción"></a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
 
                     <div id="inscripcionTblPaginacion" class="table-pagination"></div>
                 </div>
-            }
         </div>
     </div>
 
@@ -283,60 +239,108 @@
 
     <!-- JavaScript para la funcionalidad de selección de participantes y filtro de medallas -->
     <script>
+        const selectedParticipants = new Set();
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function syncSelectedParticipantInputs() {
+            const container = document.getElementById('selectedParticipantsInputs');
+            container.innerHTML = '';
+
+            selectedParticipants.forEach(idParticipante => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'participantesSeleccionados';
+                input.value = idParticipante;
+                container.appendChild(input);
+            });
+        }
+
         function updateSelectedCount() {
-            const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
-            document.getElementById('selectedCount').textContent = checkboxes.length;
-
-            // Actualizar el estado del checkbox "Seleccionar todo"
-            const allCheckboxes = document.querySelectorAll('.participant-checkbox');
+            const pageCheckboxes = Array.from(document.querySelectorAll('.participant-checkbox'));
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            document.getElementById('selectedCount').textContent = selectedParticipants.size;
 
-            if (checkboxes.length === 0) {
+            if (pageCheckboxes.length === 0) {
                 selectAllCheckbox.indeterminate = false;
                 selectAllCheckbox.checked = false;
-            } else if (checkboxes.length === allCheckboxes.length) {
+                return;
+            }
+
+            const selectedOnPage = pageCheckboxes.filter(checkbox =>
+                selectedParticipants.has(checkbox.dataset.participantId));
+
+            if (selectedOnPage.length === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (selectedOnPage.length === pageCheckboxes.length) {
                 selectAllCheckbox.indeterminate = false;
                 selectAllCheckbox.checked = true;
             } else {
+                selectAllCheckbox.checked = false;
                 selectAllCheckbox.indeterminate = true;
             }
         }
-        // ------ Funciones para seleccionar y deseleccionar todos los participantes ------
+
+        function refreshCurrentPageSelection() {
+            document.querySelectorAll('.participant-checkbox').forEach(checkbox => {
+                checkbox.checked = selectedParticipants.has(checkbox.dataset.participantId);
+            });
+            updateSelectedCount();
+        }
+
+        function handleParticipantSelection(checkbox) {
+            const idParticipante = checkbox.dataset.participantId;
+            if (checkbox.checked) {
+                selectedParticipants.add(idParticipante);
+            } else {
+                selectedParticipants.delete(idParticipante);
+            }
+
+            syncSelectedParticipantInputs();
+            refreshCurrentPageSelection();
+        }
+
         function toggleAllParticipants() {
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 
             participantCheckboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
+                const idParticipante = checkbox.dataset.participantId;
+                if (selectAllCheckbox.checked) {
+                    selectedParticipants.add(idParticipante);
+                } else {
+                    selectedParticipants.delete(idParticipante);
+                }
             });
 
-            updateSelectedCount();
+            syncSelectedParticipantInputs();
+            refreshCurrentPageSelection();
         }
 
         function selectAllParticipants() {
             const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 
             participantCheckboxes.forEach(checkbox => {
-                checkbox.checked = true;
+                selectedParticipants.add(checkbox.dataset.participantId);
             });
 
-            selectAllCheckbox.checked = true;
-            selectAllCheckbox.indeterminate = false;
-            updateSelectedCount();
+            syncSelectedParticipantInputs();
+            refreshCurrentPageSelection();
         }
 
         function clearAllParticipants() {
-            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-
-            participantCheckboxes.forEach(checkbox => {
-                checkbox.checked = false;
-            });
-
-            selectAllCheckbox.checked = false;
-            selectAllCheckbox.indeterminate = false;
-            updateSelectedCount();
+            selectedParticipants.clear();
+            syncSelectedParticipantInputs();
+            refreshCurrentPageSelection();
         }
 
         // ------ Función para filtrar medallas ------
@@ -366,15 +370,100 @@
             actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante);
         }
 
-        // Inicializar el contador al cargar la página
-        document.addEventListener('DOMContentLoaded', updateSelectedCount);
+        const initialSearchTerm = @Html.Raw(JsonSerializer.Serialize(Context.Request.Query["searchTerm"].ToString()));
+        const participantDetailsUrl = '@Url.Action("VerDatosParticipante", "Participante")';
 
-        MeticsTable.init({
+        const inscripcionesTable = MeticsTable.initServer({
             tableId: 'inscripcionTblCustomers',
             pageSizeId: 'inscripcionPageSize',
             paginationId: 'inscripcionTblPaginacion',
-            searching: false
+            ajaxUrl: '@Url.Action("ObtenerInscripcionesPaginadas", "Inscripcion")',
+            pageLength: 50,
+            initialSearch: initialSearchTerm,
+            order: [[1, 'asc']],
+            columns: [
+                {
+                    data: 'idParticipante',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        if (type !== 'display') return data;
+                        const participantId = escapeHtml(data);
+                        return '<div class="form-check">' +
+                            '<input type="checkbox" class="form-check-input participant-checkbox" ' +
+                            'id="participante_' + row.idInscripcion + '" ' +
+                            'data-participant-id="' + participantId + '" ' +
+                            'onchange="handleParticipantSelection(this)">' +
+                            '</div>';
+                    }
+                },
+                {
+                    data: 'nombre',
+                    render: function (data, type, row) {
+                        if (type !== 'display') return data;
+                        const fullName = [row.nombre, row.primerApellido, row.segundoApellido]
+                            .filter(value => value && value !== '-')
+                            .join(' ');
+                        return '<span class="table-desktop-only">' + escapeHtml(data) + '</span>' +
+                            '<span class="table-mobile-only">' + escapeHtml(fullName) + '</span>';
+                    }
+                },
+                { data: 'primerApellido', render: data => escapeHtml(data) },
+                { data: 'segundoApellido', render: data => escapeHtml(data) },
+                { data: 'correo', render: data => escapeHtml(data) },
+                {
+                    data: 'nombreGrupo',
+                    render: function (data, type, row) {
+                        if (type !== 'display') return data;
+                        return escapeHtml(data) + ' (Grupo ' + escapeHtml(row.numeroGrupo) + ')';
+                    }
+                },
+                { data: 'estado', render: data => escapeHtml(data) },
+                { data: 'horasMatriculadas', className: 'text-center' },
+                { data: 'horasAprobadas', className: 'text-center' },
+                {
+                    data: 'idParticipante',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type) {
+                        if (type !== 'display') return data;
+                        const url = participantDetailsUrl + '?idParticipante=' + encodeURIComponent(data);
+                        return '<a href="' + escapeHtml(url) + '" class="icon-action icon-view bi bi-search" ' +
+                            'title="Ver datos del participante"></a>';
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        if (type !== 'display') return '';
+                        return '<a href="#" class="icon-action icon-delete bi bi-trash js-delete-inscripcion" ' +
+                            'data-nombre-grupo="' + escapeHtml(row.nombreGrupo) + '" ' +
+                            'data-numero-grupo="' + row.numeroGrupo + '" ' +
+                            'data-id-participante="' + escapeHtml(row.idParticipante) + '" ' +
+                            'title="Eliminar inscripción"></a>';
+                    }
+                }
+            ],
+            onDraw: refreshCurrentPageSelection
         });
+
+        document.getElementById('inscripcionTblCustomers').addEventListener('click', function (event) {
+            const deleteLink = event.target.closest('.js-delete-inscripcion');
+            if (!deleteLink) return;
+
+            event.preventDefault();
+            actualizarModalEliminarInscripcion(
+                deleteLink.dataset.nombreGrupo,
+                deleteLink.dataset.numeroGrupo,
+                deleteLink.dataset.idParticipante);
+        });
+
+        document.getElementById('formAsignarMedallas').addEventListener('submit', syncSelectedParticipantInputs);
     </script>
 }
 else

@@ -1,4 +1,5 @@
 @using webMetics.Controllers
+@using System.Text.Json
 @{
     ViewBag.Title = "Participantes";
 
@@ -35,12 +36,13 @@
             </div>
         }
 
-        <div class="table-responsive" style="padding-bottom: 220px;">
+        <div style="padding-bottom: 220px;">
 
             <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
                 <div style="flex: 1;">
                     @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
+                        @Html.AntiForgeryToken()
                         <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de participantes</small>
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
                             <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
@@ -71,125 +73,64 @@
 
 
 
-            @if (ViewBag.ListaParticipantes == null)
-            {
-                <h5 class="text-center">No hay personas inscritas en módulos.</h5>
-            }
-            else
-            {
-                <div class="table-card">
-                    <div class="table-card-header">
-                        <span class="table-card-title">Participantes</span>
-                        <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
-                    </div>
-
-                    <div class="table-toolbar">
-                        <div class="table-toolbar-group">
-                            <div class="table-pagesize">
-                                <label for="pageSize">Mostrar</label>
-                                <select id="pageSize">
-                                    <option selected>5</option>
-                                    <option>10</option>
-                                    <option>25</option>
-                                    <option>50</option>
-                                </select>
-                                <label for="pageSize">registros</label>
-                            </div>
-
-                            <form asp-action="BuscarParticipantes" asp-controller="Participante" method="get" class="table-search">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
-                                <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-                            </form>
-                        </div>
-
-                        <div>
-                            @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus btn-table-sm" })
-                        </div>
-                    </div>
-
-                    <div class="table-scroll">
-                        <table id="tblCustomers" class="data-table" style="min-width: 800px;">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="text-center" style="width: 4%;"></th>
-                                    <th scope="col" style="width: 14%;">Unidad Académica</th>
-                                    <th scope="col" style="width: 24%;">Nombre Completo</th>
-                                    <th scope="col" style="width: 23%;">Correo Institucional</th>
-                                    <th scope="col" class="text-center" style="width: 10%;">Hrs. Inscritas</th>
-                                    <th scope="col" class="text-center" style="width: 10%;">Hrs. Aprobadas</th>
-                                    <th scope="col" class="text-center" style="width: 15%;">Acciones</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @foreach (var participante in ViewBag.ListaParticipantes)
-                                {
-                                    var gruposInscritos = participante.gruposInscritos;
-                                    var nombreCompleto = participante.nombre;
-                                    nombreCompleto += " " + participante.primerApellido;
-                                    if (participante.segundoApellido != "-")
-                                    {
-                                        nombreCompleto += " " + participante.segundoApellido;
-                                    }
-                                    <tr>
-                                        <td class="text-center">
-                                            @if (participante.horasAprobadas >= 30)
-                                            {
-                                                if (participante.correoNotificacionEnviado != 0)
-                                                {
-                                                    <i class="bi bi-bell" style="color: #198754;" title="Notificación enviada"></i>
-                                                }
-                                                else
-                                                {
-                                                    <a href="@Url.Action("NotificarLimiteHoras", "Participante", new { idParticipante = participante.idParticipante })" class="text-success bi bi-bell-fill" title="Notificar límite de horas"></a>
-                                                }
-                                            }
-                                        </td>
-                                        <td>@participante.unidadAcademica</td>
-                                        <td>@nombreCompleto</td>
-                                        <td>@participante.correo</td>
-                                        <td class="text-center">
-                                            <span>@participante.horasMatriculadas</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span>@participante.horasAprobadas</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <div style="display: inline-block;">
-                                                <button type="button" id="dropdownMenu_@participante.idParticipante" class="action-menu-btn" onclick="toggleActionMenu('@participante.idParticipante', event)" title="Acciones">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                                <div id="menu_@participante.idParticipante" class="action-menu">
-                                                    <a href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante })">
-                                                        <i class="bi bi-eye" style="color: #0090D8;"></i> Ver detalles
-                                                    </a>
-                                                    <a href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = participante.idParticipante })">
-                                                        <i class="bi bi-pencil-square" style="color: #0090D8;"></i> Editar
-                                                    </a>
-                                                    <a href="@Url.Action("CambiarCredencialesUsuario", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
-                                                        <i class="bi bi-fingerprint" style="color: #0090D8;"></i> Credenciales
-                                                    </a>
-                                                    <a href="@Url.Action("CambiarContrasenaAdmin", "Usuario", new { idUsuario = participante.idParticipante, nombreCompleto = nombreCompleto })">
-                                                        <i class="bi bi-key" style="color: #0090D8;"></i> Cambiar contraseña
-                                                    </a>
-                                                    <div class="action-menu-divider"></div>
-                                                    <a href="#" class="delete-option" onclick="openDeleteModal('@participante.idParticipante'); return false;">
-                                                        <i class="bi bi-trash"></i> Eliminar
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="tblPaginacion" class="table-pagination"></div>
+            <div class="table-card">
+                <div class="table-card-header">
+                    <span class="table-card-title">Participantes</span>
+                    <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
                 </div>
-            }
+
+                <div class="table-toolbar">
+                    <div class="table-toolbar-group">
+                        <div class="table-pagesize">
+                            <label for="participantePageSize">Mostrar</label>
+                            <select id="participantePageSize">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>25</option>
+                                <option selected>50</option>
+                            </select>
+                            <label for="participantePageSize">registros</label>
+                        </div>
+
+                        <form asp-action="VerParticipantes" asp-controller="Participante" method="get" class="table-search">
+                            <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
+                            <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                        </form>
+                    </div>
+
+                    <div>
+                        @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus btn-table-sm" })
+                    </div>
+                </div>
+
+                <div class="table-scroll table-scroll--fit">
+                    <table id="participanteTblCustomers" class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center" style="width: 4%;"></th>
+                                <th scope="col" style="width: 14%;">Unidad Académica</th>
+                                <th scope="col" style="width: 24%;">Nombre Completo</th>
+                                <th scope="col" style="width: 23%;">Correo Institucional</th>
+                                <th scope="col" class="text-center" style="width: 10%;">Hrs. Inscritas</th>
+                                <th scope="col" class="text-center" style="width: 10%;">Hrs. Aprobadas</th>
+                                <th scope="col" class="text-center" style="width: 15%;">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="participanteTblPaginacion" class="table-pagination"></div>
+            </div>
         </div>
     </div>
+
+    <form method="post" asp-controller="Participante" asp-action="NotificarLimiteHoras" id="formNotificarLimiteHoras" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="notificarIdParticipante" name="idParticipante" />
+        <input type="hidden" name="searchTerm" value="@Context.Request.Query["searchTerm"]" />
+    </form>
 
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -225,11 +166,28 @@ else
 }
 
 <script type="text/javascript">
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[character]);
+    }
+
+    function participantFullName(participant) {
+        return [participant.nombre, participant.primerApellido, participant.segundoApellido]
+            .filter(value => value && value !== '-')
+            .join(' ');
+    }
+
     function closeActionMenus() {
-        document.querySelectorAll('[id^="menu_"]').forEach(function(menu) {
+        document.querySelectorAll('.action-menu.is-open').forEach(function(menu) {
             menu.classList.remove('is-open');
             menu.style.left = '';
             menu.style.top = '';
+            menu.style.visibility = '';
         });
     }
 
@@ -266,14 +224,9 @@ else
         menu.style.visibility = 'visible';
     }
 
-    // Menú de acciones personalizado
-    function toggleActionMenu(participanteId, event) {
-        if (event) {
-            event.stopPropagation();
-        }
-
-        var menu = document.getElementById('menu_' + participanteId);
-        var button = document.getElementById('dropdownMenu_' + participanteId);
+    function toggleActionMenu(button, event) {
+        event.stopPropagation();
+        var menu = button.parentElement.querySelector('.action-menu');
         var wasOpen = menu.classList.contains('is-open');
 
         closeActionMenus();
@@ -283,9 +236,8 @@ else
         }
     }
 
-    // Cerrar menú al hacer clic fuera
     document.addEventListener('click', function(event) {
-        if (!event.target.closest('[id^="menu_"]') && !event.target.closest('[id^="dropdownMenu_"]')) {
+        if (!event.target.closest('.action-menu') && !event.target.closest('.js-action-menu')) {
             closeActionMenus();
         }
     });
@@ -293,22 +245,113 @@ else
     document.addEventListener('scroll', closeActionMenus, true);
     window.addEventListener('resize', closeActionMenus);
 
-    // Función para abrir modal de eliminación
     function openDeleteModal(participanteId) {
         document.getElementById("idParticipante").value = participanteId;
         var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         deleteModal.show();
     }
 
-    // Función heredada para mantener compatibilidad
     function actualizarModalEliminar(idParticipante) {
         openDeleteModal(idParticipante);
     }
 
-    MeticsTable.init({
-        tableId: 'tblCustomers',
-        pageSizeId: 'pageSize',
-        paginationId: 'tblPaginacion',
-        searching: false
+    const initialSearchTerm = @Html.Raw(JsonSerializer.Serialize(Context.Request.Query["searchTerm"].ToString()));
+    const participantDetailsUrl = '@Url.Action("VerDatosParticipante", "Participante")';
+    const participantEditUrl = '@Url.Action("EditarParticipante", "Participante")';
+    const participantCredentialsUrl = '@Url.Action("CambiarCredencialesUsuario", "Usuario")';
+    const participantPasswordUrl = '@Url.Action("CambiarContrasenaAdmin", "Usuario")';
+
+    const participantesTable = MeticsTable.initServer({
+        tableId: 'participanteTblCustomers',
+        pageSizeId: 'participantePageSize',
+        paginationId: 'participanteTblPaginacion',
+        ajaxUrl: '@Url.Action("ObtenerParticipantesPaginados", "Participante")',
+        pageLength: 50,
+        initialSearch: initialSearchTerm,
+        order: [[2, 'asc']],
+        columns: [
+            {
+                data: 'correoNotificacionEnviado',
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    if (type !== 'display' || row.horasAprobadas < 30) return '';
+
+                    if (data !== 0) {
+                        return '<i class="bi bi-bell" style="color: #198754;" title="Notificación enviada"></i>';
+                    }
+
+                    return '<button type="button" class="text-success bi bi-bell-fill border-0 bg-transparent p-0 js-notify-participant" ' +
+                        'data-id-participante="' + escapeHtml(row.idParticipante) + '" title="Notificar límite de horas"></button>';
+                }
+            },
+            { data: 'unidadAcademica', render: data => escapeHtml(data) },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return type === 'display' ? escapeHtml(participantFullName(row)) : participantFullName(row);
+                }
+            },
+            { data: 'correo', render: data => escapeHtml(data) },
+            { data: 'horasMatriculadas', className: 'text-center' },
+            { data: 'horasAprobadas', className: 'text-center' },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data, type, row) {
+                    if (type !== 'display') return '';
+
+                    const participantId = encodeURIComponent(row.idParticipante);
+                    const fullName = participantFullName(row);
+                    const encodedName = encodeURIComponent(fullName);
+                    const detailsUrl = participantDetailsUrl + '?idParticipante=' + participantId;
+                    const editUrl = participantEditUrl + '?idParticipante=' + participantId;
+                    const credentialsUrl = participantCredentialsUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
+                    const passwordUrl = participantPasswordUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
+
+                    return '<div style="display: inline-block;">' +
+                        '<button type="button" class="action-menu-btn js-action-menu" title="Acciones">' +
+                            '<i class="bi bi-three-dots-vertical"></i>' +
+                        '</button>' +
+                        '<div class="action-menu">' +
+                            '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye" style="color: #0090D8;"></i> Ver detalles</a>' +
+                            '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square" style="color: #0090D8;"></i> Editar</a>' +
+                            '<a href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint" style="color: #0090D8;"></i> Credenciales</a>' +
+                            '<a href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key" style="color: #0090D8;"></i> Cambiar contraseña</a>' +
+                            '<div class="action-menu-divider"></div>' +
+                            '<a href="#" class="delete-option js-delete-participant" data-id-participante="' + escapeHtml(row.idParticipante) + '">' +
+                                '<i class="bi bi-trash"></i> Eliminar' +
+                            '</a>' +
+                        '</div>' +
+                    '</div>';
+                }
+            }
+        ],
+        onDraw: closeActionMenus
+    });
+
+    document.getElementById('participanteTblCustomers').addEventListener('click', function (event) {
+        const menuButton = event.target.closest('.js-action-menu');
+        if (menuButton) {
+            toggleActionMenu(menuButton, event);
+            return;
+        }
+
+        const deleteLink = event.target.closest('.js-delete-participant');
+        if (deleteLink) {
+            event.preventDefault();
+            closeActionMenus();
+            openDeleteModal(deleteLink.dataset.idParticipante);
+            return;
+        }
+
+        const notificationButton = event.target.closest('.js-notify-participant');
+        if (notificationButton) {
+            document.getElementById('notificarIdParticipante').value = notificationButton.dataset.idParticipante;
+            document.getElementById('formNotificarLimiteHoras').requestSubmit();
+        }
     });
 </script>

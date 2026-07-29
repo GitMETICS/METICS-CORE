@@ -59,10 +59,10 @@
                             <div class="table-pagesize">
                                 <label for="asesorPageSize">Mostrar</label>
                                 <select id="asesorPageSize">
-                                    <option selected>5</option>
+                                    <option>5</option>
                                     <option>10</option>
                                     <option>25</option>
-                                    <option>50</option>
+                                    <option selected>50</option>
                                 </select>
                                 <label for="asesorPageSize">registros</label>
                             </div>
@@ -182,6 +182,7 @@ else
         pageSizeId: 'asesorPageSize',
         paginationId: 'asesorTblPaginacion',
         searching: true,
-        searchInputId: 'asesorBusqueda'
+        searchInputId: 'asesorBusqueda',
+        pageLength: 50
     });
 </script>

@@ -17,7 +17,6 @@ using OfficeOpenXml;
 using System.Globalization;
 using System.Text;
 using System.Linq.Expressions;
-using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
 namespace webMetics.Controllers
 {
@@ -25,7 +24,7 @@ namespace webMetics.Controllers
     /// Controlador para la gestión de inscripciones de participantes en grupos.
     /// Cubre alta/baja individual y masiva, importación desde Excel, exportaciones en PDF/Word/Excel,
     /// notificaciones por correo y cambios de estado de inscripción.
-    /// Usa IMemoryCache para almacenar la lista de inscripciones durante 30 minutos.
+    /// El listado administrativo obtiene sus filas mediante paginación backend.
     /// </summary>
     public class InscripcionController : Controller
     {
@@ -39,9 +38,7 @@ namespace webMetics.Controllers
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
 
-        private readonly IMemoryCache _memoryCache;
-
-        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService, IMemoryCache memoryCache)
+        public InscripcionController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
@@ -52,9 +49,6 @@ namespace webMetics.Controllers
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAUsuario = new UsuarioHandler(environment, configuration);
-
-
-            _memoryCache = memoryCache;
         }
 
         /// <summary>Muestra la lista de inscripciones de un grupo específico.</summary>
@@ -79,13 +73,13 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Muestra todas las inscripciones del sistema. Usa caché de 30 minutos;
-        /// si <paramref name="reload"/> es <c>true</c>, fuerza la recarga desde la base de datos.
+        /// Muestra la pantalla administrativa de inscripciones. Las filas se cargan posteriormente
+        /// desde <see cref="ObtenerInscripcionesPaginadas"/>.
         /// </summary>
-        /// <param name="reload">Si <c>true</c>, invalida la caché y recarga desde BD.</param>
+        /// <param name="reload">Parámetro conservado para compatibilidad con enlaces existentes.</param>
+        /// <param name="searchTerm">Búsqueda inicial que se envía al endpoint paginado.</param>
         /// <returns>
         /// View: VerInscripciones —
-        /// ViewBag.ListaInscripciones (List&lt;InscripcionModel&gt; con participante cargado),
         /// ViewBag.TodasLasMedallas, ViewBag.Role, ViewBag.Id,
         /// ViewBag.ErrorMessage, ViewBag.SuccessMessage.
         /// </returns>
@@ -93,41 +87,10 @@ namespace webMetics.Controllers
         /// Handlers: InscripcionHandler, ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
-        public ActionResult VerInscripciones(bool reload = false)
+        public ActionResult VerInscripciones(bool reload = false, string? searchTerm = null)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
-
-            List<InscripcionModel> inscripciones;
-
-            // Verificar si los datos están en caché o si reload es true
-            if (reload || !_memoryCache.TryGetValue("Inscripciones", out inscripciones))
-            {
-                // Si no está en caché, obtener los datos de la base de datos
-                inscripciones = accesoAInscripcion.ObtenerInscripciones();
-
-                // Si los datos existen, almacenarlos en caché por 30 minutos
-                if (inscripciones != null)
-                {
-                    foreach (InscripcionModel inscripcion in inscripciones)
-                    {
-                        inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
-                    }
-
-                    // Almacenar los datos en caché
-                    _memoryCache.Set("Inscripciones", inscripciones, TimeSpan.FromMinutes(30));
-                }
-            }
-
-            // Asignar los datos al ViewBag
-            if (inscripciones != null)
-            {
-                ViewBag.ListaInscripciones = inscripciones;
-            }
-            else
-            {
-                ViewBag.ListaInscripciones = null;
-            }
 
             ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
 
@@ -145,14 +108,61 @@ namespace webMetics.Controllers
             return View();
         }
 
+        [HttpGet]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> ObtenerInscripcionesPaginadas()
+        {
+            int draw = int.TryParse(Request.Query["draw"], out int drawValue) ? Math.Max(0, drawValue) : 0;
+            int offset = int.TryParse(Request.Query["start"], out int offsetValue) ? Math.Max(0, offsetValue) : 0;
+            int requestedPageSize = int.TryParse(Request.Query["length"], out int pageSizeValue) ? pageSizeValue : 50;
+            int pageSize = new[] { 5, 10, 25, 50 }.Contains(requestedPageSize) ? requestedPageSize : 50;
+            string? searchTerm = Request.Query["search[value]"].ToString();
+
+            int sortColumnIndex = int.TryParse(Request.Query["order[0][column]"], out int columnValue)
+                ? columnValue
+                : 1;
+            string sortColumn = sortColumnIndex switch
+            {
+                1 => "nombre",
+                2 => "primerApellido",
+                3 => "segundoApellido",
+                4 => "correo",
+                5 => "modulo",
+                6 => "estado",
+                7 => "horasMatriculadas",
+                8 => "horasAprobadas",
+                _ => "nombre"
+            };
+            string sortDirection = string.Equals(
+                Request.Query["order[0][dir]"],
+                "desc",
+                StringComparison.OrdinalIgnoreCase)
+                ? "desc"
+                : "asc";
+
+            PagedResult<InscripcionListadoModel> resultado =
+                await accesoAInscripcion.ObtenerInscripcionesPaginadasAsync(
+                    offset,
+                    pageSize,
+                    searchTerm,
+                    sortColumn,
+                    sortDirection);
+
+            return Json(new
+            {
+                draw,
+                recordsTotal = resultado.TotalRecords,
+                recordsFiltered = resultado.FilteredRecords,
+                data = resultado.Items
+            });
+        }
+
         /// <summary>
-        /// Filtra inscripciones por nombre, apellidos, correo, unidad académica, nombre de grupo, horas o estado.
-        /// Reutiliza la vista VerInscripciones.
+        /// Conserva la ruta de búsqueda anterior y redirige al listado paginado con el término recibido.
         /// </summary>
         /// <param name="searchTerm">Texto libre para filtrar.</param>
         /// <returns>
-        /// View: VerInscripciones —
-        /// ViewBag.ListaInscripciones (filtrada), ViewBag.TodasLasMedallas, ViewBag.Role, ViewBag.Id.
+        /// Redirects to VerInscripciones con searchTerm.
         /// </returns>
         /// <remarks>
         /// Handlers: InscripcionHandler, ParticipanteHandler.
@@ -160,43 +170,7 @@ namespace webMetics.Controllers
         /// </remarks>
         public IActionResult BuscarInscripciones(string searchTerm)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            // Obtener la lista de inscripciones
-            List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
-
-            if (inscripciones != null)
-            {
-                foreach (InscripcionModel inscripcion in inscripciones)
-                {
-                    inscripcion.participante = accesoAParticipante.ObtenerParticipante(inscripcion.idParticipante);
-                }
-
-                ViewBag.ListaInscripciones = inscripciones;
-            }
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                inscripciones = inscripciones.Where(inscripcion =>
-                    inscripcion.participante.unidadAcademica != null && inscripcion.participante.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.participante.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.participante.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.participante.segundoApellido != null && inscripcion.participante.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.participante.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.nombreGrupo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.horasMatriculadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.horasAprobadas.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    inscripcion.estado != null && inscripcion.estado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-
-            ViewBag.ListaInscripciones = inscripciones;
-            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
-
-            return View("VerInscripciones");
+            return RedirectToAction(nameof(VerInscripciones), new { searchTerm });
         }
 
         /// <summary>
@@ -225,11 +199,10 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Procesa el formulario de inscripción manual por nombre y número de grupo.
-        /// Invalida la caché de inscripciones al redirigir.
         /// </summary>
         /// <param name="inscripcion">Modelo con nombreGrupo, numeroGrupo e idParticipante.</param>
         /// <returns>
-        /// Redirects to VerInscripciones (reload=true) on success; sets TempData["successMessage"] o TempData["errorMessage"].
+        /// Redirects to VerInscripciones on success; sets TempData["successMessage"] o TempData["errorMessage"].
         /// View: FormularioInscripcion con errores si ModelState es inválido.
         /// </returns>
         /// <remarks>
@@ -237,6 +210,7 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult FormularioInscripcion(InscripcionModel inscripcion)
         {
             ViewBag.Role = GetRole();
@@ -606,6 +580,8 @@ namespace webMetics.Controllers
         /// Handlers: InscripcionHandler, ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult EliminarInscripcion(string nombreGrupo, int numeroGrupo, string idParticipante)
         {
             ViewBag.Role = GetRole();
@@ -877,13 +853,14 @@ namespace webMetics.Controllers
         /// <param name="file">Archivo Excel con columnas: Correo institucional, Módulo, Grupo, Horas,
         /// Estado, Horas completadas, Calificación.</param>
         /// <returns>
-        /// Redirects to VerInscripciones (reload=true). Sets TempData["successMessage"] o TempData["errorMessage"].
+        /// Redirects to VerInscripciones. Sets TempData["successMessage"] o TempData["errorMessage"].
         /// </returns>
         /// <remarks>
         /// Handlers: InscripcionHandler, ParticipanteHandler.
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubirArchivoExcelInscripciones(IFormFile file)
         {
             if (file == null)
@@ -1442,21 +1419,13 @@ namespace webMetics.Controllers
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
+            (participantes, inscripciones) = FiltrarInscripcionesParaExportacion(
+                participantes,
+                inscripciones,
+                searchTerm);
 
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            var filePath = System.IO.Path.Combine(_environment.WebRootPath, "data", "Lista_de_Inscripciones.docx");
-            PdfWriter writer = new PdfWriter(filePath);
+            using MemoryStream stream = new MemoryStream();
+            PdfWriter writer = new PdfWriter(stream);
             PdfDocument pdf = new PdfDocument(writer);
 
             PageSize pageSize = PageSize.A2;  // Puedes elegir PageSize.A3 para un tamaño más pequeño
@@ -1528,7 +1497,7 @@ namespace webMetics.Controllers
 
             // Devolver el archivo PDF
             string fileName = "Lista_de_Inscripciones.pdf";
-            return File(System.IO.File.ReadAllBytes(filePath), "application/pdf", fileName);
+            return File(stream.ToArray(), "application/pdf", fileName);
         }
 
         /// <summary>
@@ -1544,18 +1513,10 @@ namespace webMetics.Controllers
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
+            (participantes, inscripciones) = FiltrarInscripcionesParaExportacion(
+                participantes,
+                inscripciones,
+                searchTerm);
 
             var fileName = "Lista_de_Inscripciones.docx";
 
@@ -1646,18 +1607,10 @@ namespace webMetics.Controllers
         {
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerListaParticipantes();
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripciones();
-
-            // Filtrar la lista si se ha ingresado un término de búsqueda
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                participantes = participantes.Where(p =>
-                    p.unidadAcademica != null && p.unidadAcademica.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.primerApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.segundoApellido != null && p.segundoApellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.correo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
+            (participantes, inscripciones) = FiltrarInscripcionesParaExportacion(
+                participantes,
+                inscripciones,
+                searchTerm);
 
             XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -1771,6 +1724,66 @@ namespace webMetics.Controllers
                 var file = stream.ToArray();
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
+        }
+
+        private static (List<ParticipanteModel> Participantes, List<InscripcionModel> Inscripciones)
+            FiltrarInscripcionesParaExportacion(
+                List<ParticipanteModel> participantes,
+                List<InscripcionModel> inscripciones,
+                string? searchTerm)
+        {
+            Dictionary<string, ParticipanteModel> participantesPorId = participantes
+                .Where(participante => !string.IsNullOrWhiteSpace(participante.idParticipante))
+                .GroupBy(participante => participante.idParticipante!, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(
+                    grupo => grupo.Key,
+                    grupo => grupo.First(),
+                    StringComparer.OrdinalIgnoreCase);
+
+            string? termino = string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm.Trim();
+            List<InscripcionModel> inscripcionesFiltradas = inscripciones
+                .Where(inscripcion =>
+                    !string.IsNullOrWhiteSpace(inscripcion.idParticipante)
+                    && participantesPorId.TryGetValue(inscripcion.idParticipante, out ParticipanteModel? participante)
+                    && (termino == null || CoincideConBusqueda(participante, inscripcion, termino)))
+                .ToList();
+
+            HashSet<string> idsConInscripciones = inscripcionesFiltradas
+                .Select(inscripcion => inscripcion.idParticipante!)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            List<ParticipanteModel> participantesFiltrados = participantes
+                .Where(participante =>
+                    participante.idParticipante != null
+                    && idsConInscripciones.Contains(participante.idParticipante))
+                .ToList();
+
+            return (participantesFiltrados, inscripcionesFiltradas);
+        }
+
+        private static bool CoincideConBusqueda(
+            ParticipanteModel participante,
+            InscripcionModel inscripcion,
+            string searchTerm)
+        {
+            return Contiene(participante.unidadAcademica, searchTerm)
+                   || Contiene(participante.nombre, searchTerm)
+                   || Contiene(participante.primerApellido, searchTerm)
+                   || Contiene(participante.segundoApellido, searchTerm)
+                   || Contiene(participante.correo, searchTerm)
+                   || Contiene(inscripcion.nombreGrupo, searchTerm)
+                   || Contiene(inscripcion.estado, searchTerm)
+                   || inscripcion.horasMatriculadas
+                       .ToString(CultureInfo.InvariantCulture)
+                       .Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                   || inscripcion.horasAprobadas
+                       .ToString(CultureInfo.InvariantCulture)
+                       .Contains(searchTerm, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool Contiene(string? value, string searchTerm)
+        {
+            return value?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true;
         }
 
         /// <summary>Obtiene el rol del usuario autenticado desde la cookie "rolUsuario".</summary>

@@ -808,6 +808,73 @@ namespace webMetics.Handlers
             return info;
         }
 
+        public async Task<PagedResult<ParticipanteListadoModel>> ObtenerParticipantesPaginadosAsync(
+            int offset,
+            int pageSize,
+            string? searchTerm,
+            string sortColumn,
+            string sortDirection)
+        {
+            PagedResult<ParticipanteListadoModel> resultado = new PagedResult<ParticipanteListadoModel>();
+
+            using SqlCommand comando = new SqlCommand("SelectParticipantesPaginados", ConexionMetics)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            comando.Parameters.Add("@Offset", SqlDbType.Int).Value = offset;
+            comando.Parameters.Add("@PageSize", SqlDbType.Int).Value = pageSize;
+            comando.Parameters.Add("@SearchTerm", SqlDbType.NVarChar, 512).Value =
+                string.IsNullOrWhiteSpace(searchTerm) ? DBNull.Value : searchTerm.Trim();
+            comando.Parameters.Add("@SortColumn", SqlDbType.NVarChar, 32).Value = sortColumn;
+            comando.Parameters.Add("@SortDirection", SqlDbType.NVarChar, 4).Value = sortDirection;
+
+            try
+            {
+                await ConexionMetics.OpenAsync();
+                using SqlDataReader reader = await comando.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    resultado.TotalRecords = reader.GetInt32(reader.GetOrdinal("TotalRecords"));
+                }
+
+                if (await reader.NextResultAsync() && await reader.ReadAsync())
+                {
+                    resultado.FilteredRecords = reader.GetInt32(reader.GetOrdinal("FilteredRecords"));
+                }
+
+                if (await reader.NextResultAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        resultado.Items.Add(new ParticipanteListadoModel
+                        {
+                            IdParticipante = reader.GetString(reader.GetOrdinal("IdParticipante")),
+                            Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                            PrimerApellido = reader.GetString(reader.GetOrdinal("PrimerApellido")),
+                            SegundoApellido = reader.IsDBNull(reader.GetOrdinal("SegundoApellido"))
+                                ? null
+                                : reader.GetString(reader.GetOrdinal("SegundoApellido")),
+                            Correo = reader.GetString(reader.GetOrdinal("Correo")),
+                            UnidadAcademica = reader.IsDBNull(reader.GetOrdinal("UnidadAcademica"))
+                                ? null
+                                : reader.GetString(reader.GetOrdinal("UnidadAcademica")),
+                            HorasMatriculadas = reader.GetInt32(reader.GetOrdinal("HorasMatriculadas")),
+                            HorasAprobadas = reader.GetInt32(reader.GetOrdinal("HorasAprobadas")),
+                            CorreoNotificacionEnviado = reader.GetInt32(reader.GetOrdinal("CorreoNotificacionEnviado"))
+                        });
+                    }
+                }
+            }
+            finally
+            {
+                ConexionMetics.Close();
+            }
+
+            return resultado;
+        }
+
 
 
         public List<ParticipanteModel> ObtenerListaParticipantes()

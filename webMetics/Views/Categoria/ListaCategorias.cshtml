@@ -55,10 +55,10 @@
                         <div class="table-pagesize">
                             <label for="categoriaPageSize">Mostrar</label>
                             <select id="categoriaPageSize">
-                                <option selected>5</option>
+                                <option>5</option>
                                 <option>10</option>
                                 <option>25</option>
-                                <option>50</option>
+                                <option selected>50</option>
                             </select>
                             <label for="categoriaPageSize">registros</label>
                         </div>
@@ -150,6 +150,7 @@ else
         pageSizeId: 'categoriaPageSize',
         paginationId: 'categoriaTblPaginacion',
         searching: true,
-        searchInputId: 'categoriaBusqueda'
+        searchInputId: 'categoriaBusqueda',
+        pageLength: 50
     });
 </script>
