@@ -836,6 +836,20 @@
       ]
     },
     {
+      "name": "Sedes Regionales",
+      "departamentos": [
+        {
+          "name": "Sedes Regionales",
+          "secciones": [
+            {
+              "name": "Sedes Regionales",
+              "carreras": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Otros",
       "departamentos": [
         {

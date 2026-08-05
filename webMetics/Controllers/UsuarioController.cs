@@ -197,6 +197,7 @@ namespace webMetics.Controllers
                     departamento = usuario.departamento,
                     unidadAcademica = usuario.unidadAcademica,
                     sede = usuario.sede,
+                    carrera = usuario.carrera,
                     horasMatriculadas = 0,
                     horasAprobadas = 0
                 };
