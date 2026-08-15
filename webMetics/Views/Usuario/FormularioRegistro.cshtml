@@ -140,18 +140,14 @@
 
                         <div class="form-group mt-1">
                             @Html.LabelFor(usuarioModel => usuarioModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.carrera, new
-                            {
-                                @class = "form-control",
-                                id = "carreraInput",
-                                maxlength = "512",
-                                autocomplete = "off",
-                                aria_describedby = "carreraHelp",
-                                pattern = "[A-Z]+( [A-Z]+)*"
-                            })
-                            <small id="carreraHelp" class="form-text text-muted">
-                                Escriba la carrera únicamente con letras mayúsculas, sin tildes, puntos ni otros símbolos.
-                            </small>
+                            <select id="carreraDropdown" class="form-control">
+                                <option value="">Seleccione una carrera...</option>
+                            </select>
+                            <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
+                                   maxlength="512" autocomplete="off"
+                                   placeholder="Escriba el nombre de su carrera" />
+                            <small id="carreraPreview" class="form-text text-muted d-none"></small>
+                            @Html.HiddenFor(usuarioModel => usuarioModel.carrera)
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.carrera, "", new { @class = "text-danger" })
                         </div>
 
@@ -199,15 +195,21 @@ else
         $(document).ready(function () {
             var endpoints = {
                 departamentos: '@Url.Action("GetDepartamentosByArea", "Participante")',
-                secciones: '@Url.Action("GetSeccionesByDepartamento", "Participante")'
+                secciones: '@Url.Action("GetSeccionesByDepartamento", "Participante")',
+                carreras: '@Url.Action("GetCarrerasBySeccionAndSede", "Participante")'
             };
 
             var estadoInicial = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
             {
                 area = Model?.area ?? string.Empty,
                 departamento = Model?.departamento ?? string.Empty,
-                unidadAcademica = Model?.unidadAcademica ?? string.Empty
+                unidadAcademica = Model?.unidadAcademica ?? string.Empty,
+                sede = Model?.sede ?? string.Empty,
+                carrera = Model?.carrera ?? string.Empty
             }));
+
+            var CARRERA_OTRA = '__OTRA__';
+            var carrerasActuales = [];
 
             function mostrarError(mensaje) {
                 Swal.fire({
@@ -229,8 +231,9 @@ else
                     .append($('<option>', { value: '', text: 'Seleccione una unidad académica...' }));
             }
 
-            function cargarSecciones(areaName, departamentoName, seleccionInicial) {
+            function cargarSecciones(areaName, departamentoName) {
                 resetSecciones();
+                resetCarreras();
 
                 if (!areaName || !departamentoName) {
                     return $.Deferred().resolve().promise();
@@ -246,9 +249,6 @@ else
                     $.each(data || [], function (index, value) {
                         $('#seccionDropdown').append($('<option>', { value: value, text: value }));
                     });
-                    if (seleccionInicial) {
-                        $('#seccionDropdown').val(seleccionInicial);
-                    }
                 }).fail(function () {
                     mostrarError('No fue posible cargar las unidades académicas. Intente nuevamente.');
                 }).always(function () {
@@ -256,9 +256,10 @@ else
                 });
             }
 
-            function cargarDepartamentos(areaName, departamentoInicial, seccionInicial) {
+            function cargarDepartamentos(areaName) {
                 resetDepartamentos();
                 resetSecciones();
+                resetCarreras();
 
                 if (!areaName) {
                     return $.Deferred().resolve().promise();
@@ -274,11 +275,6 @@ else
                     $.each(data || [], function (index, value) {
                         $('#departamentoDropdown').append($('<option>', { value: value, text: value }));
                     });
-
-                    if (departamentoInicial) {
-                        $('#departamentoDropdown').val(departamentoInicial);
-                        cargarSecciones(areaName, departamentoInicial, seccionInicial);
-                    }
                 }).fail(function () {
                     mostrarError('No fue posible cargar las facultades o departamentos. Intente nuevamente.');
                 }).always(function () {
@@ -291,34 +287,168 @@ else
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, '')
                     .toUpperCase()
-                    .replace(/[^A-Z ]/g, '')
-                    .replace(/\s+/g, ' ')
-                    .replace(/^\s+/, '');
+                    .replace(/[^A-Z0-9]+/g, ' ')
+                    .trim()
+                    .slice(0, 512);
+            }
+
+            // Replica la regla del servidor: si lo escrito calza con una carrera del
+            // cat\u00e1logo devuelve el nombre oficial; si no, devuelve el normalizado.
+            function resolverCarrera(valor) {
+                var normalizada = normalizarCarrera(valor);
+                if (!normalizada) {
+                    return '';
+                }
+
+                for (var i = 0; i < carrerasActuales.length; i++) {
+                    if (normalizarCarrera(carrerasActuales[i]) === normalizada) {
+                        return carrerasActuales[i];
+                    }
+                }
+
+                return normalizada;
+            }
+
+            function resetCarreras() {
+                carrerasActuales = [];
+                $('#carreraDropdown')
+                    .empty()
+                    .append($('<option>', { value: '', text: 'Seleccione una carrera...' }));
+                $('#carreraPersonalizada').addClass('d-none').val('');
+                $('#carreraPreview').addClass('d-none').text('');
+                $('#carrera').val('');
+            }
+
+            function sincronizarCarrera() {
+                var seleccion = $('#carreraDropdown').val();
+
+                if (seleccion !== CARRERA_OTRA) {
+                    $('#carreraPersonalizada').addClass('d-none').val('');
+                    $('#carreraPreview').addClass('d-none').text('');
+                    $('#carrera').val(seleccion || '');
+                    return;
+                }
+
+                $('#carreraPersonalizada').removeClass('d-none');
+
+                var crudo = $('#carreraPersonalizada').val() || '';
+                var resuelta = resolverCarrera(crudo);
+                $('#carrera').val(resuelta);
+
+                if (resuelta && resuelta !== crudo.trim()) {
+                    $('#carreraPreview')
+                        .removeClass('d-none')
+                        .text('Se guardar\u00e1 como: ' + resuelta);
+                } else {
+                    $('#carreraPreview').addClass('d-none').text('');
+                }
+            }
+
+            function setCarreras(carreras, seleccionInicial) {
+                resetCarreras();
+                carrerasActuales = carreras || [];
+
+                $.each(carrerasActuales, function (index, value) {
+                    $('#carreraDropdown').append($('<option>', { value: value, text: value }));
+                });
+                $('#carreraDropdown').append($('<option>', {
+                    value: CARRERA_OTRA,
+                    text: 'Otra (no est\u00e1 en la lista)'
+                }));
+
+                var enLista = seleccionInicial && $.grep(carrerasActuales, function (c) {
+                    return c === seleccionInicial;
+                }).length > 0;
+
+                if (enLista) {
+                    $('#carreraDropdown').val(seleccionInicial);
+                } else if (seleccionInicial) {
+                    $('#carreraDropdown').val(CARRERA_OTRA);
+                    $('#carreraPersonalizada').val(seleccionInicial);
+                } else if (carrerasActuales.length === 0) {
+                    // Sin cat\u00e1logo para esa unidad y sede (caso Sedes Regionales):
+                    // se fuerza el campo libre.
+                    $('#carreraDropdown').val(CARRERA_OTRA);
+                }
+
+                sincronizarCarrera();
+            }
+
+            function cargarCarreras(seleccionInicial) {
+                var areaName = $('#areaDropdown').val();
+                var departamentoName = $('#departamentoDropdown').val();
+                var unidadAcademica = $('#seccionDropdown').val();
+                var sede = $('#sede').val();
+
+                resetCarreras();
+
+                if (!areaName || !departamentoName || !unidadAcademica || !sede) {
+                    return $.Deferred().resolve().promise();
+                }
+
+                $('#carreraDropdown').prop('disabled', true);
+                return $.ajax({
+                    url: endpoints.carreras,
+                    type: 'GET',
+                    data: {
+                        areaName: areaName,
+                        departamentoName: departamentoName,
+                        unidadAcademica: unidadAcademica,
+                        sede: sede
+                    },
+                    dataType: 'json'
+                }).done(function (data) {
+                    setCarreras(data || [], seleccionInicial);
+                }).fail(function () {
+                    mostrarError('No fue posible cargar las carreras. Intente nuevamente.');
+                    // Sin cat\u00e1logo se deja el campo libre para no bloquear el registro.
+                    setCarreras([], seleccionInicial);
+                }).always(function () {
+                    $('#carreraDropdown').prop('disabled', false);
+                });
             }
 
             $('#areaDropdown').on('change', function () {
-                cargarDepartamentos($(this).val(), '', '');
+                cargarDepartamentos($(this).val());
             });
 
             $('#departamentoDropdown').on('change', function () {
-                cargarSecciones($('#areaDropdown').val(), $(this).val(), '');
+                cargarSecciones($('#areaDropdown').val(), $(this).val());
             });
 
-            $('#carreraInput').on('input', function () {
-                this.value = normalizarCarrera(this.value);
-            }).on('blur', function () {
-                this.value = normalizarCarrera(this.value).trim();
+            $('#seccionDropdown').on('change', function () {
+                cargarCarreras('');
             });
 
+            $('#sede').on('change', function () {
+                cargarCarreras('');
+            });
+
+            $('#carreraDropdown').on('change', sincronizarCarrera);
+            $('#carreraPersonalizada').on('input', sincronizarCarrera);
+
+            // Restauración tras un error de validación: cada eslabón espera al anterior.
             if (estadoInicial.area) {
                 $('#areaDropdown').val(estadoInicial.area);
-                cargarDepartamentos(
-                    estadoInicial.area,
-                    estadoInicial.departamento,
-                    estadoInicial.unidadAcademica);
-            }
 
-            $('#carreraInput').val(normalizarCarrera($('#carreraInput').val()).trim());
+                cargarDepartamentos(estadoInicial.area)
+                    .then(function () {
+                        if (!estadoInicial.departamento) {
+                            return;
+                        }
+                        $('#departamentoDropdown').val(estadoInicial.departamento);
+                        return cargarSecciones(estadoInicial.area, estadoInicial.departamento);
+                    })
+                    .then(function () {
+                        if (estadoInicial.unidadAcademica) {
+                            $('#seccionDropdown').val(estadoInicial.unidadAcademica);
+                        }
+                        if (estadoInicial.sede) {
+                            $('#sede').val(estadoInicial.sede);
+                        }
+                        return cargarCarreras(estadoInicial.carrera);
+                    });
+            }
         });
     </script>
 }
