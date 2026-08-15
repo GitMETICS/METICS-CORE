@@ -135,10 +135,8 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult FormularioRegistro(UsuarioModel usuario)
         {
-            // La carrera se resuelve contra el catálogo antes de validar: si calza con
-            // una carrera oficial de esa unidad y sede se guarda tal cual, y si no, se
-            // normaliza. El servidor es la autoridad, así que un POST que no venga del
-            // formulario pasa por la misma regla.
+            // La carrera se resuelve contra el catálogo antes de validar: si no está se
+            // normaliza.
             List<string> catalogoCarreras;
             try
             {

@@ -65,7 +65,6 @@ namespace webMetics.Models
 
         [Required(ErrorMessage = "Es necesario ingresar una carrera.")]
         [StringLength(512, ErrorMessage = "La carrera no puede superar los 512 caracteres.")]
-        [RegularExpression(@"^[A-Z]+(?: [A-Z]+)*$", ErrorMessage = "La carrera solo puede contener letras mayúsculas sin tildes ni símbolos.")]
         [Display(Name = "Carrera")]
         public string? carrera { get; set; }
 
