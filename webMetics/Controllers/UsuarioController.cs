@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
 using webMetics.Models;
+using webMetics.Services;
 
 namespace webMetics.Controllers
 {
@@ -134,6 +135,30 @@ namespace webMetics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult FormularioRegistro(UsuarioModel usuario)
         {
+            // La carrera se resuelve contra el catálogo antes de validar: si calza con
+            // una carrera oficial de esa unidad y sede se guarda tal cual, y si no, se
+            // normaliza. El servidor es la autoridad, así que un POST que no venga del
+            // formulario pasa por la misma regla.
+            List<string> catalogoCarreras;
+            try
+            {
+                catalogoCarreras = accesoAParticipante.GetCarrerasBySeccionAndSede(
+                    usuario.area, usuario.departamento, usuario.unidadAcademica, usuario.sede);
+            }
+            catch
+            {
+                catalogoCarreras = new List<string>();
+            }
+
+            usuario.carrera = CarreraResolver.Resolver(usuario.carrera, catalogoCarreras);
+
+            // Se descartan los errores que el binder registró contra el valor crudo.
+            ModelState.Remove("carrera");
+            if (string.IsNullOrEmpty(usuario.carrera))
+            {
+                ModelState.AddModelError("carrera", "Es necesario ingresar una carrera.");
+            }
+
             if (ModelState.IsValid)
             {
                 string contrasena = GenerateRandomPassword();
