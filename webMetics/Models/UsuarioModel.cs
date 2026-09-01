@@ -63,6 +63,11 @@ namespace webMetics.Models
         [Display(Name = "Sede y Recinto")]
         public string? sede { get; set; }
 
+        [Required(ErrorMessage = "Es necesario ingresar una carrera.")]
+        [StringLength(512, ErrorMessage = "La carrera no puede superar los 512 caracteres.")]
+        [Display(Name = "Carrera")]
+        public string? carrera { get; set; }
+
         [Required(ErrorMessage = "Es necesario ingresar un tipo de participante.")]
         [Display(Name = "Tipo de Participante")]
         public string? tipoParticipante { get; set; }
