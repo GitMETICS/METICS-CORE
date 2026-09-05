@@ -93,6 +93,10 @@
                             </select>
                             <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
                                    maxlength="512" placeholder="Escriba el nombre de su carrera" />
+                            <small id="carreraFormato" class="form-text text-muted d-none">
+                                Se guardará en mayúsculas y sin tildes.
+                            </small>
+                            <small id="carreraPreview" class="form-text text-muted d-none"></small>
                             @Html.HiddenFor(m => m.carrera)
                             @Html.ValidationMessageFor(m => m.carrera, "", new { @class = "text-danger small" })
                         </div>
@@ -170,9 +174,41 @@
         $('#seccionDropdown').empty().append('<option value="">Seleccione una unidad académica...</option>');
     }
 
+    var carrerasActuales = [];
+
+    function normalizarCarrera(valor) {
+        return (valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase()
+            .replace(/[^A-Z0-9]+/g, ' ')
+            .trim()
+            .slice(0, 512);
+    }
+
+    // Replica la regla del servidor: si lo escrito calza con una carrera del
+    // catálogo devuelve el nombre oficial; si no, devuelve el normalizado.
+    function resolverCarrera(valor) {
+        var normalizada = normalizarCarrera(valor);
+        if (!normalizada) {
+            return '';
+        }
+
+        for (var i = 0; i < carrerasActuales.length; i++) {
+            if (normalizarCarrera(carrerasActuales[i]) === normalizada) {
+                return carrerasActuales[i];
+            }
+        }
+
+        return normalizada;
+    }
+
     function resetCarreras() {
+        carrerasActuales = [];
         $('#carreraDropdown').empty().append('<option value="">Seleccione una carrera...</option>');
         $('#carreraPersonalizada').addClass('d-none').val('');
+        $('#carreraFormato').addClass('d-none');
+        $('#carreraPreview').addClass('d-none').text('');
         $('#carrera').val('');
     }
 
@@ -180,12 +216,30 @@
 
     function sincronizarCarrera() {
         var seleccion = $('#carreraDropdown').val();
-        if (seleccion === CARRERA_OTRA) {
-            $('#carreraPersonalizada').removeClass('d-none');
-            $('#carrera').val($('#carreraPersonalizada').val().trim());
-        } else {
+
+        if (seleccion !== CARRERA_OTRA) {
             $('#carreraPersonalizada').addClass('d-none').val('');
+            $('#carreraFormato').addClass('d-none');
+            $('#carreraPreview').addClass('d-none').text('');
             $('#carrera').val(seleccion || '');
+            return;
+        }
+
+        // La regla de formato se anuncia al activar "Otra", antes de teclear;
+        // la vista previa de abajo aparece después, ya con el valor concreto.
+        $('#carreraPersonalizada').removeClass('d-none');
+        $('#carreraFormato').removeClass('d-none');
+
+        var crudo = $('#carreraPersonalizada').val() || '';
+        var resuelta = resolverCarrera(crudo);
+        $('#carrera').val(resuelta);
+
+        if (resuelta && resuelta !== crudo.trim()) {
+            $('#carreraPreview')
+                .removeClass('d-none')
+                .text('Se guardará como: ' + resuelta);
+        } else {
+            $('#carreraPreview').addClass('d-none').text('');
         }
     }
 
@@ -290,8 +344,9 @@
 
     function setCarreras(carreras, carreraSeleccionada) {
         resetCarreras();
+        carrerasActuales = carreras || [];
 
-        $.each(carreras || [], function (index, value) {
+        $.each(carrerasActuales, function (index, value) {
             $('#carreraDropdown').append($('<option>', { value: value, text: value }));
         });
 
@@ -386,9 +441,7 @@
         });
 
         $('#carreraDropdown').on('change', sincronizarCarrera);
-        $('#carreraPersonalizada').on('input', function () {
-            $('#carrera').val($(this).val().trim());
-        });
+        $('#carreraPersonalizada').on('input', sincronizarCarrera);
 
         var enviando = false;
 

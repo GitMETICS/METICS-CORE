@@ -670,6 +670,29 @@ namespace webMetics.Controllers
             foreach (var key in ModelState.Keys.Where(k => !boundFields.Contains(k)).ToList())
                 ModelState.Remove(key);
 
+            // participante.carrera tiene dos escritores: este formulario y el de registro.
+            // Ambos resuelven contra el catálogo antes de persistir, para que la columna
+            // quede siempre en mayúsculas sin tildes, venga del desplegable o del campo libre.
+            List<string> catalogoCarreras;
+            try
+            {
+                catalogoCarreras = accesoAParticipante.GetCarrerasBySeccionAndSede(
+                    participante.area, participante.departamento, participante.unidadAcademica, participante.sede);
+            }
+            catch
+            {
+                catalogoCarreras = new List<string>();
+            }
+
+            participante.carrera = CarreraResolver.Resolver(participante.carrera, catalogoCarreras);
+
+            // Se descartan los errores que el binder registró contra el valor crudo.
+            ModelState.Remove("carrera");
+            if (string.IsNullOrEmpty(participante.carrera))
+            {
+                ModelState.AddModelError("carrera", "Es necesario ingresar una Carrera.");
+            }
+
             if (!ModelState.IsValid)
             {
                 if (isAjaxRequest)

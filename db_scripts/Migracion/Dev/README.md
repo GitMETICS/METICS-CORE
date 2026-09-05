@@ -1,36 +1,37 @@
-# Prueba de scripts de migracion
+# Normalizacion del formato de carrera
 
-Estos scripts se deben probar sobre una copia de la base de datos, no sobre la base real.
+Estos scripts dejan `participante.carrera` en un solo formato: mayusculas, sin
+tildes y sin puntuacion. Es el mismo formato que ya tienen el catalogo de
+`webMetics/wwwroot/data/dataAreas.json` y `CarreraResolver` en C#, de modo que
+los dos escritores de la columna --- el formulario de registro y
+`CompletarCarreraYAreas` --- guardan lo mismo.
 
-## Orden recomendado
+## Orden
 
-1. Crear un respaldo de la base actual con `01-respaldar_base.sql`.
-2. Restaurar ese respaldo en un segundo servidor o contenedor SQL Server.
-3. Ejecutar `02-revertir_a_base_inicial.sql` sobre la copia para simular el estado anterior a la migracion.
-4. Ejecutar `03-aplicar_migracion.sql` sobre la copia.
-5. Ejecutar `04-verificar_migracion.sql` para validar que la migracion quedo aplicada correctamente.
+1. `01-aplicar_normalizacion_carreras.sql` --- respalda, crea la funcion y normaliza.
+2. `02-verificar_normalizacion_carreras.sql` --- confirma que no quedo ninguna fila fuera de formato.
+3. `03-revertir_normalizacion_carreras.sql` --- solo si hay que deshacer.
 
-## Paginacion de inscripciones
+`01` es idempotente: re-ejecutarlo no vuelve a respaldar ni toca filas que ya
+esten normalizadas.
 
-Para probar la paginacion backend sobre una base que ya tiene las migraciones anteriores:
+## Que hay que saber antes de correrlo
 
-1. Ejecutar `05-aplicar_paginacion_inscripciones.sql`.
-2. Ejecutar `06-verificar_paginacion_inscripciones.sql`.
+- **La normalizacion pierde informacion.** `Bachillerato en Economia Agricola y
+  Agronegocios (Desconcentrada)` queda `BACHILLERATO EN ECONOMIA AGRICOLA Y
+  AGRONEGOCIOS DESCONCENTRADA`: se van los parentesis, las comas y los dos
+  puntos. La tabla `participante_carrera_respaldo` es la unica vuelta atras.
+- `01` aborta si `participante.carrera` no existe. Una base en un esquema
+  anterior necesita primero la columna.
+- La funcion `dbo.fn_NormalizarCarrera` queda instalada, porque `02` y
+  cualquier corrida futura la necesitan.
+- Las comparaciones usan `Latin1_General_BIN2` a proposito. Con una colacion
+  acento-insensible la base creeria que el valor sin normalizar ya es igual al
+  normalizado, y el `UPDATE` no haria nada.
 
-Estos dos scripts son idempotentes y no eliminan ni modifican registros existentes.
+## Equivalencia con el codigo
 
-## Notas
-
-- Ajustar el nombre de la base y la ruta del respaldo segun el servidor SQL disponible.
-- El script `02-revertir_a_base_inicial.sql` elimina datos de campos nuevos, por eso solo debe usarse en una copia de prueba.
-- La verificacion debe mostrar los campos, tabla intermedia, restriccion y parametros esperados como correctos.
-
-## Paginacion de participantes
-
-Para probar el listado administrativo de participantes:
-
-1. Ejecutar `07-aplicar_paginacion_participantes.sql`.
-2. Ejecutar `08-verificar_paginacion_participantes.sql`.
-
-La migracion crea el procedimiento paginado y reutiliza el indice de participantes si ya existe.
-No elimina ni modifica participantes u otros registros.
+`dbo.fn_NormalizarCarrera` replica `CarreraResolver.Normalizar`. El mapa de
+diacriticos se derivo del bloque Latin-1 Supplement de Unicode aplicando la
+misma regla que usa C# --- NFD y descarte de las marcas sin espacio ---, no a
+mano. Si esa funcion de C# cambia, hay que actualizar la de SQL.
