@@ -52,23 +52,53 @@ WHERE carrera IS NOT NULL
      OR carrera COLLATE Latin1_General_BIN2 LIKE N'% '
   );
 
--- 5. Cobertura del respaldo: todo participante deberia tener su fila.
+-- 5. Alcance de la reversion. El respaldo es un historico y solo cubre las
+--    filas que la migracion cambio, asi que un participante sin respaldo es
+--    uno que ya estaba en formato, no una fila desprotegida.
+--
+--    revertibles       = 03 los devuelve a su valor original.
+--    editados_despues  = su carrera actual no es la normalizacion de lo
+--                        respaldado, o sea que se edito despues de migrar; 03
+--                        los deja intactos. Es informacion, no un error.
+WITH ultimo AS (
+    SELECT r.id_participante_FK,
+           r.carrera_original,
+           ROW_NUMBER() OVER (PARTITION BY r.id_participante_FK
+                              ORDER BY r.fecha_respaldo DESC, r.id_respaldo DESC) AS orden
+    FROM dbo.participante_carrera_respaldo AS r
+)
 SELECT
     (SELECT COUNT(*) FROM dbo.participante)                  AS participantes,
-    (SELECT COUNT(*) FROM dbo.participante_carrera_respaldo) AS respaldados,
-    (SELECT COUNT(*) FROM dbo.participante AS p
-      WHERE NOT EXISTS (SELECT 1 FROM dbo.participante_carrera_respaldo AS r
-                        WHERE r.id_participante_FK = p.id_participante_PK)
-    ) AS sin_respaldo;
-
--- 6. Muestra de lo que efectivamente cambio.
-SELECT TOP (20)
-    r.id_participante_FK,
-    r.carrera_original,
-    p.carrera AS carrera_normalizada
-FROM dbo.participante_carrera_respaldo AS r
+    (SELECT COUNT(*) FROM dbo.participante_carrera_respaldo) AS respaldos_totales,
+    COUNT(*)                                                 AS participantes_respaldados,
+    SUM(CASE WHEN ISNULL(p.carrera, N'') COLLATE Latin1_General_BIN2
+               = ISNULL(dbo.fn_NormalizarCarrera(u.carrera_original), N'') COLLATE Latin1_General_BIN2
+             THEN 1 ELSE 0 END)                              AS revertibles,
+    SUM(CASE WHEN ISNULL(p.carrera, N'') COLLATE Latin1_General_BIN2
+              <> ISNULL(dbo.fn_NormalizarCarrera(u.carrera_original), N'') COLLATE Latin1_General_BIN2
+             THEN 1 ELSE 0 END)                              AS editados_despues
+FROM ultimo AS u
 INNER JOIN dbo.participante AS p
-        ON p.id_participante_PK = r.id_participante_FK
-WHERE ISNULL(r.carrera_original, N'') COLLATE Latin1_General_BIN2
+        ON p.id_participante_PK = u.id_participante_FK
+WHERE u.orden = 1;
+
+-- 6. Muestra de lo que efectivamente cambio, contra el respaldo mas reciente
+--    de cada participante.
+WITH ultimo AS (
+    SELECT r.id_participante_FK,
+           r.carrera_original,
+           ROW_NUMBER() OVER (PARTITION BY r.id_participante_FK
+                              ORDER BY r.fecha_respaldo DESC, r.id_respaldo DESC) AS orden
+    FROM dbo.participante_carrera_respaldo AS r
+)
+SELECT TOP (20)
+    u.id_participante_FK,
+    u.carrera_original,
+    p.carrera AS carrera_normalizada
+FROM ultimo AS u
+INNER JOIN dbo.participante AS p
+        ON p.id_participante_PK = u.id_participante_FK
+WHERE u.orden = 1
+  AND ISNULL(u.carrera_original, N'') COLLATE Latin1_General_BIN2
    <> ISNULL(p.carrera, N'')          COLLATE Latin1_General_BIN2
-ORDER BY r.id_participante_FK;
+ORDER BY u.id_participante_FK;

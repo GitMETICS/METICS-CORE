@@ -6,8 +6,8 @@
 -- CarreraResolver en C#.
 --
 -- Pasos:
---   1. respalda los valores actuales en participante_carrera_respaldo
---   2. crea dbo.fn_NormalizarCarrera
+--   1. crea dbo.fn_NormalizarCarrera
+--   2. respalda en participante_carrera_respaldo las filas que van a cambiar
 --   3. normaliza participante.carrera
 --
 -- ANTES DE EJECUTAR EN PRODUCCION: tomar un respaldo completo de la base.
@@ -16,8 +16,11 @@
 -- aqui es la unica forma de deshacerlo, con
 -- 03-revertir_normalizacion_carreras.sql.
 --
--- Idempotente: re-ejecutarlo no vuelve a respaldar ni reescribe filas que ya
--- esten en el formato correcto.
+-- Idempotente: re-ejecutarlo no toca las filas que ya esten en el formato
+-- correcto, y como el respaldo cubre exactamente lo que el UPDATE va a
+-- cambiar, tampoco duplica respaldos. Si mas adelante entra un valor sin
+-- normalizar, la siguiente corrida SI lo respalda: el respaldo es un
+-- historico, no una foto de la primera corrida.
 -- ============================================================
 
 SET XACT_ABORT ON;
@@ -39,46 +42,8 @@ END
 GO
 
 -- ------------------------------------------------------------
--- 1. Tabla de respaldo. Sin llave foranea a participante a proposito: si un
---    participante se elimina, su respaldo sobrevive y no bloquea el borrado.
--- ------------------------------------------------------------
-IF OBJECT_ID('dbo.participante_carrera_respaldo', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.participante_carrera_respaldo (
-        id_participante_FK NVARCHAR(64)  NOT NULL,
-        carrera_original   NVARCHAR(512) NULL,
-        fecha_respaldo     DATETIME2(3)  NOT NULL
-            CONSTRAINT DF_participante_carrera_respaldo_fecha DEFAULT SYSUTCDATETIME(),
-
-        CONSTRAINT PK_participante_carrera_respaldo PRIMARY KEY (id_participante_FK)
-    );
-
-    PRINT N'Tabla participante_carrera_respaldo creada.';
-END
-ELSE
-BEGIN
-    PRINT N'Tabla participante_carrera_respaldo ya existia; se conserva el respaldo original.';
-END
-GO
-
--- Via sp_executesql a proposito: SET NOEXEC ON evita la ejecucion pero NO la
--- compilacion, asi que una referencia directa a p.carrera haria fallar el
--- script con 'Invalid column name' justo en el caso que el guard querria
--- reportar con claridad. El SQL dinamico se compila solo si llega a correr.
-EXEC sp_executesql N'
-INSERT INTO dbo.participante_carrera_respaldo (id_participante_FK, carrera_original)
-SELECT p.id_participante_PK, p.carrera
-FROM dbo.participante AS p
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM dbo.participante_carrera_respaldo AS r
-    WHERE r.id_participante_FK = p.id_participante_PK
-);
-PRINT N''Filas respaldadas en esta corrida: '' + CAST(@@ROWCOUNT AS NVARCHAR(16));';
-GO
-
--- ------------------------------------------------------------
--- 2. Funcion de normalizacion
+-- 1. Funcion de normalizacion. Va primero porque el respaldo del paso 3 la
+--    usa para decidir que filas van a cambiar.
 -- ------------------------------------------------------------
 -- ------------------------------------------------------------
 -- dbo.fn_NormalizarCarrera
@@ -188,7 +153,93 @@ END
 GO
 
 -- ------------------------------------------------------------
--- 3. Normalizar las filas existentes. La comparacion va en Latin1_General_BIN2 para que
+-- 2. Tabla de respaldo. Es un historico: una fila por cada vez que la
+--    migracion esta por reescribir la carrera de un participante. Con una
+--    sola fila por participante, un valor sin normalizar que entrara despues
+--    de migrar se perderia sin respaldo, y la reversion restauraria un valor
+--    viejo pisando ediciones legitimas.
+--
+--    Sin llave foranea a participante a proposito: si un participante se
+--    elimina, su respaldo sobrevive y no bloquea el borrado.
+-- ------------------------------------------------------------
+IF OBJECT_ID('dbo.participante_carrera_respaldo', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.participante_carrera_respaldo (
+        id_respaldo        INT IDENTITY(1,1) NOT NULL,
+        id_participante_FK NVARCHAR(64)  NOT NULL,
+        carrera_original   NVARCHAR(512) NULL,
+        fecha_respaldo     DATETIME2(3)  NOT NULL
+            CONSTRAINT DF_participante_carrera_respaldo_fecha DEFAULT SYSUTCDATETIME(),
+
+        CONSTRAINT PK_participante_carrera_respaldo PRIMARY KEY (id_respaldo)
+    );
+
+    CREATE INDEX IX_participante_carrera_respaldo_participante
+        ON dbo.participante_carrera_respaldo (id_participante_FK, fecha_respaldo DESC);
+
+    PRINT N'Tabla participante_carrera_respaldo creada.';
+END
+GO
+
+-- Una version anterior de este script creaba la tabla con la llave primaria
+-- sobre id_participante_FK, o sea una sola fila por participante. Ese esquema
+-- no puede guardar el segundo respaldo del mismo participante, asi que se
+-- migra a historico conservando lo ya respaldado.
+--
+-- El DDL va por EXEC porque bajo SET NOEXEC ON el lote igual se compila, y un
+-- ALTER TABLE sobre una tabla que no existe fallaria al enlazar en vez de
+-- dejar hablar al guard.
+IF OBJECT_ID('dbo.participante_carrera_respaldo', 'U') IS NOT NULL
+   AND COL_LENGTH('dbo.participante_carrera_respaldo', 'id_respaldo') IS NULL
+BEGIN
+    DECLARE @llaveVieja SYSNAME = (
+        SELECT kc.name
+        FROM sys.key_constraints AS kc
+        WHERE kc.parent_object_id = OBJECT_ID('dbo.participante_carrera_respaldo')
+          AND kc.type = 'PK');
+
+    -- El nombre se arma aparte: EXEC() no admite llamadas a funcion dentro de
+    -- la expresion que ejecuta.
+    DECLARE @quitarLlave NVARCHAR(MAX) =
+        N'ALTER TABLE dbo.participante_carrera_respaldo DROP CONSTRAINT ' + QUOTENAME(@llaveVieja);
+
+    IF @llaveVieja IS NOT NULL
+        EXEC sp_executesql @quitarLlave;
+
+    EXEC sp_executesql N'ALTER TABLE dbo.participante_carrera_respaldo ADD id_respaldo INT IDENTITY(1,1) NOT NULL';
+    EXEC sp_executesql N'ALTER TABLE dbo.participante_carrera_respaldo ADD CONSTRAINT PK_participante_carrera_respaldo PRIMARY KEY (id_respaldo)';
+    EXEC sp_executesql N'CREATE INDEX IX_participante_carrera_respaldo_participante ON dbo.participante_carrera_respaldo (id_participante_FK, fecha_respaldo DESC)';
+
+    PRINT N'Respaldo migrado a historico: se agrego id_respaldo y se quito la llave por participante.';
+END
+GO
+
+-- ------------------------------------------------------------
+-- 3. Respaldar exactamente las filas que el paso 4 va a reescribir. Ese
+--    recorte es lo que hace idempotente al script sin necesidad de recordar
+--    si ya se corrio: cuando no queda nada por normalizar, no hay nada que
+--    respaldar.
+--
+--    Un corte de conexion entre este paso y el 4 deja respaldos sin UPDATE;
+--    la siguiente corrida vuelve a respaldar esas mismas filas y quedan dos
+--    respaldos identicos, que la reversion trata igual que uno solo.
+-- ------------------------------------------------------------
+-- Via sp_executesql a proposito: SET NOEXEC ON evita la ejecucion pero NO la
+-- compilacion, asi que una referencia directa a p.carrera haria fallar el
+-- script con 'Invalid column name' justo en el caso que el guard querria
+-- reportar con claridad. El SQL dinamico se compila solo si llega a correr.
+EXEC sp_executesql N'
+INSERT INTO dbo.participante_carrera_respaldo (id_participante_FK, carrera_original)
+SELECT p.id_participante_PK, p.carrera
+FROM dbo.participante AS p
+WHERE p.carrera IS NOT NULL
+  AND p.carrera COLLATE Latin1_General_BIN2
+      <> dbo.fn_NormalizarCarrera(p.carrera) COLLATE Latin1_General_BIN2;
+PRINT N''Filas respaldadas en esta corrida: '' + CAST(@@ROWCOUNT AS NVARCHAR(16));';
+GO
+
+-- ------------------------------------------------------------
+-- 4. Normalizar las filas existentes. La comparacion va en Latin1_General_BIN2 para que
 --    una base con colacion CI_AI no considere que el valor sin normalizar ya
 --    es igual al normalizado y se salte la actualizacion.
 -- ------------------------------------------------------------
