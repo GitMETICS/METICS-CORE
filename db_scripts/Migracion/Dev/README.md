@@ -1,54 +1,80 @@
-# Normalizacion del formato de carrera
+# Normalización del formato de carrera
 
-Estos scripts dejan `participante.carrera` en un solo formato: mayusculas, sin
-tildes y sin puntuacion. Es el mismo formato que ya tienen el catalogo de
-`webMetics/wwwroot/data/dataAreas.json` y `CarreraResolver` en C#, de modo que
-los cuatro escritores de la columna --- el formulario de registro,
-`CompletarCarreraYAreas`, y los formularios de participante del administrador
-(`FormularioParticipante` y `ActualizarParticipante`) --- guardan lo mismo.
+Los scripts de Dev y Prod normalizan `participante.carrera` con las reglas de
+`webMetics/Services/CarreraResolver.cs`: mayúsculas, eliminación de diacríticos,
+caracteres ASCII alfanuméricos y espacios simples entre palabras.
 
-## Orden
+## Ejecución
 
-1. `01-aplicar_normalizacion_carreras.sql` --- crea la funcion, respalda y normaliza.
-2. `02-verificar_normalizacion_carreras.sql` --- confirma que no quedo ninguna fila fuera de formato.
-3. `03-revertir_normalizacion_carreras.sql` --- solo si hay que deshacer.
+1. Probar primero sobre una copia. En producción, tomar un respaldo completo.
+2. Ejecutar `01-aplicar_normalizacion_carreras.sql` en la base elegida.
+3. Ejecutar `02-verificar_normalizacion_carreras.sql`. Los casos deben dar `OK`
+   y ambos contadores de formato deben dar cero.
+4. Si se necesita deshacer, ejecutar `03-revertir_normalizacion_carreras.sql`.
 
-`01` es idempotente: no toca filas que ya esten normalizadas, y como respalda
-exactamente las filas que va a reescribir, tampoco duplica respaldos.
+Los archivos son UTF-8. Con sqlcmd usar `-f 65001 -I -b`, indicar explícitamente
+el servidor y la base, y detenerse ante errores. `01` aborta si falta la columna
+`participante.carrera`; no reemplaza las migraciones anteriores del esquema.
+No ejecutar simultáneamente instalaciones o actualizaciones del esquema.
 
-## El respaldo es un historico
+## Respaldo atómico e historial
 
-`participante_carrera_respaldo` guarda una fila por cada vez que la migracion
-esta por reescribir una carrera, no una foto de la primera corrida. Eso importa
-porque la columna se puede volver a ensuciar entre corridas: con una sola fila
-por participante, el segundo valor sin normalizar no quedaria respaldado y `03`
-restauraria el valor de la primera corrida, descartando en silencio lo que se
-hubiera editado en el medio.
+`UPDATE ... OUTPUT deleted ... INTO` guarda en la misma sentencia el valor
+original y el valor escrito (`carrera_normalizada`). Si falla la actualización
+o el respaldo, la sentencia se revierte completa. No hay una lectura de respaldo
+separada que pueda quedar desactualizada por una escritura concurrente.
 
-`03` toma de cada participante el respaldo mas reciente y **solo restaura si la
-carrera actual sigue siendo la normalizacion de ese respaldo**. Si alguien la
-edito despues de migrar, la fila se deja intacta y se lista al terminar. `02`
-cuenta esas mismas filas como `editados_despues`.
+Solo se modifican y respaldan filas que cambian. La comparación usa VARBINARY
+para incluir espacios finales, que incluso una comparación textual BIN2 ignora.
+Una segunda ejecución sobre datos normalizados no agrega respaldos. Si después
+entra otro valor sin normalizar, una nueva ejecución guarda un nuevo respaldo.
+Las escrituras posteriores a la sentencia quedan para la próxima ejecución;
+no se instala un trigger que normalice futuras escrituras externas.
 
-## Que hay que saber antes de correrlo
+El respaldo no tiene FK a participante, por lo que sobrevive a sus borrados.
+Conservar esta tabla: la normalización elimina información y no se puede invertir
+sin los valores originales. El respaldo completo sigue siendo necesario.
 
-- **La normalizacion pierde informacion.** `Bachillerato en Economia Agricola y
-  Agronegocios (Desconcentrada)` queda `BACHILLERATO EN ECONOMIA AGRICOLA Y
-  AGRONEGOCIOS DESCONCENTRADA`: se van los parentesis, las comas y los dos
-  puntos. La tabla `participante_carrera_respaldo` es la unica vuelta atras.
-- `01` aborta si `participante.carrera` no existe. Una base en un esquema
-  anterior necesita primero la columna.
-- La funcion `dbo.fn_NormalizarCarrera` queda instalada, porque `02`, `03` y
-  cualquier corrida futura la necesitan. `03` aborta si no la encuentra: sin
-  ella no puede distinguir lo que escribio la migracion de lo que se edito
-  despues.
-- Las comparaciones usan `Latin1_General_BIN2` a proposito. Con una colacion
-  acento-insensible la base creeria que el valor sin normalizar ya es igual al
-  normalizado, y el `UPDATE` no haria nada.
+## Reversión y versiones anteriores
 
-## Equivalencia con el codigo
+`03` toma el último respaldo de cada participante y restaura solo si el valor
+actual coincide exactamente con el valor que escribió esa migración. Compara
+espacios finales y distingue NULL de una cadena vacía. Las filas con un valor
+diferente se conservan y se muestran al final para revisión. Una edición que
+escriba exactamente el mismo valor es indistinguible de la escritura original.
+La reversión no depende de la versión actual de `fn_NormalizarCarrera`.
 
-`dbo.fn_NormalizarCarrera` replica `CarreraResolver.Normalizar`. El mapa de
-diacriticos se derivo del bloque Latin-1 Supplement de Unicode aplicando la
-misma regla que usa C# --- NFD y descarte de las marcas sin espacio ---, no a
-mano. Si esa funcion de C# cambia, hay que actualizar la de SQL.
+`01` actualiza tanto el esquema de una fila por participante como el historial
+anterior. Antes de reemplazar la función SQL antigua, calcula con ella el valor
+escrito de los respaldos antiguos. Este paso conserva la posibilidad de revertir
+los resultados de aquella versión aunque su normalización fuera diferente.
+Si falta la función antigua, no adivina: deja el valor escrito en NULL, avisa y
+`03` omite esos respaldos. Revisarlos con el respaldo completo. No vuelve a llenar
+estos NULL usando una función nueva en ejecuciones posteriores.
+
+Esta actualización no reconstruye automáticamente nombres dañados por una
+migración anterior: un valor como `DISEN O` ya cumple el formato ASCII. Para
+recuperar su significado se necesita consultar el respaldo original.
+
+## Unicode y mantenimiento
+
+El bloque marcado como generado en `01` se obtiene ejecutando el mismo
+`CarreraResolver` que usa la aplicación. Incluye letras precompuestas fuera de
+Latin-1 y marcas combinantes, y no depende del UPPER ni de la colación de SQL.
+La función recorre unidades UTF-16 sobre la columna NVARCHAR(512).
+
+Desde la raíz del repositorio:
+
+```powershell
+dotnet run --project scripts/carreras/NormalizacionSql
+dotnet run --project scripts/carreras/NormalizacionSql -- --check
+```
+
+Regenerar y revisar el diff si cambia `CarreraResolver` o la versión de .NET y sus
+reglas Unicode. No editar el bloque generado a mano. El resto de los scripts
+sigue siendo SQL autónomo: no requiere instalar .NET en el servidor de base de
+datos ni habilitar SQL CLR.
+
+Las pruebas en [PruebasMigracion](../../../scripts/carreras/PruebasMigracion/README.md)
+comparan SQL con C#, verifican ambos ambientes y prueban concurrencia, fallos,
+idempotencia, reversión y actualización de respaldos anteriores.
