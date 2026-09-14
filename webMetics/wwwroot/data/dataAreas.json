@@ -836,6 +836,19 @@
       ]
     },
     {
+      "name": "Sistema de Educación General",
+      "departamentos": [
+        {
+          "name": "Estudios Generales",
+          "secciones": [
+            {
+              "name": "Escuela de Estudios Generales"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Sedes Regionales",
       "departamentos": [
         {
