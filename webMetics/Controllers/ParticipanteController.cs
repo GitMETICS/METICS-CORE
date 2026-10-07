@@ -18,6 +18,7 @@ using System.Globalization;
 using System.Text;
 using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
+using webMetics.Services;
 
 
 namespace webMetics.Controllers
@@ -1130,6 +1131,7 @@ namespace webMetics.Controllers
             bool isAjaxRequest = IsAjaxRequest();
 
             ValidarAreasExtra(participante);
+            ResolverCarrera(participante);
 
             if (!ModelState.IsValid)
             {
@@ -1247,6 +1249,34 @@ namespace webMetics.Controllers
             }
             }
 
+        /// <summary>
+        /// Resuelve participante.carrera contra el catálogo de la sección y sede elegidas,
+        /// igual que el formulario de registro y CompletarCarreraYAreas, para que la columna
+        /// quede en mayúsculas sin tildes venga del desplegable o del campo libre.
+        /// </summary>
+        private void ResolverCarrera(ParticipanteModel participante)
+        {
+            List<string> catalogoCarreras;
+            try
+            {
+                catalogoCarreras = accesoAParticipante.GetCarrerasBySeccionAndSede(
+                    participante.area, participante.departamento, participante.unidadAcademica, participante.sede);
+            }
+            catch
+            {
+                catalogoCarreras = new List<string>();
+            }
+
+            participante.carrera = CarreraResolver.Resolver(participante.carrera, catalogoCarreras);
+
+            // Se descartan los errores que el binder registró contra el valor crudo.
+            ModelState.Remove("carrera");
+            if (string.IsNullOrEmpty(participante.carrera))
+            {
+                ModelState.AddModelError("carrera", "Es necesario ingresar una Carrera.");
+            }
+        }
+
         private List<string> FiltrarAreasExtraValidas(List<string>? areasExtraSeleccionadas, string? areaPrincipal)
         {
             if (areasExtraSeleccionadas == null || areasExtraSeleccionadas.Count == 0)
@@ -1326,6 +1356,7 @@ namespace webMetics.Controllers
             bool isAjaxRequest = IsAjaxRequest();
 
             ValidarAreasExtra(participante);
+            ResolverCarrera(participante);
 
             try
             {

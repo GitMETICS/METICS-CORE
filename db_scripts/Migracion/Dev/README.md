@@ -1,36 +1,80 @@
-# Prueba de scripts de migracion
+# Normalización del formato de carrera
 
-Estos scripts se deben probar sobre una copia de la base de datos, no sobre la base real.
+Los scripts de Dev y Prod normalizan `participante.carrera` con las reglas de
+`webMetics/Services/CarreraResolver.cs`: mayúsculas, eliminación de diacríticos,
+caracteres ASCII alfanuméricos y espacios simples entre palabras.
 
-## Orden recomendado
+## Ejecución
 
-1. Crear un respaldo de la base actual con `01-respaldar_base.sql`.
-2. Restaurar ese respaldo en un segundo servidor o contenedor SQL Server.
-3. Ejecutar `02-revertir_a_base_inicial.sql` sobre la copia para simular el estado anterior a la migracion.
-4. Ejecutar `03-aplicar_migracion.sql` sobre la copia.
-5. Ejecutar `04-verificar_migracion.sql` para validar que la migracion quedo aplicada correctamente.
+1. Probar primero sobre una copia. En producción, tomar un respaldo completo.
+2. Ejecutar `01-aplicar_normalizacion_carreras.sql` en la base elegida.
+3. Ejecutar `02-verificar_normalizacion_carreras.sql`. Los casos deben dar `OK`
+   y ambos contadores de formato deben dar cero.
+4. Si se necesita deshacer, ejecutar `03-revertir_normalizacion_carreras.sql`.
 
-## Paginacion de inscripciones
+Los archivos son UTF-8. Con sqlcmd usar `-f 65001 -I -b`, indicar explícitamente
+el servidor y la base, y detenerse ante errores. `01` aborta si falta la columna
+`participante.carrera`; no reemplaza las migraciones anteriores del esquema.
+No ejecutar simultáneamente instalaciones o actualizaciones del esquema.
 
-Para probar la paginacion backend sobre una base que ya tiene las migraciones anteriores:
+## Respaldo atómico e historial
 
-1. Ejecutar `05-aplicar_paginacion_inscripciones.sql`.
-2. Ejecutar `06-verificar_paginacion_inscripciones.sql`.
+`UPDATE ... OUTPUT deleted ... INTO` guarda en la misma sentencia el valor
+original y el valor escrito (`carrera_normalizada`). Si falla la actualización
+o el respaldo, la sentencia se revierte completa. No hay una lectura de respaldo
+separada que pueda quedar desactualizada por una escritura concurrente.
 
-Estos dos scripts son idempotentes y no eliminan ni modifican registros existentes.
+Solo se modifican y respaldan filas que cambian. La comparación usa VARBINARY
+para incluir espacios finales, que incluso una comparación textual BIN2 ignora.
+Una segunda ejecución sobre datos normalizados no agrega respaldos. Si después
+entra otro valor sin normalizar, una nueva ejecución guarda un nuevo respaldo.
+Las escrituras posteriores a la sentencia quedan para la próxima ejecución;
+no se instala un trigger que normalice futuras escrituras externas.
 
-## Notas
+El respaldo no tiene FK a participante, por lo que sobrevive a sus borrados.
+Conservar esta tabla: la normalización elimina información y no se puede invertir
+sin los valores originales. El respaldo completo sigue siendo necesario.
 
-- Ajustar el nombre de la base y la ruta del respaldo segun el servidor SQL disponible.
-- El script `02-revertir_a_base_inicial.sql` elimina datos de campos nuevos, por eso solo debe usarse en una copia de prueba.
-- La verificacion debe mostrar los campos, tabla intermedia, restriccion y parametros esperados como correctos.
+## Reversión y versiones anteriores
 
-## Paginacion de participantes
+`03` toma el último respaldo de cada participante y restaura solo si el valor
+actual coincide exactamente con el valor que escribió esa migración. Compara
+espacios finales y distingue NULL de una cadena vacía. Las filas con un valor
+diferente se conservan y se muestran al final para revisión. Una edición que
+escriba exactamente el mismo valor es indistinguible de la escritura original.
+La reversión no depende de la versión actual de `fn_NormalizarCarrera`.
 
-Para probar el listado administrativo de participantes:
+`01` actualiza tanto el esquema de una fila por participante como el historial
+anterior. Antes de reemplazar la función SQL antigua, calcula con ella el valor
+escrito de los respaldos antiguos. Este paso conserva la posibilidad de revertir
+los resultados de aquella versión aunque su normalización fuera diferente.
+Si falta la función antigua, no adivina: deja el valor escrito en NULL, avisa y
+`03` omite esos respaldos. Revisarlos con el respaldo completo. No vuelve a llenar
+estos NULL usando una función nueva en ejecuciones posteriores.
 
-1. Ejecutar `07-aplicar_paginacion_participantes.sql`.
-2. Ejecutar `08-verificar_paginacion_participantes.sql`.
+Esta actualización no reconstruye automáticamente nombres dañados por una
+migración anterior: un valor como `DISEN O` ya cumple el formato ASCII. Para
+recuperar su significado se necesita consultar el respaldo original.
 
-La migracion crea el procedimiento paginado y reutiliza el indice de participantes si ya existe.
-No elimina ni modifica participantes u otros registros.
+## Unicode y mantenimiento
+
+El bloque marcado como generado en `01` se obtiene ejecutando el mismo
+`CarreraResolver` que usa la aplicación. Incluye letras precompuestas fuera de
+Latin-1 y marcas combinantes, y no depende del UPPER ni de la colación de SQL.
+La función recorre unidades UTF-16 sobre la columna NVARCHAR(512).
+
+Desde la raíz del repositorio:
+
+```powershell
+dotnet run --project scripts/carreras/NormalizacionSql
+dotnet run --project scripts/carreras/NormalizacionSql -- --check
+```
+
+Regenerar y revisar el diff si cambia `CarreraResolver` o la versión de .NET y sus
+reglas Unicode. No editar el bloque generado a mano. El resto de los scripts
+sigue siendo SQL autónomo: no requiere instalar .NET en el servidor de base de
+datos ni habilitar SQL CLR.
+
+Las pruebas en [PruebasMigracion](../../../scripts/carreras/PruebasMigracion/README.md)
+comparan SQL con C#, verifican ambos ambientes y prueban concurrencia, fallos,
+idempotencia, reversión y actualización de respaldos anteriores.

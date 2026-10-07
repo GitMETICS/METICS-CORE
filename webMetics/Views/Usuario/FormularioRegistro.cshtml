@@ -146,6 +146,9 @@
                             <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
                                    maxlength="512" autocomplete="off"
                                    placeholder="Escriba el nombre de su carrera" />
+                            <small id="carreraFormato" class="form-text text-muted d-none">
+                                Se guardará en mayúsculas y sin tildes.
+                            </small>
                             <small id="carreraPreview" class="form-text text-muted d-none"></small>
                             @Html.HiddenFor(usuarioModel => usuarioModel.carrera)
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.carrera, "", new { @class = "text-danger" })
@@ -315,6 +318,7 @@ else
                     .empty()
                     .append($('<option>', { value: '', text: 'Seleccione una carrera...' }));
                 $('#carreraPersonalizada').addClass('d-none').val('');
+                $('#carreraFormato').addClass('d-none');
                 $('#carreraPreview').addClass('d-none').text('');
                 $('#carrera').val('');
             }
@@ -324,12 +328,16 @@ else
 
                 if (seleccion !== CARRERA_OTRA) {
                     $('#carreraPersonalizada').addClass('d-none').val('');
+                    $('#carreraFormato').addClass('d-none');
                     $('#carreraPreview').addClass('d-none').text('');
                     $('#carrera').val(seleccion || '');
                     return;
                 }
 
+                // La regla de formato se anuncia al activar "Otra", antes de teclear;
+                // la vista previa de abajo aparece después, ya con el valor concreto.
                 $('#carreraPersonalizada').removeClass('d-none');
+                $('#carreraFormato').removeClass('d-none');
 
                 var crudo = $('#carreraPersonalizada').val() || '';
                 var resuelta = resolverCarrera(crudo);

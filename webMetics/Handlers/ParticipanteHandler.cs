@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MailKit.Search;
 using NPOI.HPSF;
+using webMetics.Services;
 
 
 namespace webMetics.Handlers
@@ -1385,7 +1386,14 @@ namespace webMetics.Handlers
                                     JArray carrerasArray = (JArray)carrerasObj[sede];
                                     foreach (var carrera in carrerasArray)
                                     {
-                                        carrerasList.Add((string)carrera);
+                                        // El catálogo ya está normalizado en dataAreas.json; normalizar
+                                        // aquí también evita que una reimportación del catálogo de la UCR
+                                        // vuelva a meter tildes y minúsculas en participante.carrera.
+                                        string carreraNormalizada = CarreraResolver.Normalizar((string)carrera);
+                                        if (carreraNormalizada.Length > 0 && !carrerasList.Contains(carreraNormalizada))
+                                        {
+                                            carrerasList.Add(carreraNormalizada);
+                                        }
                                     }
                                 }
                                 return carrerasList;
