@@ -275,36 +275,35 @@
         <br />
 
         <!-- Grupos disponibles para inscripción -->
-        <h1>@ViewBag.Title</h1>
-        <div class="d-flex justify-content-between my-4">
-            <!-- Barra de búsqueda -->
-            <div class="w-50 me-2">
-                <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
-                    <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
-                    <input type="number" name="userRole" value="@ViewBag.Role" hidden/>
-                    <input type="text" name="userId" value="@ViewBag.Id" hidden/>
-
-                        <input type="hidden" id="currentFilterParam" name="filter" value="@(Context.Request.Query["filter"] == string.Empty ? Context.Request.Query["filter"] : "all")" />
-
-                    <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
+        <section class="module-catalog-toolbar" aria-labelledby="moduleCatalogTitle">
+            <h1 id="moduleCatalogTitle" class="module-catalog-title">@ViewBag.Title</h1>
+            <div class="module-toolbar-controls">
+                <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="module-search-form" role="search">
+                    <div class="module-search-control">
+                        <button class="module-search-submit" type="submit" aria-label="Buscar módulos">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </button>
+                        <input type="text" name="searchTerm" class="form-control module-search-input" placeholder="Buscar módulo" aria-label="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
+                    </div>
+                    <input type="number" name="userRole" value="@ViewBag.Role" hidden />
+                    <input type="text" name="userId" value="@ViewBag.Id" hidden />
+                    <input type="hidden" id="currentFilterParam" name="filter" value="@(Context.Request.Query["filter"] == string.Empty ? Context.Request.Query["filter"] : "all")" />
                 </form>
-            </div>
-            <!-- Botón para filtrar entre activos e inactivos -->
-            <div class="ms-2" role="group" id="filterButtons">
-                <button type="button" class="btn btn-secondary" data-filter="all" onclick="filterModules('all', this)">Todos</button>
-                <button type="button" class="btn btn-outline-secondary" data-filter="active" onclick="filterModules('active', this)">Activos</button>
-                @if (ViewBag.Role == 1)
-                {
-                    <button type="button" class="btn btn-outline-secondary" data-filter="inactive" onclick="filterModules('inactive', this)">Inactivos</button>
-                }
-            </div>
-            <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
-            <div class="ms-2">
-                <button class="btn btn-secondary" id="toggleViewBtn2" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
-            </div>
-        </div>
 
-        <br />
+                <div class="btn-group module-filter-group" role="group" id="filterButtons" aria-label="Filtrar módulos">
+                    <button type="button" class="btn btn-secondary" data-filter="all" aria-pressed="true" onclick="filterModules('all', this)">Todos</button>
+                    <button type="button" class="btn btn-outline-secondary" data-filter="active" aria-pressed="false" onclick="filterModules('active', this)">Activos</button>
+                    @if (ViewBag.Role == 1)
+                    {
+                        <button type="button" class="btn btn-outline-secondary" data-filter="inactive" aria-pressed="false" onclick="filterModules('inactive', this)">Inactivos</button>
+                    }
+                </div>
+
+                <button class="btn btn-secondary module-view-toggle" type="button" id="toggleViewBtn2" onclick="toggleView()">
+                    <i class="bi bi-list-ul me-2" aria-hidden="true"></i>Modo lista
+                </button>
+            </div>
+        </section>
 
         <div class="view-container" id="viewContainer">
             <div class="row d-none" id="gridView">
@@ -845,17 +844,20 @@ else
         filterButtons.forEach(button => {
             button.classList.remove('btn-secondary');
             button.classList.add('btn-outline-secondary');
+            button.setAttribute('aria-pressed', 'false');
         });
 
         if (clickedButton) {
             clickedButton.classList.remove('btn-outline-secondary');
             clickedButton.classList.add('btn-secondary');
+            clickedButton.setAttribute('aria-pressed', 'true');
         } else {
             // Caso inicial o si se llama sin botón (p. ej. desde toggleView)
             const defaultButton = document.querySelector(`#filterButtons button[data-filter='${filter}']`);
             if (defaultButton) {
                 defaultButton.classList.remove('btn-outline-secondary');
                 defaultButton.classList.add('btn-secondary');
+                defaultButton.setAttribute('aria-pressed', 'true');
             }
         }
 

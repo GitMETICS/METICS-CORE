@@ -82,7 +82,7 @@
 
     @if (showNav)
     {
-        <nav class="navbar navbar-expand-lg metics-tabs-navbar">
+        <nav class="navbar navbar-expand-xl metics-tabs-navbar">
             <div class="container-fluid metics-tabs-container">
                 <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -98,8 +98,8 @@
                                         <i class="bi bi-gear"></i>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="settingsDropdown">
-                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item bi bi-envelope" })</li>
+                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item bi bi-clock-history" })</li>
                                     </ul>
                                 </li>
 
@@ -109,8 +109,8 @@
                                         <span>Gestión académica</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="academicDropdown">
-                                        <li>@Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item bi bi-diagram-3" })</li>
+                                        <li>@Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item bi bi-collection" })</li>
                                     </ul>
                                 </li>
 
@@ -120,8 +120,8 @@
                                         <span>Personas</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="peopleDropdown">
-                                        <li>@Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item bi bi-person-badge" })</li>
+                                        <li>@Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item bi bi-people" })</li>
                                     </ul>
                                 </li>
 
@@ -131,7 +131,7 @@
                                         <span>Inscripciones</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="inscriptionDropdown">
-                                        <li>@Html.ActionLink("Lista de inscripciones", "VerInscripciones", "Inscripcion", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Lista de inscripciones", "VerInscripciones", "Inscripcion", new { }, new { @class = "dropdown-item bi bi-card-checklist" })</li>
                                     </ul>
                                 </li>
 
@@ -141,10 +141,10 @@
                                         <span>Contenido</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="contentDropdown">
-                                        <li>@Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item bi bi-plus-square" })</li>
+                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item bi bi-journal-plus" })</li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item bi bi-award" })</li>
                                     </ul>
                                 </li>
 
@@ -165,8 +165,8 @@
                                         <span>Facilitador(a)</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="facilitatorDropdown">
-                                        <li>@Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
+                                        <li>@Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item bi bi-journal-text" })</li>
+                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item bi bi-journal-plus" })</li>
                                     </ul>
                                 </li>
 
@@ -205,10 +205,10 @@
                                 </a>
 
                                 <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
-                                    <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item" })</li>
-                                    <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item" })</li>
+                                    <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-person" })</li>
+                                    <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item bi bi-key" })</li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item metics-logout" })</li>
+                                    <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item bi bi-box-arrow-right metics-logout" })</li>
                                 </ul>
                             </li>
                         </ul>
