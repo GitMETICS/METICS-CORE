@@ -17,7 +17,7 @@
 
 .metics-tabs-container {
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     min-height: 60px;
     padding-left: 32px;
     padding-right: 32px;
@@ -44,12 +44,12 @@
     align-items: center;
     align-self: stretch;
     flex-shrink: 0;
-    gap: 20px;
+    gap: 16px;
     min-height: 60px;
 }
 
 .metics-tabs-nav {
-    gap: 8px;
+    gap: 5px;
     min-width: 0;
 }
 
@@ -68,11 +68,11 @@
     border-radius: 8px;
     color: #334155;
     display: inline-flex;
-    font-size: 18px;
-    gap: 12px;
+    font-size: 17px;
+    gap: 10px;
     height: 44px;
     line-height: 1;
-    padding: 0 18px;
+    padding: 0 15px;
     position: relative;
     text-decoration: none;
     white-space: nowrap;
@@ -127,7 +127,7 @@
 }
 
 .metics-tabs-navbar .bi {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1;
 }
 
@@ -136,7 +136,7 @@
     border: 1px solid #d7e1ec;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
-    font-size: 18px;
+    font-size: 17px;
     margin-top: 0;
     max-width: calc(100vw - 32px);
     min-width: 0;
@@ -149,8 +149,8 @@
     align-items: center;
     color: #334155;
     display: flex;
-    min-height: 68px;
-    padding: 12px 24px;
+    min-height: 60px;
+    padding: 10px 20px;
     position: relative;
     white-space: nowrap;
 }
@@ -158,10 +158,10 @@
 .metics-tabs-menu .dropdown-item.bi::before {
     color: #60758c;
     display: inline-block;
-    font-size: 22px;
-    margin-right: 14px;
+    font-size: 20px;
+    margin-right: 12px;
     text-align: center;
-    width: 24px;
+    width: 22px;
 }
 
 .metics-tabs-menu .dropdown-item::after {
@@ -206,7 +206,7 @@
     .metics-tabs-navbar .dropdown:focus-within > .nav-link {
         background: #dcecff;
         border-color: #b9d7f4;
-        border-radius: 0;
+        border-radius: 8px;
         color: #095998;
         height: 60px;
         min-height: 60px;
@@ -259,20 +259,20 @@
     color: #fff;
     display: inline-flex;
     flex: 0 0 228px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
-    gap: 10px;
+    gap: 8px;
     height: 48px;
     justify-content: center;
     line-height: 1;
     margin-block: 0;
     min-height: 48px;
-    padding: 0 24px;
+    padding: 0 20px;
     vertical-align: middle;
 }
 
 .metics-tabs-navbar .metics-create-module::before {
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
     margin-right: 0;
 }
@@ -299,7 +299,7 @@
 .metics-tabs-right .metics-account {
     border-left: 1px solid #dbe1e8;
     margin-left: 0;
-    padding-left: 18px;
+    padding-left: 16px;
 }
 
 .metics-account .dropdown-menu {
@@ -424,20 +424,18 @@
 
 .module-catalog-toolbar {
     border-bottom: 1px solid #e5eaf1;
-    margin: 112px 0 54px;
-    margin-left: calc(50% - 50vw + 64px);
-    max-width: none;
-    padding: 0 0 40px;
-    width: calc(100vw - 128px);
+    margin: -4px auto 34px;
+    max-width: 100%;
+    padding: 0 5px 32px;
 }
 
 .module-catalog-title {
     color: #101c2c;
-    font-size: clamp(2.5rem, 3.4vw, 3.5rem);
+    font-size: clamp(2.1rem, 3.4vw, 3rem);
     font-weight: 700;
     letter-spacing: -0.035em;
     line-height: 1.15;
-    margin: 0 0 24px;
+    margin: 0 0 30px;
 }
 
 .module-toolbar-controls {
@@ -458,7 +456,7 @@
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     display: flex;
-    min-height: 72px;
+    min-height: 48px;
     padding: 0 14px;
     transition: border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -475,7 +473,7 @@
     color: #52657c;
     display: inline-flex;
     flex: 0 0 42px;
-    font-size: 24px;
+    font-size: 21px;
     justify-content: flex-start;
     padding: 0 0 0 2px;
 }
@@ -495,8 +493,8 @@
     border: 0;
     box-shadow: none;
     color: #334155;
-    font-size: 20px;
-    height: 70px;
+    font-size: 17px;
+    height: 46px;
     min-width: 0;
     padding: 0 4px;
 }
@@ -517,10 +515,10 @@
     border: 0;
     border-radius: 0;
     color: #334155;
-    font-size: 18px;
-    min-height: 72px;
-    min-width: 160px;
-    padding: 0 24px;
+    font-size: 16px;
+    min-height: 48px;
+    min-width: 112px;
+    padding: 0 20px;
 }
 
 .module-toolbar-controls .module-filter-group .btn + .btn {
@@ -551,12 +549,12 @@
     border-radius: 10px;
     color: #334155;
     display: inline-flex;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     justify-content: center;
-    min-height: 72px;
-    min-width: 220px;
-    padding: 0 24px;
+    min-height: 48px;
+    min-width: 174px;
+    padding: 0 20px;
     position: relative;
     white-space: nowrap;
 }
@@ -564,15 +562,15 @@
 .module-toolbar-controls .module-view-toggle::before {
     border-left: 1px solid #d5deea;
     content: "";
-    height: 72px;
-    left: -25px;
+    height: 44px;
+    left: -13px;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .module-toolbar-controls .module-view-toggle .bi {
-    font-size: 22px;
+    font-size: 16px;
 }
 
 .module-toolbar-controls .module-view-toggle:hover {
@@ -586,21 +584,56 @@
     outline-offset: 2px;
 }
 
-@media (max-width: 1199.98px) {
-    .module-catalog-toolbar {
-        margin-left: calc(50% - 50vw + 32px);
-        margin-top: 64px;
-        width: calc(100vw - 64px);
+/* Mantiene el control de vista de módulos inscritos igual al del catálogo. */
+.module-subscribed-toolbar .module-view-toggle,
+#toggleViewBtn1 {
+    align-items: center;
+    background: #f2f5fa;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    color: #334155;
+    display: inline-flex;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    min-height: 48px;
+    min-width: 174px;
+    padding: 0 20px;
+    white-space: nowrap;
+}
+
+.module-subscribed-toolbar .module-view-toggle:hover,
+#toggleViewBtn1:hover {
+    background: #e8eff8;
+    border-color: #aebfd2;
+    color: #095998;
+}
+
+.module-subscribed-toolbar .module-view-toggle:focus-visible,
+#toggleViewBtn1:focus-visible {
+    outline: 3px solid rgba(9, 89, 152, 0.3);
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .module-subscribed-toolbar {
+        align-items: stretch !important;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .module-subscribed-toolbar > div {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .module-subscribed-toolbar .module-view-toggle,
+    #toggleViewBtn1 {
+        width: 100%;
     }
 }
 
 @media (max-width: 991.98px) {
-    .module-catalog-toolbar {
-        margin-top: 64px;
-        margin-left: calc(50% - 50vw + 24px);
-        width: calc(100vw - 48px);
-    }
-
     .module-toolbar-controls {
         gap: 14px;
         grid-template-columns: minmax(0, 1fr) auto;
@@ -613,10 +646,8 @@
 
 @media (max-width: 575.98px) {
     .module-catalog-toolbar {
-        margin: 42px 0 26px;
-        margin-left: calc(50% - 50vw + 16px);
-        padding: 0 0 24px;
-        width: calc(100vw - 32px);
+        margin: 24px auto 32px;
+        padding: 0 5px 24px;
     }
 
     .module-catalog-title {
@@ -626,6 +657,10 @@
 
     .module-toolbar-controls {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .module-toolbar-controls .module-view-toggle::before {
+        display: none;
     }
 
     .module-search-form,

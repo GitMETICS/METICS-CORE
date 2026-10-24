@@ -48,7 +48,7 @@
             if (ViewBag.GruposInscritos != null)
             {
             
-            <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 module-subscribed-toolbar">
                 <!-- Barra de búsqueda -->
                 <div class="w-75 me-2">
                         <h1>Módulos Inscritos</h1>
@@ -60,7 +60,7 @@
 
                 <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
                 <div class="ms-2">
-                    <button class="btn btn-secondary" id="toggleViewBtn1" onclick="toggleView()"><i class="bi bi-list-ul me-2"></i>Modo lista</button>
+                    <button class="btn module-view-toggle" type="button" id="toggleViewBtn1" onclick="toggleView()"><i class="bi bi-list-ul me-2" aria-hidden="true"></i>Modo lista</button>
                 </div>
             </div>
 
