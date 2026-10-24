@@ -1,4 +1,4 @@
-﻿@using webMetics.Models
+@using webMetics.Models
 @using webMetics.Helpers
 
 
@@ -76,75 +76,87 @@
                             {
                                 visible = "0.5";
                             }
-                            <div class="col-12 col-md-6 mb-4">
-                                <div id="@grupo.idGrupo" class="card h-100 text-center border-info border-1 border-opacity-50" style="opacity:@visible">
-                                    <div class="card-header bg-info bg-opacity-25 border-info border-1 border-opacity-25 text-muted">
-                                        <div>
-                                            <div style="float:left">
-                                                <span class="badge bg-info" style="float:right">Inscrito(a)</span>
-                                            </div>
-                                        </div>
-                                        <br />
-                                        <div class="justify-content-center mt-3 text-secondary">
-                                            <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                            <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
-                                        </div>
+                            <div class="col-12 col-md-6 mb-4 module-card-item">
+                                <div id="@grupo.idGrupo" class="card h-100 text-center" style="opacity:@visible">
+                                    <div class="card-header module-enrolled-header">
+                                        <div><div><span class="badge bg-info"><i class="bi bi-check-circle" aria-hidden="true"></i> Inscrito(a)</span></div></div>
                                     </div>
-                                    <div class="card-body align-content-center bg-info bg-opacity-10 border-info border-0 border-opacity-50">
-                                        <div class="mb-3"><h4>@grupo.nombre</h4></div>
-                                            @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                <div class="card-body module-card-body">
+                                    <div class="module-card-heading"><h4>@grupo.nombre</h4></div>
+                                    <div class="module-card-dates">
+                                        <div><i class="bi bi-calendar-event" aria-hidden="true"></i><span><small>Fecha de inicio</small><time>@grupo.fechaInicioGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                        <div><i class="bi bi-calendar-check" aria-hidden="true"></i><span><small>Fin del módulo</small><time>@grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                    {
+                                        <div class="card-text module-card-description" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
+                                            @grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))
+                                            @if (grupo.descripcion.Length > 250)
                                             {
-                                                <div class="card-text mb-3" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
-                                                    @grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))
-                                                    @if (grupo.descripcion.Length > 250)
-                                                    {
-                                                        <span class="dots">...</span>
-                                                        <span class="more" style="display:none;">@grupo.descripcion.Substring(250)</span>
-                                                        <button class="btn btn-link p-0 see-more-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMore(this)">Ver más</button>
-                                                    }
-                                                </div>
+                                                <span class="dots">...</span>
+                                                <span class="more" style="display:none;">@grupo.descripcion.Substring(250)</span>
+                                                <button class="btn btn-link p-0 see-more-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMore(this)">Ver más</button>
                                             }
-                                        <div class="card-text mb-3">Número de grupo: @grupo.numeroGrupo</div>
-                                        <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
+                                        </div>
+                                    }
+                                    <div class="module-card-details">
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-people" aria-hidden="true"></i>Número de grupo</span>
+                                            <span class="module-card-detail-value">@grupo.numeroGrupo</span>
+                                        </div>
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-clock" aria-hidden="true"></i>Cantidad de horas</span>
+                                            <span class="module-card-detail-value">@grupo.cantidadHoras</span>
+                                        </div>
                                         @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                         {
-                                            <div class="card-text mb-3">Facilitador(a): @grupo.nombreAsesor</div>
+                                            <div class="module-card-detail module-card-detail-wide">
+                                                <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador(a)</span>
+                                                <span class="module-card-detail-value">@grupo.nombreAsesor</span>
+                                            </div>
                                         }
                                         else
                                         {
                                             @if (grupo.modalidad == "Autogestionado")
                                             {
-                                                    <div class="card-text mb-3">Facilitador: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                                <div class="module-card-detail module-card-detail-wide">
+                                                    <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador</span>
+                                                    <span class="module-card-detail-value">Equipo del Área de Asesoría Docente de la Unidad METICS</span>
+                                                </div>
                                             }
                                         }
-                                        <div class="card-text mb-3">
-                                            Área(s) de competencia:
-                                            @if (grupo.TemasSeleccionadosNombres != null)
-                                            {
-                                                @String.Join(", ", grupo.TemasSeleccionadosNombres)
-                                            }
-                                            else
-                                            {
-                                                <span>No hay temas asociados.</span>
-                                            }
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-journal-bookmark" aria-hidden="true"></i>Área(s) de competencia</span>
+                                            <span class="module-card-detail-value">
+                                                @if (grupo.TemasSeleccionadosNombres != null)
+                                                {
+                                                    @String.Join(", ", grupo.TemasSeleccionadosNombres)
+                                                }
+                                                else
+                                                {
+                                                    <span>No hay temas asociados.</span>
+                                                }
+                                            </span>
                                         </div>
-                                        <div class="card-text mb-3">@grupo.nombreCategoria</div>
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i>Nivel</span>
+                                            <span class="module-card-detail-value">@grupo.nombreCategoria</span>
+                                        </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="card-text mb-3">
-                                                <strong><a href="@grupo.enlace" target="_blank">Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-link module-card-detail-wide">
+                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
                                             </div>
                                         }
-
-      
-                                        <div class="mt-3">
-                                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</button>
-                                        </div>
-@*                                      <div class="mt-2">
-                                            @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
-                                        </div> *@
                                     </div>
-                                    <div class="card-footer bg-info bg-opacity-25 border-info border-1 border-opacity-25 text-muted">
+
+
+                                    <div class="module-card-actions module-enrolled-actions">
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
+                                    </div>
+                                </div>
+                                    <div class="card-footer text-muted">
+                                        <span class="module-card-location"><i class="bi bi-geo-alt" aria-hidden="true"></i>
                                         @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
                                         {
                                             @grupo.lugar
@@ -153,8 +165,8 @@
                                         {
                                                 @EnumHelper.GetDisplayName(grupo.modalidad)
                                         }
-                                        <br />
-                                        @grupo.horario
+                                        </span>
+                                        <span class="module-card-schedule"><i class="bi bi-clock" aria-hidden="true"></i>@grupo.horario</span>
                                     </div>
                                 </div>
                             </div>
@@ -172,7 +184,7 @@
                             {
                                 visible = "0.5";
                             }
-                            <div class="col-12 mb-3 ">
+                            <div class="col-12 mb-3 module-card-item">
                                 <div id="@grupo.idGrupo" class="list-group" style="opacity:@visible">
                                     <div class="list-group-item border rounded shadow-sm" style="background-color: #e6fafd;">
                                         <div class="d-flex card-header justify-content-between align-items-start">
@@ -190,20 +202,20 @@
                                             <div class="card-body d-flex flex-column align-items-center text-center text-secondary">
                                                 <div class="justify-content-center mt-0 text-secondary">
                                                     <div class="mb-3">
-                                                        <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                                        <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
+                                                        <i class="bi bi-calendar-event" aria-hidden="true"></i> <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
+                                                        <i class="bi bi-calendar-check" aria-hidden="true"></i> <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
                                                     </div>
                                                     <div class="mb-3">
-                                                        <strong>Horario: </strong> @grupo.horario
+                                                        <i class="bi bi-clock" aria-hidden="true"></i> <strong>Horario: </strong> @grupo.horario
                                                     </div>
                                                     <div class="mb-0">
                                                         @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
                                                         {
-                                                            <strong>Lugar: </strong> @grupo.lugar
+                                                            <i class="bi bi-geo-alt" aria-hidden="true"></i> <strong>Lugar: </strong> @grupo.lugar
                                                         }
                                                         else
                                                         {
-                                                            <strong>Modalidad: </strong> @EnumHelper.GetDisplayName(grupo.modalidad)
+                                                            <i class="bi bi-geo-alt" aria-hidden="true"></i> <strong>Modalidad: </strong> @EnumHelper.GetDisplayName(grupo.modalidad)
                                                         }
                                                     </div>
                                                 </div>
@@ -220,21 +232,21 @@
                                                         }
                                                     </div>
                                                 }
-                                                <div class="card-text mb-3"><strong>Número de grupo:</strong> @grupo.numeroGrupo</div>
-                                                <div class="card-text mb-3"><strong>Cantidad de horas:</strong> @grupo.cantidadHoras</div>
+                                                <div class="card-text mb-3"><i class="bi bi-people" aria-hidden="true"></i> <strong>Número de grupo:</strong> @grupo.numeroGrupo</div>
+                                                <div class="card-text mb-3"><i class="bi bi-clock" aria-hidden="true"></i> <strong>Cantidad de horas:</strong> @grupo.cantidadHoras</div>
                                                 @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                                 {
-                                                    <div class="card-text mb-3"><strong>Facilitador(a):</strong> @grupo.nombreAsesor</div>
+                                                    <div class="card-text mb-3"><i class="bi bi-person-badge" aria-hidden="true"></i> <strong>Facilitador(a):</strong> @grupo.nombreAsesor</div>
                                                 }
                                                 else
                                                 {
                                                     @if (grupo.modalidad == "Autogestionado")
                                                     {
-                                                        <div class="card-text mb-3"><strong>Facilitador:</strong> Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                                        <div class="card-text mb-3"><i class="bi bi-person-badge" aria-hidden="true"></i> <strong>Facilitador:</strong> Equipo del Área de Asesoría Docente de la Unidad METICS</div>
                                                     }
                                                 }
                                                 <div class="card-text mb-3">
-                                                    <strong>Área(s) de competencia:</strong>
+                                                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i> <strong>Área(s) de competencia:</strong>
                                                     @if (grupo.TemasSeleccionadosNombres != null)
                                                     {
                                                         @String.Join(", ", grupo.TemasSeleccionadosNombres)
@@ -244,7 +256,7 @@
                                                         <span>No hay temas asociados.</span>
                                                     }
                                                 </div>
-                                                <div class="card-text mb-3"><strong>@grupo.nombreCategoria</strong></div>
+                                                <div class="card-text mb-3"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> <strong>@grupo.nombreCategoria</strong></div>
                                                 @if (!string.IsNullOrEmpty(grupo.enlace))
                                                 {
                                                     <div class="card-text mb-3">
@@ -256,7 +268,7 @@
                                             </div>
                                         </div>
                                         <div class="mt-3 align-items-center text-center">
-                                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</button>
+                                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
                                         </div>
 @*                                         <div class="mt-2">
                                             <div class="d-flex align-items-center justify-content-center">
@@ -318,7 +330,7 @@
                     if (visibleInicialmente)
                     {
                         var visibleStyle = grupo.esVisible == false ? "opacity:0.5" : "";
-                        <div class="col-12 col-md-6 mb-4 module-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
+                        <div class="col-12 col-md-6 mb-4 module-item module-card-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
                             <div class="card h-100 text-center mb-1">
                                 <div class="card-header">
                                     <div>
@@ -363,16 +375,16 @@
                                         }
                                     </div>
                                     <br />
-                                    <div class="justify-content-center mt-3 text-secondary">
-                                        <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                        <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
-                                    </div>
                                 </div>
-                                <div class="card-body align-content-center">
-                                    <div class="mb-3"><h4>@grupo.nombre</h4></div>
+                                <div class="card-body module-card-body">
+                                    <div class="module-card-heading"><h4>@grupo.nombre</h4></div>
+                                    <div class="module-card-dates">
+                                        <div><i class="bi bi-calendar-event" aria-hidden="true"></i><span><small>Fecha de inicio</small><time>@grupo.fechaInicioGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                        <div><i class="bi bi-calendar-check" aria-hidden="true"></i><span><small>Fin del módulo</small><time>@grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                    </div>
                                     @if (!string.IsNullOrEmpty(grupo.descripcion))
                                     {
-                                        <div class="card-text mb-3" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
+                                        <div class="card-text module-card-description" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
                                             @grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))
                                             @if (grupo.descripcion.Length > 250)
                                             {
@@ -382,40 +394,59 @@
                                             }
                                         </div>
                                     }
-                                    <div class="card-text mb-3">Número de grupo: @grupo.numeroGrupo</div>
-                                    <div class="card-text mb-3">Cantidad de horas: @grupo.cantidadHoras</div>
-                                    @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
-                                    {
-                                        <div class="card-text mb-3">Facilitador(a): @grupo.nombreAsesor</div>
-                                    }
-                                    else
-                                    {
-                                        @if (grupo.modalidad == "Autogestionado")
+                                    <div class="module-card-details">
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-people" aria-hidden="true"></i>Número de grupo</span>
+                                            <span class="module-card-detail-value">@grupo.numeroGrupo</span>
+                                        </div>
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-clock" aria-hidden="true"></i>Cantidad de horas</span>
+                                            <span class="module-card-detail-value">@grupo.cantidadHoras</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                         {
-                                            <div class="card-text mb-3">Facilitador: Equipo del Área de Asesoría Docente de la Unidad METICS</div>
-                                        }
-                                    }
-                                    <div class="card-text mb-3">
-                                        Área(s) de competencia:
-                                        @if (grupo.TemasSeleccionadosNombres != null)
-                                        {
-                                            @String.Join(", ", grupo.TemasSeleccionadosNombres)
+                                            <div class="module-card-detail module-card-detail-wide">
+                                                <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador(a)</span>
+                                                <span class="module-card-detail-value">@grupo.nombreAsesor</span>
+                                            </div>
                                         }
                                         else
                                         {
-                                            <span>No hay temas asociados.</span>
+                                            @if (grupo.modalidad == "Autogestionado")
+                                            {
+                                                <div class="module-card-detail module-card-detail-wide">
+                                                    <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador</span>
+                                                    <span class="module-card-detail-value">Equipo del Área de Asesoría Docente de la Unidad METICS</span>
+                                                </div>
+                                            }
+                                        }
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-journal-bookmark" aria-hidden="true"></i>Área(s) de competencia</span>
+                                            <span class="module-card-detail-value">
+                                                @if (grupo.TemasSeleccionadosNombres != null)
+                                                {
+                                                    @String.Join(", ", grupo.TemasSeleccionadosNombres)
+                                                }
+                                                else
+                                                {
+                                                    <span>No hay temas asociados.</span>
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i>Nivel</span>
+                                            <span class="module-card-detail-value">@grupo.nombreCategoria</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(grupo.enlace))
+                                        {
+                                            <div class="module-card-link module-card-detail-wide">
+                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            </div>
                                         }
                                     </div>
-                                    <div class="card-text mb-3">@grupo.nombreCategoria</div>
-                                    @if (!string.IsNullOrEmpty(grupo.enlace))
-                                    {
-                                        <div class="card-text mb-3">
-                                            <strong><a href="@grupo.enlace" target="_blank">Enlace de Mediación Virtual</a></strong>
-                                        </div>
-                                    }
 
 
-                                    <div class="mt-3">
+                                    <div class="module-card-actions">
                                         @if (ViewBag.Role == 1)
                                         {
                                             <div class="mb-3">
@@ -479,6 +510,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted bg-primary bg-opacity-25 border-primary border-1 border-opacity-25">
+                                    <span class="module-card-location"><i class="bi bi-geo-alt" aria-hidden="true"></i>
                                     @if (string.Equals(grupo.modalidad, "Presencial", StringComparison.OrdinalIgnoreCase))
                                     {
                                         @grupo.lugar
@@ -487,8 +519,8 @@
                                     {
                                         @EnumHelper.GetDisplayName(grupo.modalidad)
                                     }
-                                    <br />
-                                    @grupo.horario
+                                    </span>
+                                    <span class="module-card-schedule"><i class="bi bi-clock" aria-hidden="true"></i>@grupo.horario</span>
                                 </div>
                             </div>
                         </div>
@@ -510,7 +542,7 @@
                     if (visibleInicialmente)
                     {
                         var visibleStyle = grupo.esVisible == false ? "opacity:0.5" : "";
-                        <div class="col-12 mb-3 list-group module-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
+                        <div class="col-12 mb-3 list-group module-item module-card-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
                             <div class="list-group-item border rounded shadow-sm">
                                 <div class="d-flex card-header justify-content-between align-items-start">
                                     <h4 class="mb-2">@grupo.nombre</h4>

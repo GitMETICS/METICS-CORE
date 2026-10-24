@@ -1,4 +1,4 @@
-﻿.navbar-custom {
+.navbar-custom {
     background: #f4f4f4;
 }
 
@@ -692,6 +692,442 @@
 
     .module-toolbar-controls .module-view-toggle::before {
         display: none;
+    }
+}
+
+/* Tarjetas del catálogo: jerarquía clara con los mismos tonos institucionales. */
+:is(#gridView, #gridView0) .module-card-item > .card {
+    border: 1px solid #d9e2ed;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(24, 52, 84, 0.07);
+    overflow: hidden;
+    transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+:is(#gridView, #gridView0) .module-card-item > .card:hover {
+    box-shadow: 0 8px 20px rgba(24, 52, 84, 0.12);
+    transform: translateY(-2px);
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header {
+    background: #fff;
+    border-bottom: 0;
+    padding: 20px 24px 10px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div {
+    float: none !important;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:first-child {
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header .badge {
+    border-radius: 12px;
+    float: none !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0 !important;
+    padding: 7px 10px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header .badge.bg-info {
+    background: #dff2ff !important;
+    color: #075ca8;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header .badge.bg-danger {
+    background: #ffe1e6 !important;
+    color: #bd1738;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child .bi-eye-slash {
+    color: #bd1738 !important;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 10px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child a,
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child i {
+    color: #48617d !important;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0 !important;
+    text-decoration: none;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child a:hover,
+:is(#gridView, #gridView0) .module-card-item .card-header > div:first-child > div:last-child i:hover {
+    color: #095998 !important;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > br {
+    display: none;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-header > .justify-content-center {
+    color: #52657c !important;
+    font-size: 0.9rem;
+    margin: 12px 0 0 !important;
+    text-align: center;
+}
+
+:is(#gridView, #gridView0) .module-card-item > .card > .card-body {
+    padding: 22px 24px 20px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-body {
+    align-content: initial !important;
+    display: flex;
+    flex-direction: column;
+    text-align: left !important;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-heading {
+    margin-bottom: 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    border-bottom: 1px solid #e5eaf1;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates > div {
+    align-items: center;
+    display: flex;
+    gap: 9px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates > div + div {
+    border-left: 1px solid #dbe7f5;
+    padding-left: 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates .bi {
+    background: #eaf3fd;
+    border-radius: 8px;
+    color: #095998;
+    padding: 9px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates small,
+:is(#gridView, #gridView0) .module-card-dates time {
+    display: block;
+}
+
+:is(#gridView, #gridView0) .module-card-dates small {
+    color: #64758a;
+    font-size: 12px;
+}
+
+:is(#gridView, #gridView0) .module-card-dates time {
+    color: #24364b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-body h4 {
+    color: #14243a;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0;
+    text-align: left;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-description {
+    color: #40536a;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0 0 18px !important;
+    max-width: 66ch;
+    padding: 0 !important;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-details {
+    display: grid;
+    gap: 0;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 2px 0 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-detail {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #e6eef7;
+    border-radius: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 0.48fr) minmax(0, 0.52fr);
+    gap: 12px;
+    min-width: 0;
+    padding: 9px 0;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-detail-wide {
+    grid-column: 1 / -1;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-detail-label {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 10px;
+    color: #526b88;
+    font-size: 0.88rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-transform: none;
+}
+
+:is(#gridView, #gridView0) .module-card-detail-label .bi {
+    align-items: center;
+    background: #edf5ff;
+    border-radius: 10px;
+    color: #095998;
+    display: inline-flex;
+    font-size: 19px;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-detail-value {
+    color: #24364b;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-link {
+    border-bottom: 1px solid #e6eef7;
+    padding: 12px 0;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    margin-top: auto !important;
+    border-top: 1px solid #e5eaf1;
+    padding-top: 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-item .module-card-actions > div {
+    flex: 1 1 0;
+    margin: 0 !important;
+    min-width: 0;
+}
+
+:is(#gridView, #gridView0) .module-card-actions > div > a {
+    align-items: center;
+    display: flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    justify-content: center;
+    min-height: 44px;
+    padding: 9px 12px;
+    width: 100%;
+}
+
+:is(#gridView, #gridView0) .module-card-actions > div > a.link {
+    border: 1px solid #0d6efd;
+    border-radius: 8px;
+    gap: 8px;
+}
+
+:is(#gridView, #gridView0) .module-card-actions > div > a.link:hover {
+    background: #edf5ff;
+}
+
+:is(#gridView, #gridView0) .module-card-item .card-body .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 9px 16px;
+}
+
+:is(#gridView, #gridView0) .module-card-item > .card > .card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    justify-content: space-between;
+    background: #eef5fc !important;
+    border: 0;
+    border-top: 1px solid #dbe7f5 !important;
+    color: #40536a !important;
+    line-height: 1.55;
+    padding: 12px 18px;
+}
+
+:is(#gridView, #gridView0) .module-card-location,
+:is(#gridView, #gridView0) .module-card-schedule {
+    align-items: center;
+    display: inline-flex;
+    gap: 7px;
+    text-align: left;
+}
+
+:is(#gridView, #gridView0) .module-card-location,
+:is(#gridView, #gridView0) .module-card-schedule {
+    flex: 1 1 0;
+    font-size: 0.88rem;
+}
+
+:is(#gridView, #gridView0) .module-card-schedule {
+    border-left: 1px solid #cddff2;
+    padding-left: 16px;
+}
+
+:is(#listView, #listView0) .module-card-item > .list-group-item,
+#listView0 .module-card-item > .list-group > .list-group-item {
+    background: #fff !important;
+    border: 1px solid #d9e2ed;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(24, 52, 84, 0.07);
+    padding: 20px 22px;
+}
+
+#gridView0 .module-enrolled-actions > .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+    min-height: 44px;
+    width: 100%;
+}
+
+#gridView0 .module-enrolled-header .badge .bi {
+    color: #075ca8 !important;
+    font-size: 12px !important;
+}
+
+#listView0 .more-info .card-body {
+    align-items: stretch !important;
+    text-align: left !important;
+}
+
+#listView0 .more-info .card-text {
+    border-bottom: 1px solid #e6eef7;
+    line-height: 1.6;
+    padding: 10px 0;
+    width: 100%;
+}
+
+#listView0 .more-info .bi {
+    color: #095998;
+    margin-right: 6px;
+}
+
+#listView0 .badge.bg-info {
+    background: #dff2ff !important;
+    border-radius: 12px;
+    color: #075ca8;
+    padding: 7px 10px;
+}
+
+#listView0 .btn-secondary {
+    background: #fff;
+    border-color: #6c757d;
+    border-radius: 8px;
+    color: #52657c;
+    padding: 9px 18px;
+}
+
+#listView0 .btn-secondary:hover {
+    background: #f2f5fa;
+}
+
+:is(#listView, #listView0) .module-card-item .card-header {
+    background: transparent;
+    border: 0;
+    padding: 0 0 12px;
+}
+
+:is(#listView, #listView0) .module-card-item .card-header h4 {
+    color: #14243a;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+:is(#listView, #listView0) .module-card-item .more-info .card-body {
+    color: #40536a !important;
+    padding: 18px 8px 8px;
+}
+
+@media (max-width: 575.98px) {
+    :is(#gridView, #gridView0) .module-card-item > .card > .card-body {
+        padding: 20px 16px 18px;
+    }
+
+    :is(#gridView, #gridView0) .module-card-item .card-header {
+        padding: 14px 14px 12px;
+    }
+
+    :is(#gridView, #gridView0) .module-card-item .module-card-details {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :is(#gridView, #gridView0) .module-card-dates {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :is(#gridView, #gridView0) .module-card-dates > div + div {
+        border-left: 0;
+        padding-left: 0;
+    }
+
+    :is(#gridView, #gridView0) .module-card-item .module-card-detail {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 5px;
+    }
+
+    :is(#gridView, #gridView0) .module-card-detail-value {
+        padding-left: 46px;
+    }
+
+    :is(#gridView, #gridView0) .module-card-item .module-card-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    :is(#gridView, #gridView0) .module-card-location,
+    :is(#gridView, #gridView0) .module-card-schedule {
+        flex-basis: 100%;
+    }
+
+    :is(#gridView, #gridView0) .module-card-schedule {
+        border-left: 0;
+        padding-left: 0;
+    }
+
+    :is(#listView, #listView0) .module-card-item > .list-group-item {
+        padding: 16px;
     }
 }
 
