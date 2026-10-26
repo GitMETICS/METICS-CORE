@@ -146,8 +146,57 @@
     justify-content: flex-end;
     padding: 24px 0 8px;
 }
-.metics-page-actions + .contenedor-caja {
+.metics-page-actions + .contenedor-caja,
+.metics-page-context + .contenedor-caja {
     margin-top: 20px;
+}
+.metics-page-context {
+    align-items: center;
+    display: flex;
+    gap: 16px 24px;
+    justify-content: space-between;
+    padding: 28px 0 12px;
+}
+.metics-page-context .metics-page-actions { flex-shrink: 0; margin-left: auto; padding: 0; }
+.metics-breadcrumbs { min-width: 0; }
+.metics-breadcrumbs ol {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.metics-breadcrumbs li { align-items: center; display: inline-flex; gap: 12px; min-width: 0; }
+.metics-breadcrumbs li + li::before {
+    border-right: 1px solid #8da0b6;
+    border-top: 1px solid #8da0b6;
+    content: '';
+    flex: 0 0 5px;
+    height: 5px;
+    transform: rotate(45deg);
+    width: 5px;
+}
+.metics-breadcrumbs a,
+.metics-breadcrumbs span {
+    align-items: center;
+    color: #58718c;
+    display: inline;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+.metics-breadcrumbs .bi { font-size: 14px; margin-right: 6px; }
+.metics-breadcrumbs a:hover { color: #245b94; text-decoration: underline; }
+.metics-breadcrumbs a:focus-visible { border-radius: 3px; outline: 2px solid #245b94; outline-offset: 3px; }
+.metics-breadcrumbs .metics-breadcrumb-current { color: #24364b; font-weight: 600; }
+@media (max-width: 575.98px) {
+    .metics-page-context { align-items: flex-start; flex-direction: column; gap: 12px; padding-top: 20px; }
+    .metics-page-context .metics-page-actions { margin-left: 0; }
+    .metics-breadcrumbs ol { gap: 6px 9px; }
+    .metics-breadcrumbs li { gap: 9px; }
 }
 .metics-create-module {
     align-items: center;
@@ -181,7 +230,6 @@
     .metics-tabs-left { flex: 1 1 0; justify-content: center; }
     .metics-tabs-nav { gap: 0; justify-content: center; max-width: 1000px; width: 100%; }
     .metics-tabs-nav > .metics-tab { flex: var(--metics-section-weight, 1) 1 0; min-width: 0; }
-    .metics-section-home { --metics-section-weight: .45; max-width: 110px; }
     .metics-section-academic { --metics-section-weight: 1.15; }
     .metics-section-people { --metics-section-weight: 1.2; }
     .metics-section-inscriptions { --metics-section-weight: 1.15; }

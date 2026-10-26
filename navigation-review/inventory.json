@@ -1,0 +1,4196 @@
+{
+  "items": [
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 53,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "MisModulos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "BuscarGrupos",
+      "verb": "ANY",
+      "params": "string searchTerm",
+      "returns": "IActionResult",
+      "line": 127,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "MisModulos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "ListaAsesores",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 167,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaAsesores",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "CrearAsesor",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 198,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearAsesor",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/ListaAsesores.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "AgregarAsesor",
+      "verb": "POST",
+      "params": "AsesorModel asesor",
+      "returns": "ActionResult",
+      "line": 232,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearAsesor",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearAsesor",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaAsesores\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/CrearAsesor.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "EditarAsesor",
+      "verb": "ANY",
+      "params": "string idAsesor",
+      "returns": "ActionResult",
+      "line": 301,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarAsesor",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaAsesores\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/ListaAsesores.cshtml",
+        "webMetics/Views/Usuario/InformacionPersonal.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "ActualizarAsesor",
+      "verb": "POST",
+      "params": "AsesorModel asesor",
+      "returns": "ActionResult",
+      "line": 335,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarAsesor",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarAsesor",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaAsesores\")",
+        "\"InformacionPersonal\", \"Usuario\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/EditarAsesor.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "EliminarAsesor",
+      "verb": "ANY",
+      "params": "string idAsesor",
+      "returns": "ActionResult",
+      "line": 501,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaAsesores\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/ListaAsesores.cshtml"
+      ]
+    },
+    {
+      "controller": "Asesor",
+      "action": "PuedeEliminarAsesor",
+      "verb": "ANY",
+      "params": "string idAsesor",
+      "returns": "bool",
+      "line": 533,
+      "file": "webMetics/Controllers/AsesorController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "VerCalificaciones",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 65,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerCalificaciones",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Calificaciones/EditarCalificacion.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "EditarCalificacion",
+      "verb": "ANY",
+      "params": "int idGrupo, string idParticipante",
+      "returns": "ActionResult",
+      "line": 101,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarCalificacion",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirHorasAprobadasYCalificacion",
+      "verb": "POST",
+      "params": "int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0",
+      "returns": "ActionResult",
+      "line": 133,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerDatosParticipante\", \"Participante\", new { idParticipante })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerDatosParticipante.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirHorasAprobadasYCalificacionAjax",
+      "verb": "POST",
+      "params": "int idGrupo, string idParticipante, int horasAprobadas = -1, int calificacion = -1",
+      "returns": "Task<IActionResult>",
+      "line": 192,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirCalificacion",
+      "verb": "POST",
+      "params": "int idGrupo, string idParticipante, int calificacion",
+      "returns": "ActionResult",
+      "line": 310,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerCalificaciones\", \"Calificaciones\", new { idGrupo = idGrupo })"
+      ],
+      "incoming": [
+        "webMetics/Views/Calificaciones/EditarCalificacion.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirExcelCalificaciones",
+      "verb": "POST",
+      "params": "IFormFile file, int idGrupo",
+      "returns": "Task<IActionResult>",
+      "line": 351,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaParticipantes\", \"Participante\", new { idGrupo = idGrupo })"
+      ],
+      "incoming": [
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "DescargarPlantillaSubirCalificaciones",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 537,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesPDF",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 619,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesWord",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 683,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesExcel",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 745,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "EnviarCalificacionesAlCorreo",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 883,
+      "file": "webMetics/Controllers/CalificacionesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaParticipantes\", \"Participante\", new { idGrupo })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "ListaCategorias",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 57,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaCategorias",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "CrearCategoria",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 75,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearCategoria",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Categoria/CrearCategoria.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "CrearCategoria",
+      "verb": "POST",
+      "params": "CategoriaModel categoria",
+      "returns": "ActionResult",
+      "line": 93,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearCategoria",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaCategorias\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Categoria/CrearCategoria.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "EditarCategoria",
+      "verb": "ANY",
+      "params": "int idCategoria",
+      "returns": "ActionResult",
+      "line": 125,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarCategoria",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Categoria/EditarCategoria.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "EditarCategoria",
+      "verb": "POST",
+      "params": "CategoriaModel categoria",
+      "returns": "ActionResult",
+      "line": 145,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarCategoria",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaCategorias\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Categoria/EditarCategoria.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml"
+      ]
+    },
+    {
+      "controller": "Categoria",
+      "action": "EliminarCategoria",
+      "verb": "ANY",
+      "params": "int idCategoria",
+      "returns": "ActionResult",
+      "line": 178,
+      "file": "webMetics/Controllers/CategoriaController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaCategorias\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Categoria/ListaCategorias.cshtml"
+      ]
+    },
+    {
+      "controller": "Cookies",
+      "action": "CreateCookie",
+      "verb": "ANY",
+      "params": "string cookieName, string cookieValue, DateTimeOffset expirationTime",
+      "returns": "IActionResult",
+      "line": 26,
+      "file": "webMetics/Controllers/CookiesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Cookies",
+      "action": "UpdateCookie",
+      "verb": "ANY",
+      "params": "string cookieName, string value",
+      "returns": "IActionResult",
+      "line": 40,
+      "file": "webMetics/Controllers/CookiesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Cookies",
+      "action": "DeleteCookie",
+      "verb": "ANY",
+      "params": "string cookieName",
+      "returns": "IActionResult",
+      "line": 60,
+      "file": "webMetics/Controllers/CookiesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Cookies",
+      "action": "FetchCookieValue",
+      "verb": "ANY",
+      "params": "string cookieName",
+      "returns": "string",
+      "line": 70,
+      "file": "webMetics/Controllers/CookiesController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "Index",
+      "verb": "ANY",
+      "params": "",
+      "returns": "IActionResult",
+      "line": 65,
+      "file": "webMetics/Controllers/EmailSettingsController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "Index",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "ToggleEmailSending",
+      "verb": "POST",
+      "params": "bool isEnabled",
+      "returns": "IActionResult",
+      "line": 90,
+      "file": "webMetics/Controllers/EmailSettingsController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"Index\")"
+      ],
+      "incoming": [
+        "webMetics/Views/EmailSettings/Index.cshtml"
+      ]
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "UpdateNotificationEmail",
+      "verb": "POST",
+      "params": "string correoLimiteHoras",
+      "returns": "ActionResult",
+      "line": 140,
+      "file": "webMetics/Controllers/EmailSettingsController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"Index\", \"EmailSettings\")"
+      ],
+      "incoming": [
+        "webMetics/Views/EmailSettings/Index.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 87,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaGruposDisponibles",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/ListaAsesores.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml",
+        "webMetics/Views/EmailSettings/Index.cshtml",
+        "webMetics/Views/Grupo/CrearGrupo.cshtml",
+        "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+        "webMetics/Views/Grupo/VerAdjunto.cshtml",
+        "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Medallas/ListaMedallas.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Tema/CrearTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+        "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml",
+        "webMetics/Views/Usuario/InformacionPersonal.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "BuscarGrupos",
+      "verb": "ANY",
+      "params": "string searchTerm, int userRole, string userId",
+      "returns": "IActionResult",
+      "line": 205,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaGruposDisponibles",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "DescargarArchivo",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 318,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+        "webMetics/Views/Grupo/EditarGrupo.cshtml",
+        "webMetics/Views/Grupo/VerAdjunto.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 341,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/CrearGrupo.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "verb": "POST",
+      "params": "GrupoModel grupo, int[] temasSeleccionados",
+      "returns": "ActionResult",
+      "line": 382,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "CrearGrupo",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/CrearGrupo.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "EliminarGrupo",
+      "verb": "ANY",
+      "params": "int? idGrupo",
+      "returns": "ActionResult",
+      "line": 485,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 522,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaGruposDisponibles\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarGrupo",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 564,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/EditarGrupo.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarGrupo",
+      "verb": "POST",
+      "params": "GrupoModel grupo, int[] temasSeleccionados",
+      "returns": "ActionResult",
+      "line": 623,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "EditarGrupo",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"EditarGrupo\", new { idGrupo = grupo.idGrupo })",
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/EditarGrupo.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "VerAdjunto",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 736,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerAdjunto",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\")"
+      ],
+      "incoming": []
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarAdjunto",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 779,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarAdjunto",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Grupo/EditarAdjunto.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarAdjunto",
+      "verb": "POST",
+      "params": "GrupoModel grupo",
+      "returns": "ActionResult",
+      "line": 824,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"EditarAdjunto\", new { idGrupo = grupo.idGrupo })",
+        "\"ListaGruposDisponibles\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Grupo/EditarAdjunto.cshtml"
+      ]
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarTemas",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 870,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarTemas",
+          "partial": false,
+          "exists": false
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": []
+    },
+    {
+      "controller": "Grupo",
+      "action": "GuardarTemasAsociados",
+      "verb": "POST",
+      "params": "int idGrupo, int[] TemasSeleccionados",
+      "returns": "ActionResult",
+      "line": 922,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"EditarGrupo\", new { idGrupo })",
+        "\"EditarTemas\", new { idGrupo })"
+      ],
+      "incoming": []
+    },
+    {
+      "controller": "Grupo",
+      "action": "CopiarGrupo",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 959,
+      "file": "webMetics/Controllers/GrupoController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Home",
+      "action": "Index",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 27,
+      "file": "webMetics/Controllers/HomeController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Home",
+      "action": "ThrowTest",
+      "verb": "GET",
+      "params": "",
+      "returns": "IActionResult",
+      "line": 37,
+      "file": "webMetics/Controllers/HomeController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Home",
+      "action": "Error",
+      "verb": "ANY",
+      "params": "",
+      "returns": "IActionResult",
+      "line": 43,
+      "file": "webMetics/Controllers/HomeController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "Error",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ListaDeParticipantesInscritos",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 64,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaDeParticipantesInscritos",
+          "partial": false,
+          "exists": false
+        }
+      ],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "verb": "ANY",
+      "params": "bool reload = false, string? searchTerm = null",
+      "returns": "ActionResult",
+      "line": 90,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerInscripciones",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ObtenerInscripcionesPaginadas",
+      "verb": "GET",
+      "params": "",
+      "returns": "Task<IActionResult>",
+      "line": 113,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "BuscarInscripciones",
+      "verb": "ANY",
+      "params": "string searchTerm",
+      "returns": "IActionResult",
+      "line": 171,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "nameof(VerInscripciones), new { searchTerm })"
+      ],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcion",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 187,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioInscripcion",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcion",
+      "verb": "POST",
+      "params": "InscripcionModel inscripcion",
+      "returns": "ActionResult",
+      "line": 214,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioInscripcion",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerInscripciones\", \"Inscripcion\", new { reload = true })"
+      ],
+      "incoming": [
+        "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 255,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioInscripcionManual",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+        "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "verb": "POST",
+      "params": "InscripcionModel inscripcion",
+      "returns": "Task<IActionResult>",
+      "line": 284,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioInscripcionManual",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"MisModulos\", \"Asesor\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+        "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "verb": "ANY",
+      "params": "int idGrupo, string idParticipante",
+      "returns": "ActionResult",
+      "line": 337,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "Inscribir",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "InscribirManualmente",
+      "verb": "ANY",
+      "params": "int idGrupo, string idParticipante",
+      "returns": "Task<IActionResult>",
+      "line": 468,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "InscribirManualmente",
+          "partial": false,
+          "exists": false
+        },
+        {
+          "name": "InscribirManualmente",
+          "partial": false,
+          "exists": false
+        }
+      ],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcion",
+      "verb": "POST",
+      "params": "string nombreGrupo, int numeroGrupo, string idParticipante",
+      "returns": "ActionResult",
+      "line": 585,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcionesMasivo",
+      "verb": "POST",
+      "params": "List<string> participantesSeleccionados, string nombreGrupo, int numeroGrupo",
+      "returns": "ActionResult",
+      "line": 640,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "DesinscribirParticipante",
+      "verb": "ANY",
+      "params": "string idParticipante, int idGrupo",
+      "returns": "ActionResult",
+      "line": 719,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ConstructorDelMensajeNotificacionInscripcion",
+      "verb": "ANY",
+      "params": "GrupoModel grupo, ParticipanteModel participante",
+      "returns": "string",
+      "line": 778,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "DescargarPlantillaSubirInscripciones",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 823,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "SubirArchivoExcelInscripciones",
+      "verb": "POST",
+      "params": "IFormFile file",
+      "returns": "Task<IActionResult>",
+      "line": 864,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerInscripciones\")",
+        "\"VerInscripciones\", \"Inscripcion\", new { reload = true })"
+      ],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarParticipantesPDF",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1001,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarParticipantesWord",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1129,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarParticipantesExcel",
+      "verb": "ANY",
+      "params": "int idGrupo, string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1250,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesPDF",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1418,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesWord",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1512,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesExcel",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 1606,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml"
+      ]
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "CambiarEstadoInscritoAIncompleto",
+      "verb": "POST",
+      "params": "List<string> participantesSeleccionados, int idGrupo",
+      "returns": "ActionResult",
+      "line": 1832,
+      "file": "webMetics/Controllers/InscripcionController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaParticipantes\", \"Participante\", new { idGrupo = idGrupo })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "ListaMedallas",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 65,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaMedallas",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Medallas/EditarMedalla.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "SubirMedalla",
+      "verb": "POST",
+      "params": "IFormFile imageFile",
+      "returns": "Task<IActionResult>",
+      "line": 90,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaMedallas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Medallas/ListaMedallas.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "EditarMedalla",
+      "verb": "ANY",
+      "params": "string nombreMedalla",
+      "returns": "ActionResult",
+      "line": 141,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarMedalla",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Medallas/EditarMedalla.cshtml",
+        "webMetics/Views/Medallas/ListaMedallas.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "EditarMedalla",
+      "verb": "POST",
+      "params": "string nombreMedalla, IFormFile imageFile",
+      "returns": "Task<IActionResult>",
+      "line": 162,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaMedallas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Medallas/EditarMedalla.cshtml",
+        "webMetics/Views/Medallas/ListaMedallas.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "EliminarMedalla",
+      "verb": "ANY",
+      "params": "string nombreMedalla",
+      "returns": "ActionResult",
+      "line": 196,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaMedallas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Medallas/ListaMedallas.cshtml"
+      ]
+    },
+    {
+      "controller": "Medallas",
+      "action": "EliminarMedallaParticipante",
+      "verb": "POST",
+      "params": "string idParticipante, string nombreMedalla",
+      "returns": "IActionResult",
+      "line": 230,
+      "file": "webMetics/Controllers/MedallasController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerDatosParticipante\", \"Participante\", new { idParticipante })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerDatosParticipante.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "verb": "ANY",
+      "params": "int idGrupo",
+      "returns": "ActionResult",
+      "line": 73,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaParticipantes",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "verb": "ANY",
+      "params": "string? searchTerm = null",
+      "returns": "ActionResult",
+      "line": 121,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerParticipantes",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+        "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ObtenerParticipantesPaginados",
+      "verb": "GET",
+      "params": "",
+      "returns": "Task<IActionResult>",
+      "line": 140,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "BuscarParticipantes",
+      "verb": "ANY",
+      "params": "string searchTerm",
+      "returns": "IActionResult",
+      "line": 195,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "nameof(VerParticipantes), new { searchTerm })"
+      ],
+      "incoming": []
+    },
+    {
+      "controller": "Participante",
+      "action": "BuscarParticipantesDelGrupo",
+      "verb": "ANY",
+      "params": "int idGrupo, string searchTerm",
+      "returns": "IActionResult",
+      "line": 217,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaParticipantes",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "AsignarMedallas",
+      "verb": "POST",
+      "params": "string idParticipante, List<string> selectedMedallas",
+      "returns": "IActionResult",
+      "line": 281,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerDatosParticipante\", new { idParticipante })",
+        "\"VerDatosParticipante\", \"Participante\", new { idParticipante })",
+        "\"VerDatosParticipante\", new { idParticipante = idParticipante })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerDatosParticipante.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "AsignarMedallaMasiva",
+      "verb": "POST",
+      "params": "string nombreMedalla, List<string> participantesSeleccionados",
+      "returns": "IActionResult",
+      "line": 334,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "SubirArchivoExcelParticipantes",
+      "verb": "POST",
+      "params": "IFormFile file",
+      "returns": "Task<IActionResult>",
+      "line": 383,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "NotificarLimiteHoras",
+      "verb": "POST",
+      "params": "string idParticipante, string? searchTerm = null",
+      "returns": "Task<IActionResult>",
+      "line": 462,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\", new { searchTerm })"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesPDF",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 537,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesWord",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 638,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesExcel",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 758,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesExcel2",
+      "verb": "ANY",
+      "params": "string? searchTerm",
+      "returns": "ActionResult",
+      "line": 892,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "DescargarPlantillaSubirParticipantes",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 993,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Archivo",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "VerDatosParticipante",
+      "verb": "ANY",
+      "params": "string idParticipante, int? idGrupo",
+      "returns": "ActionResult",
+      "line": 1042,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerDatosParticipante",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioParticipante",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 1095,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioParticipante",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/FormularioParticipante.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioParticipante",
+      "verb": "POST",
+      "params": "ParticipanteModel participante",
+      "returns": "ActionResult",
+      "line": 1127,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioParticipante",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/FormularioParticipante.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "EditarParticipante",
+      "verb": "ANY",
+      "params": "string idParticipante",
+      "returns": "ActionResult",
+      "line": 1313,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarParticipante",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerParticipantes\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Usuario/InformacionPersonal.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "ActualizarParticipante",
+      "verb": "POST",
+      "params": "ParticipanteModel participante",
+      "returns": "ActionResult",
+      "line": 1352,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarParticipante",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerParticipantes\", \"Participante\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/EditarParticipante.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "EliminarParticipante",
+      "verb": "POST",
+      "params": "string idParticipante",
+      "returns": "ActionResult",
+      "line": 1499,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"VerParticipantes\", \"Participante\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Shared/_Modal.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "DisplayModal",
+      "verb": "POST",
+      "params": "string idParticipante",
+      "returns": "ActionResult",
+      "line": 1529,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Parcial",
+      "views": [
+        {
+          "name": "_Modal",
+          "partial": true,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Participante",
+      "action": "GetTiposParticipante",
+      "verb": "GET",
+      "params": "string tipoParticipante",
+      "returns": "JsonResult",
+      "line": 1542,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": []
+    },
+    {
+      "controller": "Participante",
+      "action": "GetDepartamentosByArea",
+      "verb": "GET",
+      "params": "string areaName",
+      "returns": "IActionResult",
+      "line": 1552,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/EditarParticipante.cshtml",
+        "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "GetSeccionesByDepartamento",
+      "verb": "GET",
+      "params": "string areaName, string departamentoName",
+      "returns": "IActionResult",
+      "line": 1567,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/EditarParticipante.cshtml",
+        "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "GetAllAreasData",
+      "verb": "GET",
+      "params": "",
+      "returns": "IActionResult",
+      "line": 1586,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/FormularioParticipante.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "GetCarrerasBySeccionAndSede",
+      "verb": "GET",
+      "params": "string areaName, string departamentoName, string unidadAcademica, string sede",
+      "returns": "IActionResult",
+      "line": 1624,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "JSON",
+      "views": [],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/EditarParticipante.cshtml",
+        "webMetics/Views/Participante/FormularioParticipante.cshtml",
+        "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioRecuperarContrasena",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 1755,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioRecuperarContrasena",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/IniciarSesion.cshtml"
+      ]
+    },
+    {
+      "controller": "Participante",
+      "action": "RecuperarContrasena",
+      "verb": "POST",
+      "params": "ParticipanteModel participante",
+      "returns": "Task<IActionResult>",
+      "line": 1773,
+      "file": "webMetics/Controllers/ParticipanteController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioRecuperarContrasena",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Participante/FormularioRecuperarContrasena.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "ListaTemas",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 59,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ListaTemas",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 79,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearTema",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Tema/CrearTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "verb": "POST",
+      "params": "TemaModel tema",
+      "returns": "ActionResult",
+      "line": 98,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CrearTema",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaTemas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Tema/CrearTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "EditarTema",
+      "verb": "ANY",
+      "params": "int idTema",
+      "returns": "ActionResult",
+      "line": 133,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarTema",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Tema/EditarTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "EditarTema",
+      "verb": "POST",
+      "params": "TemaModel tema",
+      "returns": "ActionResult",
+      "line": 154,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "EditarTema",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaTemas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Tema/EditarTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml"
+      ]
+    },
+    {
+      "controller": "Tema",
+      "action": "EliminarTema",
+      "verb": "ANY",
+      "params": "int idTema",
+      "returns": "ActionResult",
+      "line": 188,
+      "file": "webMetics/Controllers/TemaController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"ListaTemas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Tema/ListaTemas.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "IniciarSesion",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 50,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "IniciarSesion",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/IniciarSesion.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "IniciarSesion",
+      "verb": "POST",
+      "params": "LoginModel usuario",
+      "returns": "ActionResult",
+      "line": 81,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "IniciarSesion",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"IniciarSesion\", \"Usuario\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/IniciarSesion.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "FormularioRegistro",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 114,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "FormularioRegistro",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+        "webMetics/Views/Usuario/IniciarSesion.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "FormularioRegistro",
+      "verb": "POST",
+      "params": "UsuarioModel usuario",
+      "returns": "ActionResult",
+      "line": 136,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "ParticipanteRegistrado",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "FormularioRegistro",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+        "webMetics/Views/Usuario/IniciarSesion.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "InformacionPersonal",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 377,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "InformacionPersonal",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 471,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"IniciarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Asesor/CrearAsesor.cshtml",
+        "webMetics/Views/Asesor/EditarAsesor.cshtml",
+        "webMetics/Views/Asesor/ListaAsesores.cshtml",
+        "webMetics/Views/Asesor/MisModulos.cshtml",
+        "webMetics/Views/Calificaciones/EditarCalificacion.cshtml",
+        "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+        "webMetics/Views/Categoria/CrearCategoria.cshtml",
+        "webMetics/Views/Categoria/EditarCategoria.cshtml",
+        "webMetics/Views/Categoria/ListaCategorias.cshtml",
+        "webMetics/Views/EmailSettings/Index.cshtml",
+        "webMetics/Views/Grupo/CrearGrupo.cshtml",
+        "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+        "webMetics/Views/Grupo/EditarGrupo.cshtml",
+        "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+        "webMetics/Views/Grupo/VerAdjunto.cshtml",
+        "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+        "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+        "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+        "webMetics/Views/Medallas/EditarMedalla.cshtml",
+        "webMetics/Views/Medallas/ListaMedallas.cshtml",
+        "webMetics/Views/Participante/EditarParticipante.cshtml",
+        "webMetics/Views/Participante/FormularioParticipante.cshtml",
+        "webMetics/Views/Participante/ListaParticipantes.cshtml",
+        "webMetics/Views/Participante/ObtenerParticipante.cshtml",
+        "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Tema/CrearTema.cshtml",
+        "webMetics/Views/Tema/EditarTema.cshtml",
+        "webMetics/Views/Tema/ListaTemas.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+        "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+        "webMetics/Views/Usuario/InformacionPersonal.cshtml",
+        "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCorreoAlternativo",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 494,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CompletarCorreoAlternativo",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"IniciarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarCorreoAlternativo.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCorreoAlternativo",
+      "verb": "POST",
+      "params": "UsuarioModel usuario",
+      "returns": "ActionResult",
+      "line": 541,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"IniciarSesion\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")",
+        "\"CompletarCorreoAlternativo\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarCorreoAlternativo.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCarreraYAreas",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 622,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CompletarCarreraYAreas",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"IniciarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCarreraYAreas",
+      "verb": "POST",
+      "params": "[Bind(\"area,departamento,unidadAcademica,sede,carrera,areasExtra\")] ParticipanteModel participante",
+      "returns": "ActionResult",
+      "line": 657,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CompletarCarreraYAreas",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"IniciarSesion\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")",
+        "\"CompletarCarreraYAreas\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarGradoAcademico",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 785,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CompletarGradoAcademico",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"IniciarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarGradoAcademico.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarGradoAcademico",
+      "verb": "POST",
+      "params": "UsuarioModel usuario",
+      "returns": "ActionResult",
+      "line": 822,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"IniciarSesion\")",
+        "\"ListaGruposDisponibles\", \"Grupo\")",
+        "\"CompletarGradoAcademico\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Usuario/CompletarGradoAcademico.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarCredencialesUsuario",
+      "verb": "ANY",
+      "params": "string idUsuario, string nombreCompleto",
+      "returns": "ActionResult",
+      "line": 878,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CambiarCredencialesUsuario",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"ListaGruposDisponibles\", \"Grupo\")",
+        "\"CerrarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarCredencialesUsuario",
+      "verb": "POST",
+      "params": "NewLoginModel usuario",
+      "returns": "ActionResult",
+      "line": 938,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"CambiarCredencialesUsuario\", new { idUsuario = usuario.id })",
+        "\"CerrarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasena",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 1063,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CambiarContrasena",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"CerrarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasena.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasena",
+      "verb": "POST",
+      "params": "NewLoginModel usuario",
+      "returns": "ActionResult",
+      "line": 1111,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"CambiarContrasena\", new { id = GetId() })"
+      ],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasena.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasenaAdmin",
+      "verb": "ANY",
+      "params": "string idUsuario, string nombreCompleto",
+      "returns": "ActionResult",
+      "line": 1150,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "CambiarContrasenaAdmin",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [
+        "\"VerParticipantes\", \"Participante\")",
+        "\"CerrarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasenaAdmin",
+      "verb": "POST",
+      "params": "NewLoginModel usuario",
+      "returns": "ActionResult",
+      "line": 1210,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Operación/redirección",
+      "views": [],
+      "redirects": [
+        "\"CambiarContrasenaAdmin\", new { idUsuario = usuario.id })",
+        "\"CerrarSesion\")"
+      ],
+      "incoming": [
+        "webMetics/Views/Participante/VerParticipantes.cshtml",
+        "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesos",
+      "verb": "ANY",
+      "params": "",
+      "returns": "ActionResult",
+      "line": 1251,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerBitacoraAccesos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Shared/_Layout.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesoUsuario",
+      "verb": "GET",
+      "params": "string idUsuario, int diasAtras = 30",
+      "returns": "ActionResult",
+      "line": 1282,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerBitacoraAccesos",
+          "partial": false,
+          "exists": true
+        },
+        {
+          "name": "VerBitacoraAccesos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesoPorFecha",
+      "verb": "GET",
+      "params": "string fechaDesde, string fechaHasta, string estadoAcceso",
+      "returns": "ActionResult",
+      "line": 1317,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerBitacoraAccesos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml"
+      ]
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraUltimoAccesoUsuario",
+      "verb": "GET",
+      "params": "string idUsuario",
+      "returns": "ActionResult",
+      "line": 1348,
+      "file": "webMetics/Controllers/UsuarioController.cs",
+      "kind": "Página",
+      "views": [
+        {
+          "name": "VerBitacoraAccesos",
+          "partial": false,
+          "exists": true
+        }
+      ],
+      "redirects": [],
+      "incoming": [
+        "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Asesor/CrearAsesor.cshtml",
+      "line": 126
+    },
+    {
+      "controller": "Asesor",
+      "action": "AgregarAsesor",
+      "file": "webMetics/Views/Asesor/CrearAsesor.cshtml",
+      "line": 26
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Asesor/EditarAsesor.cshtml",
+      "line": 178
+    },
+    {
+      "controller": "Asesor",
+      "action": "ActualizarAsesor",
+      "file": "webMetics/Views/Asesor/EditarAsesor.cshtml",
+      "line": 59
+    },
+    {
+      "controller": "Asesor",
+      "action": "CrearAsesor",
+      "file": "webMetics/Views/Asesor/ListaAsesores.cshtml",
+      "line": 77
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Asesor/ListaAsesores.cshtml",
+      "line": 20
+    },
+    {
+      "controller": "Asesor",
+      "action": "EditarAsesor",
+      "file": "webMetics/Views/Asesor/ListaAsesores.cshtml",
+      "line": 114
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Asesor/ListaAsesores.cshtml",
+      "line": 163
+    },
+    {
+      "controller": "Asesor",
+      "action": "EliminarAsesor",
+      "file": "webMetics/Views/Asesor/ListaAsesores.cshtml",
+      "line": 145
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 162
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 165
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 186
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 191
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 366
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 373
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 393
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 398
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 453
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 94
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 99
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 267
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 272
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 547
+    },
+    {
+      "controller": "Grupo",
+      "action": "EliminarGrupo",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 472
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarGrupo",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 500
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "DesinscribirParticipante",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 528
+    },
+    {
+      "controller": "Asesor",
+      "action": "BuscarGrupos",
+      "file": "webMetics/Views/Asesor/MisModulos.cshtml",
+      "line": 37
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "VerCalificaciones",
+      "file": "webMetics/Views/Calificaciones/EditarCalificacion.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "VerCalificaciones",
+      "file": "webMetics/Views/Calificaciones/EditarCalificacion.cshtml",
+      "line": 84
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Calificaciones/EditarCalificacion.cshtml",
+      "line": 94
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirCalificacion",
+      "file": "webMetics/Views/Calificaciones/EditarCalificacion.cshtml",
+      "line": 69
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesPDF",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 74
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesExcel",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 77
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesWord",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 80
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "EditarCalificacion",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 120
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 128
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 138
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "EnviarCalificaciones",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 154
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirExcelCalificaciones",
+      "file": "webMetics/Views/Calificaciones/VerCalificaciones.cshtml",
+      "line": 48
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Categoria/CrearCategoria.cshtml",
+      "line": 73
+    },
+    {
+      "controller": "Categoria",
+      "action": "CrearCategoria",
+      "file": "webMetics/Views/Categoria/CrearCategoria.cshtml",
+      "line": 21
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Categoria/EditarCategoria.cshtml",
+      "line": 75
+    },
+    {
+      "controller": "Categoria",
+      "action": "EditarCategoria",
+      "file": "webMetics/Views/Categoria/EditarCategoria.cshtml",
+      "line": 21
+    },
+    {
+      "controller": "Categoria",
+      "action": "CrearCategoria",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 42
+    },
+    {
+      "controller": "Categoria",
+      "action": "CrearCategoria",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 73
+    },
+    {
+      "controller": "Categoria",
+      "action": "EditarCategoria",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 95
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 137
+    },
+    {
+      "controller": "Categoria",
+      "action": "EliminarCategoria",
+      "file": "webMetics/Views/Categoria/ListaCategorias.cshtml",
+      "line": 121
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/EmailSettings/Index.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/EmailSettings/Index.cshtml",
+      "line": 80
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/EmailSettings/Index.cshtml",
+      "line": 94
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "UpdateNotificationEmail",
+      "file": "webMetics/Views/EmailSettings/Index.cshtml",
+      "line": 39
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "ToggleEmailSending",
+      "file": "webMetics/Views/EmailSettings/Index.cshtml",
+      "line": 59
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Grupo/CrearGrupo.cshtml",
+      "line": 24
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Grupo/CrearGrupo.cshtml",
+      "line": 212
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Grupo/CrearGrupo.cshtml",
+      "line": 228
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Grupo/CrearGrupo.cshtml",
+      "line": 30
+    },
+    {
+      "controller": "Grupo",
+      "action": "DescargarArchivo",
+      "file": "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+      "line": 53
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+      "line": 73
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+      "line": 88
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarAdjunto",
+      "file": "webMetics/Views/Grupo/EditarAdjunto.cshtml",
+      "line": 39
+    },
+    {
+      "controller": "Grupo",
+      "action": "DescargarArchivo",
+      "file": "webMetics/Views/Grupo/EditarGrupo.cshtml",
+      "line": 218
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Grupo/EditarGrupo.cshtml",
+      "line": 252
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarGrupo",
+      "file": "webMetics/Views/Grupo/EditarGrupo.cshtml",
+      "line": 31
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 41
+    },
+    {
+      "controller": "Grupo",
+      "action": "CopiarGrupo",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 358
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 453
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 456
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 478
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 483
+    },
+    {
+      "controller": "Grupo",
+      "action": "CopiarGrupo",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 553
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 666
+    },
+    {
+      "controller": "Participante",
+      "action": "ListaParticipantes",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 667
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 687
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "Inscribir",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 692
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 366
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 371
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 561
+    },
+    {
+      "controller": "Grupo",
+      "action": "CambiarEstadoVisible",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 566
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 820
+    },
+    {
+      "controller": "Grupo",
+      "action": "EliminarGrupo",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 745
+    },
+    {
+      "controller": "Grupo",
+      "action": "EditarGrupo",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 773
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "DesinscribirParticipante",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 801
+    },
+    {
+      "controller": "Grupo",
+      "action": "BuscarGrupos",
+      "file": "webMetics/Views/Grupo/ListaGruposDisponibles.cshtml",
+      "line": 293
+    },
+    {
+      "controller": "Grupo",
+      "action": "DescargarArchivo",
+      "file": "webMetics/Views/Grupo/VerAdjunto.cshtml",
+      "line": 48
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Grupo/VerAdjunto.cshtml",
+      "line": 58
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Grupo/VerAdjunto.cshtml",
+      "line": 72
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+      "line": 15
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+      "line": 65
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+      "line": 79
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcion",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcion.cshtml",
+      "line": 21
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 17
+    },
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 25
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 69
+    },
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 73
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 88
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "FormularioInscripcionManual",
+      "file": "webMetics/Views/Inscripcion/FormularioInscripcionManual.cshtml",
+      "line": 32
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 15
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesPDF",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 57
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesExcel",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 58
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ExportarTodosParticipantesWord",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 59
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "DescargarPlantillaSubirInscripciones",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 69
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 156
+    },
+    {
+      "controller": "Participante",
+      "action": "VerDatosParticipante",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 374
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "ObtenerInscripcionesPaginadas",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 380
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 472
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "SubirArchivoExcelInscripciones",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 43
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcion",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 222
+    },
+    {
+      "controller": "Participante",
+      "action": "AsignarMedallaMasiva",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 77
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "file": "webMetics/Views/Inscripcion/VerInscripciones.cshtml",
+      "line": 173
+    },
+    {
+      "controller": "Medallas",
+      "action": "ListaMedallas",
+      "file": "webMetics/Views/Medallas/EditarMedalla.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Medallas/EditarMedalla.cshtml",
+      "line": 75
+    },
+    {
+      "controller": "Medallas",
+      "action": "EditarMedalla",
+      "file": "webMetics/Views/Medallas/EditarMedalla.cshtml",
+      "line": 61
+    },
+    {
+      "controller": "Medallas",
+      "action": "EditarMedalla",
+      "file": "webMetics/Views/Medallas/ListaMedallas.cshtml",
+      "line": 61
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Medallas/ListaMedallas.cshtml",
+      "line": 13
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Medallas/ListaMedallas.cshtml",
+      "line": 111
+    },
+    {
+      "controller": "Medallas",
+      "action": "EliminarMedalla",
+      "file": "webMetics/Views/Medallas/ListaMedallas.cshtml",
+      "line": 95
+    },
+    {
+      "controller": "Medallas",
+      "action": "SubirMedalla",
+      "file": "webMetics/Views/Medallas/ListaMedallas.cshtml",
+      "line": 43
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/EditarParticipante.cshtml",
+      "line": 213
+    },
+    {
+      "controller": "Participante",
+      "action": "ActualizarParticipante",
+      "file": "webMetics/Views/Participante/EditarParticipante.cshtml",
+      "line": 26
+    },
+    {
+      "controller": "Participante",
+      "action": "GetSeccionesByDepartamento",
+      "file": "webMetics/Views/Participante/EditarParticipante.cshtml",
+      "line": 418
+    },
+    {
+      "controller": "Participante",
+      "action": "GetDepartamentosByArea",
+      "file": "webMetics/Views/Participante/EditarParticipante.cshtml",
+      "line": 450
+    },
+    {
+      "controller": "Participante",
+      "action": "GetCarrerasBySeccionAndSede",
+      "file": "webMetics/Views/Participante/EditarParticipante.cshtml",
+      "line": 520
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/FormularioParticipante.cshtml",
+      "line": 214
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioParticipante",
+      "file": "webMetics/Views/Participante/FormularioParticipante.cshtml",
+      "line": 26
+    },
+    {
+      "controller": "Participante",
+      "action": "GetCarrerasBySeccionAndSede",
+      "file": "webMetics/Views/Participante/FormularioParticipante.cshtml",
+      "line": 501
+    },
+    {
+      "controller": "Participante",
+      "action": "GetAllAreasData",
+      "file": "webMetics/Views/Participante/FormularioParticipante.cshtml",
+      "line": 554
+    },
+    {
+      "controller": "Participante",
+      "action": "RecuperarContrasena",
+      "file": "webMetics/Views/Participante/FormularioRecuperarContrasena.cshtml",
+      "line": 57
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "DescargarPlantillaSubirCalificaciones",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 172
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesPDF",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 182
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesExcel",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 183
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "ExportarCalificacionesWord",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 184
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "EnviarCalificacionesAlCorreo",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 185
+    },
+    {
+      "controller": "Participante",
+      "action": "VerDatosParticipante",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 418
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 115
+    },
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 121
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 439
+    },
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 443
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 579
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirHorasAprobadasYCalificacionAjax",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 597
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirHorasAprobadasYCalificacionAjax",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 632
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirExcelCalificaciones",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 156
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "CambiarEstadoInscritoAIncompleto",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 469
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcion",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 513
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcionesMasivo",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 542
+    },
+    {
+      "controller": "Participante",
+      "action": "AsignarMedallaMasiva",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 208
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "CambiarEstadoInscritoAIncompleto",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 275
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "EliminarInscripcionMasivo",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 283
+    },
+    {
+      "controller": "Participante",
+      "action": "BuscarParticipantesDelGrupo",
+      "file": "webMetics/Views/Participante/ListaParticipantes.cshtml",
+      "line": 303
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/ObtenerParticipante.cshtml",
+      "line": 30
+    },
+    {
+      "controller": "Participante",
+      "action": "ObtenerParticipante",
+      "file": "webMetics/Views/Participante/ObtenerParticipante.cshtml",
+      "line": 12
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 551
+    },
+    {
+      "controller": "Calificaciones",
+      "action": "SubirHorasAprobadasYCalificacion",
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 494
+    },
+    {
+      "controller": "Medallas",
+      "action": "EliminarMedallaParticipante",
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 533
+    },
+    {
+      "controller": "Participante",
+      "action": "AsignarMedallas",
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 258
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 19
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioParticipante",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 102
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 15
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesPDF",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 57
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesExcel",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 58
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesExcel2",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 59
+    },
+    {
+      "controller": "Participante",
+      "action": "ExportarParticipantesWord",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 60
+    },
+    {
+      "controller": "Participante",
+      "action": "DescargarPlantillaSubirParticipantes",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 70
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 164
+    },
+    {
+      "controller": "Participante",
+      "action": "VerDatosParticipante",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 259
+    },
+    {
+      "controller": "Participante",
+      "action": "EditarParticipante",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 260
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarCredencialesUsuario",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 261
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasenaAdmin",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 262
+    },
+    {
+      "controller": "Participante",
+      "action": "ObtenerParticipantesPaginados",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 268
+    },
+    {
+      "controller": "Participante",
+      "action": "SubirArchivoExcelParticipantes",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 43
+    },
+    {
+      "controller": "Participante",
+      "action": "EliminarParticipante",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 145
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 95
+    },
+    {
+      "controller": "Participante",
+      "action": "NotificarLimiteHoras",
+      "file": "webMetics/Views/Participante/VerParticipantes.cshtml",
+      "line": 129
+    },
+    {
+      "controller": "Categoria",
+      "action": "ListaCategorias",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 85
+    },
+    {
+      "controller": "Tema",
+      "action": "ListaTemas",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 86
+    },
+    {
+      "controller": "Asesor",
+      "action": "ListaAsesores",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 96
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 97
+    },
+    {
+      "controller": "Inscripcion",
+      "action": "VerInscripciones",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 107
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 117
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 118
+    },
+    {
+      "controller": "Medallas",
+      "action": "ListaMedallas",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 120
+    },
+    {
+      "controller": "Asesor",
+      "action": "MisModulos",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 140
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 141
+    },
+    {
+      "controller": "Usuario",
+      "action": "InformacionPersonal",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 170
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasena",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 171
+    },
+    {
+      "controller": "EmailSettings",
+      "action": "Index",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 176
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesos",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 177
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 180
+    },
+    {
+      "controller": "Grupo",
+      "action": "CrearGrupo",
+      "file": "webMetics/Views/Shared/_Layout.cshtml",
+      "line": 194
+    },
+    {
+      "controller": "Participante",
+      "action": "EliminarParticipante",
+      "file": "webMetics/Views/Shared/_Modal.cshtml",
+      "line": 24
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Tema/CrearTema.cshtml",
+      "line": 15
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Tema/CrearTema.cshtml",
+      "line": 53
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Tema/CrearTema.cshtml",
+      "line": 69
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "file": "webMetics/Views/Tema/CrearTema.cshtml",
+      "line": 21
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Tema/EditarTema.cshtml",
+      "line": 68
+    },
+    {
+      "controller": "Tema",
+      "action": "EditarTema",
+      "file": "webMetics/Views/Tema/EditarTema.cshtml",
+      "line": 21
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 42
+    },
+    {
+      "controller": "Tema",
+      "action": "CrearTema",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 73
+    },
+    {
+      "controller": "Tema",
+      "action": "EditarTema",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 93
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 135
+    },
+    {
+      "controller": "Tema",
+      "action": "EliminarTema",
+      "file": "webMetics/Views/Tema/ListaTemas.cshtml",
+      "line": 119
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+      "line": 51
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+      "line": 111
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+      "line": 127
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasena",
+      "file": "webMetics/Views/Usuario/CambiarContrasena.cshtml",
+      "line": 57
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+      "line": 49
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "file": "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+      "line": 116
+    },
+    {
+      "controller": "Admin",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+      "line": 130
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarContrasenaAdmin",
+      "file": "webMetics/Views/Usuario/CambiarContrasenaAdmin.cshtml",
+      "line": 55
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml",
+      "line": 49
+    },
+    {
+      "controller": "Participante",
+      "action": "VerParticipantes",
+      "file": "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml",
+      "line": 122
+    },
+    {
+      "controller": "Admin",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml",
+      "line": 136
+    },
+    {
+      "controller": "Usuario",
+      "action": "CambiarCredencialesUsuario",
+      "file": "webMetics/Views/Usuario/CambiarCredencialesUsuario.cshtml",
+      "line": 55
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCarreraYAreas",
+      "file": "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+      "line": 37
+    },
+    {
+      "controller": "Participante",
+      "action": "GetSeccionesByDepartamento",
+      "file": "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+      "line": 290
+    },
+    {
+      "controller": "Participante",
+      "action": "GetDepartamentosByArea",
+      "file": "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+      "line": 320
+    },
+    {
+      "controller": "Participante",
+      "action": "GetCarrerasBySeccionAndSede",
+      "file": "webMetics/Views/Usuario/CompletarCarreraYAreas.cshtml",
+      "line": 392
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarCorreoAlternativo",
+      "file": "webMetics/Views/Usuario/CompletarCorreoAlternativo.cshtml",
+      "line": 32
+    },
+    {
+      "controller": "Usuario",
+      "action": "CompletarGradoAcademico",
+      "file": "webMetics/Views/Usuario/CompletarGradoAcademico.cshtml",
+      "line": 32
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+      "line": 190
+    },
+    {
+      "controller": "Participante",
+      "action": "GetDepartamentosByArea",
+      "file": "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+      "line": 200
+    },
+    {
+      "controller": "Participante",
+      "action": "GetSeccionesByDepartamento",
+      "file": "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+      "line": 201
+    },
+    {
+      "controller": "Participante",
+      "action": "GetCarrerasBySeccionAndSede",
+      "file": "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+      "line": 202
+    },
+    {
+      "controller": "Usuario",
+      "action": "FormularioRegistro",
+      "file": "webMetics/Views/Usuario/FormularioRegistro.cshtml",
+      "line": 22
+    },
+    {
+      "controller": "Participante",
+      "action": "EditarParticipante",
+      "file": "webMetics/Views/Usuario/InformacionPersonal.cshtml",
+      "line": 141
+    },
+    {
+      "controller": "Asesor",
+      "action": "EditarAsesor",
+      "file": "webMetics/Views/Usuario/InformacionPersonal.cshtml",
+      "line": 147
+    },
+    {
+      "controller": "Grupo",
+      "action": "ListaGruposDisponibles",
+      "file": "webMetics/Views/Usuario/InformacionPersonal.cshtml",
+      "line": 14
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/InformacionPersonal.cshtml",
+      "line": 460
+    },
+    {
+      "controller": "Usuario",
+      "action": "FormularioRegistro",
+      "file": "webMetics/Views/Usuario/IniciarSesion.cshtml",
+      "line": 105
+    },
+    {
+      "controller": "Participante",
+      "action": "FormularioRecuperarContrasena",
+      "file": "webMetics/Views/Usuario/IniciarSesion.cshtml",
+      "line": 107
+    },
+    {
+      "controller": "Usuario",
+      "action": "IniciarSesion",
+      "file": "webMetics/Views/Usuario/IniciarSesion.cshtml",
+      "line": 56
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesoPorFecha",
+      "file": "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml",
+      "line": 54
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraAccesoUsuario",
+      "file": "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml",
+      "line": 80
+    },
+    {
+      "controller": "Usuario",
+      "action": "VerBitacoraUltimoAccesoUsuario",
+      "file": "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml",
+      "line": 98
+    },
+    {
+      "controller": "Usuario",
+      "action": "CerrarSesion",
+      "file": "webMetics/Views/Usuario/VerBitacoraAccesos.cshtml",
+      "line": 250
+    }
+  ],
+  "dynamic": [
+    {
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 212,
+      "expression": "Url.Action(volverAction, volverController, volverRouteValues)\">"
+    },
+    {
+      "file": "webMetics/Views/Participante/VerDatosParticipante.cshtml",
+      "line": 519,
+      "expression": "Url.Action(volverAction, volverController, volverRouteValues)\" class=\"btn btn-secondary btn-block\">@volverTexto</a>"
+    }
+  ]
+}

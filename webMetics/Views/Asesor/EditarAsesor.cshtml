@@ -56,7 +56,7 @@
                 </div>
             }
 
-            @using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("ActualizarAsesor", "Asesor", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
                 <h1>@ViewBag.Title</h1>

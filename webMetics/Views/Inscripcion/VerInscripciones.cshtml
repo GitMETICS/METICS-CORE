@@ -429,7 +429,7 @@
                     className: 'text-center',
                     render: function (data, type) {
                         if (type !== 'display') return data;
-                        const url = participantDetailsUrl + '?idParticipante=' + encodeURIComponent(data);
+                        const url = participantDetailsUrl + '?idParticipante=' + encodeURIComponent(data) + '&breadcrumbOrigin=inscriptions';
                         return '<a href="' + escapeHtml(url) + '" class="icon-action icon-view bi bi-search" ' +
                             'title="Ver datos del participante"></a>';
                     }

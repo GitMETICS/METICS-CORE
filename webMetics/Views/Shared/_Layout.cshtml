@@ -3,6 +3,7 @@
     Aqui se encuentra el Header y Footer del sitio web que se comparte para cada vista del sitio
 //-->
 @using webMetics.Controllers
+@using webMetics.Helpers
 
 <html>
 <head>
@@ -43,10 +44,10 @@
         bool isContentActive = currentController == "Medallas"
             || (currentController == "Tema" && currentAction == "CrearTema")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
-        bool isHomeActive = currentController == "Grupo" && currentAction == "ListaGruposDisponibles";
         bool isFacilitatorActive = (currentController == "Asesor" && currentAction == "MisModulos")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
+        var breadcrumbs = showNav ? BreadcrumbBuilder.Build(ViewContext, Url) : Array.Empty<BreadcrumbItem>();
     }
 
     <header class="metics-unified-header">
@@ -69,12 +70,6 @@
                         @if (navRole == 1)
                         {
                             <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
 
                                 <li class="nav-item dropdown metics-tab metics-section-academic @(isAcademicActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,12 +120,6 @@
                         else if (navRole == 2)
                         {
                             <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
                                 <li class="nav-item dropdown metics-tab metics-section-facilitator @(isFacilitatorActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="facilitatorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-person-workspace"></i>
@@ -140,17 +129,6 @@
                                         <li>@Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item bi bi-journal-text" })</li>
                                         <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item bi bi-journal-plus" })</li>
                                     </ul>
-                                </li>
-                            </ul>
-                        }
-                        else
-                        {
-                            <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
                                 </li>
                             </ul>
                         }
@@ -188,10 +166,16 @@
         </nav>
     </header>
     <div class="container body-content" style="min-height: 100vh">
-        @if (showNav && (navRole == 1 || navRole == 2))
+        @if (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2)))
         {
-            <div class="metics-page-actions" aria-label="Acciones de página">
-                @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+            <div class="metics-page-context">
+                @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                @if (showNav && (navRole == 1 || navRole == 2))
+                {
+                    <div class="metics-page-actions" aria-label="Acciones de página">
+                        @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                    </div>
+                }
             </div>
         }
         @RenderBody()

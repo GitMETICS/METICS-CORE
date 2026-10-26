@@ -307,8 +307,8 @@ else
                     const participantId = encodeURIComponent(row.idParticipante);
                     const fullName = participantFullName(row);
                     const encodedName = encodeURIComponent(fullName);
-                    const detailsUrl = participantDetailsUrl + '?idParticipante=' + participantId;
-                    const editUrl = participantEditUrl + '?idParticipante=' + participantId;
+                    const detailsUrl = participantDetailsUrl + '?idParticipante=' + participantId + '&breadcrumbOrigin=participants';
+                    const editUrl = participantEditUrl + '?idParticipante=' + participantId + '&breadcrumbOrigin=participants';
                     const credentialsUrl = participantCredentialsUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
                     const passwordUrl = participantPasswordUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
 

@@ -138,13 +138,13 @@
                                     </td>
 
                                     <td class="">
-                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
+                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante, breadcrumbOrigin = "account" }, new { @class = "text-secondary bi bi-pencil-square" })
                                     </td>
                                 }
                                 else
                                 {
                                     <td class="">
-                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = ViewBag.Id }, new { @class = "text-secondary bi bi-pencil-square" })
+                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = ViewBag.Id, breadcrumbOrigin = "account" }, new { @class = "text-secondary bi bi-pencil-square" })
                                     </td>
                                 }
                             </tr>
