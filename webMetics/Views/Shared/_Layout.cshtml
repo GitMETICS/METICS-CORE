@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
     Aqui se encuentra el Header y Footer del sitio web que se comparte para cada vista del sitio
 //-->
@@ -24,37 +24,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body>
-    <div style="background-color: #095998; height: 95px;">
-        <div class="logo-container">
-            <div class="d-flex justify-content-between align-items-center" style="position: relative; z-index: 0;">
-
-                <div class="logo-link ms-4 py-2">
-                    <a href="https://www.ucr.ac.cr/">
-                        <img src="@Url.Content("~/images/ucr.svg")" style="height: 65px; width: auto;" alt="Logo Universidad de Costa Rica" />
-                    </a>
-                </div>
-
-                <div class="d-flex justify-content-end align-items-center">
-                    <div class="logo-link me-3 py-2">
-                        <a href="https://vd.ucr.ac.cr/" style="display: block;">
-                            <img src="@Url.Content("~/images/VD-01.png")" style="height: 56px; width: auto;" alt="Logo Vicerrectoria de Docencia" />
-                        </a>
-                    </div>
-
-                    <div class="logo-link me-4 py-2">
-                        <a href="https://metics.ucr.ac.cr/es/">
-                            <img src="@Url.Content("~/images/METICS-01.png")" style="height: 65px; width: auto;" alt="Logo METICS" />
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
-
-
     @{
         string navUserId = Convert.ToString(ViewBag.Id) ?? "";
         string navRoleValue = Convert.ToString(ViewBag.Role) ?? "";
@@ -80,11 +49,18 @@
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
     }
 
-    @if (showNav)
-    {
-        <nav class="navbar navbar-expand-xl metics-tabs-navbar">
+    <header class="metics-unified-header">
+        <nav class="navbar metics-navbar-expand metics-tabs-navbar" aria-label="Navegación principal">
             <div class="container-fluid metics-tabs-container">
-                <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="metics-institutional-brand" aria-label="Universidad de Costa Rica, Vicerrectoría de Docencia y METICS">
+                    <a class="metics-brand-ucr" href="https://www.ucr.ac.cr/"><img src="@Url.Content("~/images/ucr.svg")" alt="Logo Universidad de Costa Rica" /></a>
+                    <span class="metics-brand-divider" aria-hidden="true"></span>
+                    <a class="metics-brand-vd" href="https://vd.ucr.ac.cr/"><img src="@Url.Content("~/images/VD-01.png")" alt="Logo Vicerrectoria de Docencia" /></a>
+                    <a class="metics-brand-metics" href="https://metics.ucr.ac.cr/es/"><img src="@Url.Content("~/images/METICS-01.png")" alt="Logo METICS" /></a>
+                </div>
+                @if (showNav)
+                {
+                <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Abrir o cerrar navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -93,17 +69,14 @@
                         @if (navRole == 1)
                         {
                             <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item dropdown metics-settings-tab">
-                                    <a class="nav-link metics-icon-tab" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Configuración" aria-label="Configuración">
-                                        <i class="bi bi-gear"></i>
+                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
+                                        <i class="bi bi-house-door-fill"></i>
+                                        <span>Inicio</span>
                                     </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="settingsDropdown">
-                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item bi bi-envelope" })</li>
-                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item bi bi-clock-history" })</li>
-                                    </ul>
                                 </li>
 
-                                <li class="nav-item dropdown metics-tab @(isAcademicActive ? "active" : "")">
+                                <li class="nav-item dropdown metics-tab metics-section-academic @(isAcademicActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-list-ul"></i>
                                         <span>Gestión académica</span>
@@ -114,7 +87,7 @@
                                     </ul>
                                 </li>
 
-                                <li class="nav-item dropdown metics-tab @(isPeopleActive ? "active" : "")">
+                                <li class="nav-item dropdown metics-tab metics-section-people @(isPeopleActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-people"></i>
                                         <span>Personas</span>
@@ -125,7 +98,7 @@
                                     </ul>
                                 </li>
 
-                                <li class="nav-item dropdown metics-tab @(isInscriptionActive ? "active" : "")">
+                                <li class="nav-item dropdown metics-tab metics-section-inscriptions @(isInscriptionActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="inscriptionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-card-checklist"></i>
                                         <span>Inscripciones</span>
@@ -135,7 +108,7 @@
                                     </ul>
                                 </li>
 
-                                <li class="nav-item dropdown metics-tab @(isContentActive ? "active" : "")">
+                                <li class="nav-item dropdown metics-tab metics-section-content @(isContentActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-file-earmark-plus"></i>
                                         <span>Contenido</span>
@@ -147,19 +120,18 @@
                                         <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item bi bi-award" })</li>
                                     </ul>
                                 </li>
-
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
                             </ul>
                         }
                         else if (navRole == 2)
                         {
                             <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item dropdown metics-tab @(isFacilitatorActive ? "active" : "")">
+                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
+                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
+                                        <i class="bi bi-house-door-fill"></i>
+                                        <span>Inicio</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown metics-tab metics-section-facilitator @(isFacilitatorActive ? "active" : "")">
                                     <a class="nav-link dropdown-toggle" href="#" id="facilitatorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-person-workspace"></i>
                                         <span>Facilitador(a)</span>
@@ -169,19 +141,12 @@
                                         <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item bi bi-journal-plus" })</li>
                                     </ul>
                                 </li>
-
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
                             </ul>
                         }
                         else
                         {
                             <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
+                                <li class="nav-item metics-tab metics-section-home @(isHomeActive ? "active" : "")">
                                     <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
                                         <i class="bi bi-house-door-fill"></i>
                                         <span>Inicio</span>
@@ -192,10 +157,6 @@
                     </div>
 
                     <div class="metics-tabs-right">
-                        @if (navRole == 1 || navRole == 2)
-                        {
-                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-secondary metics-create-module bi bi-plus-lg" })
-                        }
 
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown metics-account">
@@ -205,8 +166,16 @@
                                 </a>
 
                                 <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
+                                    <li><h6 class="dropdown-header">Mi cuenta</h6></li>
                                     <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-person" })</li>
                                     <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item bi bi-key" })</li>
+                                    @if (navRole == 1)
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><h6 class="dropdown-header">Configuración</h6></li>
+                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item bi bi-envelope" })</li>
+                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item bi bi-clock-history" })</li>
+                                    }
                                     <li><hr class="dropdown-divider"></li>
                                     <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item bi bi-box-arrow-right metics-logout" })</li>
                                 </ul>
@@ -214,10 +183,17 @@
                         </ul>
                     </div>
                 </div>
+                }
             </div>
         </nav>
-    }
+    </header>
     <div class="container body-content" style="min-height: 100vh">
+        @if (showNav && (navRole == 1 || navRole == 2))
+        {
+            <div class="metics-page-actions" aria-label="Acciones de página">
+                @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+            </div>
+        }
         @RenderBody()
     </div>
 
