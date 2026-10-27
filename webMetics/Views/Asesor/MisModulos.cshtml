@@ -211,14 +211,6 @@
                                                 }
                                             </div>
                                             <div class="mt-2">
-                                                @if (ViewBag.Role == 1 || ViewBag.Role == 2)
-                                                {
-                                                    <div>
-                                                        <div class="d-flex align-items-center justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#modalEditarAdjunto" onclick="actualizarModalEditarAdjunto(@grupo.idGrupo)">
-                                                            @Html.ActionLink("   Editar programa del módulo", "EditarAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "bi bi-pencil-square text-secondary link-opacity-50 link-opacity-100-hover link-underline link-underline-opacity-0" })
-                                                        </div>
-                                                    </div>
-                                                }
                                                 @*                                         else
                                 {
                                 @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
@@ -426,14 +418,6 @@
                                                 }
                                             </div>
                                             <div class="mt-2">
-                                                @if (ViewBag.Role == 1 || ViewBag.Role == 2)
-                                                {
-                                                    <div>
-                                                        <div class="d-flex align-items-center justify-content-center" type="button" data-bs-toggle="modal" data-bs-target="#modalEditarAdjunto" onclick="actualizarModalEditarAdjunto(@grupo.idGrupo)">
-                                                            @Html.ActionLink("   Editar programa del módulo", "EditarAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "bi bi-pencil-square text-secondary link-opacity-50 link-opacity-100-hover link-underline link-underline-opacity-0" })
-                                                        </div>
-                                                    </div>
-                                                }
                                                 @*                                         else
                                 {
                                 <div class="d-flex align-items-center justify-content-center">
