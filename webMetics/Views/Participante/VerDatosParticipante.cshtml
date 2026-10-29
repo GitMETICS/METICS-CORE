@@ -1,6 +1,7 @@
-﻿@model webMetics.Models.ParticipanteModel
+@model webMetics.Models.ParticipanteModel
 @{
     ViewBag.Title = "Módulos del Participante";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
     var volverController = "Inscripcion";
@@ -215,8 +216,8 @@
             </div>
         }
 
-        <h1>@ViewBag.Title</h1>
-        <hr />
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
 
         @if (ViewBag.ErrorMessage != null)
         {

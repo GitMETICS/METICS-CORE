@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using webMetics.Helpers;
+using webMetics.TagHelpers;
 
 var checks = 0;
 void Check(bool condition, string message)
@@ -134,7 +136,41 @@ Check(Build("Categoria", "ListaCategorias", signedIn: false).Count == 0, "Sin br
 Check(Build("Inscripcion", "Inscribir", 0).All(i => i.Url == null || i.Url == "/Grupo/ListaGruposDisponibles"), "El resultado de inscripción no vuelve a ejecutar Inscribir");
 Check(Build("Grupo", "VerAdjunto", 0).All(i => i.Url == null || i.Url == "/Grupo/ListaGruposDisponibles"), "Un programa abierto directamente no reactiva enlaces ocultos");
 Check(Build("Grupo", "EditarAdjunto", 0).Count == 0, "Sin breadcrumb de edición de programa para participante");
-Console.WriteLine($"OK: {checks} comprobaciones de breadcrumbs; sin acceder a BD ni ejecutar acciones MVC.");
+var headingContext = new ViewContext
+{
+    HttpContext = new DefaultHttpContext(),
+    RouteData = new RouteData(),
+    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+    {
+        ["Id"] = "signed-in-user", ["Role"] = 1, ["Title"] = "Inscripciones"
+    }
+};
+headingContext.RouteData.Values["controller"] = "Inscripcion";
+headingContext.RouteData.Values["action"] = "VerInscripciones";
+PageHeadingBuilder.Configure(headingContext, new TestUrlHelper(headingContext), "Lista de inscripciones", "Módulo de ejemplo");
+Check(headingContext.ViewData["UseSharedPageHeader"] is true, "Activar el encabezado compartido en páginas con breadcrumb");
+Check(Equals(headingContext.ViewData["PageHeading"], "Lista de inscripciones"), "Conservar título personalizado");
+Check(Equals(headingContext.ViewData["PageSubheading"], "Módulo de ejemplo"), "Conservar el nombre contextual como subtítulo");
+foreach (var tag in new[] { "h1", "h2", "hr", "div" })
+{
+    var tagContext = new TagHelperContext(new TagHelperAttributeList(), new Dictionary<object, object>(), "heading");
+    var output = new TagHelperOutput(tag, new TagHelperAttributeList { new("metics-page-heading") },
+        (_, _) => Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
+    output.Content.SetContent("Título anterior");
+    new PageHeadingTagHelper { ViewContext = headingContext }.Process(tagContext, output);
+    Check(output.TagName == null && output.Content.IsEmptyOrWhiteSpace, "Evitar el encabezado duplicado: " + tag);
+}
+headingContext.ViewData["Id"] = "";
+PageHeadingBuilder.Configure(headingContext, new TestUrlHelper(headingContext));
+Check(headingContext.ViewData["UseSharedPageHeader"] is false, "Conservar encabezado original sin sesión");
+var fallbackOutput = new TagHelperOutput("h1", new TagHelperAttributeList { new("metics-page-heading") },
+    (_, _) => Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
+fallbackOutput.Content.SetContent("Encabezado original");
+new PageHeadingTagHelper { ViewContext = headingContext }.Process(
+    new TagHelperContext(new TagHelperAttributeList(), new Dictionary<object, object>(), "fallback"), fallbackOutput);
+Check(fallbackOutput.TagName == "h1" && fallbackOutput.Content.GetContent() == "Encabezado original", "El fallback conserva el contenido original");
+Check(!fallbackOutput.Attributes.ContainsName("metics-page-heading"), "No emitir atributos de control en el HTML");
+Console.WriteLine($"OK: {checks} comprobaciones de breadcrumbs y encabezados; sin acceder a BD ni ejecutar acciones MVC.");
 
 sealed class TestUrlHelper(ActionContext context) : IUrlHelper
 {

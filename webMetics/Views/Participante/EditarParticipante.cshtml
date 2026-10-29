@@ -1,8 +1,9 @@
-﻿@model webMetics.Models.ParticipanteModel
+@model webMetics.Models.ParticipanteModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
     ViewBag.Title = "Información Personal";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
     var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
@@ -26,8 +27,8 @@
         @using (Html.BeginForm("ActualizarParticipante", "Participante", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data", id = "participanteEditForm" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

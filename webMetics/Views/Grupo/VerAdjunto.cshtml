@@ -1,7 +1,8 @@
-﻿@model webMetics.Models.GrupoModel
+@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Programa del Módulo";
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: Model?.nombre);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -17,9 +18,9 @@
                 </a>
             </div>
         }
-        <h1>@Model.nombre</h1>
-        <h2>@ViewBag.Title</h2>
-        <hr />
+        <h1 metics-page-heading>@Model.nombre</h1>
+        <h2 metics-page-heading>@ViewBag.Title</h2>
+        <hr metics-page-heading />
 
         @if (ViewBag.ErrorMessage != null)
         {

@@ -1,7 +1,8 @@
-﻿@model webMetics.Models.InscripcionModel
+@model webMetics.Models.InscripcionModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Inscripción - ";
+    PageHeadingBuilder.Configure(ViewContext, Url, title: "Inscripción", subtitle: $"{ViewBag.NombreGrupo} (Grupo: {ViewBag.NumeroGrupo})");
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -32,8 +33,8 @@
         @using (Html.BeginForm("FormularioInscripcionManual", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title @ViewBag.NombreGrupo (Grupo: @ViewBag.NumeroGrupo)</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title @ViewBag.NombreGrupo (Grupo: @ViewBag.NumeroGrupo)</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

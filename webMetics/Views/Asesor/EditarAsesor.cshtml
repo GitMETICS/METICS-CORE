@@ -1,10 +1,11 @@
-﻿@model webMetics.Models.AsesorModel
+@model webMetics.Models.AsesorModel
 @using webMetics.Controllers
 <!--
     Vista del formulario para editar los datos de un asesor
 -->
 @{
     ViewBag.Title = "Editar Facilitador(a)";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -59,8 +60,8 @@
             @using (Html.BeginForm("ActualizarAsesor", "Asesor", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title</h1>
-                <hr />
+                <h1 metics-page-heading>@ViewBag.Title</h1>
+                <hr metics-page-heading />
 
                 if (ViewBag.ErrorMessage != null)
                 {

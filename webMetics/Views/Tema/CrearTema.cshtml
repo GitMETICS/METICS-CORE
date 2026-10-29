@@ -1,7 +1,8 @@
-﻿@model webMetics.Models.TemaModel
+@model webMetics.Models.TemaModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Crear Área de Competencia";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -21,8 +22,8 @@
         @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

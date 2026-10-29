@@ -1,6 +1,7 @@
-﻿@model bool
+@model bool
 @{
     ViewBag.Title = "Configuración del Correo";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -16,8 +17,8 @@
                 </a>
             </div>
         }
-        <h1>@ViewBag.Title</h1>
-        <hr />
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
 
         @if (ViewBag.ErrorMessage != null)
         {

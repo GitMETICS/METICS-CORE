@@ -380,14 +380,29 @@ namespace webMetics.Controllers
             const int RolUsuarioAdmin = 1;
             const int RolUsuarioAsesor = 2;
 
-            int role = GetRole();
             string idUsuario = GetId();
+            if (string.IsNullOrWhiteSpace(idUsuario)
+                || !int.TryParse(Request.Cookies["rolUsuario"], out int role)
+                || role < RolUsuarioParticipante || role > RolUsuarioAsesor)
+            {
+                return RedirectToAction("CerrarSesion");
+            }
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (role == RolUsuarioParticipante && participante == null)
+            {
+                TempData["errorMessage"] = "No se pudo cargar su perfil. Inicie sesión nuevamente.";
+                return RedirectToAction("CerrarSesion");
+            }
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idUsuario);
             List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
 
             AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+            if (role == RolUsuarioAsesor && asesor == null)
+            {
+                TempData["errorMessage"] = "No se pudo cargar su perfil. Inicie sesión nuevamente.";
+                return RedirectToAction("CerrarSesion");
+            }
             List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
 
             switch (role)

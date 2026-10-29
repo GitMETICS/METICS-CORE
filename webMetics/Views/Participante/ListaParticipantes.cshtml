@@ -1,6 +1,7 @@
-﻿@using webMetics.Controllers;
+@using webMetics.Controllers;
 @{
 	ViewBag.Title = "Participantes";
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: Convert.ToString(ViewBag.NombreGrupo));
 	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
@@ -125,11 +126,11 @@
 			</div>
 		}
 
-		<div class="mb-3">
-			<h1 class="mb-1">@ViewBag.NombreGrupo</h1>
-			<h2 class="mb-0">@ViewBag.Title</h2>
+		<div metics-page-heading class="mb-3">
+			<h1 metics-page-heading class="mb-1">@ViewBag.NombreGrupo</h1>
+			<h2 metics-page-heading class="mb-0">@ViewBag.Title</h2>
 		</div>
-		<hr class="my-2" />
+		<hr metics-page-heading class="my-2" />
 
 		@if (ViewBag.ErrorMessage != null)
 		{

@@ -1,8 +1,9 @@
-﻿@model webMetics.Models.ParticipanteModel
+@model webMetics.Models.ParticipanteModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
     ViewBag.Title = "Formulario de Participante";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
     var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
@@ -26,8 +27,8 @@
         @using (Html.BeginForm("FormularioParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data", id = "participanteCreateForm" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

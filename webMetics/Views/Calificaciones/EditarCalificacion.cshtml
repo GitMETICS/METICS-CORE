@@ -1,6 +1,7 @@
-﻿@using webMetics.Controllers
+@using webMetics.Controllers
 @{
     ViewBag.Title = "Editar calificación";
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: Convert.ToString(ViewBag.NombreGrupo));
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -17,9 +18,9 @@
             </div>
         }
 
-        <h1>@ViewBag.NombreGrupo</h1>
-        <h2>@ViewBag.Title</h2>
-        <hr />
+        <h1 metics-page-heading>@ViewBag.NombreGrupo</h1>
+        <h2 metics-page-heading>@ViewBag.Title</h2>
+        <hr metics-page-heading />
 
         @if (ViewBag.ErrorMessage != null)
         {

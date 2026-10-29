@@ -1,8 +1,9 @@
-﻿@model webMetics.Models.GrupoModel
+@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
     ViewBag.Title = "Crear Módulo";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -30,8 +31,8 @@
         @using (Html.BeginForm("CrearGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

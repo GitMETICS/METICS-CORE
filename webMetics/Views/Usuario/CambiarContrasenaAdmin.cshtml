@@ -1,7 +1,8 @@
-﻿@model webMetics.Models.NewLoginModel
+@model webMetics.Models.NewLoginModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Cambiar Contraseña";
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: Convert.ToString(ViewBag.NombreCompleto));
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
@@ -55,9 +56,9 @@
             @using (Html.BeginForm("CambiarContrasenaAdmin", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
                 @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title</h1>
-                <h2>@ViewBag.NombreCompleto</h2>
-                <hr />
+                <h1 metics-page-heading>@ViewBag.Title</h1>
+                <h2 metics-page-heading>@ViewBag.NombreCompleto</h2>
+                <hr metics-page-heading />
 
                 if (ViewBag.ErrorMessage != null)
                 {

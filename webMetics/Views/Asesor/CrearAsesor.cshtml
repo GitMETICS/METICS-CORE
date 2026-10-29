@@ -1,4 +1,4 @@
-﻿@model webMetics.Models.AsesorModel
+@model webMetics.Models.AsesorModel
 @using webMetics.Controllers
 
 <!--
@@ -7,6 +7,7 @@
 
 @{
     ViewBag.Title = "Agregar Facilitador(a)";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
@@ -26,8 +27,8 @@
         @using (Html.BeginForm("AgregarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
             if (ViewBag.ErrorMessage != null)
             {

@@ -8,5 +8,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Compile Include="../../webMetics/Helpers/BreadcrumbBuilder.cs" Link="BreadcrumbBuilder.cs" />
+    <Compile Include="../../webMetics/Helpers/PageHeadingBuilder.cs" Link="PageHeadingBuilder.cs" />
+    <Compile Include="../../webMetics/TagHelpers/PageHeadingTagHelper.cs" Link="PageHeadingTagHelper.cs" />
   </ItemGroup>
 </Project>

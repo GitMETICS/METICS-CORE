@@ -1,4 +1,4 @@
-﻿@using webMetics.Models
+@using webMetics.Models
 @using webMetics.Helpers
 
 
@@ -7,6 +7,7 @@
 -->
 @{
     ViewBag.Title = "Mis Módulos";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
 @if (!string.IsNullOrEmpty(ViewBag.Id))
@@ -30,7 +31,7 @@
         @if (ViewBag.Role == 2)
         {
             <!-- Grupos Creados por Asesor -->
-            <h1>@ViewBag.Title</h1>
+            <h1 metics-page-heading>@ViewBag.Title</h1>
             <div class="d-flex justify-content-between my-4">
                 <!-- Barra de búsqueda -->
                 <div class="w-75 me-2">

@@ -48,6 +48,7 @@
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
         var breadcrumbs = showNav ? BreadcrumbBuilder.Build(ViewContext, Url) : Array.Empty<BreadcrumbItem>();
+        bool hasPageHeading = showNav && ViewData["UseSharedPageHeader"] is true;
     }
 
     <header class="metics-unified-header">
@@ -165,8 +166,29 @@
             </div>
         </nav>
     </header>
-    <div class="container body-content" style="min-height: 100vh">
-        @if (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2)))
+    @if (hasPageHeading)
+    {
+        <section class="metics-page-header" aria-labelledby="@(ViewData["PageHeadingId"] ?? "pageHeading")">
+            <div class="container metics-page-header-inner">
+                <div class="metics-page-header-content">
+                    @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                    <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
+                    @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                    {
+                        <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                    }
+                </div>
+                @if (navRole == 1 || navRole == 2)
+                {
+                    <div class="metics-page-actions" aria-label="Acciones de página">
+                        @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                    </div>
+                }
+            </div>
+        </section>
+    }
+    <div class="container body-content @(hasPageHeading ? "metics-has-page-heading" : "")" style="min-height: 100vh">
+        @if (!hasPageHeading && (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2))))
         {
             <div class="metics-page-context">
                 @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)

@@ -9,11 +9,13 @@
 -->
 @{
     ViewBag.Title = "Módulos Disponibles para Inscripción";
+    PageHeadingBuilder.Configure(ViewContext, Url);
+    ViewData["PageHeadingId"] = "moduleCatalogTitle";
 }
 
 @if (!string.IsNullOrEmpty(ViewBag.Id))
 {
-    <div class="contenedor-caja container-fluid">
+    <div class="contenedor-caja container-fluid module-catalog-page">
         @if (ViewBag.ErrorMessage != null)
         {
             <div class="alert alert-dark alert-dismissible fade show" role="alert">
@@ -51,7 +53,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3 module-subscribed-toolbar">
                 <!-- Barra de búsqueda -->
                 <div class="w-75 me-2">
-                        <h1>Módulos Inscritos</h1>
+                        <h2>Módulos Inscritos</h2>
                     @* <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
                         <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
                         <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
@@ -284,11 +286,9 @@
             </div>
         }
 
-        <br />
-
         <!-- Grupos disponibles para inscripción -->
         <section class="module-catalog-toolbar" aria-labelledby="moduleCatalogTitle">
-            <h1 id="moduleCatalogTitle" class="module-catalog-title">@ViewBag.Title</h1>
+            <h1 metics-page-heading id="moduleCatalogTitle" class="module-catalog-title">@ViewBag.Title</h1>
             <div class="module-toolbar-controls">
                 <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="module-search-form" role="search">
                     <div class="module-search-control">

@@ -58,6 +58,7 @@
     color: #fff;
     display: inline-flex;
     font-size: 14px;
+    font-weight: 450;
     gap: 8px;
     line-height: 1.3;
     min-height: 40px;
@@ -70,7 +71,7 @@
 .metics-tabs-navbar .nav-link:focus,
 .metics-tabs-navbar .dropdown.show > .nav-link { background: rgba(255,255,255,.12); color: #fff; }
 .metics-tabs-navbar .nav-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-.metics-tabs-navbar .metics-tab.active > .nav-link { font-weight: 700; }
+.metics-tabs-navbar .metics-tab.active > .nav-link { font-weight: 600; }
 .metics-tabs-navbar .metics-tab.active > .nav-link::before {
     background: #fff;
     bottom: -11px;
@@ -80,7 +81,23 @@
     position: absolute;
     right: 8px;
 }
-.metics-tabs-navbar .dropdown-toggle::after { margin-left: 2px; }
+.metics-tabs-navbar .dropdown-toggle::after {
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    content: '';
+    flex: 0 0 7px;
+    height: 7px;
+    margin-left: 2px;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 150ms ease;
+    width: 7px;
+}
+.metics-tabs-navbar .dropdown-toggle[aria-expanded="true"]::after {
+    transform: translateY(2px) rotate(225deg);
+}
+@media (prefers-reduced-motion: reduce) {
+    .metics-tabs-navbar .dropdown-toggle::after { transition: none; }
+}
 .metics-tabs-navbar .bi { font-size: 16px; line-height: 1; }
 .metics-tabs-navbar .metics-account-link > .bi { font-size: 25px; }
 .metics-icon-tab { justify-content: center; width: 36px; }
@@ -141,6 +158,67 @@
     margin: 6px 12px;
 }
 .metics-logout { color: #b91c1c !important; }
+.metics-page-header {
+    background: transparent;
+    border: 0;
+}
+.metics-page-header .metics-page-header-inner {
+    align-items: center;
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    min-height: 142px;
+    padding: 28px 12px;
+}
+.metics-page-header-content { flex: 1 1 auto; min-width: 0; }
+.metics-page-header .metics-breadcrumbs { margin-bottom: 14px; }
+.metics-page-header h1 {
+    color: #14243a;
+    font-size: clamp(1.65rem, 2.3vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -.025em;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+.metics-page-subheading {
+    color: #58718c;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 9px 0 0;
+    overflow-wrap: anywhere;
+}
+.metics-page-header .metics-page-actions { flex: 0 0 auto; padding: 0; }
+.metics-page-header .metics-create-module {
+    align-items: center;
+    background: linear-gradient(180deg, #3067a2, #245b94);
+    border: 1px solid #245b94;
+    border-radius: 7px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 10px;
+    justify-content: center;
+    line-height: 1.2;
+    min-height: 48px;
+    min-width: 184px;
+    padding: 12px 22px;
+}
+.metics-page-header .metics-create-module::before {
+    display: block;
+    flex: 0 0 auto;
+    font-size: 18px;
+    line-height: 1;
+    margin: 0;
+}
+.metics-page-header .metics-create-module:hover { background: #1b497b; border-color: #1b497b; color: #fff; }
+.metics-has-page-heading > .contenedor-caja { margin-top: 28px; }
+.metics-has-page-heading > .module-catalog-page { margin-top: 0; }
+@media (max-width: 767.98px) {
+    .metics-page-header .metics-page-header-inner { align-items: flex-start; flex-direction: column; gap: 20px; padding: 24px 16px; }
+    .metics-page-header .metics-create-module { min-width: 0; }
+}
 .metics-page-actions {
     display: flex;
     justify-content: flex-end;
@@ -235,7 +313,8 @@
     .metics-section-inscriptions { --metics-section-weight: 1.15; }
     .metics-section-content { --metics-section-weight: 1.5; }
     .metics-tabs-nav > .metics-tab > .nav-link { justify-content: center; width: 100%; }
-    .metics-tabs-right .metics-account { min-width: 185px; }
+    .metics-tabs-right .metics-account { min-width: 245px; }
+    .metics-tabs-right .metics-account > .nav-link { width: 100%; }
     .metics-tabs-navbar .metics-tab > .nav-link > .bi { display: none; }
     .metics-tabs-navbar .dropdown > .metics-tabs-menu {
         bottom: auto !important;
@@ -249,6 +328,10 @@
 @media (hover: hover) and (pointer: fine) and (min-width: 1600px) {
     .metics-tabs-navbar .dropdown:hover > .metics-tabs-menu,
     .metics-tabs-navbar .dropdown:focus-within > .metics-tabs-menu { display: block; }
+    .metics-tabs-navbar .dropdown:hover > .dropdown-toggle::after,
+    .metics-tabs-navbar .dropdown:focus-within > .dropdown-toggle::after {
+        transform: translateY(2px) rotate(225deg);
+    }
 }
 @media (max-width: 1599.98px) {
     .metics-tabs-container { flex-wrap: wrap; gap: 0; }
