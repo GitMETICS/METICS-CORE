@@ -15,37 +15,6 @@
 		width: 100%;
 	}
 
-	#tblCustomers {
-		border-collapse: collapse;
-		font-size: 12px;
-		margin: 0 !important;
-		width: 100% !important;
-	}
-
-	#tblCustomers thead th {
-		background: #ECECEC;
-		border: 1px solid #CCCCCC;
-		color: #333;
-		font-weight: bold;
-		padding: 9px 9px;
-		vertical-align: middle;
-		white-space: nowrap;
-	}
-
-	#tblCustomers tbody td {
-		border: 1px solid #CCCCCC;
-		padding: 8px 9px;
-		vertical-align: middle;
-	}
-
-	#tblCustomers tbody tr:nth-child(odd) {
-		background: #F7F7F7;
-	}
-
-	#tblCustomers tbody tr:nth-child(even) {
-		background: white;
-	}
-
 	#tblCustomers .form-check {
 		align-items: center;
 		display: flex;
@@ -296,8 +265,10 @@
 				<!-- SECCIÓN: Tabla de Participantes -->
 				<div class="table-card mb-3">
 					<div class="table-card-header">
+					<div class="table-card-heading">
 						<span class="table-card-title">Participantes</span>
 						<span class="table-card-desc">Listado de participantes inscritos en el módulo</span>
+					</div>
 					</div>
 
 					<div class="table-toolbar">
@@ -308,8 +279,8 @@
 						<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" form="formBuscarParticipantesDelGrupo">
 					</div>
 
-					<div class="grupo-participantes-wrapper">
-							<table class="table mb-0" id="tblCustomers">
+				<div class="grupo-participantes-wrapper table-scroll">
+							<table class="table data-table mb-0" id="tblCustomers">
 								<thead>
 									<tr>
 										<th class="text-center p-2" style="width:40px;">

@@ -2,22 +2,11 @@
 @{
     ViewBag.Title = "Áreas de Competencia";
     PageHeadingBuilder.Configure(ViewContext, Url);
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
@@ -40,19 +29,32 @@
         {
             <h5 class="text-center mb-4">No hay temas.</h5>
             <div class="text-center">
-                @Html.ActionLink("  Crear Área de Competencia", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                @Html.ActionLink("Crear área", "CrearTema", "Tema", new { }, new { @class = "table-card-action bi bi-plus-lg" })
             </div>
         }
         else
         {
             <div class="table-card">
                 <div class="table-card-header">
-                    <span class="table-card-title">Áreas de Competencia</span>
-                    <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
+                    <div class="table-card-heading">
+                        <span class="table-card-title">Áreas de Competencia</span>
+                        <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
+                    </div>
+                    <div class="table-card-header-actions">
+                        <span class="table-card-count">@ViewBag.Temas.Count áreas encontradas</span>
+                        @Html.ActionLink("Crear área", "CrearTema", "Tema", new { }, new { @class = "table-card-action bi bi-plus-lg" })
+                    </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
+                        <div class="table-search">
+                            <div class="table-search-field">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                <input type="search" id="temaBusqueda" class="form-control" placeholder="Buscar área de competencia" aria-label="Buscar área de competencia" />
+                            </div>
+                        </div>
+
                         <div class="table-pagesize">
                             <label for="temaPageSize">Mostrar</label>
                             <select id="temaPageSize">
@@ -63,15 +65,6 @@
                             </select>
                             <label for="temaPageSize">registros</label>
                         </div>
-
-                        <div class="table-search">
-                            <input type="text" id="temaBusqueda" class="form-control" placeholder="Buscar área de competencia" />
-                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        @Html.ActionLink("  Crear Área", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
                     </div>
                 </div>
 

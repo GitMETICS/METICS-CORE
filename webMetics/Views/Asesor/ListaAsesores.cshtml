@@ -8,22 +8,11 @@
 @{
     ViewBag.Title = "Facilitadores(as)";
     PageHeadingBuilder.Configure(ViewContext, Url);
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
@@ -51,12 +40,25 @@
             {
                 <div class="table-card">
                     <div class="table-card-header">
-                        <span class="table-card-title">Facilitadores(as)</span>
-                        <span class="table-card-desc">Listado de facilitadores(as) registrados en el sistema</span>
+                        <div class="table-card-heading">
+                            <span class="table-card-title">Facilitadores(as)</span>
+                            <span class="table-card-desc">Listado de facilitadores(as) registrados en el sistema</span>
+                        </div>
+                        <div class="table-card-header-actions">
+                            <span class="table-card-count">@ViewBag.Asesores.Count facilitadores encontrados</span>
+                            @Html.ActionLink("Crear facilitador(a)", "CrearAsesor", "Asesor", new { }, new { @class = "table-card-action bi bi-plus-lg" })
+                        </div>
                     </div>
 
                     <div class="table-toolbar">
                         <div class="table-toolbar-group">
+                            <div class="table-search">
+                                <div class="table-search-field">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                    <input type="search" id="asesorBusqueda" class="form-control" placeholder="Buscar facilitador(a)" aria-label="Buscar facilitador(a)" />
+                                </div>
+                            </div>
+
                             <div class="table-pagesize">
                                 <label for="asesorPageSize">Mostrar</label>
                                 <select id="asesorPageSize">
@@ -67,15 +69,6 @@
                                 </select>
                                 <label for="asesorPageSize">registros</label>
                             </div>
-
-                            <div class="table-search">
-                                <input type="text" id="asesorBusqueda" class="form-control" placeholder="Buscar facilitador(a)" />
-                                <button type="button" class="btn"><i class="bi bi-search"></i></button>
-                            </div>
-                        </div>
-
-                        <div>
-                            @Html.ActionLink("  Crear Facilitador(a)", "CrearAsesor", "Asesor", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
                         </div>
                     </div>
 

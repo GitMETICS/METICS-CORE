@@ -3,22 +3,11 @@
 @{
     ViewBag.Title = "Participantes";
     PageHeadingBuilder.Configure(ViewContext, Url);
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
@@ -76,12 +65,27 @@
 
             <div class="table-card">
                 <div class="table-card-header">
-                    <span class="table-card-title">Participantes</span>
-                    <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
+                    <div class="table-card-heading">
+                        <span class="table-card-title">Participantes</span>
+                        <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
+                    </div>
+                    <div class="table-card-header-actions">
+                        <span id="participantesCount" class="table-card-count" aria-live="polite">Cargando participantes…</span>
+                        @Html.ActionLink("Agregar participante", "FormularioParticipante", "Participante", new { }, new { @class = "table-card-action bi bi-person-plus" })
+                    </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
+                        <form asp-action="VerParticipantes" asp-controller="Participante" method="get" class="table-search">
+                            <div class="table-search-field">
+                                <button type="submit" class="table-search-submit" aria-label="Buscar participante">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                </button>
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" aria-label="Buscar participante" />
+                            </div>
+                        </form>
+
                         <div class="table-pagesize">
                             <label for="participantePageSize">Mostrar</label>
                             <select id="participantePageSize">
@@ -92,15 +96,6 @@
                             </select>
                             <label for="participantePageSize">registros</label>
                         </div>
-
-                        <form asp-action="VerParticipantes" asp-controller="Participante" method="get" class="table-search">
-                            <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
-                            <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-                        </form>
-                    </div>
-
-                    <div>
-                        @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus btn-table-sm" })
                     </div>
                 </div>
 
@@ -331,7 +326,12 @@ else
                 }
             }
         ],
-        onDraw: closeActionMenus
+        onDraw: function (api) {
+            closeActionMenus();
+            const count = api.page.info().recordsDisplay;
+            document.getElementById('participantesCount').textContent = count +
+                (count === 1 ? ' participante encontrado' : ' participantes encontrados');
+        }
     });
 
     document.getElementById('participanteTblCustomers').addEventListener('click', function (event) {

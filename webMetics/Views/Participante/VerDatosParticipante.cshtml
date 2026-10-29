@@ -59,32 +59,11 @@
     }
 
     .participante-detalle-table {
-        border-collapse: collapse;
-        font-size: 12px;
         width: 100%;
         min-width: 1100px;
-        background: white;
-        margin: 0;
     }
 
-    .participante-detalle-table th {
-        background: #ECECEC;
-        border: 1px solid #CCCCCC;
-        padding: 9px;
-        font-weight: bold;
-        white-space: nowrap;
-        color: #333;
-        text-align: left;
-        vertical-align: middle;
-    }
-
-    .participante-detalle-table td {
-        border: 1px solid #CCCCCC;
-        padding: 8px 9px;
-        vertical-align: top;
-    }
-
-    .participante-detalle-table .detalle-label {
+    .body-content .participante-detalle-table .detalle-label {
         width: 16%;
         background: #F9F9F9;
         color: #204C6F;
@@ -173,29 +152,9 @@
     }
 
     .modulo-detalle-table {
-        background: white;
-        border-collapse: collapse;
-        font-size: 12px;
         margin: 0;
         min-width: 980px;
         width: 100%;
-    }
-
-    .modulo-detalle-table th {
-        background: #ECECEC;
-        border: 1px solid #CCCCCC;
-        color: #333;
-        font-weight: bold;
-        padding: 9px;
-        text-align: left;
-        vertical-align: middle;
-        white-space: nowrap;
-    }
-
-    .modulo-detalle-table td {
-        border: 1px solid #CCCCCC;
-        padding: 8px 9px;
-        vertical-align: middle;
     }
 
     .modulo-detalle-table .form-control {
@@ -353,12 +312,14 @@
 
                 <div class="table-card">
                     <div class="table-card-header">
+                    <div class="table-card-heading">
                         <span class="table-card-title">Datos del participante</span>
                         <span class="table-card-desc">Información completa registrada en el sistema</span>
                     </div>
+                    </div>
 
-                    <div class="participante-detalle-wrapper">
-                        <table class="participante-detalle-table">
+                    <div class="participante-detalle-wrapper table-scroll">
+                        <table class="participante-detalle-table data-table">
                             <thead>
                                 <tr>
                                     <th colspan="4">Información personal y académica</th>
@@ -469,8 +430,8 @@
                                 </button>
 
                                 <div id="detalle-@inscripcion.idInscripcion" class="collapse">
-                                    <div class="modulo-detalle-wrapper">
-                                        <table class="modulo-detalle-table">
+                                <div class="modulo-detalle-wrapper table-scroll">
+                                        <table class="modulo-detalle-table data-table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col" style="width:20%;">Nombre Completo</th>

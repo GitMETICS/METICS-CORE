@@ -4,271 +4,10 @@
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
-<style>
-    .category-list-page { margin-top: 0; }
-
-    .category-list-page .table-card {
-        background: #fff;
-        border: 1px solid #e1e8f0;
-        border-radius: 10px;
-        box-shadow: 0 4px 18px rgba(25, 54, 86, .06);
-        margin-top: 20px;
-        overflow: hidden;
-    }
-
-    .category-list-page .table-card-header {
-        align-items: center;
-        background: #fff;
-        border-bottom: 1px solid #e5ebf3;
-        display: flex;
-        gap: 16px;
-        justify-content: space-between;
-        padding: 20px 24px;
-    }
-
-    .category-list-page .table-card-heading { min-width: 0; }
-    .category-list-page .table-card-title {
-        color: #1b2c43;
-        display: block;
-        font-size: 20px;
-        font-weight: 700;
-        line-height: 1.3;
-        margin: 0 0 3px;
-    }
-    .category-list-page .table-card-desc {
-        color: #718096;
-        display: block;
-        font-size: 14px;
-        line-height: 1.45;
-    }
-
-    .category-list-page .table-card-header-actions {
-        align-items: center;
-        display: flex;
-        flex: 0 0 auto;
-        gap: 14px;
-    }
-    .category-list-page .category-count {
-        align-items: center;
-        background: #edf4ff;
-        border-radius: 7px;
-        color: #2863a8;
-        display: inline-flex;
-        font-size: 12px;
-        font-weight: 600;
-        min-height: 42px;
-        padding: 8px 12px;
-        white-space: nowrap;
-    }
-    .category-list-page .category-create-btn {
-        align-items: center;
-        background: #3268f5;
-        border: 1px solid #3268f5;
-        border-radius: 7px;
-        color: #fff;
-        display: inline-flex;
-        font-size: 14px;
-        font-weight: 600;
-        gap: 9px;
-        min-height: 42px;
-        min-width: 156px;
-        justify-content: center;
-        padding: 9px 18px;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-    .category-list-page .category-create-btn:hover,
-    .category-list-page .category-create-btn:focus-visible {
-        background: #2458df;
-        border-color: #2458df;
-        color: #fff;
-    }
-
-    .category-list-page .table-toolbar {
-        align-items: center;
-        background: #fff;
-        border: 0;
-        justify-content: flex-start;
-        padding: 18px 24px;
-    }
-    .category-list-page .table-toolbar-group {
-        align-items: center;
-        flex-wrap: nowrap;
-        gap: 24px;
-        justify-content: space-between;
-        width: 100%;
-    }
-    .category-list-page .table-pagesize { gap: 8px; }
-    .category-list-page .table-pagesize label {
-        color: #52647a;
-        font-size: 14px;
-    }
-    .category-list-page .table-pagesize select {
-        background-color: #fff;
-        border: 1px solid #d9e2ee;
-        border-radius: 7px;
-        color: #27384e;
-        font-size: 14px;
-        min-height: 38px;
-        min-width: 66px;
-        padding: 6px 10px;
-    }
-    .category-list-page .table-search {
-        align-items: center;
-        flex: 1 1 auto;
-        max-width: none;
-        min-width: 0;
-    }
-    .category-list-page .category-search-field {
-        flex: 1 1 auto;
-        min-width: 0;
-        position: relative;
-    }
-    .category-list-page .category-search-field > .bi-search {
-        color: #657991;
-        font-size: 16px;
-        left: 13px;
-        pointer-events: none;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    .category-list-page .table-search .form-control {
-        background: #fff;
-        border: 1px solid #d9e2ee;
-        border-radius: 7px;
-        color: #27384e;
-        font-size: 14px;
-        min-height: 40px;
-        padding: 8px 12px 8px 40px;
-        width: 100%;
-    }
-    .category-list-page .table-search .form-control:focus {
-        border-color: #78a7ee;
-        box-shadow: 0 0 0 3px rgba(50, 104, 245, .12);
-    }
-    .category-list-page .table-scroll {
-        background: #fff;
-        border: 1px solid #e6edf5;
-        border-radius: 8px;
-        margin: 0 24px;
-        max-height: min(58vh, 560px);
-        overflow: auto;
-        overscroll-behavior: contain;
-        width: calc(100% - 48px);
-    }
-    .category-list-page .dataTables_wrapper { min-width: 100%; }
-    .category-list-page table.data-table {
-        background: #fff;
-        border: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 14px;
-        margin: 0 !important;
-        width: 100% !important;
-    }
-    .category-list-page .data-table thead th {
-        background: #f1f6fc;
-        border: 0;
-        border-bottom: 1px solid #e1e8f0;
-        color: #23344b;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 15px 18px;
-        position: sticky;
-        text-align: left;
-        top: 0;
-        z-index: 2;
-    }
-    .category-list-page .data-table thead th + th,
-    .category-list-page .data-table tbody td + td { border-left: 1px solid #e8eef5; }
-    .category-list-page .data-table tbody td {
-        background: #fff;
-        border: 0;
-        border-bottom: 1px solid #e8eef5;
-        color: #42536a;
-        font-size: 14px;
-        padding: 13px 18px;
-        vertical-align: middle;
-    }
-    .category-list-page .data-table tbody tr:hover td { background: #f8fbff; }
-    .category-list-page .data-table tbody tr:last-child td { border-bottom: 0; }
-    .category-list-page .data-table .icon-action {
-        align-items: center;
-        background: #edf4ff;
-        border-radius: 7px;
-        font-size: 16px;
-        height: 36px;
-        width: 36px;
-    }
-    .category-list-page .data-table .icon-edit { color: #2870d5; }
-    .category-list-page .data-table .icon-delete {
-        background: #fff0f0;
-        color: #d93030;
-    }
-
-    .category-list-page .category-table-footer {
-        align-items: center;
-        border-top: 1px solid #e8eef5;
-        display: flex;
-        gap: 16px;
-        justify-content: flex-end;
-        margin: 14px 24px 0;
-        min-height: 62px;
-    }
-    .category-list-page .category-table-footer:has(#categoriaTblPaginacion:empty) { display: none; }
-    .category-list-page .table-card:has(> .category-table-footer > #categoriaTblPaginacion:empty) { padding-bottom: 20px; }
-    .category-list-page .table-pagination {
-        background: transparent;
-        border: 0;
-        gap: 6px;
-        padding: 10px 0;
-    }
-    .category-list-page .page-btn {
-        align-items: center;
-        border: 1px solid #dce5ef;
-        border-radius: 7px;
-        color: #49617c;
-        display: inline-flex;
-        font-family: inherit;
-        font-size: 14px;
-        height: 38px;
-        justify-content: center;
-        margin: 0;
-        min-width: 38px;
-        padding: 0 11px;
-    }
-    .category-list-page .page-btn:hover { background: #f2f7ff; color: #245b94; }
-    .category-list-page .page-btn.current,
-    .category-list-page .page-btn.current:hover {
-        background: #3268f5;
-        border-color: #3268f5;
-        color: #fff;
-    }
-    .category-list-page .page-btn.disabled { color: #9aa9b9; }
-
-    @@media (max-width: 767.98px) {
-        .category-list-page .table-card-header { align-items: flex-start; flex-direction: column; padding: 18px 16px; }
-        .category-list-page .table-card-header-actions { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
-        .category-list-page .category-count { font-size: 11px; min-height: 38px; padding: 6px 9px; }
-        .category-list-page .category-create-btn { font-size: 12px; min-height: 38px; min-width: 156px; padding: 8px 11px; }
-        .category-list-page .table-toolbar { padding: 14px 16px; }
-        .category-list-page .table-toolbar-group { align-items: stretch; flex-direction: column; gap: 12px; }
-        .category-list-page .table-search { flex-basis: auto; max-width: none; min-width: 0; width: 100%; }
-        .category-list-page .table-pagesize { align-self: flex-end; }
-        .category-list-page .table-scroll { margin: 0 12px; max-height: 55vh; width: calc(100% - 24px); }
-        .category-list-page .data-table { min-width: 700px; }
-        .category-list-page .data-table thead th,
-        .category-list-page .data-table tbody td { padding: 12px; }
-        .category-list-page .category-table-footer { align-items: flex-start; flex-direction: column; gap: 4px; margin: 12px 16px 0; padding: 12px 0; }
-        .category-list-page .table-pagination { align-self: flex-end; padding: 4px 0; }
-        .category-list-page .table-card:has(> .category-table-footer > #categoriaTblPaginacion:empty) { padding-bottom: 16px; }
-    }
-</style>
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid category-list-page">
+    <div class="contenedor-caja container-fluid category-list-page table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
@@ -303,15 +42,15 @@
                         <span class="table-card-desc">Listado de niveles registrados en el sistema.</span>
                     </div>
                     <div class="table-card-header-actions">
-                        <span class="category-count">@ViewBag.Categorias.Count niveles encontrados</span>
-                        @Html.ActionLink("Crear nivel", "CrearCategoria", "Categoria", new { }, new { @class = "category-create-btn bi bi-plus-lg" })
+                        <span class="table-card-count">@ViewBag.Categorias.Count niveles encontrados</span>
+                        @Html.ActionLink("Crear nivel", "CrearCategoria", "Categoria", new { }, new { @class = "table-card-action bi bi-plus-lg" })
                     </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
                         <div class="table-search">
-                            <div class="category-search-field">
+                            <div class="table-search-field">
                                 <i class="bi bi-search" aria-hidden="true"></i>
                                 <input type="search" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" aria-label="Buscar nivel" />
                             </div>
@@ -359,7 +98,7 @@
                     </table>
                 </div>
 
-                <div class="category-table-footer">
+                <div class="table-card-footer">
                     <div id="categoriaTblPaginacion" class="table-pagination"></div>
                 </div>
             </div>
