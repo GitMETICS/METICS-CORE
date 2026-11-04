@@ -23,18 +23,44 @@ var MeticsTable = (function () {
     }
 
     // Construye un botón/elemento de paginación con la clase compartida .page-btn.
-    function makePageButton(label, targetPageIndex, table, isCurrent) {
+    function makePageButton(label, targetPageIndex, table, isCurrent, ariaLabel, isDisabled) {
+        var isArrow = label === '‹' || label === '›';
+        var appendLabel = function (element) {
+            if (isArrow) {
+                var icon = document.createElement('i');
+                icon.className = label === '‹' ? 'bi bi-chevron-left' : 'bi bi-chevron-right';
+                icon.setAttribute('aria-hidden', 'true');
+                element.classList.add('page-btn-arrow');
+                element.appendChild(icon);
+            } else {
+                element.textContent = label;
+            }
+        };
+
+        if (isDisabled) {
+            var disabledButton = document.createElement('button');
+            disabledButton.type = 'button';
+            disabledButton.className = 'page-btn disabled';
+            disabledButton.disabled = true;
+            appendLabel(disabledButton);
+            if (ariaLabel) disabledButton.setAttribute('aria-label', ariaLabel);
+            return disabledButton;
+        }
+
         if (isCurrent) {
             var span = document.createElement('span');
             span.className = 'page-btn current';
             span.textContent = label;
+            span.setAttribute('aria-current', 'page');
+            span.setAttribute('aria-label', 'Página ' + label + ', actual');
             return span;
         }
 
         var link = document.createElement('a');
         link.href = '#';
         link.className = 'page-btn';
-        link.textContent = label;
+        appendLabel(link);
+        if (ariaLabel) link.setAttribute('aria-label', ariaLabel);
         link.addEventListener('click', function (event) {
             event.preventDefault();
             table.page(targetPageIndex).draw(false);
@@ -44,8 +70,9 @@ var MeticsTable = (function () {
 
     function makePaginationEllipsis() {
         var span = document.createElement('span');
-        span.className = 'page-btn disabled';
-        span.textContent = '...';
+        span.className = 'page-ellipsis';
+        span.textContent = '…';
+        span.setAttribute('aria-label', 'Páginas omitidas');
         return span;
     }
 
@@ -60,26 +87,26 @@ var MeticsTable = (function () {
 
         if (pageCount <= 1) return;
 
-        if (currentPage > 1) {
-            container.appendChild(makePageButton('«', currentPage - 2, table, false));
-        }
+        container.appendChild(makePageButton('‹', currentPage - 2, table, false, 'Página anterior', currentPage === 1));
 
-        if (pageCount <= 7) {
+        if (pageCount <= 5) {
             for (var page = 1; page <= pageCount; page++) {
-                container.appendChild(makePageButton(String(page), page - 1, table, page === currentPage));
+                container.appendChild(makePageButton(String(page), page - 1, table, page === currentPage, 'Ir a la página ' + page));
             }
         } else {
-            container.appendChild(makePageButton('1', 0, table, currentPage === 1));
+            container.appendChild(makePageButton('1', 0, table, currentPage === 1, 'Ir a la página 1'));
 
-            var startPage = Math.max(2, currentPage - 2);
-            var endPage = Math.min(pageCount - 1, currentPage + 2);
-
-            if (currentPage <= 4) {
+            var startPage;
+            var endPage;
+            if (currentPage <= 3) {
                 startPage = 2;
-                endPage = 5;
-            } else if (currentPage >= pageCount - 3) {
-                startPage = pageCount - 4;
+                endPage = 4;
+            } else if (currentPage >= pageCount - 2) {
+                startPage = pageCount - 3;
                 endPage = pageCount - 1;
+            } else {
+                startPage = currentPage - 1;
+                endPage = currentPage + 1;
             }
 
             if (startPage > 2) {
@@ -87,19 +114,17 @@ var MeticsTable = (function () {
             }
 
             for (var i = startPage; i <= endPage; i++) {
-                container.appendChild(makePageButton(String(i), i - 1, table, i === currentPage));
+                container.appendChild(makePageButton(String(i), i - 1, table, i === currentPage, 'Ir a la página ' + i));
             }
 
             if (endPage < pageCount - 1) {
                 container.appendChild(makePaginationEllipsis());
             }
 
-            container.appendChild(makePageButton(String(pageCount), pageCount - 1, table, currentPage === pageCount));
+            container.appendChild(makePageButton(String(pageCount), pageCount - 1, table, currentPage === pageCount, 'Ir a la página ' + pageCount));
         }
 
-        if (currentPage < pageCount) {
-            container.appendChild(makePageButton('»', currentPage, table, false));
-        }
+        container.appendChild(makePageButton('›', currentPage, table, false, 'Página siguiente', currentPage === pageCount));
     }
 
     // options: { tableId, pageSizeId, paginationId, searching, searchInputId }

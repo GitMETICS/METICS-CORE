@@ -3,148 +3,168 @@
 @{
     ViewBag.Title = "Inscripciones";
     PageHeadingBuilder.Configure(ViewContext, Url, title: "Lista de inscripciones");
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+        @await Html.PartialAsync("_MeticsToast")
 
         <div style="padding-bottom: 220px;">
+            <section class="file-management-card" aria-labelledby="inscripcionFileManagementTitle">
+                <header class="file-management-header">
+                    <h2 id="inscripcionFileManagementTitle">Gestión de archivos</h2>
+                    <p>Importa y exporta información de inscripciones</p>
+                </header>
 
-            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    @using (Html.BeginForm("SubirArchivoExcelInscripciones", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de inscripciones</small>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
-                            <input class="btn btn-secondary" type="submit" value="Subir" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">
+                <div class="file-management-body">
+                    <section class="file-management-section" aria-labelledby="importInscripcionesTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-upload" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="importInscripcionesTitle">Importar inscripciones</h3>
+                                <p>Carga un archivo Excel al sistema</p>
+                            </div>
                         </div>
-                    }
+
+                        @using (Html.BeginForm("SubirArchivoExcelInscripciones", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inscripcion-import-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="file-management-controls file-import-controls">
+                                <input type="file" class="participant-file-input" name="file" id="inscripcionFileInput" accept=".xls,.xlsx" required aria-label="Seleccionar archivo Excel de inscripciones" onchange="updateInscripcionFileName(this)">
+                                <label for="inscripcionFileInput" class="file-management-button file-management-button-secondary file-picker-trigger">
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i>
+                                    <span id="inscripcionFileName">Elegir archivo</span>
+                                </label>
+                                <button class="file-management-button file-management-button-primary" type="submit">
+                                    <i class="bi bi-upload" aria-hidden="true"></i>
+                                    Subir
+                                </button>
+                            </div>
+                        }
+
+                        <div class="file-management-note file-requirements-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas y Calificación</strong>.</p>
+                            <a href="@Url.Action("DescargarPlantillaSubirInscripciones", "Inscripcion")" class="file-management-download-link">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar plantilla
+                            </a>
+                        </div>
+                    </section>
+
+                    <section class="file-management-section file-export-section" aria-labelledby="exportInscripcionesTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-download" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="exportInscripcionesTitle">Exportar inscripciones</h3>
+                                <p>Descarga los datos en el formato que necesites</p>
+                            </div>
+                        </div>
+
+                        <div class="file-management-controls file-export-controls">
+                            <label class="visually-hidden" for="inscripcionExportFormat">Formato de exportación</label>
+                            <select id="inscripcionExportFormat" class="file-management-select">
+                                <option value="@Url.Action("ExportarTodosParticipantesPDF", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })">PDF</option>
+                                <option value="@Url.Action("ExportarTodosParticipantesExcel", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })">Excel</option>
+                                <option value="@Url.Action("ExportarTodosParticipantesWord", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" selected>Word</option>
+                            </select>
+                            <button type="button" id="downloadInscripcionExport" class="file-management-button file-management-button-secondary">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar
+                            </button>
+                        </div>
+
+                        <div class="file-management-note file-export-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Formatos disponibles para descargar: PDF, Excel y Word.</p>
+                        </div>
+                    </section>
                 </div>
-
-                <div style="flex-shrink: 0;">
-                    <small class="text-secondary" style="display: block; margin-bottom: 8px;">Exportar datos:</small>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="@Url.Action("ExportarTodosParticipantesPDF", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">PDF</a>
-                        <a href="@Url.Action("ExportarTodosParticipantesExcel", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel</a>
-                        <a href="@Url.Action("ExportarTodosParticipantesWord", "Inscripcion", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Word</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
-                <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
-                <small class="text-muted" style="flex: 1;">
-                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con al menos las siguientes columnas: <strong>Correo Institucional, Módulo, Grupo, Horas, Estado, Horas Completadas</strong>
-                    <br />
-                    <a href="@Url.Action("DescargarPlantillaSubirInscripciones", "Inscripcion")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
-                </small>
-            </div>
-
+            </section>
 
 
             <!-- Sección de Asignación de Medallas -->
-                <div class="mb-4">
-                    <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" asp-antiforgery="false" id="formAsignarMedallas">
-                        @Html.AntiForgeryToken()
-                        <div id="selectedParticipantsInputs"></div>
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title mb-3">
-                                    <i class="bi bi-award me-2"></i>Asignación Masiva de Medallas
-                                </h5>
+            <form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" asp-antiforgery="false" id="formAsignarMedallas">
+                @Html.AntiForgeryToken()
+                <div id="selectedParticipantsInputs"></div>
+                <section class="medal-assignment-card mb-4" aria-labelledby="medalAssignmentTitle">
+                    <header class="medal-assignment-header">
+                        <i class="bi bi-award" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="medalAssignmentTitle">Asignación masiva de medallas</h2>
+                            <p>Selecciona las medallas y los participantes a quienes deseas asignarlas.</p>
+                        </div>
+                    </header>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label class="form-label"><b>Buscar Medalla:</b></label>
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
-                                            <span class="input-group-text">
-                                                <i class="bi bi-search"></i>
-                                            </span>
-                                        </div>
+                    <div class="medal-assignment-layout">
+                        <section class="medal-gallery-section" aria-labelledby="medalGalleryTitle">
+                            <label class="medal-section-label" id="medalGalleryTitle" for="medalla-search">Seleccionar medalla</label>
+                            <div class="input-group medal-search-group">
+                                <input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Buscar medalla..." aria-label="Buscar medalla">
+                                <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
+                            </div>
 
-                                        <div class="mb-3" style="max-height: 150px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 8px; background-color: #f8f9fa;">
-                                            @if (ViewBag.TodasLasMedallas != null)
+                            @if (ViewBag.TodasLasMedallas != null && ViewBag.TodasLasMedallas.Count > 0)
+                            {
+                                <div class="medal-carousel" aria-label="Navegación de medallas">
+                                    <button type="button" class="medal-carousel-button" id="medalCarouselPrevious" onclick="navigateMedalCarousel(-1)" aria-label="Ver medallas anteriores" aria-controls="medalCarouselViewport" disabled>
+                                        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="medal-gallery-scroll" id="medalCarouselViewport" role="region" aria-label="Galería de medallas" tabindex="0" aria-live="polite">
+                                        <div id="medalla-list" class="medalla-list-container">
+                                            @foreach (var medalla in ViewBag.TodasLasMedallas)
                                             {
-                                                <div id="medalla-list" class="medalla-list-container d-flex flex-column">
-                                                    @foreach (var medalla in ViewBag.TodasLasMedallas)
-                                                    {
-                                                        <div class="medalla-item">
-                                                            <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" style="width: 164px; height: 164px; object-fit: contain;" />
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla">
-                                                                <label class="form-check-label" for="medallaSeleccionada">
-                                                                    @medalla
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="medalla-list-container">
-                                                    <p>No hay medallas disponibles.</p>
+                                                <div class="medalla-item medal-option-card">
+                                                    <img src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString((string)medalla))" alt="Medalla: @medalla" class="medalla-image" />
+                                                    <div class="form-check">
+                                                        <label class="form-check-label">
+                                                            <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla" aria-label="Seleccionar medalla @medalla">
+                                                            <span>@medalla</span>
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             }
                                         </div>
                                     </div>
+                                    <button type="button" class="medal-carousel-button" id="medalCarouselNext" onclick="navigateMedalCarousel(1)" aria-label="Ver más medallas" aria-controls="medalCarouselViewport">
+                                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="medal-gallery-empty">No hay medallas disponibles.</p>
+                            }
+                        </section>
 
-                                    <div class="col-md-6">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <label class="form-label"><b>Participantes Seleccionados:</b></label>
-                                            <small class="text-muted">
-                                                <span id="selectedCount">0</span> seleccionados
-                                            </small>
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
-                                                <i class="bi bi-check-all me-1"></i>Seleccionar página
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
-                                                <i class="bi bi-x-circle me-1"></i>Limpiar
-                                            </button>
-                                            <button type="submit" class="btn btn-success" id="btnAsignarMedallas">
-                                                <i class="bi bi-award me-1"></i>Asignar Medallas
-                                            </button>
-                                        </div>
-                                    </div>
+                        <aside class="medal-assignment-panel" aria-labelledby="assignmentSummaryTitle">
+                            <h3 id="assignmentSummaryTitle">Resumen de asignación</h3>
+                            <div class="medal-participant-summary" aria-live="polite" aria-atomic="true">
+                                <i class="bi bi-people" aria-hidden="true"></i>
+                                <div>
+                                    <span>Participantes seleccionados</span>
+                                    <strong id="selectedCount">0</strong>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
+                            <p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Selecciona participantes desde la tabla de inscripciones.</p>
+                            <div class="medal-assignment-actions">
+                                <button type="button" class="btn btn-outline-primary" onclick="selectAllParticipants()" aria-pressed="false">
+                                    <i class="bi bi-check-all" aria-hidden="true"></i><span id="selectPageParticipantsText">Seleccionar página</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearAllParticipants()">
+                                    <i class="bi bi-x-circle" aria-hidden="true"></i>Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-success" id="btnAsignarMedallas">
+                                    <i class="bi bi-award" aria-hidden="true"></i>Asignar Medallas
+                                </button>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+            </form>
 
                 <div class="table-card">
                     <div class="table-card-header">
@@ -244,6 +264,22 @@
     <script>
         const selectedParticipants = new Set();
 
+        function updateInscripcionFileName(fileInput) {
+            const fileNameLabel = document.getElementById('inscripcionFileName');
+            if (!fileNameLabel) return;
+
+            const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+            fileNameLabel.textContent = selectedFile ? selectedFile.name : 'Elegir archivo';
+            fileNameLabel.title = selectedFile ? selectedFile.name : '';
+        }
+
+        document.getElementById('downloadInscripcionExport').addEventListener('click', function () {
+            const exportUrl = document.getElementById('inscripcionExportFormat').value;
+            if (exportUrl) {
+                window.location.assign(exportUrl);
+            }
+        });
+
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, character => ({
                 '&': '&amp;',
@@ -271,6 +307,17 @@
             const pageCheckboxes = Array.from(document.querySelectorAll('.participant-checkbox'));
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             document.getElementById('selectedCount').textContent = selectedParticipants.size;
+            const selectPageButton = document.querySelector('.medal-assignment-actions button[onclick="selectAllParticipants()"]');
+            const selectPageText = document.getElementById('selectPageParticipantsText');
+            const allPageSelected = pageCheckboxes.length > 0 && pageCheckboxes.every(checkbox =>
+                selectedParticipants.has(checkbox.dataset.participantId));
+
+            if (selectPageText) {
+                selectPageText.textContent = allPageSelected ? 'Deseleccionar página' : 'Seleccionar página';
+            }
+            if (selectPageButton) {
+                selectPageButton.setAttribute('aria-pressed', String(allPageSelected));
+            }
 
             if (pageCheckboxes.length === 0) {
                 selectAllCheckbox.indeterminate = false;
@@ -330,10 +377,16 @@
         }
 
         function selectAllParticipants() {
-            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+            const participantCheckboxes = Array.from(document.querySelectorAll('.participant-checkbox'));
+            const deselectPage = participantCheckboxes.length > 0 && participantCheckboxes.every(checkbox =>
+                selectedParticipants.has(checkbox.dataset.participantId));
 
             participantCheckboxes.forEach(checkbox => {
-                selectedParticipants.add(checkbox.dataset.participantId);
+                if (deselectPage) {
+                    selectedParticipants.delete(checkbox.dataset.participantId);
+                } else {
+                    selectedParticipants.add(checkbox.dataset.participantId);
+                }
             });
 
             syncSelectedParticipantInputs();
@@ -354,11 +407,42 @@
             medalItems.forEach(item => {
                 const label = item.querySelector('.form-check-label').textContent.toLowerCase();
                 if (label.includes(searchInput)) {
-                    item.style.display = 'block';
+                    item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
             });
+
+            const viewport = document.getElementById('medalCarouselViewport');
+            if (viewport) {
+                viewport.scrollLeft = 0;
+                updateMedalCarouselControls();
+            }
+        }
+
+        function navigateMedalCarousel(direction) {
+            const viewport = document.getElementById('medalCarouselViewport');
+            if (!viewport) return;
+
+            viewport.scrollBy({ left: direction * viewport.clientWidth * 0.8, behavior: 'smooth' });
+        }
+
+        function updateMedalCarouselControls() {
+            const viewport = document.getElementById('medalCarouselViewport');
+            const previousButton = document.getElementById('medalCarouselPrevious');
+            const nextButton = document.getElementById('medalCarouselNext');
+            if (!viewport || !previousButton || !nextButton) return;
+
+            const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+            previousButton.disabled = viewport.scrollLeft <= 1;
+            nextButton.disabled = viewport.scrollLeft >= maxScroll - 1;
+        }
+
+        const medalCarouselViewport = document.getElementById('medalCarouselViewport');
+        if (medalCarouselViewport) {
+            medalCarouselViewport.addEventListener('scroll', updateMedalCarouselControls, { passive: true });
+            window.addEventListener('resize', updateMedalCarouselControls);
+            updateMedalCarouselControls();
         }
 
         function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
@@ -452,7 +536,12 @@
                     }
                 }
             ],
-            onDraw: refreshCurrentPageSelection
+            onDraw: function () {
+                refreshCurrentPageSelection();
+                if (window.__meticsFinishScrollRestore) {
+                    window.__meticsFinishScrollRestore();
+                }
+            }
         });
 
         document.getElementById('inscripcionTblCustomers').addEventListener('click', function (event) {
@@ -466,7 +555,14 @@
                 deleteLink.dataset.idParticipante);
         });
 
-        document.getElementById('formAsignarMedallas').addEventListener('submit', syncSelectedParticipantInputs);
+        document.getElementById('formAsignarMedallas').addEventListener('submit', function () {
+            syncSelectedParticipantInputs();
+            history.scrollRestoration = 'manual';
+            sessionStorage.setItem('metics-inscripcion-assignment-scroll', JSON.stringify({
+                top: window.scrollY,
+                savedAt: Date.now()
+            }));
+        });
     </script>
 }
 else

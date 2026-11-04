@@ -1,0 +1,87 @@
+@{
+    var successMessage = ViewData["SuccessMessage"]?.ToString();
+    var errorMessage = ViewData["ErrorMessage"]?.ToString();
+    var successTitle = "Operación completada";
+    var successDetail = successMessage;
+    string? assignedParticipants = null;
+
+    const string assignmentPrefix = "Se asignó la medalla '";
+    const string assignmentSeparator = "' a ";
+    const string assignmentSuffix = " participantes.";
+    if (!string.IsNullOrWhiteSpace(successMessage)
+        && successMessage.StartsWith(assignmentPrefix, StringComparison.Ordinal)
+        && successMessage.EndsWith(assignmentSuffix, StringComparison.Ordinal))
+    {
+        var medalNameStart = assignmentPrefix.Length;
+        var assignmentSeparatorIndex = successMessage.IndexOf(assignmentSeparator, medalNameStart, StringComparison.Ordinal);
+        if (assignmentSeparatorIndex > medalNameStart)
+        {
+            var countStart = assignmentSeparatorIndex + assignmentSeparator.Length;
+            var countLength = successMessage.Length - countStart - assignmentSuffix.Length;
+            if (countLength > 0 && int.TryParse(successMessage.Substring(countStart, countLength), out var participantCount))
+            {
+                successTitle = "Medalla asignada correctamente";
+                successDetail = successMessage.Substring(medalNameStart, assignmentSeparatorIndex - medalNameStart);
+                assignedParticipants = $"{participantCount} {(participantCount == 1 ? "participante" : "participantes")}";
+            }
+        }
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(successMessage) || !string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="metics-toast-region" aria-label="Notificaciones">
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="metics-toast toast fade" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="6500">
+                <div class="metics-toast-inner">
+                    <span class="metics-toast-icon" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
+                    <div class="metics-toast-message">
+                        <strong>@successTitle</strong>
+                        @if (!string.IsNullOrWhiteSpace(successDetail))
+                        {
+                            <p>@successDetail</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(assignedParticipants))
+                        {
+                            <span class="metics-toast-count"><i class="bi bi-people-fill" aria-hidden="true"></i>@assignedParticipants</span>
+                        }
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="metics-toast metics-toast--error toast fade" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="9000">
+                <div class="metics-toast-inner">
+                    <span class="metics-toast-icon" aria-hidden="true"><i class="bi bi-exclamation-lg"></i></span>
+                    <div class="metics-toast-message">
+                        <strong>No se pudo completar la operación</strong>
+                        <p>@errorMessage</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const showNotifications = function () {
+                document.querySelectorAll('.metics-toast').forEach(function (element) {
+                    if (window.bootstrap && window.bootstrap.Toast) {
+                        window.bootstrap.Toast.getOrCreateInstance(element).show();
+                    }
+                });
+            };
+
+            if (document.documentElement.classList.contains('metics-scroll-restore-pending')) {
+                document.addEventListener('metics:scroll-restored', showNotifications, { once: true });
+            } else {
+                showNotifications();
+            }
+        });
+    </script>
+}

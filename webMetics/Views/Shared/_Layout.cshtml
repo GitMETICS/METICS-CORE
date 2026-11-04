@@ -11,9 +11,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+    <script>
+        (function () {
+            const storageKey = 'metics-inscripcion-assignment-scroll';
+            try {
+                if (!window.location.pathname.toLowerCase().endsWith('/inscripcion/verinscripciones')) {
+                    sessionStorage.removeItem(storageKey);
+                    return;
+                }
+
+                const savedPosition = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+                if (!savedPosition || !Number.isFinite(savedPosition.top) || !Number.isFinite(savedPosition.savedAt) || Date.now() - savedPosition.savedAt > 30000) {
+                    sessionStorage.removeItem(storageKey);
+                    return;
+                }
+
+                history.scrollRestoration = 'manual';
+                document.documentElement.classList.add('metics-scroll-restore-pending');
+                let restored = false;
+                let fallbackTimer;
+                window.__meticsFinishScrollRestore = function () {
+                    if (restored) return;
+                    restored = true;
+                    window.clearTimeout(fallbackTimer);
+                    requestAnimationFrame(function () {
+                        window.scrollTo(0, savedPosition.top);
+                        sessionStorage.removeItem(storageKey);
+                        document.documentElement.classList.remove('metics-scroll-restore-pending');
+                        history.scrollRestoration = 'auto';
+                        window.__meticsFinishScrollRestore = null;
+                        document.dispatchEvent(new Event('metics:scroll-restored'));
+                    });
+                };
+                document.addEventListener('DOMContentLoaded', function () {
+                    fallbackTimer = window.setTimeout(window.__meticsFinishScrollRestore, 1800);
+                }, { once: true });
+            } catch (error) {
+                document.documentElement.classList.remove('metics-scroll-restore-pending');
+            }
+        })();
+    </script>
 
     <!-- jQuery se carga una sola vez en el head para que esté disponible en todas las vistas (DataTables, etc.) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -49,6 +93,9 @@
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
         var breadcrumbs = showNav ? BreadcrumbBuilder.Build(ViewContext, Url) : Array.Empty<BreadcrumbItem>();
         bool hasPageHeading = showNav && ViewData["UseSharedPageHeader"] is true;
+        bool showCreateModuleAction = (navRole == 1 || navRole == 2)
+            && currentController == "Grupo"
+            && (currentAction == "ListaGruposDisponibles" || currentAction == "BuscarGrupos");
     }
 
     <header class="metics-unified-header">
@@ -178,7 +225,7 @@
                         <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
                     }
                 </div>
-                @if (navRole == 1 || navRole == 2)
+                @if (showCreateModuleAction)
                 {
                     <div class="metics-page-actions" aria-label="Acciones de página">
                         @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
@@ -192,7 +239,7 @@
         {
             <div class="metics-page-context">
                 @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
-                @if (showNav && (navRole == 1 || navRole == 2))
+                @if (showNav && showCreateModuleAction)
                 {
                     <div class="metics-page-actions" aria-label="Acciones de página">
                         @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })

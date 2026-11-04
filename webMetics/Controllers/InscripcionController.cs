@@ -92,7 +92,16 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+            string rutaMedallas = System.IO.Path.Combine(_environment.ContentRootPath, "wwwroot", "images", "medallas");
+            string[] extensionesImagen = { ".png", ".jpg", ".jpeg" };
+            ViewBag.TodasLasMedallas = Directory.Exists(rutaMedallas)
+                ? Directory.EnumerateFiles(rutaMedallas)
+                    .Where(ruta => extensionesImagen.Contains(System.IO.Path.GetExtension(ruta) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                    .Select(ruta => System.IO.Path.GetFileName(ruta) ?? string.Empty)
+                    .Where(nombre => !string.IsNullOrWhiteSpace(nombre))
+                    .OrderBy(nombre => nombre, StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+                : new List<string>();
 
 
             // Manejar los mensajes de TempData
@@ -1806,7 +1815,7 @@ namespace webMetics.Controllers
 
             if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                id = Request.Cookies["idUsuario"] ?? "";
             }
 
             return id;

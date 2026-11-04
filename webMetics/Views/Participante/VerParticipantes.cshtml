@@ -11,57 +11,95 @@
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-
         <div style="padding-bottom: 220px;">
 
-            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            <section class="file-management-card" aria-labelledby="fileManagementTitle">
+                <header class="file-management-header">
+                    <h2 id="fileManagementTitle">Gestión de archivos</h2>
+                    <p>Importa y exporta información de participantes</p>
+                </header>
+
+                <div class="file-management-body">
+                    @if (ViewBag.ErrorMessage != null)
                     {
-                        @Html.AntiForgeryToken()
-                        <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de participantes</small>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
-                            <input class="btn btn-secondary" type="submit" value="Subir" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">
+                        <div class="alert alert-dark alert-dismissible fade show file-management-alert" role="alert">
+                            @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show file-management-alert" role="alert">
+                            @ViewBag.SuccessMessage
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <section class="file-management-section" aria-labelledby="importParticipantsTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-upload" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="importParticipantsTitle">Importar participantes</h3>
+                                <p>Carga un archivo Excel al sistema</p>
+                            </div>
+                        </div>
+
+                        @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data", @class = "participant-import-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="file-management-controls file-import-controls">
+                                <input type="file" class="participant-file-input" name="file" id="participantFileInput" accept=".xls,.xlsx" required aria-label="Seleccionar archivo Excel de participantes" onchange="updateParticipantFileName(this)">
+                                <label for="participantFileInput" class="file-management-button file-management-button-secondary file-picker-trigger">
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i>
+                                    <span id="participantFileName">Elegir archivo</span>
+                                </label>
+                                <button class="file-management-button file-management-button-primary" type="submit">
+                                    <i class="bi bi-upload" aria-hidden="true"></i>
+                                    Subir
+                                </button>
+                            </div>
+                        }
+
+                        <div class="file-management-note file-requirements-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas</strong>.</p>
+                            <a href="@Url.Action("DescargarPlantillaSubirParticipantes", "Participante")" class="file-management-download-link">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar plantilla
+                            </a>
+                        </div>
+                    </section>
+
+                    <section class="file-management-section file-export-section" aria-labelledby="exportParticipantsTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-download" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="exportParticipantsTitle">Exportar participantes</h3>
+                                <p>Descarga los datos en el formato que necesites</p>
+                            </div>
+                        </div>
+
+                        <div class="file-management-controls file-export-controls">
+                            <label class="visually-hidden" for="participantExportFormat">Formato de exportación</label>
+                            <select id="participantExportFormat" class="file-management-select">
+                                <option value="@Url.Action("ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">PDF</option>
+                                <option value="@Url.Action("ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">Excel 1</option>
+                                <option value="@Url.Action("ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">Excel 2</option>
+                                <option value="@Url.Action("ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" selected>Word</option>
+                            </select>
+                            <button type="button" id="downloadParticipantsExport" class="file-management-button file-management-button-secondary">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar
+                            </button>
+                        </div>
+
+                        <div class="file-management-note file-export-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Formatos disponibles para descargar: PDF, Excel 1, Excel 2 y Word.</p>
+                        </div>
+                    </section>
                 </div>
-
-                <div style="flex-shrink: 0;">
-                    <small class="text-secondary" style="display: block; margin-bottom: 8px;">Exportar datos:</small>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="@Url.Action("ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">PDF</a>
-                        <a href="@Url.Action("ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 1</a>
-                        <a href="@Url.Action("ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 2</a>
-                        <a href="@Url.Action("ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Word</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
-                <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
-                <small class="text-muted" style="flex: 1;">
-                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas</strong>
-                    <br />
-                    <a href="@Url.Action("DescargarPlantillaSubirParticipantes", "Participante")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
-                </small>
-            </div>
-
-
+            </section>
 
             <div class="table-card">
                 <div class="table-card-header">
@@ -162,6 +200,26 @@ else
 }
 
 <script type="text/javascript">
+    function updateParticipantFileName(fileInput) {
+        const fileNameLabel = document.getElementById('participantFileName');
+        if (!fileNameLabel) return;
+
+        const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+        fileNameLabel.textContent = selectedFile ? selectedFile.name : 'Elegir archivo';
+        fileNameLabel.title = selectedFile ? selectedFile.name : '';
+    }
+
+    const downloadParticipantsExport = document.getElementById('downloadParticipantsExport');
+    const participantExportFormat = document.getElementById('participantExportFormat');
+    if (downloadParticipantsExport && participantExportFormat) {
+        downloadParticipantsExport.addEventListener('click', function () {
+            const exportUrl = participantExportFormat.value;
+            if (exportUrl) {
+                window.location.assign(exportUrl);
+            }
+        });
+    }
+
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
             '&': '&amp;',

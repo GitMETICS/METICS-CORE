@@ -18,7 +18,7 @@
 
 @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
 {
-    <div class="contenedor-caja container-fluid">
+    <div class="contenedor-caja container-fluid create-group-page">
         @if (urlReferrer != null)
         {
             <div class="d-flex justify-content-start mb-3">
@@ -49,28 +49,36 @@
                 </div>
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
+            <div class="create-group-sections">
+                <section class="create-group-card" aria-labelledby="createGroupGeneralTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="createGroupGeneralTitle">Información general</h2>
+                            <p>Datos principales del módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="form-group mt-1 create-group-full-field">
                             @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
                             @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
                         </div>
 
-                        <div class="form-group mt-1">
+                        <div class="form-group mt-1 create-group-full-field">
                             @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
                             @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "5000", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
                         </div>
-                        <div class="row mt-1">
-                            <div class="col">
+
+                        <div class="create-group-field-grid">
+                            <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.numeroGrupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(grupoModel => grupoModel.numeroGrupo, new { @type = "number", @class = "form-control", @min = "1", @max = "100", @value = "" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.numeroGrupo, new { @type = "number", @class = "form-control", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.numeroGrupo, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="col">
+                            <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
                                 <a style="color:red;font-size:22px">*</a>
                                 @Html.DropDownListFor(
@@ -85,140 +93,192 @@
                                          new { @class = "form-control", @id = "modalidadSelect" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
+
+                            <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @min = "0", @value = "" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @min = "1", @max = "100", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="col">
+                            <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @min = "0", @value = "" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @min = "1", @max = "5000", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.enlace, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.claveInscripcion, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off", @id = "horarioText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
-                        </div>
+                    </div>
+                </section>
 
-                        @{
-                            var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>(); 
-                        }
+                <section class="create-group-card" aria-labelledby="createGroupLocationTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="createGroupLocationTitle">Ubicación y acceso</h2>
+                            <p>Información para acceder y participar en el módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="create-group-field-grid">
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.enlace, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.claveInscripcion, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                        <div class="form-group mt-1">
+                @{
+                    var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>();
+                }
+
+                <section class="create-group-card" aria-labelledby="createGroupClassificationTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="createGroupClassificationTitle">Clasificación académica</h2>
+                            <p>Competencias, nivel y facilitación del módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="form-group mt-1 create-group-competencies">
                             @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
 
-                            @foreach (var item in temas)
-                            {
-
-                                <div class="form-check">
-                                    <input type="checkbox" name="TemasSeleccionados" value="@item.Value" class="form-check-input" />
-                                    <label class="form-check-label">@item.Text</label>
-                                </div>
+                            @{
+                                var temasSeleccionados = Model?.TemasSeleccionados ?? new List<int>();
+                                var indiceTema = 0;
                             }
+                            <div class="create-group-checkbox-grid">
+                                @foreach (var item in temas)
+                                {
+                                    var idCheckboxTema = $"competencia_{indiceTema++}";
+                                    var temaSeleccionado = int.TryParse(item.Value, out var idTema) && temasSeleccionados.Contains(idTema);
+                                    <div class="form-check">
+                                        <input type="checkbox" id="@idCheckboxTema" name="TemasSeleccionados" value="@item.Value" class="form-check-input" checked="@(temaSeleccionado ? "checked" : null)" />
+                                        <label class="form-check-label" for="@idCheckboxTema">@item.Text</label>
+                                    </div>
+                                }
+                            </div>
 
                             @Html.ValidationMessageFor(grupoModel => grupoModel.TemasSeleccionados, "", new { @class = "text-danger" })
-
                         </div>
 
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
-                        </div>
-
-                        @if (ViewBag.Role == 2)
-                        {
-                            @Html.DropDownListFor(
-                                grupoModel => grupoModel.idAsesor,
-                                new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text", defaultAsesorId),
-                                "Seleccione un(a) facilitador(a)...",
-                                new { @class = "form-select", @hidden = true }
-                            )
-                        }
-                        else
-                        {
+                        <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.idCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select", @required = "required" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.idCategoria, "", new { @class = "text-danger" })
+                            </div>
+
+                            @if (ViewBag.Role == 2)
+                            {
                                 @Html.DropDownListFor(
-                                         grupoModel => grupoModel.idAsesor,
-                                         new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
-                                         "Seleccione un(a) facilitador(a)...",
-                                         new { @class = "form-select", @id = "asesorSelect" }
-                                         )
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
-                            </div>
-                        }
-
-                        <br />
-                        <div class="row mt-3">
-                            <h4>Fechas de inscripción</h4>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
-
-                            </div>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <h4>Fecha de inicio y fin del grupo</h4>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <h4>Adjuntar archivo del módulo</h4>
-                            <div class="form-group">
-                                @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
-                            </div>
+                                    grupoModel => grupoModel.idAsesor,
+                                    new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text", defaultAsesorId),
+                                    "Seleccione un(a) facilitador(a)...",
+                                    new { @class = "form-select", @hidden = true }
+                                )
+                            }
+                            else
+                            {
+                                <div class="form-group mt-1">
+                                    @Html.Label("asesorSelect", "Facilitador(a)", new { Style = "font-size:22px" })
+                                    @Html.DropDownListFor(
+                                             grupoModel => grupoModel.idAsesor,
+                                             new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
+                                             "Seleccione un(a) facilitador(a)...",
+                                             new { @class = "form-select", @id = "asesorSelect" }
+                                             )
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
+                                </div>
+                            }
                         </div>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
-                                Cancelar
-                            </a>
+                </section>
+
+                <section class="create-group-card" aria-labelledby="createGroupDatesTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="createGroupDatesTitle">Fechas del módulo</h2>
+                            <p>Define los períodos de inscripción y ejecución</p>
                         </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                    </header>
+                    <div class="create-group-card-body create-group-date-groups">
+                        <section class="create-group-date-block" aria-labelledby="createGroupEnrollmentDatesTitle">
+                            <h3 id="createGroupEnrollmentDatesTitle">Período de inscripción</h3>
+                            <div class="create-group-field-grid">
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="create-group-date-block" aria-labelledby="createGroupExecutionDatesTitle">
+                            <h3 id="createGroupExecutionDatesTitle">Inicio y finalización del módulo</h3>
+                            <div class="create-group-field-grid">
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="create-group-card" aria-labelledby="createGroupAttachmentTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-paperclip" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="createGroupAttachmentTitle">Archivo adjunto</h2>
+                            <p>Adjunta un archivo al módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="form-group">
+                            @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
                         </div>
                     </div>
-                </div>
+                </section>
+            </div>
+
+            <div class="create-group-actions">
+                <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
+                    Cancelar
+                </a>
+                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
             </div>
         }
     </div>
@@ -230,7 +290,6 @@ else
     </script>
 }
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         function verificarModalidad() {
@@ -238,16 +297,16 @@ else
             if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
                 $('#asesorSelect').prop('disabled', true);
                 $('#asesorSelect').val('');
-                $('#horarioText').prop('disabled', true);
-                $('#horarioText').val('');
-                $('#lugarText').prop('disabled', true);
-                $('#lugarText').val('');
+                $('#horario').prop('disabled', true);
+                $('#horario').val('');
+                $('#lugar, #enlace, #claveInscripcion').prop('disabled', true);
+                $('#lugar, #enlace, #claveInscripcion').val('');
             } else {
                 if ('@ViewBag.Role' && '@ViewBag.Role' != 2) {
                     $('#asesorSelect').prop('disabled', false);
                 }
-                $('#horarioText').prop('disabled', false);
-                $('#lugarText').prop('disabled', false);
+                $('#horario').prop('disabled', false);
+                $('#lugar, #enlace, #claveInscripcion').prop('disabled', false);
             }
         }
         
@@ -257,4 +316,654 @@ else
             verificarModalidad();
         });
     });
+</script>
+<script>
+    (function () {
+        function initializeCreateGroupDatePickers() {
+            var inputs = Array.prototype.slice.call(
+                document.querySelectorAll('.create-group-page input[type="date"]')
+            );
+            var instances = [];
+
+            function pad(number) { return String(number).padStart(2, '0'); }
+            function dateKey(date) {
+                return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+            }
+            function parseDate(value) {
+                if (!value) return null;
+                var parts = value.split('-').map(Number);
+                if (parts.length !== 3) return null;
+                var date = new Date(parts[0], parts[1] - 1, parts[2]);
+                return date.getFullYear() === parts[0] && date.getMonth() === parts[1] - 1 && date.getDate() === parts[2] ? date : null;
+            }
+            function sameDay(left, right) {
+                return !!left && !!right && dateKey(left) === dateKey(right);
+            }
+
+            inputs.forEach(function (input, inputIndex) {
+                if (input.dataset.customDateReady === 'true') return;
+
+                var baseId = input.id || input.name || ('createGroupDate' + inputIndex);
+                var wrapper = document.createElement('div');
+                wrapper.className = 'create-group-custom-date';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+                input.classList.add('create-group-native-date');
+                input.setAttribute('aria-hidden', 'true');
+                input.setAttribute('tabindex', '-1');
+                input.dataset.customDateReady = 'true';
+
+                var trigger = document.createElement('button');
+                trigger.type = 'button';
+                trigger.id = baseId + 'CalendarTrigger';
+                trigger.className = 'create-group-date-trigger';
+                trigger.setAttribute('aria-haspopup', 'dialog');
+                trigger.setAttribute('aria-expanded', 'false');
+                trigger.setAttribute('aria-controls', baseId + 'Calendar');
+
+                var value = document.createElement('span');
+                value.className = 'create-group-date-value';
+                var icon = document.createElement('i');
+                icon.className = 'bi bi-calendar3';
+                icon.setAttribute('aria-hidden', 'true');
+                trigger.appendChild(value);
+                trigger.appendChild(icon);
+
+                var panel = document.createElement('div');
+                panel.id = baseId + 'Calendar';
+                panel.className = 'create-group-date-panel';
+                panel.setAttribute('role', 'dialog');
+                panel.setAttribute('aria-label', 'Seleccionar fecha');
+                panel.hidden = true;
+
+                var header = document.createElement('div');
+                header.className = 'create-group-date-header';
+                var previous = document.createElement('button');
+                previous.type = 'button';
+                previous.className = 'create-group-date-nav';
+                previous.setAttribute('aria-label', 'Mes anterior');
+                previous.innerHTML = '<i class="bi bi-chevron-left" aria-hidden="true"></i>';
+                var monthTitle = document.createElement('div');
+                monthTitle.className = 'create-group-date-month';
+                monthTitle.setAttribute('aria-live', 'polite');
+                var next = document.createElement('button');
+                next.type = 'button';
+                next.className = 'create-group-date-nav';
+                next.setAttribute('aria-label', 'Mes siguiente');
+                next.innerHTML = '<i class="bi bi-chevron-right" aria-hidden="true"></i>';
+                header.append(previous, monthTitle, next);
+
+                var calendar = document.createElement('div');
+                calendar.className = 'create-group-date-calendar';
+                calendar.setAttribute('role', 'group');
+                var footer = document.createElement('div');
+                footer.className = 'create-group-date-footer';
+                var todayButton = document.createElement('button');
+                todayButton.type = 'button';
+                todayButton.className = 'create-group-date-today';
+                todayButton.textContent = 'Hoy';
+                footer.appendChild(todayButton);
+                panel.append(header, calendar, footer);
+                wrapper.append(trigger, panel);
+
+                var fieldContainer = input.closest('.form-group');
+                var validationMessage = fieldContainer
+                    ? fieldContainer.querySelector('[data-valmsg-for="' + input.name + '"]')
+                    : null;
+                if (validationMessage) {
+                    if (!validationMessage.id) validationMessage.id = baseId + 'CalendarValidation';
+                    trigger.setAttribute('aria-describedby', validationMessage.id);
+                }
+                var labels = Array.prototype.filter.call(document.querySelectorAll('label'), function (label) {
+                    return label.htmlFor === input.id || label.htmlFor === input.name;
+                });
+                if (labels.length) {
+                    trigger.setAttribute('aria-labelledby', labels.map(function (label, labelIndex) {
+                        if (!label.id) label.id = baseId + 'CalendarLabel' + labelIndex;
+                        return label.id;
+                    }).join(' '));
+                    labels.forEach(function (label) {
+                        label.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            if (!trigger.disabled) {
+                                trigger.focus();
+                                toggle();
+                            }
+                        });
+                    });
+                }
+
+                var isOpen = false;
+                var viewMonth = new Date();
+                viewMonth.setDate(1);
+                var focusedDate = null;
+                var dayButtons = [];
+
+                function formatDisplay(date) {
+                    return new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+                }
+                function isAllowed(date) {
+                    var key = dateKey(date);
+                    return (!input.min || key >= input.min) && (!input.max || key <= input.max);
+                }
+                function renderValue() {
+                    var selected = parseDate(input.value);
+                    value.textContent = selected ? formatDisplay(selected) : 'dd/mm/aaaa';
+                    value.classList.toggle('is-placeholder', !selected);
+                    if (selected) {
+                        viewMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
+                    }
+                    renderCalendar();
+                    var hasError = validationMessage && validationMessage.textContent.trim().length > 0;
+                    if (hasError) {
+                        trigger.setAttribute('aria-invalid', 'true');
+                        wrapper.classList.add('has-validation-error');
+                    } else {
+                        trigger.removeAttribute('aria-invalid');
+                        wrapper.classList.remove('has-validation-error');
+                    }
+                }
+                function renderCalendar() {
+                    monthTitle.textContent = new Intl.DateTimeFormat('es-CR', { month: 'long', year: 'numeric' }).format(viewMonth);
+                    calendar.replaceChildren();
+                    dayButtons = [];
+                    ['L', 'M', 'X', 'J', 'V', 'S', 'D'].forEach(function (dayName) {
+                        var weekday = document.createElement('span');
+                        weekday.className = 'create-group-date-weekday';
+                        weekday.setAttribute('role', 'columnheader');
+                        weekday.textContent = dayName;
+                        calendar.appendChild(weekday);
+                    });
+
+                    var firstDay = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1);
+                    var offset = (firstDay.getDay() + 6) % 7;
+                    var daysInMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0).getDate();
+                    var weeks = Math.ceil((offset + daysInMonth) / 7);
+                    var selectedDate = parseDate(input.value);
+                    var today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    for (var cell = 0; cell < weeks * 7; cell++) {
+                        var date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), cell - offset + 1);
+                        var dayButton = document.createElement('button');
+                        dayButton.type = 'button';
+                        dayButton.className = 'create-group-date-day';
+                        dayButton.textContent = String(date.getDate());
+                        dayButton.setAttribute('aria-label', new Intl.DateTimeFormat('es-CR', { dateStyle: 'full' }).format(date));
+                        dayButton.dataset.date = dateKey(date);
+                        dayButton.disabled = !isAllowed(date);
+                        dayButton.tabIndex = -1;
+                        if (date.getMonth() !== viewMonth.getMonth()) dayButton.classList.add('is-outside-month');
+                        if (sameDay(date, selectedDate)) {
+                            dayButton.classList.add('is-selected');
+                            dayButton.setAttribute('aria-selected', 'true');
+                        } else {
+                            dayButton.setAttribute('aria-selected', 'false');
+                        }
+                        if (sameDay(date, today)) dayButton.classList.add('is-today');
+                        dayButton.addEventListener('click', function () { chooseDate(parseDate(dayButton.dataset.date)); });
+                        calendar.appendChild(dayButton);
+                        dayButtons.push(dayButton);
+                    }
+                }
+                function setFocusedDate(date, focusButton) {
+                    focusedDate = date;
+                    if (date.getMonth() !== viewMonth.getMonth() || date.getFullYear() !== viewMonth.getFullYear()) {
+                        viewMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+                        renderCalendar();
+                    }
+                    dayButtons.forEach(function (button) {
+                        var isFocused = button.dataset.date === dateKey(date);
+                        button.tabIndex = isFocused && !button.disabled ? 0 : -1;
+                    });
+                    var target = dayButtons.find(function (button) { return button.dataset.date === dateKey(date); });
+                    if (focusButton && target && !target.disabled) target.focus();
+                }
+                function open() {
+                    if (trigger.disabled || isOpen) return;
+                    instances.forEach(function (instance) { if (instance.wrapper !== wrapper) instance.close(false); });
+                    if (!input.value) {
+                        var now = new Date();
+                        focusedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        viewMonth = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1);
+                    } else {
+                        focusedDate = parseDate(input.value);
+                    }
+                    renderCalendar();
+                    panel.hidden = false;
+                    wrapper.classList.add('is-open');
+                    var card = wrapper.closest('.create-group-card');
+                    if (card) card.classList.add('create-group-card--select-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    isOpen = true;
+                    var rect = trigger.getBoundingClientRect();
+                    var roomBelow = window.innerHeight - rect.bottom;
+                    wrapper.classList.toggle('is-open-above', roomBelow < panel.offsetHeight + 12 && rect.top > panel.offsetHeight + 12);
+                    setFocusedDate(focusedDate, true);
+                }
+                function close(returnFocus) {
+                    if (!isOpen) return;
+                    panel.hidden = true;
+                    wrapper.classList.remove('is-open', 'is-open-above');
+                    var card = wrapper.closest('.create-group-card');
+                    if (card) card.classList.remove('create-group-card--select-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                    isOpen = false;
+                    if (returnFocus) trigger.focus();
+                }
+                function chooseDate(date) {
+                    if (!date || !isAllowed(date)) return;
+                    input.value = dateKey(date);
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    if (validationMessage && input.checkValidity()) validationMessage.textContent = '';
+                    renderValue();
+                    close(true);
+                }
+                function changeMonth(amount) {
+                    viewMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + amount, 1);
+                    renderCalendar();
+                    var preferred = focusedDate && focusedDate.getDate() || 1;
+                    var last = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0).getDate();
+                    setFocusedDate(new Date(viewMonth.getFullYear(), viewMonth.getMonth(), Math.min(preferred, last)), false);
+                }
+                function toggle() { if (isOpen) close(false); else open(); }
+
+                trigger.addEventListener('click', toggle);
+                previous.addEventListener('click', function () { changeMonth(-1); });
+                next.addEventListener('click', function () { changeMonth(1); });
+                todayButton.addEventListener('click', function () {
+                    var now = new Date();
+                    chooseDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+                });
+                trigger.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape' && isOpen) { event.preventDefault(); close(true); }
+                    else if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        if (!isOpen) open();
+                    }
+                });
+                panel.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') { event.preventDefault(); close(true); return; }
+                    var delta = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : event.key === 'ArrowUp' ? -7 : event.key === 'ArrowDown' ? 7 : 0;
+                    if (delta) {
+                        event.preventDefault();
+                        var nextDate = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), focusedDate.getDate() + delta);
+                        while (!isAllowed(nextDate)) nextDate.setDate(nextDate.getDate() + Math.sign(delta));
+                        setFocusedDate(nextDate, true);
+                    } else if (event.key === 'Enter' && event.target.classList.contains('create-group-date-day')) {
+                        event.preventDefault();
+                        chooseDate(parseDate(event.target.dataset.date));
+                    }
+                });
+                input.addEventListener('change', renderValue);
+                input.addEventListener('invalid', function (event) {
+                    event.preventDefault();
+                    if (validationMessage) validationMessage.textContent = input.validationMessage;
+                    trigger.setAttribute('aria-invalid', 'true');
+                    wrapper.classList.add('has-validation-error');
+                    window.setTimeout(function () { trigger.focus(); }, 0);
+                });
+                var instance = { close: close, wrapper: wrapper };
+                instances.push(instance);
+                renderValue();
+            });
+
+            document.addEventListener('pointerdown', function (event) {
+                instances.forEach(function (instance) {
+                    if (!instance.wrapper.contains(event.target)) instance.close(false);
+                });
+            });
+            document.addEventListener('focusin', function (event) {
+                instances.forEach(function (instance) {
+                    if (!instance.wrapper.contains(event.target)) instance.close(false);
+                });
+            });
+            var form = document.querySelector('.create-group-page form');
+            if (form) {
+                form.addEventListener('reset', function () {
+                    window.setTimeout(function () {
+                        inputs.forEach(function (input) { input.dispatchEvent(new Event('change', { bubbles: true })); });
+                    }, 0);
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeCreateGroupDatePickers, { once: true });
+        } else {
+            initializeCreateGroupDatePickers();
+        }
+    })();
+</script>
+
+<script>
+    (function () {
+        function initializeCreateGroupSelects() {
+            var selects = Array.prototype.slice.call(
+                document.querySelectorAll('.create-group-page select:not([hidden])')
+            );
+            var instances = [];
+
+            function closeAll(except) {
+                instances.forEach(function (instance) {
+                    if (instance !== except) instance.close(false);
+                });
+            }
+
+            selects.forEach(function (select, selectIndex) {
+                if (select.dataset.customSelectReady === 'true') return;
+
+                var baseId = select.id || select.name || ('createGroupSelect' + selectIndex);
+                var wrapper = document.createElement('div');
+                wrapper.className = 'create-group-custom-select';
+
+                select.parentNode.insertBefore(wrapper, select);
+                wrapper.appendChild(select);
+                select.classList.add('create-group-native-select');
+                select.setAttribute('aria-hidden', 'true');
+                select.setAttribute('tabindex', '-1');
+                select.dataset.customSelectReady = 'true';
+
+                var trigger = document.createElement('button');
+                trigger.type = 'button';
+                trigger.id = baseId + 'CustomTrigger';
+                trigger.className = 'create-group-select-trigger';
+                trigger.setAttribute('role', 'combobox');
+                trigger.setAttribute('aria-haspopup', 'listbox');
+                trigger.setAttribute('aria-expanded', 'false');
+                trigger.setAttribute('aria-controls', baseId + 'CustomListbox');
+
+                var selectedText = document.createElement('span');
+                selectedText.className = 'create-group-select-value';
+                var arrow = document.createElement('span');
+                arrow.className = 'create-group-select-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                trigger.appendChild(selectedText);
+                trigger.appendChild(arrow);
+
+                var panel = document.createElement('div');
+                panel.id = baseId + 'CustomListbox';
+                panel.className = 'create-group-select-panel';
+                panel.setAttribute('role', 'listbox');
+                panel.hidden = true;
+
+                var fieldContainer = select.closest('.form-group');
+                var validationMessage = fieldContainer
+                    ? fieldContainer.querySelector('[data-valmsg-for="' + select.name + '"]')
+                    : null;
+                if (validationMessage) {
+                    if (!validationMessage.id) validationMessage.id = baseId + 'CustomValidation';
+                    trigger.setAttribute('aria-describedby', validationMessage.id);
+                }
+
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(panel);
+
+                var labels = Array.prototype.filter.call(document.querySelectorAll('label'), function (label) {
+                    return label.htmlFor === select.id || label.htmlFor === select.name;
+                });
+                if (labels.length) {
+                    trigger.setAttribute('aria-labelledby', labels.map(function (label, labelIndex) {
+                        if (!label.id) label.id = baseId + 'CustomLabel' + labelIndex;
+                        return label.id;
+                    }).join(' '));
+                    labels.forEach(function (label) {
+                        label.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            if (!trigger.disabled) {
+                                trigger.focus();
+                                toggle();
+                            }
+                        });
+                    });
+                } else {
+                    trigger.setAttribute('aria-label', select.name || 'Seleccionar una opción');
+                }
+
+                var activeIndex = -1;
+                var optionRows = [];
+                var isOpen = false;
+
+                function enabledIndexFrom(startIndex, step) {
+                    var index = startIndex;
+                    while (index >= 0 && index < select.options.length) {
+                        if (!select.options[index].disabled) return index;
+                        index += step;
+                    }
+                    return -1;
+                }
+
+                function renderOptions() {
+                    panel.replaceChildren();
+                    optionRows = [];
+
+                    Array.prototype.forEach.call(select.options, function (nativeOption, optionIndex) {
+                        var row = document.createElement('div');
+                        row.id = panel.id + 'Option' + optionIndex;
+                        row.className = 'create-group-select-option';
+                        row.setAttribute('role', 'option');
+                        row.setAttribute('aria-selected', nativeOption.selected ? 'true' : 'false');
+                        row.setAttribute('aria-disabled', nativeOption.disabled ? 'true' : 'false');
+                        row.dataset.optionIndex = String(optionIndex);
+                        row.textContent = nativeOption.text;
+
+                        if (nativeOption.selected) row.classList.add('is-selected');
+                        if (nativeOption.disabled) row.tabIndex = -1;
+
+                        row.addEventListener('mouseenter', function () {
+                            if (!nativeOption.disabled) setActive(optionIndex, false);
+                        });
+                        row.addEventListener('mousedown', function (event) {
+                            event.preventDefault();
+                        });
+                        row.addEventListener('click', function () {
+                            if (!nativeOption.disabled) choose(optionIndex);
+                        });
+
+                        panel.appendChild(row);
+                        optionRows.push(row);
+                    });
+                }
+
+                function updateSelection(clearValidation) {
+                    var selectedOption = select.options[select.selectedIndex];
+                    selectedText.textContent = selectedOption ? selectedOption.text : '';
+                    optionRows.forEach(function (row, index) {
+                        var selected = index === select.selectedIndex;
+                        row.classList.toggle('is-selected', selected);
+                        row.setAttribute('aria-selected', selected ? 'true' : 'false');
+                    });
+
+                    if (clearValidation && select.checkValidity() && select.value !== '' && validationMessage) {
+                        validationMessage.textContent = '';
+                    }
+                    var hasValidationMessage = validationMessage && validationMessage.textContent.trim().length > 0;
+                    if (hasValidationMessage) {
+                        trigger.setAttribute('aria-invalid', 'true');
+                        wrapper.classList.add('has-validation-error');
+                    } else {
+                        trigger.removeAttribute('aria-invalid');
+                        wrapper.classList.remove('has-validation-error');
+                    }
+                }
+
+                function syncDisabled() {
+                    trigger.disabled = select.disabled;
+                    trigger.setAttribute('aria-disabled', select.disabled ? 'true' : 'false');
+                    if (select.disabled) close(false);
+                }
+
+                function syncFromNative() {
+                    renderOptions();
+                    updateSelection(true);
+                    syncDisabled();
+                }
+
+                function setActive(index, scrollIntoView) {
+                    if (index < 0 || index >= optionRows.length || select.options[index].disabled) return;
+                    activeIndex = index;
+                    optionRows.forEach(function (row, rowIndex) {
+                        row.classList.toggle('is-active', rowIndex === activeIndex);
+                    });
+                    trigger.setAttribute('aria-activedescendant', optionRows[activeIndex].id);
+                    if (scrollIntoView) optionRows[activeIndex].scrollIntoView({ block: 'nearest' });
+                }
+
+                function open() {
+                    if (trigger.disabled || isOpen) return;
+                    closeAll(instance);
+                    renderOptions();
+                    panel.hidden = false;
+                    wrapper.classList.add('is-open');
+                    var card = wrapper.closest('.create-group-card');
+                    if (card) card.classList.add('create-group-card--select-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    isOpen = true;
+
+                    var triggerRect = trigger.getBoundingClientRect();
+                    var panelHeight = Math.min(panel.scrollHeight, window.innerHeight - 24);
+                    var roomBelow = window.innerHeight - triggerRect.bottom;
+                    wrapper.classList.toggle('is-open-above', roomBelow < panelHeight + 14 && triggerRect.top > panelHeight + 14);
+
+                    var selectedIndex = select.selectedIndex;
+                    if (selectedIndex < 0 || select.options[selectedIndex].disabled) {
+                        selectedIndex = enabledIndexFrom(0, 1);
+                    }
+                    if (selectedIndex >= 0) setActive(selectedIndex, true);
+                }
+
+                function close(returnFocus) {
+                    if (!isOpen) return;
+                    panel.hidden = true;
+                    wrapper.classList.remove('is-open', 'is-open-above');
+                    var card = wrapper.closest('.create-group-card');
+                    if (card) card.classList.remove('create-group-card--select-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                    trigger.removeAttribute('aria-activedescendant');
+                    isOpen = false;
+                    activeIndex = -1;
+                    if (returnFocus) trigger.focus();
+                }
+
+                function choose(index) {
+                    if (index < 0 || index >= select.options.length || select.options[index].disabled) return;
+                    if (select.selectedIndex !== index) {
+                        select.selectedIndex = index;
+                        select.dispatchEvent(new Event('input', { bubbles: true }));
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    updateSelection();
+                    syncDisabled();
+                    close(true);
+                }
+
+                function toggle() {
+                    if (isOpen) close(false);
+                    else open();
+                }
+
+                function moveActive(step) {
+                    var start = activeIndex;
+                    if (start < 0) start = step > 0 ? -1 : select.options.length;
+                    var next = start + step;
+                    while (next >= 0 && next < select.options.length && select.options[next].disabled) next += step;
+                    if (next >= 0 && next < select.options.length) setActive(next, true);
+                }
+
+                var instance = { close: close, select: select, syncDisabled: syncDisabled, syncFromNative: syncFromNative };
+                instances.push(instance);
+
+                trigger.addEventListener('click', toggle);
+                trigger.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        if (isOpen) {
+                            event.preventDefault();
+                            close(true);
+                        }
+                        return;
+                    }
+
+                    if (event.key === 'Tab') {
+                        close(false);
+                        return;
+                    }
+
+                    if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].indexOf(event.key) === -1) return;
+                    event.preventDefault();
+
+                    if (!isOpen) {
+                        open();
+                        if (event.key === 'ArrowDown') setActive(enabledIndexFrom(select.selectedIndex + 1, 1), true);
+                        if (event.key === 'ArrowUp') setActive(enabledIndexFrom(select.selectedIndex - 1, -1), true);
+                        return;
+                    }
+
+                    if (event.key === 'ArrowDown') moveActive(1);
+                    else if (event.key === 'ArrowUp') moveActive(-1);
+                    else if (event.key === 'Home') setActive(enabledIndexFrom(0, 1), true);
+                    else if (event.key === 'End') setActive(enabledIndexFrom(select.options.length - 1, -1), true);
+                    else if (activeIndex >= 0) choose(activeIndex);
+                });
+
+                select.addEventListener('change', function () {
+                    syncFromNative();
+                });
+                select.addEventListener('invalid', function (event) {
+                    event.preventDefault();
+                    if (validationMessage) validationMessage.textContent = select.validationMessage;
+                    trigger.setAttribute('aria-invalid', 'true');
+                    wrapper.classList.add('has-validation-error');
+                    window.setTimeout(function () { trigger.focus(); }, 0);
+                });
+
+                var disabledObserver = new MutationObserver(syncDisabled);
+                disabledObserver.observe(select, { attributes: true, attributeFilter: ['disabled'] });
+                renderOptions();
+                updateSelection();
+                syncDisabled();
+            });
+
+            document.addEventListener('pointerdown', function (event) {
+                instances.forEach(function (instance) {
+                    if (!instance.select.closest('.create-group-custom-select').contains(event.target)) {
+                        instance.close(false);
+                    }
+                });
+            });
+
+            var modalitySelect = document.getElementById('modalidadSelect');
+            if (modalitySelect) {
+                modalitySelect.addEventListener('change', function () {
+                    window.setTimeout(function () {
+                        instances.forEach(function (instance) { instance.syncFromNative(); });
+                    }, 0);
+                });
+            }
+
+            document.addEventListener('focusin', function (event) {
+                instances.forEach(function (instance) {
+                    var wrapper = instance.select.closest('.create-group-custom-select');
+                    if (!wrapper.contains(event.target)) instance.close(false);
+                });
+            });
+
+            var form = document.querySelector('.create-group-page form');
+            if (form) {
+                form.addEventListener('reset', function () {
+                    window.setTimeout(function () {
+                        instances.forEach(function (instance) {
+                            instance.select.dispatchEvent(new Event('change', { bubbles: true }));
+                        });
+                    }, 0);
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeCreateGroupSelects, { once: true });
+        } else {
+            initializeCreateGroupSelects();
+        }
+    })();
 </script>
