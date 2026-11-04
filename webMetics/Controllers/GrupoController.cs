@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.DataProtection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -23,14 +24,17 @@ namespace webMetics.Controllers
         private protected AsesorHandler accesoAAsesor;
         private protected InscripcionHandler accesoAInscripcion;
         private protected GrupoTemaHandler accesoAGrupoTema;
+        private readonly UsuarioHandler accesoAUsuario;
 
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration)
+        public GrupoController(IWebHostEnvironment environment, IConfiguration configuration, IDataProtectionProvider dataProtectionProvider)
         {
             _environment = environment;
             _configuration = configuration;
+            _dataProtectionProvider = dataProtectionProvider;
             
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
             accesoACategoria = new CategoriaHandler(environment, configuration);
@@ -39,6 +43,7 @@ namespace webMetics.Controllers
             accesoAAsesor = new AsesorHandler(environment, configuration);
             accesoAInscripcion = new InscripcionHandler(environment, configuration);
             accesoAGrupoTema = new GrupoTemaHandler(environment, configuration,accesoATema); // Añadir el GrupoTemaHandler
+            accesoAUsuario = new UsuarioHandler(environment, configuration);
         }
 
         /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
@@ -379,14 +384,79 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult CrearGrupo(GrupoModel grupo, int[] temasSeleccionados)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
+            // La cookie de rol es modificable desde el cliente. Se contrasta la identidad
+            // protegida de la sesión con el usuario y rol vigentes en el servidor.
+            string idUsuario = GetId();
+            string idSesionProtegido;
+            try
+            {
+                if (!Request.Cookies.TryGetValue("USUARIOAUTORIZADO", out string? cookieSesion)
+                    || string.IsNullOrWhiteSpace(cookieSesion))
+                {
+                    return RedirectToAction("CerrarSesion", "Usuario");
+                }
+
+                idSesionProtegido = _dataProtectionProvider
+                    .CreateProtector("USUARIOAUTORIZADO")
+                    .Unprotect(cookieSesion);
+            }
+            catch
+            {
+                return RedirectToAction("CerrarSesion", "Usuario");
+            }
+
+            if (string.IsNullOrWhiteSpace(idUsuario)
+                || !string.Equals(idSesionProtegido, idUsuario, StringComparison.Ordinal))
+            {
+                return RedirectToAction("CerrarSesion", "Usuario");
+            }
+
+            LoginModel? usuarioActual = accesoAUsuario.ObtenerUsuario(idUsuario);
+            if (usuarioActual == null || (usuarioActual.rol != 1 && usuarioActual.rol != 2))
+            {
+                return RedirectToAction("CerrarSesion", "Usuario");
+            }
+
+            int rolUsuario = usuarioActual.rol;
+            ViewBag.Role = rolUsuario;
+            ViewBag.Id = idUsuario;
+
+            // El facilitador solo puede crear un módulo asociado a su propia cuenta.
+            if (rolUsuario == 2 && !string.Equals(grupo.modalidad, TipoModalidad.Autogestionado.ToString(), StringComparison.Ordinal))
+            {
+                grupo.idAsesor = idUsuario;
+            }
 
             try
             {
-                List<TemaModel> temasDisponiblesList = accesoATema.ObtenerTemas();
+                if (grupo.idCategoria <= 0)
+                {
+                    ModelState.AddModelError(nameof(grupo.idCategoria), "Debe asociar un nivel al módulo.");
+                }
+                if (Request.Form.TryGetValue(nameof(grupo.numeroGrupo), out var numeroGrupoIngresado)
+                    && string.IsNullOrWhiteSpace(numeroGrupoIngresado))
+                {
+                    ModelState.AddModelError(nameof(grupo.numeroGrupo), "Es necesario que ingrese un número de grupo.");
+                }
+                if (grupo.fechaInicioInscripcion == default)
+                {
+                    ModelState.AddModelError(nameof(grupo.fechaInicioInscripcion), "Es necesario que seleccione la fecha de inicio de la inscripción.");
+                }
+                if (grupo.fechaFinalizacionInscripcion == default)
+                {
+                    ModelState.AddModelError(nameof(grupo.fechaFinalizacionInscripcion), "Es necesario que seleccione la fecha de finalización de la inscripción.");
+                }
+                if (grupo.fechaInicioGrupo == default)
+                {
+                    ModelState.AddModelError(nameof(grupo.fechaInicioGrupo), "Es necesario que seleccione la fecha de inicio de la actividad.");
+                }
+                if (grupo.fechaFinalizacionGrupo == default)
+                {
+                    ModelState.AddModelError(nameof(grupo.fechaFinalizacionGrupo), "Es necesario que seleccione la fecha de finalización de la actividad.");
+                }
 
                 if (ModelState.IsValid)
                 {
@@ -447,12 +517,21 @@ namespace webMetics.Controllers
                     if (temasSeleccionados == null || !temasSeleccionados.Any())
                     {
                         ViewBag.ErrorMessage = "Debe seleccionar al menos una competencia.";
-                        ModelState.AddModelError("temasSeleccionados", "Debe seleccionar al menos una competencia.");
+                        ModelState.AddModelError(nameof(grupo.TemasSeleccionados), "Debe seleccionar al menos una competencia.");
+                        ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                        ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                        ViewData["Asesores"] = accesoAAsesor.ObtenerListaSeleccionAsesores();
                         return View(grupo);
                     }
 
-                    accesoAGrupo.CrearGrupo(grupo, temasSeleccionados);
-                    TempData["successMessage"] = "Se guardó el nuevo módulo.";
+                    if (accesoAGrupo.CrearGrupo(grupo, temasSeleccionados))
+                    {
+                        TempData["successMessage"] = "Se guardó el nuevo módulo.";
+                    }
+                    else
+                    {
+                        TempData["errorMessage"] = "No se pudo guardar el nuevo módulo.";
+                    }
                     return RedirectToAction("ListaGruposDisponibles", "Grupo");
                 }
                 else

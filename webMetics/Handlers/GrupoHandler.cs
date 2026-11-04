@@ -91,22 +91,78 @@ namespace webMetics.Handlers
                 try
                 {
                     ConexionMetics.Open();
-                    // Ejecutar el comando y obtener el ID del grupo recién creado
-                    int idGrupo = Convert.ToInt32(command.ExecuteScalar());
-
-                    // Insertar los temas asociados al grupo
-                    foreach (var idTema in idTemas)
+                    using (SqlTransaction transaction = ConexionMetics.BeginTransaction())
                     {
-                        using (var commandTema = new SqlCommand("InsertGrupoTema", ConexionMetics))
+                        bool transactionFinalized = false;
+                        command.Transaction = transaction;
+
+                        try
                         {
-                            commandTema.CommandType = CommandType.StoredProcedure;
-                            commandTema.Parameters.AddWithValue("@idGrupo", idGrupo);
-                            commandTema.Parameters.AddWithValue("@idTema", idTema);
-                            commandTema.ExecuteNonQuery();
+                            // Ejecutar el comando y obtener el ID del grupo recién creado.
+                            object resultadoGrupo = command.ExecuteScalar();
+                            int idGrupo = resultadoGrupo == null || resultadoGrupo == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(resultadoGrupo);
+
+                            if (idGrupo <= 0)
+                            {
+                                transaction.Rollback();
+                                transactionFinalized = true;
+                                return false;
+                            }
+
+                            // Insertar y verificar cada competencia dentro de la misma transacción.
+                            foreach (var idTema in idTemas)
+                            {
+                                using (var commandTema = new SqlCommand("InsertGrupoTema", ConexionMetics))
+                                {
+                                    commandTema.Transaction = transaction;
+                                    commandTema.CommandType = CommandType.StoredProcedure;
+                                    commandTema.Parameters.AddWithValue("@idGrupo", idGrupo);
+                                    commandTema.Parameters.AddWithValue("@idTema", idTema);
+                                    commandTema.ExecuteNonQuery();
+                                }
+
+                                // InsertGrupoTema usa SET NOCOUNT ON, por lo que ExecuteNonQuery
+                                // no permite determinar de forma fiable si insertó la relación.
+                                using (var commandVerificarTema = new SqlCommand(
+                                    "SELECT CASE WHEN EXISTS (SELECT 1 FROM grupo_tema WHERE id_grupo_FK = @idGrupo AND id_tema_FK = @idTema) THEN 1 ELSE 0 END;",
+                                    ConexionMetics,
+                                    transaction))
+                                {
+                                    commandVerificarTema.Parameters.AddWithValue("@idGrupo", idGrupo);
+                                    commandVerificarTema.Parameters.AddWithValue("@idTema", idTema);
+
+                                    if (Convert.ToInt32(commandVerificarTema.ExecuteScalar()) != 1)
+                                    {
+                                        transaction.Rollback();
+                                        transactionFinalized = true;
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            transaction.Commit();
+                            transactionFinalized = true;
+                            exito = true;
+                        }
+                        catch
+                        {
+                            if (!transactionFinalized)
+                            {
+                                try
+                                {
+                                    transaction.Rollback();
+                                }
+                                catch (Exception rollbackException)
+                                {
+                                    Console.WriteLine($"Error rolling back CrearGrupo transaction: {rollbackException.Message}");
+                                }
+                            }
+
+                            throw;
                         }
                     }
-
-                    exito = true;
                 }
                 catch (Exception ex)
                 {
