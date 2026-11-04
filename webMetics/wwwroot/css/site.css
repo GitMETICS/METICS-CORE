@@ -2780,6 +2780,44 @@ html.metics-scroll-restore-pending body { visibility: hidden; }
     margin: 18px 0 8px;
 }
 
+.create-group-page .create-group-actions > .create-group-action-button {
+    align-items: center;
+    border-radius: 8px;
+    display: inline-flex;
+    font-size: .9rem;
+    font-weight: 600;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 112px;
+    padding: 9px 16px;
+    text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.create-group-page .create-group-action-cancel {
+    background: #fff;
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+}
+
+.create-group-page .create-group-action-cancel:hover {
+    background: #edf5ff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.create-group-page .create-group-action-save,
+.create-group-page .create-group-action-save:hover {
+    background: #0d6efd;
+    border: 1px solid #0d6efd;
+    color: #fff;
+}
+
+.create-group-page .create-group-action-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, .2);
+    outline: 0;
+}
+
 @media (max-width: 767.98px) {
     .create-group-page .create-group-card-header { padding: 15px 16px; }
     .create-group-page .create-group-card-body { gap: 16px; padding: 16px; }

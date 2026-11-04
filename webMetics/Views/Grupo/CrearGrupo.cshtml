@@ -4,8 +4,6 @@
 @{
     ViewBag.Title = "Crear Módulo";
     PageHeadingBuilder.Configure(ViewContext, Url);
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @{
@@ -18,16 +16,7 @@
 
 @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
 {
-    <div class="contenedor-caja container-fluid create-group-page">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid create-group-page table-page-with-divider">
         @using (Html.BeginForm("CrearGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
@@ -275,10 +264,10 @@
             </div>
 
             <div class="create-group-actions">
-                <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
+                <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn create-group-action-button create-group-action-cancel">
                     Cancelar
                 </a>
-                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                <input type="submit" class="btn btn-primary create-group-action-button create-group-action-save" value="Guardar" />
             </div>
         }
     </div>
@@ -482,6 +471,7 @@ else
                     var selectedDate = parseDate(input.value);
                     var today = new Date();
                     today.setHours(0, 0, 0, 0);
+                    todayButton.disabled = !isAllowed(today);
 
                     for (var cell = 0; cell < weeks * 7; cell++) {
                         var date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), cell - offset + 1);
@@ -522,13 +512,13 @@ else
                 function open() {
                     if (trigger.disabled || isOpen) return;
                     instances.forEach(function (instance) { if (instance.wrapper !== wrapper) instance.close(false); });
-                    if (!input.value) {
-                        var now = new Date();
-                        focusedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                        viewMonth = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1);
-                    } else {
-                        focusedDate = parseDate(input.value);
-                    }
+                    var now = new Date();
+                    focusedDate = parseDate(input.value) || new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    var minimumDate = parseDate(input.min);
+                    var maximumDate = parseDate(input.max);
+                    if (minimumDate && focusedDate < minimumDate) focusedDate = minimumDate;
+                    if (maximumDate && focusedDate > maximumDate) focusedDate = maximumDate;
+                    viewMonth = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1);
                     renderCalendar();
                     panel.hidden = false;
                     wrapper.classList.add('is-open');
@@ -588,9 +578,18 @@ else
                     var delta = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : event.key === 'ArrowUp' ? -7 : event.key === 'ArrowDown' ? 7 : 0;
                     if (delta) {
                         event.preventDefault();
+                        if (input.min && input.max && input.min > input.max) return;
                         var nextDate = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), focusedDate.getDate() + delta);
-                        while (!isAllowed(nextDate)) nextDate.setDate(nextDate.getDate() + Math.sign(delta));
-                        setFocusedDate(nextDate, true);
+                        var attempts = 0;
+                        while (!isAllowed(nextDate) && attempts < 3700) {
+                            var nextKey = dateKey(nextDate);
+                            if (input.min && nextKey < input.min) nextDate = parseDate(input.min);
+                            else if (input.max && nextKey > input.max) nextDate = parseDate(input.max);
+                            else nextDate.setDate(nextDate.getDate() + Math.sign(delta));
+                            if (!nextDate) break;
+                            attempts++;
+                        }
+                        if (attempts < 3700 && isAllowed(nextDate)) setFocusedDate(nextDate, true);
                     } else if (event.key === 'Enter' && event.target.classList.contains('create-group-date-day')) {
                         event.preventDefault();
                         chooseDate(parseDate(event.target.dataset.date));
@@ -604,10 +603,87 @@ else
                     wrapper.classList.add('has-validation-error');
                     window.setTimeout(function () { trigger.focus(); }, 0);
                 });
-                var instance = { close: close, wrapper: wrapper };
+                var instance = { close: close, wrapper: wrapper, sync: renderValue };
                 instances.push(instance);
                 renderValue();
             });
+
+            var dateInputs = {};
+            inputs.forEach(function (input) { dateInputs[input.name] = input; });
+
+            function earliestDate(left, right) {
+                if (!left) return right;
+                if (!right) return left;
+                return dateKey(left) <= dateKey(right) ? left : right;
+            }
+            function latestDate(left, right) {
+                if (!left) return right;
+                if (!right) return left;
+                return dateKey(left) >= dateKey(right) ? left : right;
+            }
+            function setDateRange(input, minimum, maximum) {
+                if (!input) return;
+                if (minimum) input.min = dateKey(minimum);
+                else input.removeAttribute('min');
+                if (maximum) input.max = dateKey(maximum);
+                else input.removeAttribute('max');
+            }
+            function updateDateConstraints() {
+                var enrollmentStartInput = dateInputs.fechaInicioInscripcion;
+                var enrollmentEndInput = dateInputs.fechaFinalizacionInscripcion;
+                var moduleStartInput = dateInputs.fechaInicioGrupo;
+                var moduleEndInput = dateInputs.fechaFinalizacionGrupo;
+                if (!enrollmentStartInput || !enrollmentEndInput || !moduleStartInput || !moduleEndInput) return;
+
+                var enrollmentStart = parseDate(enrollmentStartInput.value);
+                var enrollmentEnd = parseDate(enrollmentEndInput.value);
+                var moduleStart = parseDate(moduleStartInput.value);
+                var moduleEnd = parseDate(moduleEndInput.value);
+
+                setDateRange(enrollmentStartInput, null, earliestDate(enrollmentEnd, moduleStart));
+                setDateRange(enrollmentEndInput, enrollmentStart, moduleEnd);
+                setDateRange(moduleStartInput, enrollmentStart, moduleEnd);
+                setDateRange(moduleEndInput, latestDate(moduleStart, enrollmentEnd), null);
+
+                var errors = {};
+                function addError(input, message) {
+                    if (!input) return;
+                    errors[input.name] = errors[input.name] ? errors[input.name] + ' ' + message : message;
+                }
+                if (enrollmentStart && enrollmentEnd && enrollmentStart > enrollmentEnd) {
+                    addError(enrollmentEndInput, 'La fecha de finalización de inscripción no puede ser anterior al inicio de inscripción.');
+                }
+                if (moduleStart && moduleEnd && moduleStart > moduleEnd) {
+                    addError(moduleEndInput, 'La fecha de finalización del módulo no puede ser anterior a su inicio.');
+                }
+                if (enrollmentEnd && moduleEnd && enrollmentEnd > moduleEnd) {
+                    addError(enrollmentEndInput, 'La fecha de finalización de inscripción no puede ser posterior al fin del módulo.');
+                }
+                if (enrollmentStart && moduleStart && enrollmentStart > moduleStart) {
+                    addError(enrollmentStartInput, 'La inscripción no puede iniciar después del inicio del módulo.');
+                }
+
+                inputs.forEach(function (input) {
+                    var message = errors[input.name] || '';
+                    input.setCustomValidity(message);
+                    var fieldContainer = input.closest('.form-group');
+                    var validationMessage = fieldContainer
+                        ? fieldContainer.querySelector('[data-valmsg-for="' + input.name + '"]')
+                        : null;
+                    if (!validationMessage) return;
+
+                    var previousClientMessage = input.dataset.dateConstraintMessage || '';
+                    if (message) validationMessage.textContent = message;
+                    else if (previousClientMessage && validationMessage.textContent === previousClientMessage) validationMessage.textContent = '';
+                    input.dataset.dateConstraintMessage = message;
+                });
+                instances.forEach(function (instance) { instance.sync(); });
+            }
+
+            inputs.forEach(function (input) {
+                input.addEventListener('change', updateDateConstraints);
+            });
+            updateDateConstraints();
 
             document.addEventListener('pointerdown', function (event) {
                 instances.forEach(function (instance) {
