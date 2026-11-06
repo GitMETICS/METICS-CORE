@@ -11,21 +11,7 @@
     <div class="contenedor-caja container-fluid category-list-page table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+        @await Html.PartialAsync("_MeticsToast")
 
         @if (ViewBag.Categorias == null)
         {
@@ -88,7 +74,14 @@
                                     <td>@categoria.nombre</td>
                                     <td>@categoria.descripcion</td>
                                     <td class="text-center">
-                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
+                                        <button type="button"
+                                                class="icon-action icon-edit bi bi-pencil-square"
+                                                title="Editar"
+                                                aria-label="Editar @categoria.nombre"
+                                                data-category-id="@categoria.idCategoria"
+                                                data-category-name="@categoria.nombre"
+                                                data-category-description="@categoria.descripcion"
+                                                onclick="abrirModalEditarCategoria(this)"></button>
                                     </td>
                                     <td class="text-center">
                                         <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
@@ -133,25 +126,67 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal" id="modalEditarCategoria" tabindex="-1" aria-labelledby="modalEditarCategoriaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categoría</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta categoría?
-                    <br />
-                    @using (Html.BeginForm("EliminarCategoria", "Categoria"))
-                    {
-                        <div class="modal-footer">
-                            <input type="hidden" id="idCategoria" name="idCategoria">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="idCategoria" id="editarCategoriaId" value="@(Model?.idCategoria ?? 0)" />
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEditarCategoriaLabel">Editar nivel</h2>
+                            <p>Actualiza la información de este nivel.</p>
                         </div>
-                    }
-                </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        <div class="form-group create-category-field">
+                            @Html.Label("nombre", "Nombre", new { @for = "editarCategoriaNombre" })
+                            <span class="create-category-required" aria-hidden="true">*</span>
+                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarCategoriaNombre", maxlength = "64", autocomplete = "off" })
+                            @Html.ValidationMessage("nombre", "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group create-category-field">
+                            @Html.Label("descripcion", "Descripción", new { @for = "editarCategoriaDescripcion" })
+                            <span class="create-category-required" aria-hidden="true">*</span>
+                            @Html.TextArea("descripcion", Model?.descripcion, new { @class = "form-control", id = "editarCategoriaDescripcion", rows = "3", maxlength = "256" })
+                            @Html.ValidationMessage("descripcion", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar cambios</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("EliminarCategoria", "Categoria"))
+                {
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar nivel</h2>
+                            <p>Confirma si deseas quitar este nivel del sistema.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Estás seguro de que deseas eliminar este nivel? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idCategoria" name="idCategoria">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar nivel</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -170,6 +205,13 @@ else
         deleteModal.show();
     }
 
+    function abrirModalEditarCategoria(button) {
+        document.getElementById('editarCategoriaId').value = button.dataset.categoryId || '';
+        document.getElementById('editarCategoriaNombre').value = button.dataset.categoryName || '';
+        document.getElementById('editarCategoriaDescripcion').value = button.dataset.categoryDescription || '';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarCategoria')).show();
+    }
+
     @if (ViewBag.OpenCreateCategoriaModal == true)
     {
         <text>
@@ -177,6 +219,18 @@ else
                 var createModalElement = document.getElementById('modalCrearCategoria');
                 if (createModalElement) {
                     bootstrap.Modal.getOrCreateInstance(createModalElement).show();
+                }
+            });
+        </text>
+    }
+
+    @if (ViewBag.OpenEditCategoriaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var editModalElement = document.getElementById('modalEditarCategoria');
+                if (editModalElement) {
+                    bootstrap.Modal.getOrCreateInstance(editModalElement).show();
                 }
             });
         </text>

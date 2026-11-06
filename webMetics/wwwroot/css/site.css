@@ -3300,6 +3300,24 @@ html body {
 .create-topic-modal .create-category-field { margin-bottom: 8px; }
 .create-topic-modal .modal-footer.create-category-modal-actions { padding-top: 12px; }
 
+.category-delete-modal .create-category-modal-icon { background: #fff0f0; color: #d92d3a; }
+.category-delete-message { color: #415672; line-height: 1.6; }
+.category-delete-modal .category-delete-confirm {
+    align-items: center;
+    background: #dc3545;
+    border: 1px solid #dc3545;
+    border-radius: 9px;
+    color: #fff;
+    display: inline-flex;
+    font-weight: 650;
+    justify-content: center;
+    min-height: 46px;
+    min-width: 122px;
+    padding: 10px 18px;
+}
+.category-delete-modal .category-delete-confirm:hover,
+.category-delete-modal .category-delete-confirm:focus-visible { background: #bb2d3b; border-color: #bb2d3b; color: #fff; }
+
 @media (max-width: 575.98px) {
     .create-category-modal .modal-dialog { margin: 8px auto; padding: 8px; }
     .create-category-modal .modal-content { border-radius: 15px; }
@@ -3310,7 +3328,8 @@ html body {
     .create-category-modal .modal-body.create-category-modal-body { padding: 22px 18px 10px; }
     .create-category-modal .modal-footer.create-category-modal-actions { padding: 14px 18px 22px; }
     .create-category-modal .create-category-cancel,
-    .create-category-modal .create-category-save { flex: 1 1 0; min-width: 0; padding: 9px 10px; }
+    .create-category-modal .create-category-save,
+    .category-delete-modal .category-delete-confirm { flex: 1 1 0; min-width: 0; padding: 9px 10px; }
 }
 
 /* Medallas catalog: responsive image cards with per-card Bootstrap menus. */
