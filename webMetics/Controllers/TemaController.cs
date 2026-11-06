@@ -151,7 +151,7 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult EditarTema(TemaModel tema)
+        public ActionResult EditarTema(TemaModel tema, bool returnToList = false)
         {
             try
             {
@@ -165,6 +165,14 @@ namespace webMetics.Controllers
                     return RedirectToAction("ListaTemas");
                 }
 
+                if (returnToList)
+                {
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
+                    ViewBag.OpenEditTemaModal = true;
+                    return View("ListaTemas", tema);
+                }
+
                 ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
@@ -173,6 +181,16 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
+                    ViewBag.OpenEditTemaModal = true;
+                    return View("ListaTemas", tema);
+                }
+
                 TempData["errorMessage"] = "No se pudo editar el área de competencia.";
                 return RedirectToAction("ListaTemas");
             }
