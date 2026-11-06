@@ -1723,12 +1723,24 @@ html.metics-scroll-restore-pending body { visibility: hidden; }
     opacity: 0;
     overflow: hidden;
     pointer-events: auto;
-    transform: translateY(-10px) scale(.985);
-    transition: opacity .28s ease, transform .36s cubic-bezier(.2, .75, .25, 1);
+    transform: translateX(-56px) scale(.985);
+    transition: opacity .46s ease, transform .46s cubic-bezier(.2, .75, .25, 1);
     width: 100%;
+    will-change: opacity, transform;
 }
-.metics-toast.toast.showing,
-.metics-toast.toast.show { opacity: 1; transform: translateY(0) scale(1); }
+.metics-toast.toast.showing:not(.show) {
+    opacity: 0;
+    transform: translateX(-56px) scale(.985);
+}
+.metics-toast.toast.show {
+    animation: metics-toast-enter .46s cubic-bezier(.2, .75, .25, 1) both;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+@keyframes metics-toast-enter {
+    from { opacity: 0; transform: translateX(-56px) scale(.985); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
 .metics-toast-inner {
     align-items: center;
     display: flex;
@@ -1792,6 +1804,9 @@ html.metics-scroll-restore-pending body { visibility: hidden; }
 }
 .metics-toast--error .metics-toast-icon { background: #fde6e4; color: #c83c32; }
 .metics-toast--error .metics-toast-message strong { color: #702a26; }
+@media (prefers-reduced-motion: reduce) {
+    .metics-toast.toast { animation: none !important; transition: none; }
+}
 @media (max-width: 575.98px) {
     .metics-toast-region {
         left: 12px;
