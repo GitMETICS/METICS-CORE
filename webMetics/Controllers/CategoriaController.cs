@@ -90,7 +90,7 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult CrearCategoria(CategoriaModel categoria)
+        public ActionResult CrearCategoria(CategoriaModel categoria, bool returnToList = false)
         {
             try
             {
@@ -104,12 +104,30 @@ namespace webMetics.Controllers
                     return RedirectToAction("ListaCategorias");
                 }
 
+                if (returnToList)
+                {
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo crear el nivel.";
+                    ViewBag.OpenCreateCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
+                }
+
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
 
                 return View(categoria);
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo crear el nivel.";
+                    ViewBag.OpenCreateCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
+                }
+
                 TempData["errorMessage"] = "No se pudo crear el nivel.";
                 return RedirectToAction("ListaCategorias");
             }

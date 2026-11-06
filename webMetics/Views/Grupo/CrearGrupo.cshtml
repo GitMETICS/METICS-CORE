@@ -313,6 +313,7 @@ else
                 document.querySelectorAll('.create-group-page input[type="date"]')
             );
             var instances = [];
+            var manualErrors = {};
 
             function pad(number) { return String(number).padStart(2, '0'); }
             function dateKey(date) {
@@ -342,20 +343,29 @@ else
                 input.setAttribute('tabindex', '-1');
                 input.dataset.customDateReady = 'true';
 
+                var manualInput = document.createElement('input');
+                manualInput.type = 'text';
+                manualInput.id = baseId + 'DateText';
+                manualInput.className = 'create-group-date-text';
+                manualInput.placeholder = 'dd/mm/aaaa';
+                manualInput.autocomplete = 'off';
+                manualInput.inputMode = 'numeric';
+                manualInput.setAttribute('aria-haspopup', 'dialog');
+                manualInput.setAttribute('aria-expanded', 'false');
+                manualInput.setAttribute('aria-controls', baseId + 'Calendar');
+                if (input.required) manualInput.setAttribute('aria-required', 'true');
+
                 var trigger = document.createElement('button');
                 trigger.type = 'button';
                 trigger.id = baseId + 'CalendarTrigger';
                 trigger.className = 'create-group-date-trigger';
-                trigger.setAttribute('aria-haspopup', 'dialog');
+                trigger.setAttribute('aria-label', 'Abrir calendario de fecha');
                 trigger.setAttribute('aria-expanded', 'false');
                 trigger.setAttribute('aria-controls', baseId + 'Calendar');
 
-                var value = document.createElement('span');
-                value.className = 'create-group-date-value';
                 var icon = document.createElement('i');
                 icon.className = 'bi bi-calendar3';
                 icon.setAttribute('aria-hidden', 'true');
-                trigger.appendChild(value);
                 trigger.appendChild(icon);
 
                 var panel = document.createElement('div');
@@ -393,7 +403,7 @@ else
                 todayButton.textContent = 'Hoy';
                 footer.appendChild(todayButton);
                 panel.append(header, calendar, footer);
-                wrapper.append(trigger, panel);
+                wrapper.append(manualInput, trigger, panel);
 
                 var fieldContainer = input.closest('.form-group');
                 var validationMessage = fieldContainer
@@ -401,23 +411,25 @@ else
                     : null;
                 if (validationMessage) {
                     if (!validationMessage.id) validationMessage.id = baseId + 'CalendarValidation';
+                    manualInput.setAttribute('aria-describedby', validationMessage.id);
                     trigger.setAttribute('aria-describedby', validationMessage.id);
                 }
                 var labels = Array.prototype.filter.call(document.querySelectorAll('label'), function (label) {
                     return label.htmlFor === input.id || label.htmlFor === input.name;
                 });
                 if (labels.length) {
-                    trigger.setAttribute('aria-labelledby', labels.map(function (label, labelIndex) {
+                    var labelIds = labels.map(function (label, labelIndex) {
                         if (!label.id) label.id = baseId + 'CalendarLabel' + labelIndex;
                         return label.id;
+                    }).join(' ');
+                    manualInput.setAttribute('aria-labelledby', labelIds);
+                    trigger.setAttribute('aria-label', 'Abrir calendario para ' + labels.map(function (label) {
+                        return label.textContent.trim();
                     }).join(' '));
                     labels.forEach(function (label) {
                         label.addEventListener('click', function (event) {
                             event.preventDefault();
-                            if (!trigger.disabled) {
-                                trigger.focus();
-                                toggle();
-                            }
+                            manualInput.focus();
                         });
                     });
                 }
@@ -431,14 +443,34 @@ else
                 function formatDisplay(date) {
                     return new Intl.DateTimeFormat('es-CR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
                 }
+                function parseTypedDate(value) {
+                    var text = value.trim();
+                    var isoParts = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+                    var localParts = text.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})$/);
+                    var year;
+                    var month;
+                    var day;
+                    if (isoParts) {
+                        year = Number(isoParts[1]);
+                        month = Number(isoParts[2]);
+                        day = Number(isoParts[3]);
+                    } else if (localParts) {
+                        day = Number(localParts[1]);
+                        month = Number(localParts[2]);
+                        year = Number(localParts[3]);
+                    } else {
+                        return null;
+                    }
+                    var date = new Date(year, month - 1, day);
+                    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null;
+                }
                 function isAllowed(date) {
                     var key = dateKey(date);
                     return (!input.min || key >= input.min) && (!input.max || key <= input.max);
                 }
                 function renderValue() {
                     var selected = parseDate(input.value);
-                    value.textContent = selected ? formatDisplay(selected) : 'dd/mm/aaaa';
-                    value.classList.toggle('is-placeholder', !selected);
+                    if (!manualErrors[input.name]) manualInput.value = selected ? formatDisplay(selected) : '';
                     if (selected) {
                         viewMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
                     }
@@ -446,9 +478,11 @@ else
                     var hasError = validationMessage && validationMessage.textContent.trim().length > 0;
                     if (hasError) {
                         trigger.setAttribute('aria-invalid', 'true');
+                        manualInput.setAttribute('aria-invalid', 'true');
                         wrapper.classList.add('has-validation-error');
                     } else {
                         trigger.removeAttribute('aria-invalid');
+                        manualInput.removeAttribute('aria-invalid');
                         wrapper.classList.remove('has-validation-error');
                     }
                 }
@@ -491,7 +525,9 @@ else
                             dayButton.setAttribute('aria-selected', 'false');
                         }
                         if (sameDay(date, today)) dayButton.classList.add('is-today');
-                        dayButton.addEventListener('click', function () { chooseDate(parseDate(dayButton.dataset.date)); });
+                        dayButton.addEventListener('click', function (event) {
+                            chooseDate(parseDate(event.currentTarget.dataset.date));
+                        });
                         calendar.appendChild(dayButton);
                         dayButtons.push(dayButton);
                     }
@@ -525,6 +561,7 @@ else
                     var card = wrapper.closest('.create-group-card');
                     if (card) card.classList.add('create-group-card--select-open');
                     trigger.setAttribute('aria-expanded', 'true');
+                    manualInput.setAttribute('aria-expanded', 'true');
                     isOpen = true;
                     var rect = trigger.getBoundingClientRect();
                     var roomBelow = window.innerHeight - rect.bottom;
@@ -538,15 +575,17 @@ else
                     var card = wrapper.closest('.create-group-card');
                     if (card) card.classList.remove('create-group-card--select-open');
                     trigger.setAttribute('aria-expanded', 'false');
+                    manualInput.setAttribute('aria-expanded', 'false');
                     isOpen = false;
-                    if (returnFocus) trigger.focus();
+                    if (returnFocus) manualInput.focus();
                 }
                 function chooseDate(date) {
                     if (!date || !isAllowed(date)) return;
+                    manualErrors[input.name] = '';
                     input.value = dateKey(date);
                     input.dispatchEvent(new Event('input', { bubbles: true }));
                     input.dispatchEvent(new Event('change', { bubbles: true }));
-                    if (validationMessage && input.checkValidity()) validationMessage.textContent = '';
+                    if (validationMessage && input.validity.valid) validationMessage.textContent = '';
                     renderValue();
                     close(true);
                 }
@@ -560,6 +599,41 @@ else
                 function toggle() { if (isOpen) close(false); else open(); }
 
                 trigger.addEventListener('click', toggle);
+                manualInput.addEventListener('input', function () {
+                    var typedValue = manualInput.value.trim();
+                    if (!typedValue) {
+                        manualErrors[input.name] = '';
+                        input.value = '';
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                        return;
+                    }
+
+                    var typedDate = parseTypedDate(typedValue);
+                    if (!typedDate) {
+                        manualErrors[input.name] = 'Ingrese una fecha válida con formato dd/mm/aaaa.';
+                        input.value = '';
+                        updateDateConstraints();
+                        return;
+                    }
+
+                    var typedKey = dateKey(typedDate);
+                    manualErrors[input.name] = '';
+                    input.value = typedKey;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    if (validationMessage && input.validity.valid) validationMessage.textContent = '';
+                    renderValue();
+                });
+                manualInput.addEventListener('keydown', function (event) {
+                    if (event.key === 'ArrowDown' && !isOpen) {
+                        event.preventDefault();
+                        open();
+                    } else if (event.key === 'Escape' && isOpen) {
+                        event.preventDefault();
+                        close(true);
+                    }
+                });
                 previous.addEventListener('click', function () { changeMonth(-1); });
                 next.addEventListener('click', function () { changeMonth(1); });
                 todayButton.addEventListener('click', function () {
@@ -600,8 +674,9 @@ else
                     event.preventDefault();
                     if (validationMessage) validationMessage.textContent = input.validationMessage;
                     trigger.setAttribute('aria-invalid', 'true');
+                    manualInput.setAttribute('aria-invalid', 'true');
                     wrapper.classList.add('has-validation-error');
-                    window.setTimeout(function () { trigger.focus(); }, 0);
+                    window.setTimeout(function () { manualInput.focus(); }, 0);
                 });
                 var instance = { close: close, wrapper: wrapper, sync: renderValue };
                 instances.push(instance);
@@ -650,6 +725,14 @@ else
                     if (!input) return;
                     errors[input.name] = errors[input.name] ? errors[input.name] + ' ' + message : message;
                 }
+                inputs.forEach(function (input) {
+                    if (input.value && input.min && input.value < input.min) {
+                        addError(input, 'La fecha no puede ser anterior al ' + formatDisplay(parseDate(input.min)) + '.');
+                    }
+                    if (input.value && input.max && input.value > input.max) {
+                        addError(input, 'La fecha no puede ser posterior al ' + formatDisplay(parseDate(input.max)) + '.');
+                    }
+                });
                 if (enrollmentStart && enrollmentEnd && enrollmentStart > enrollmentEnd) {
                     addError(enrollmentEndInput, 'La fecha de finalización de inscripción no puede ser anterior al inicio de inscripción.');
                 }
@@ -665,6 +748,9 @@ else
 
                 inputs.forEach(function (input) {
                     var message = errors[input.name] || '';
+                    if (manualErrors[input.name]) {
+                        message = message ? message + ' ' + manualErrors[input.name] : manualErrors[input.name];
+                    }
                     input.setCustomValidity(message);
                     var fieldContainer = input.closest('.form-group');
                     var validationMessage = fieldContainer
@@ -699,7 +785,11 @@ else
             if (form) {
                 form.addEventListener('reset', function () {
                     window.setTimeout(function () {
-                        inputs.forEach(function (input) { input.dispatchEvent(new Event('change', { bubbles: true })); });
+                        inputs.forEach(function (input) {
+                            manualErrors[input.name] = '';
+                            input.setCustomValidity('');
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        });
                     }, 0);
                 });
             }
@@ -800,6 +890,8 @@ else
                 var activeIndex = -1;
                 var optionRows = [];
                 var isOpen = false;
+                var typeAheadBuffer = '';
+                var typeAheadTimer = null;
 
                 function enabledIndexFrom(startIndex, step) {
                     var index = startIndex;
@@ -947,6 +1039,36 @@ else
                     if (next >= 0 && next < select.options.length) setActive(next, true);
                 }
 
+                function findTypeAheadMatch(query) {
+                    var startIndex = select.selectedIndex;
+                    for (var offset = 1; offset <= select.options.length; offset++) {
+                        var optionIndex = (startIndex + offset + select.options.length) % select.options.length;
+                        var option = select.options[optionIndex];
+                        var optionText = option.text.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                        if (!option.disabled && option.value !== '' && optionText.startsWith(query)) {
+                            return optionIndex;
+                        }
+                    }
+                    return -1;
+                }
+
+                function searchByTyping(character) {
+                    var normalizedCharacter = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                    var repeatedCharacter = typeAheadBuffer && Array.from(typeAheadBuffer).every(function (letter) {
+                        return letter === normalizedCharacter;
+                    });
+                    typeAheadBuffer = repeatedCharacter ? normalizedCharacter : typeAheadBuffer + normalizedCharacter;
+                    window.clearTimeout(typeAheadTimer);
+                    typeAheadTimer = window.setTimeout(function () { typeAheadBuffer = ''; }, 800);
+
+                    var match = findTypeAheadMatch(typeAheadBuffer);
+                    if (match < 0 && typeAheadBuffer !== normalizedCharacter) {
+                        typeAheadBuffer = normalizedCharacter;
+                        match = findTypeAheadMatch(typeAheadBuffer);
+                    }
+                    if (match >= 0) choose(match);
+                }
+
                 var instance = { close: close, select: select, syncDisabled: syncDisabled, syncFromNative: syncFromNative };
                 instances.push(instance);
 
@@ -962,6 +1084,12 @@ else
 
                     if (event.key === 'Tab') {
                         close(false);
+                        return;
+                    }
+
+                    if (event.key.length === 1 && event.key.trim() && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                        event.preventDefault();
+                        searchByTyping(event.key);
                         return;
                     }
 

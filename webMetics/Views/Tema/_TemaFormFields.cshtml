@@ -1,0 +1,8 @@
+@model webMetics.Models.TemaModel
+
+<div class="form-group create-category-field">
+    @Html.LabelFor(temaModel => temaModel.nombre)
+    <span class="create-category-required" aria-hidden="true">*</span>
+    @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+    @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
+</div>

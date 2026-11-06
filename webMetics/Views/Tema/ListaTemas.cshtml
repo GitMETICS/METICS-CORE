@@ -1,3 +1,4 @@
+@model webMetics.Models.TemaModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Áreas de Competencia";
@@ -29,7 +30,7 @@
         {
             <h5 class="text-center mb-4">No hay temas.</h5>
             <div class="text-center">
-                @Html.ActionLink("Crear área", "CrearTema", "Tema", new { }, new { @class = "table-card-action bi bi-plus-lg" })
+                <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearTema">Crear área</button>
             </div>
         }
         else
@@ -42,7 +43,7 @@
                     </div>
                     <div class="table-card-header-actions">
                         <span class="table-card-count">@ViewBag.Temas.Count áreas encontradas</span>
-                        @Html.ActionLink("Crear área", "CrearTema", "Tema", new { }, new { @class = "table-card-action bi bi-plus-lg" })
+                        <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearTema">Crear área</button>
                     </div>
                 </div>
 
@@ -100,6 +101,33 @@
         }
     </div>
 
+    <div class="modal fade create-category-modal create-topic-modal" id="modalCrearTema" tabindex="-1" aria-labelledby="modalCrearTemaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-collection"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalCrearTemaLabel">Crear área de competencia</h2>
+                            <p>Completa el nombre para registrar una nueva área.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        @await Html.PartialAsync("_TemaFormFields", Model ?? new webMetics.Models.TemaModel())
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar área</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -135,6 +163,18 @@ else
         document.getElementById("idTema").value = idTema;
         var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         deleteModal.show();
+    }
+
+    @if (ViewBag.OpenCreateTemaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var createModalElement = document.getElementById('modalCrearTema');
+                if (createModalElement) {
+                    bootstrap.Modal.getOrCreateInstance(createModalElement).show();
+                }
+            });
+        </text>
     }
 
     MeticsTable.init({

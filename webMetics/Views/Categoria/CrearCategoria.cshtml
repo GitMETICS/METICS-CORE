@@ -40,29 +40,11 @@
                 </div>
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(categoriaModel => categoriaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px"> *</a>
-                            @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64" })
-                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group">
-                            @Html.LabelFor(categoriaModel => categoriaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px"> *</a>
-                            @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300" })
-                            @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
-
-                        </div>
-                        <div class="row justify-content-center m-4">
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                            </div>
-                            <div class="col-auto">
-                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                            </div>
-                        </div>
-                    </div>
+            <div class="create-category-standalone-form">
+                @await Html.PartialAsync("_CategoriaFormFields", Model ?? new webMetics.Models.CategoriaModel())
+                <div class="create-category-form-actions">
+                    <a href="#" class="btn create-category-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                    <input type="submit" class="btn btn-primary create-category-save" value="Guardar nivel" />
                 </div>
             </div>
         }

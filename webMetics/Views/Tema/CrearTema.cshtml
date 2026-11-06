@@ -40,25 +40,11 @@
                 </div>
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(temaModel => temaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64" })
-                            @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
-                                Cancelar
-                            </a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
+            <div class="create-category-standalone-form">
+                @await Html.PartialAsync("_TemaFormFields", Model ?? new webMetics.Models.TemaModel())
+                <div class="create-category-form-actions">
+                    <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn create-category-cancel">Cancelar</a>
+                    <input type="submit" class="btn btn-primary create-category-save" value="Guardar" />
                 </div>
             </div>
         }

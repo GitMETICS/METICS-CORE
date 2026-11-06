@@ -67,7 +67,18 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+            ViewBag.MedallasRegistradas = accesoAParticipante.ObtenerTodasMedallas() ?? new List<string>();
+
+            string rutaMedallas = System.IO.Path.Combine(_environment.WebRootPath, "images", "medallas");
+            string[] extensionesImagen = { ".png", ".jpg", ".jpeg" };
+            ViewBag.TodasLasMedallas = Directory.Exists(rutaMedallas)
+                ? Directory.EnumerateFiles(rutaMedallas)
+                    .Where(ruta => extensionesImagen.Contains(System.IO.Path.GetExtension(ruta) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                    .Select(ruta => System.IO.Path.GetFileName(ruta) ?? string.Empty)
+                    .Where(nombre => !string.IsNullOrWhiteSpace(nombre))
+                    .OrderBy(nombre => nombre, StringComparer.OrdinalIgnoreCase)
+                    .ToList()
+                : new List<string>();
             ViewBag.TodosLosParticipantes = accesoAParticipante.ObtenerListaParticipantes();
 
             ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();

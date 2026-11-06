@@ -82,11 +82,10 @@
             && ViewBag.Title != "Recuperar Contraseña"
             && ViewBag.Title != "Completar Información - Correo Alternativo"
             && ViewBag.Title != "Completar Información - Grado Académico";
-        bool isAcademicActive = currentController == "Categoria" || (currentController == "Tema" && currentAction != "CrearTema");
+        bool isAcademicActive = currentController == "Categoria" || currentController == "Tema";
         bool isPeopleActive = currentController == "Participante" || (currentController == "Asesor" && currentAction != "MisModulos");
         bool isInscriptionActive = currentController == "Inscripcion";
         bool isContentActive = currentController == "Medallas"
-            || (currentController == "Tema" && currentAction == "CrearTema")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
         bool isFacilitatorActive = (currentController == "Asesor" && currentAction == "MisModulos")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
@@ -157,7 +156,6 @@
                                         <span>Contenido</span>
                                     </a>
                                     <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="contentDropdown">
-                                        <li>@Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item bi bi-plus-square" })</li>
                                         <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item bi bi-journal-plus" })</li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item bi bi-award" })</li>
