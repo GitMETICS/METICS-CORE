@@ -186,97 +186,91 @@
                             {
                                 visible = "0.5";
                             }
-                            <div class="col-12 mb-3 module-card-item">
-                                <div id="@grupo.idGrupo" class="list-group" style="opacity:@visible">
-                                    <div class="list-group-item border rounded shadow-sm" style="background-color: #e6fafd;">
-                                        <div class="d-flex card-header justify-content-between align-items-start">
-                                            <h4 class="mb-0">@grupo.nombre</h4>
-                                            <div class="ms-2">
-                                                <div style="float:left">
-                                                    <span class="badge bg-info" style="float:right">Inscrito(a)</span>
-                                                </div>
-                                            </div>
+                            <div class="col-12 mb-4 module-card-item">
+                                <div id="@grupo.idGrupo" class="card h-100 text-center" style="opacity:@visible">
+                                    <div class="card-header module-enrolled-header">
+                                        <div><div><span class="badge bg-info"><i class="bi bi-check-circle" aria-hidden="true"></i> Inscrito(a)</span></div></div>
+                                    </div>
+                                <div class="card-body module-card-body">
+                                    <div class="module-card-heading"><h4>@grupo.nombre</h4></div>
+                                    <div class="module-card-dates">
+                                        <div><i class="bi bi-calendar-event" aria-hidden="true"></i><span><small>Fecha de inicio</small><time>@grupo.fechaInicioGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                        <div><i class="bi bi-calendar-check" aria-hidden="true"></i><span><small>Fin del módulo</small><time>@grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                    {
+                                        <div class="card-text module-card-description" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
+                                            @grupo.descripcion
                                         </div>
-                                        <br />
-                                        <button class="btn btn-link p-0 see-more-info-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMoreInfo(this)">Ver detalles</button>
-
-                                        <div class="more-info" style="display:none; margin-top: 10px;">
-                                            <div class="card-body d-flex flex-column align-items-center text-center text-secondary">
-                                                <div class="justify-content-center mt-0 text-secondary">
-                                                    <div class="mb-3">
-                                                        <i class="bi bi-calendar-event" aria-hidden="true"></i> <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                                        <i class="bi bi-calendar-check" aria-hidden="true"></i> <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <i class="bi bi-clock" aria-hidden="true"></i> <strong>Horario: </strong> @grupo.horario
-                                                    </div>
-                                                    <div class="mb-0">
-                                                        @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
-                                                        {
-                                                            <i class="bi bi-geo-alt" aria-hidden="true"></i> <strong>Lugar: </strong> @grupo.lugar
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="bi bi-geo-alt" aria-hidden="true"></i> <strong>Modalidad: </strong> @EnumHelper.GetDisplayName(grupo.modalidad)
-                                                        }
-                                                    </div>
+                                    }
+                                    <div class="module-card-details">
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-people" aria-hidden="true"></i>Número de grupo</span>
+                                            <span class="module-card-detail-value">@grupo.numeroGrupo</span>
+                                        </div>
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-clock" aria-hidden="true"></i>Cantidad de horas</span>
+                                            <span class="module-card-detail-value">@grupo.cantidadHoras</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
+                                        {
+                                            <div class="module-card-detail module-card-detail-wide">
+                                                <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador(a)</span>
+                                                <span class="module-card-detail-value">@grupo.nombreAsesor</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @if (grupo.modalidad == "Autogestionado")
+                                            {
+                                                <div class="module-card-detail module-card-detail-wide">
+                                                    <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador</span>
+                                                    <span class="module-card-detail-value">Equipo del Área de Asesoría Docente de la Unidad METICS</span>
                                                 </div>
-                                                <!-- Flexbox to center content -->
-                                                @if (!string.IsNullOrEmpty(grupo.descripcion))
+                                            }
+                                        }
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-journal-bookmark" aria-hidden="true"></i>Área(s) de competencia</span>
+                                            <span class="module-card-detail-value">
+                                                @if (grupo.TemasSeleccionadosNombres != null)
                                                 {
-                                                    <div class="card-text mb-2" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
-                                                        <strong>Descripción: </strong>@grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))
-                                                        @if (grupo.descripcion.Length > 250)
-                                                        {
-                                                            <span class="dots">...</span>
-                                                            <span class="more" style="display:none;">@grupo.descripcion.Substring(250)</span>
-                                                            <button class="btn btn-link p-0 see-more-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMore(this)">Ver más</button>
-                                                        }
-                                                    </div>
-                                                }
-                                                <div class="card-text mb-3"><i class="bi bi-people" aria-hidden="true"></i> <strong>Número de grupo:</strong> @grupo.numeroGrupo</div>
-                                                <div class="card-text mb-3"><i class="bi bi-clock" aria-hidden="true"></i> <strong>Cantidad de horas:</strong> @grupo.cantidadHoras</div>
-                                                @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
-                                                {
-                                                    <div class="card-text mb-3"><i class="bi bi-person-badge" aria-hidden="true"></i> <strong>Facilitador(a):</strong> @grupo.nombreAsesor</div>
+                                                    @String.Join(", ", grupo.TemasSeleccionadosNombres)
                                                 }
                                                 else
                                                 {
-                                                    @if (grupo.modalidad == "Autogestionado")
-                                                    {
-                                                        <div class="card-text mb-3"><i class="bi bi-person-badge" aria-hidden="true"></i> <strong>Facilitador:</strong> Equipo del Área de Asesoría Docente de la Unidad METICS</div>
-                                                    }
+                                                    <span>No hay temas asociados.</span>
                                                 }
-                                                <div class="card-text mb-3">
-                                                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i> <strong>Área(s) de competencia:</strong>
-                                                    @if (grupo.TemasSeleccionadosNombres != null)
-                                                    {
-                                                        @String.Join(", ", grupo.TemasSeleccionadosNombres)
-                                                    }
-                                                    else
-                                                    {
-                                                        <span>No hay temas asociados.</span>
-                                                    }
-                                                </div>
-                                                <div class="card-text mb-3"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i> <strong>@grupo.nombreCategoria</strong></div>
-                                                @if (!string.IsNullOrEmpty(grupo.enlace))
-                                                {
-                                                    <div class="card-text mb-3">
-                                                            <strong><a href="@grupo.enlace" target="_blank">Enlace de Mediación Virtual</a></strong>
-                                                    </div>
-                                                }
+                                            </span>
+                                        </div>
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i>Nivel</span>
+                                            <span class="module-card-detail-value">@grupo.nombreCategoria</span>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(grupo.enlace))
+                                        {
+                                            <div class="module-card-link module-card-detail-wide">
+                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            </div>
+                                        }
+                                    </div>
 
 
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 align-items-center text-center">
-                                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
-                                        </div>
-@*                                         <div class="mt-2">
-                                            <div class="d-flex align-items-center justify-content-center">
-                                                @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
-                                            </div>
-                                        </div> *@
+                                    <div class="module-card-actions module-enrolled-actions">
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
+                                    </div>
+                                </div>
+                                    <div class="card-footer text-muted">
+                                        <span class="module-card-location"><i class="bi bi-geo-alt" aria-hidden="true"></i>
+                                        @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            @grupo.lugar
+                                        }
+                                        else
+                                        {
+                                                @EnumHelper.GetDisplayName(grupo.modalidad)
+                                        }
+                                        </span>
+                                        <span class="module-card-schedule"><i class="bi bi-clock" aria-hidden="true"></i>@grupo.horario</span>
                                     </div>
                                 </div>
                             </div>
@@ -542,11 +536,28 @@
                     if (visibleInicialmente)
                     {
                         var visibleStyle = grupo.esVisible == false ? "opacity:0.5" : "";
-                        <div class="col-12 mb-3 list-group module-item module-card-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
-                            <div class="list-group-item border rounded shadow-sm">
-                                <div class="d-flex card-header justify-content-between align-items-start">
-                                    <h4 class="mb-2">@grupo.nombre</h4>
-                                    <div class="ms-2">
+                        <div class="col-12 mb-4 module-item module-card-item @estadoGrupo" id="module-@grupo.idGrupo" style="@visibleStyle">
+                            <div class="card h-100 text-center mb-1">
+                                <div class="card-header">
+                                    <div>
+                                        <div style="float:left">
+                                            @if (grupo.cupoActual < grupo.cupo)
+                                            {
+                                                <span class="badge bg-info" style="float:left; margin-right: 10px;">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
+                                            }
+                                            @if (ViewBag.DateNow.Date > fechaFinInscripcion)
+                                            {
+                                                <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
+                                            }
+                                            @if (ViewBag.Role == 1)
+                                            {
+                                                <span class="badge bg-info" style="float:left; margin-right: 10px;">Inscripciones: @(grupo.cupoActual)</span>
+                                            }
+                                        </div>
                                         @if (ViewBag.Role == 1 || ViewBag.Role == 2)
                                         {
                                             <div style="float:right">
@@ -569,118 +580,103 @@
                                             </div>
                                         }
                                     </div>
+                                    <br />
                                 </div>
-                                <div style="float:left">
-                                    @if (grupo.cupoActual < grupo.cupo)
+                                <div class="card-body module-card-body">
+                                    <div class="module-card-heading"><h4>@grupo.nombre</h4></div>
+                                    <div class="module-card-dates">
+                                        <div><i class="bi bi-calendar-event" aria-hidden="true"></i><span><small>Fecha de inicio</small><time>@grupo.fechaInicioGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                        <div><i class="bi bi-calendar-check" aria-hidden="true"></i><span><small>Fin del módulo</small><time>@grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")</time></span></div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(grupo.descripcion))
                                     {
-                                        <span class="badge bg-info" style="float:left; margin-right: 10px;">Cupo: @(grupo.cupo - grupo.cupoActual)</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger" style="float:left; margin-right: 10px;">Sin cupo</span>
-                                    }
-                                    @if (ViewBag.DateNow.Date > fechaFinInscripcion)
-                                    {
-                                        <span class="badge bg-danger" style="float:left; margin-right: 10px;">Inscripción finalizada</span>
-                                    }
-                                    @if (ViewBag.Role == 1)
-                                    {
-                                        <span class="badge bg-info" style="float:left; margin-right: 10px;">Inscripciones: @(grupo.cupoActual)</span>
-                                    }
-                                </div>
-                                <br />
-                                <button class="btn btn-link p-0 see-more-info-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMoreInfo(this)">Ver detalles</button>
-
-                                <div class="more-info" style="display:none; margin-top: 10px;">
-                                    <div class="card-body d-flex flex-column align-items-center text-center text-secondary">
-                                        <div class="justify-content-center mt-0 text-secondary">
-                                            <div class="mb-3">
-                                                <strong>Fecha de inicio:</strong> @grupo.fechaInicioGrupo.ToString("dd/MM/yyyy") -
-                                                <strong>Fin del módulo:</strong> @grupo.fechaFinalizacionGrupo.ToString("dd/MM/yyyy")
-                                            </div>
-                                            <div class="mb-3">
-                                                <strong>Horario: </strong> @grupo.horario
-                                            </div>
-                                            <div class="mb-0">
-                                                @if (string.Equals(grupo.modalidad, "presencial", StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    <strong>Lugar: </strong> 
-                                                    @grupo.lugar
-                                                }
-                                                else
-                                                {
-                                                    <strong>Modalidad: </strong> 
-                                                    @EnumHelper.GetDisplayName(grupo.modalidad)
-                                                }
-                                            </div>
+                                        <div class="card-text module-card-description" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
+                                            @grupo.descripcion
                                         </div>
-                                        <!-- Flexbox to center content -->
-                                        @if (!string.IsNullOrEmpty(grupo.descripcion))
-                                        {
-                                            <div class="card-text mb-2" style="line-height: 1.6; font-size: 1rem; padding: 10px;">
-                                                <strong>Descripción: </strong>@grupo.descripcion.Substring(0, Math.Min(250, grupo.descripcion.Length))
-                                                @if (grupo.descripcion.Length > 250)
-                                                {
-                                                    <span class="dots">...</span>
-                                                    <span class="more" style="display:none;">@grupo.descripcion.Substring(250)</span>
-                                                    <button class="btn btn-link p-0 see-more-btn" style="color: #007bff; font-weight: bold;" onclick="toggleSeeMore(this)">Ver más</button>
-                                                }
-                                            </div>
-                                        }
-                                        <div class="card-text mb-3"><strong>Número de grupo:</strong> @grupo.numeroGrupo</div>
-                                        <div class="card-text mb-3"><strong>Cantidad de horas:</strong> @grupo.cantidadHoras</div>
+                                    }
+                                    <div class="module-card-details">
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-people" aria-hidden="true"></i>Número de grupo</span>
+                                            <span class="module-card-detail-value">@grupo.numeroGrupo</span>
+                                        </div>
+                                        <div class="module-card-detail">
+                                            <span class="module-card-detail-label"><i class="bi bi-clock" aria-hidden="true"></i>Cantidad de horas</span>
+                                            <span class="module-card-detail-value">@grupo.cantidadHoras</span>
+                                        </div>
                                         @if (!string.IsNullOrEmpty(grupo.nombreAsesor))
                                         {
-                                            <div class="card-text mb-3"><strong>Facilitador(a):</strong> @grupo.nombreAsesor</div>
+                                            <div class="module-card-detail module-card-detail-wide">
+                                                <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador(a)</span>
+                                                <span class="module-card-detail-value">@grupo.nombreAsesor</span>
+                                            </div>
                                         }
                                         else
                                         {
                                             @if (grupo.modalidad == "Autogestionado")
                                             {
-                                                <div class="card-text mb-3"><strong>Facilitador:</strong> Equipo del Área de Asesoría Docente de la Unidad METICS</div>
+                                                <div class="module-card-detail module-card-detail-wide">
+                                                    <span class="module-card-detail-label"><i class="bi bi-person-badge" aria-hidden="true"></i>Facilitador</span>
+                                                    <span class="module-card-detail-value">Equipo del Área de Asesoría Docente de la Unidad METICS</span>
+                                                </div>
                                             }
                                         }
-                                        <div class="card-text mb-3">
-                                            <strong>Área(s) de competencia:</strong>
-                                            @if (grupo.TemasSeleccionadosNombres != null)
-                                            {
-                                                @String.Join(", ", grupo.TemasSeleccionadosNombres)
-                                            }
-                                            else
-                                            {
-                                                <span>No hay temas asociados.</span>
-                                            }
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-journal-bookmark" aria-hidden="true"></i>Área(s) de competencia</span>
+                                            <span class="module-card-detail-value">
+                                                @if (grupo.TemasSeleccionadosNombres != null)
+                                                {
+                                                    @String.Join(", ", grupo.TemasSeleccionadosNombres)
+                                                }
+                                                else
+                                                {
+                                                    <span>No hay temas asociados.</span>
+                                                }
+                                            </span>
                                         </div>
-                                        <div class="card-text mb-3"><strong>@grupo.nombreCategoria</strong></div>
+                                        <div class="module-card-detail module-card-detail-wide">
+                                            <span class="module-card-detail-label"><i class="bi bi-bar-chart-steps" aria-hidden="true"></i>Nivel</span>
+                                            <span class="module-card-detail-value">@grupo.nombreCategoria</span>
+                                        </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="card-text mb-3">
-                                                <strong><a href="@grupo.enlace" target="_blank">Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-link module-card-detail-wide">
+                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
                                             </div>
                                         }
                                     </div>
-                                </div>
-                                <div class="mt-3 align-items-center text-center d-flex flex-column">
-                                    @if (ViewBag.Role == 1)
-                                    {
-                                        @Html.ActionLink("    Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @class = "link link-primary bi bi-person-add mb-2", @style = "text-decoration:none;" })
-                                        @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
-                                    }
-                                    else
-                                    {
-                                        if (fechaInicioInscripcion < ViewBag.DateNow.Date && ViewBag.DateNow.Date < fechaFinInscripcion)
-                                        {
-                                            if (grupo.cupoActual < grupo.cupo)
-                                            {
-                                                if (ViewBag.ParticipantesEnGrupos != null)
-                                                {
-                                                    var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
-                                                    var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == ViewBag.Id);
-                                                    var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
 
-                                                    if (inscripcionesDelUsuarioEnEsteGrupo != null)
+
+                                    <div class="module-card-actions">
+                                        @if (ViewBag.Role == 1)
+                                        {
+                                            <div class="mb-3">
+                                                @Html.ActionLink("    Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @class = "link link-primary bi bi-person-add", @style = "text-decoration:none;" })
+                                            </div>
+                                            <div class="mb-2">
+                                                @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
+                                            </div>
+
+                                        }
+                                        else
+                                        {
+                                            if (fechaInicioInscripcion < ViewBag.DateNow.Date && ViewBag.DateNow.Date < fechaFinInscripcion)
+                                            {
+                                                if (grupo.cupoActual < grupo.cupo)
+                                                {
+                                                    if (ViewBag.ParticipantesEnGrupos != null)
                                                     {
-                                                        <i class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</i>
+                                                        var inscripcionesDelGrupo = (List<InscripcionModel>)ViewBag.ParticipantesEnGrupos;
+                                                        var inscripcionesDelUsuario = inscripcionesDelGrupo.Where(inscripcionModel => inscripcionModel.idParticipante == ViewBag.Id);
+                                                        var inscripcionesDelUsuarioEnEsteGrupo = inscripcionesDelUsuario.FirstOrDefault(inscripcionModel => inscripcionModel.idGrupo == grupo.idGrupo);
+
+                                                        if (inscripcionesDelUsuarioEnEsteGrupo != null)
+                                                        {
+                                                            <i class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)">Desinscribirse</i>
+                                                        }
+                                                        else
+                                                        {
+                                                            @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                        }
                                                     }
                                                     else
                                                     {
@@ -689,36 +685,42 @@
                                                 }
                                                 else
                                                 {
-                                                    @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                    <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
                                                 }
+                                            }
+                                            else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
+                                            {
+                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <br />
+                                                <small class="text-muted">Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
                                             else
                                             {
                                                 <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <br />
+                                                <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
                                         }
-
-                                        else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
+                                    </div>
+                                    <div class="mt-2">
+                                        @*                                         else
                                         {
-                                            <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
-                                            <br />
-                                            <small class="text-muted">Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</small>
-                                        }
-                                        else
-                                        {
-                                            <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
-                                            <br />
-                                            <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy")</small>
-                                        }
-                                    }
-                                </div>
-                                <div class="mt-2">
-                                    @*                                         else
-                                    {
-                                        <div class="d-flex align-items-center justify-content-center">
                                             @Html.ActionLink("Ver el programa del módulo", "VerAdjunto", "Grupo", new { idGrupo = grupo.idGrupo }, new { @class = "text-secondary link-opacity-50 link-opacity-100-hover" })
-                                        </div>
-                                    } *@
+                                        } *@
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted bg-primary bg-opacity-25 border-primary border-1 border-opacity-25">
+                                    <span class="module-card-location"><i class="bi bi-geo-alt" aria-hidden="true"></i>
+                                    @if (string.Equals(grupo.modalidad, "Presencial", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        @grupo.lugar
+                                    }
+                                    else
+                                    {
+                                        @EnumHelper.GetDisplayName(grupo.modalidad)
+                                    }
+                                    </span>
+                                    <span class="module-card-schedule"><i class="bi bi-clock" aria-hidden="true"></i>@grupo.horario</span>
                                 </div>
                             </div>
                         </div>
@@ -737,7 +739,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Eliminar módulo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar este módulo?
@@ -763,7 +764,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editarModalLabel">Editar módulo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <h8 style="padding-bottom:5px">
@@ -791,7 +791,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editarAdjuntoModalLabel">Desinscribirse del módulo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <h8 style="padding-bottom:5px">
@@ -974,19 +973,6 @@ else
             dots.style.display = "none";
             btn.innerHTML = "Ver menos";
             moreText.style.display = "inline";
-        }
-    }
-</script>
-
-<script>
-    function toggleSeeMoreInfo(button) {
-        const moreInfoDiv = button.nextElementSibling; 
-        if (moreInfoDiv.style.display === "none") {
-            moreInfoDiv.style.display = "block"; 
-            button.innerText = "Ocultar detalles"; 
-        } else {
-            moreInfoDiv.style.display = "none"; 
-            button.innerText = "Ver detalles"; 
         }
     }
 </script>
