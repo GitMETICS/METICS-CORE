@@ -1,3 +1,4 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment MedalEnvironment
 @model webMetics.Models.ParticipanteModel
 @{
     ViewBag.Title = "Módulos del Participante";
@@ -99,12 +100,11 @@
                                                 </button>
                                             }
                                             @{
-                                                var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                                                var medalPath = System.IO.Path.Combine(MedalEnvironment.WebRootPath, "images", "medallas", nombreMedalla);
                                             }
-                                            @if (medalPath != null)
+                                            @if (webMetics.Services.MedallasCatalogoService.EsNombreValido(nombreMedalla) && System.IO.File.Exists(medalPath))
                                             {
-                                                var normalizedMedalPath = medalPath.Replace('\\', '/');
-                                                var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                                                var relativeMedalPath = Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla));
                                                 <div class="medal-catalog-image-wrap"><img src="@relativeMedalPath" alt="Medalla: @nombreMedalla" loading="lazy" /></div>
                                             }
                                             <h3>@nombreMedalla</h3>
@@ -278,11 +278,11 @@
                                                     @using (Html.BeginForm("SubirHorasAprobadasYCalificacion", "Calificaciones", new { idGrupo = inscripcion.idGrupo, idParticipante = ViewBag.Participante.idParticipante }, FormMethod.Post))
                                                     {
                                                         <td class="text-center">
-                                                            <input type="number" min="0" class="form-control mx-auto" name="horasAprobadas">
+                                                            <input type="number" min="0" step="1" class="form-control mx-auto" name="horasAprobadas" aria-label="Horas aprobadas de @inscripcion.nombreGrupo">
                                                         </td>
                                                         <td class="text-center">@((inscripcion.calificacion ?? 0))</td>
                                                         <td class="text-center">
-                                                            <input type="number" min="0" , max="100" class="form-control mx-auto" name="calificacion" id="calificacion">
+                                                            <input type="number" min="0" max="100" step="1" class="form-control mx-auto" name="calificacion" id="calificacion-@inscripcion.idInscripcion" aria-label="Calificación de @inscripcion.nombreGrupo">
                                                         </td>
                                                         <td class="text-center">
                                                             <button type="submit" class="btn btn-primary bi bi-check-lg modulo-detalle-save" title="Guardar" aria-label="Guardar horas y calificación"></button>

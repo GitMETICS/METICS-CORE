@@ -1,3 +1,4 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment MedalEnvironment
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Editar Medalla";
@@ -41,12 +42,11 @@
             <div class="card me-2" style="height: 305px; width: 305px;">
                 @{
                     string nombreMedalla = ViewBag.NombreMedalla;
-                    var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                    var medalPath = System.IO.Path.Combine(MedalEnvironment.WebRootPath, "images", "medallas", nombreMedalla);
                 }
-                @if (medalPath != null)
+                @if (webMetics.Services.MedallasCatalogoService.EsNombreValido(nombreMedalla) && System.IO.File.Exists(medalPath))
                 {
-                    var normalizedMedalPath = medalPath.Replace('\\', '/');
-                    var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                    var relativeMedalPath = Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla));
                     <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
                 }
             </div>

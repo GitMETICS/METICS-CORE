@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webMetics.Models;
 using webMetics.Handlers;
+using webMetics.Services;
 
 namespace webMetics.Controllers
 {
@@ -17,12 +18,14 @@ namespace webMetics.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
+        private readonly MedallasCatalogoService catalogo;
 
         public MedallasController(IWebHostEnvironment environment, IConfiguration configuration, EmailService emailService)
         {
             _environment = environment;
             _configuration = configuration;
             _emailService = emailService;
+            catalogo = new MedallasCatalogoService(environment, configuration);
 
             accesoAUsuario = new UsuarioHandler(environment, configuration);
             accesoAParticipante = new ParticipanteHandler(environment, configuration);
@@ -69,16 +72,7 @@ namespace webMetics.Controllers
 
             ViewBag.MedallasRegistradas = accesoAParticipante.ObtenerTodasMedallas() ?? new List<string>();
 
-            string rutaMedallas = System.IO.Path.Combine(_environment.WebRootPath, "images", "medallas");
-            string[] extensionesImagen = { ".png", ".jpg", ".jpeg" };
-            ViewBag.TodasLasMedallas = Directory.Exists(rutaMedallas)
-                ? Directory.EnumerateFiles(rutaMedallas)
-                    .Where(ruta => extensionesImagen.Contains(System.IO.Path.GetExtension(ruta) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
-                    .Select(ruta => System.IO.Path.GetFileName(ruta) ?? string.Empty)
-                    .Where(nombre => !string.IsNullOrWhiteSpace(nombre))
-                    .OrderBy(nombre => nombre, StringComparer.OrdinalIgnoreCase)
-                    .ToList()
-                : new List<string>();
+            ViewBag.TodasLasMedallas = ViewBag.MedallasRegistradas;
             ViewBag.TodosLosParticipantes = accesoAParticipante.ObtenerListaParticipantes();
 
             ViewBag.ErrorMessage = TempData["errorMessage"]?.ToString();
@@ -100,46 +94,21 @@ namespace webMetics.Controllers
         [HttpPost]
         public async Task<IActionResult> SubirMedalla(IFormFile imageFile)
         {
+            if (GetRole() != 1 || string.IsNullOrWhiteSpace(GetId())) return RedirectToAction("CerrarSesion", "Usuario");
             try
             {
-                if (!accesoAParticipante.ExisteMedalla(imageFile.FileName))
-                {
-                    if (imageFile != null && imageFile.Length > 0)
-                    {
-                        var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
-
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await imageFile.CopyToAsync(stream);
-                        }
-
-                        // Guardar la ruta de la medalla en la base de datos
-                        accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
-
-                        TempData["successMessage"] = "Se subió la medalla.";
-                    }
-                    else
-                    {
-                        TempData["errorMessage"] = "Elija una imagen válida.";
-                    }
-                }
-                else
-                {
-                    TempData["errorMessage"] = "Ya existe una medalla con el mismo nombre.";
-                }
-            }
-            catch
-            {
-                if (imageFile == null)
-                {
+                if (imageFile == null || imageFile.Length == 0)
                     TempData["errorMessage"] = "Elija una imagen válida.";
-                }
                 else
                 {
-                    TempData["errorMessage"] = "Error al subir la medalla";
+                    await catalogo.GuardarImagenAsync(imageFile);
+                    TempData["successMessage"] = "Se subió la medalla.";
                 }
             }
-                
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "No se pudo subir la medalla. Verifique el formato, el nombre y que no exista ya en el catálogo.";
+            }
             return RedirectToAction("ListaMedallas");
         }
 
@@ -160,7 +129,7 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Reemplaza la imagen de una medalla: elimina la antigua del sistema y registra la nueva.
+        /// Reemplaza la imagen de una medalla conservando sus asignaciones; el nombre anterior queda inactivo.
         /// </summary>
         /// <param name="nombreMedalla">Nombre de la medalla a reemplazar.</param>
         /// <param name="imageFile">Nueva imagen de la medalla.</param>
@@ -172,32 +141,25 @@ namespace webMetics.Controllers
         [HttpPost]
         public async Task<IActionResult> EditarMedalla(string nombreMedalla, IFormFile imageFile)
         {
-            if (imageFile != null && imageFile.Length > 0)
+            if (GetRole() != 1 || string.IsNullOrWhiteSpace(GetId())) return RedirectToAction("CerrarSesion", "Usuario");
+            try
             {
-                var filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "medallas", imageFile.FileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                if (imageFile == null || imageFile.Length == 0)
+                    TempData["errorMessage"] = "Elija una imagen válida.";
+                else
                 {
-                    await imageFile.CopyToAsync(stream);
+                    await catalogo.GuardarImagenAsync(imageFile, nombreMedalla);
+                    TempData["successMessage"] = "Se editó la medalla.";
                 }
-
-                // Eliminar la medalla existente
-                accesoAParticipante.EliminarMedalla(nombreMedalla);
-                
-                // Guardar la ruta de la medalla en la base de datos
-                accesoAParticipante.AgregarMedalla(GetId(), imageFile.FileName);
-
-                TempData["successMessage"] = "Se editó la medalla.";
             }
-            else
+            catch (Exception)
             {
-                TempData["errorMessage"] = "Elija una imagen válida.";
+                TempData["errorMessage"] = "No se pudo editar la medalla. Verifique el nombre y que no pertenezca a otra medalla.";
             }
-
             return RedirectToAction("ListaMedallas");
         }
 
-        /// <summary>Elimina una medalla del sistema (registro en BD e imagen en servidor).</summary>
+        /// <summary>Desactiva una medalla del catálogo y elimina sus asignaciones. Conserva la imagen para recuperación.</summary>
         /// <param name="nombreMedalla">Nombre de archivo de la medalla a eliminar.</param>
         /// <returns>
         /// Redirects to ListaMedallas. Sets TempData["successMessage"] on success or
@@ -206,6 +168,7 @@ namespace webMetics.Controllers
         /// <remarks>Handlers: ParticipanteHandler. Role required: Admin (1).</remarks>
         public ActionResult EliminarMedalla(string nombreMedalla)
         {
+            if (GetRole() != 1 || string.IsNullOrWhiteSpace(GetId())) return RedirectToAction("CerrarSesion", "Usuario");
             try
             {
                 ViewBag.Role = GetRole();

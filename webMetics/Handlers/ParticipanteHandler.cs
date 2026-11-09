@@ -1027,26 +1027,7 @@ namespace webMetics.Handlers
 
         public List<string> ObtenerTodasMedallas()
         {
-            string consulta = "SELECT DISTINCT nombre_medalla FROM medallas;";
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
-            List<string> listaMedallas = new List<string>();
-
-            // Iterar sobre las filas de resultado y agregar la información del participante a la lista
-            foreach (DataRow fila in tablaResultado.Rows)
-            {
-                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
-            }
-
-            // Si la lista está vacía, devolver null
-            if (listaMedallas.Count == 0)
-            {
-                return null;
-            }
-
-            return listaMedallas;
+            return new webMetics.Services.MedallasCatalogoService(_environment, _configuration).ObtenerNombres();
         }
 
         public List<string> ObtenerMedallas(string idParticipante)
@@ -1077,30 +1058,7 @@ namespace webMetics.Handlers
 
         public bool ExisteMedalla(string fileName)
         {
-            string consulta = "SELECT * FROM medallas WHERE nombre_medalla = @nombreMedalla;";
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
-
-            DataTable tablaResultado = CrearTablaConsulta(comandoConsulta);
-            List<string> listaMedallas = new List<string>();
-
-            // Iterar sobre las filas de resultado y agregar la información del participante a la lista
-            foreach (DataRow fila in tablaResultado.Rows)
-            {
-                listaMedallas.Add(Convert.ToString(fila["nombre_medalla"]));
-            }
-
-            // Si la lista está vacía, devolver null
-            if (listaMedallas.Count == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return new webMetics.Services.MedallasCatalogoService(_environment, _configuration).Existe(fileName);
         }
 
         public bool ParticipanteTieneMedalla(string idUsuario, string fileName)
@@ -1132,70 +1090,18 @@ namespace webMetics.Handlers
 
         public bool AgregarMedalla(string idUsuario, string fileName)
         {
-            string consulta = "INSERT INTO medallas VALUES (@idUsuario, @nombreMedalla);";
-
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@idUsuario", idUsuario);
-            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            return new webMetics.Services.MedallasCatalogoService(_environment, _configuration).Registrar(fileName);
         }
 
         public bool AgregarMedallaParticipante(string idParticipante, string fileName)
         {
-            string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
-
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            new webMetics.Services.MedallasCatalogoService(_environment, _configuration).Asignar(fileName, new[] { idParticipante });
+            return true;
         }
 
         public void AsignarMedallaAParticipantes(string nombreMedalla, List<string> idsParticipantes)
         {
-            try
-            {
-                foreach (var idParticipante in idsParticipantes)
-                {
-                    if (!ParticipanteTieneMedalla(idParticipante, nombreMedalla))
-                    {
-                        string consulta = "INSERT INTO medallas VALUES (@idParticipante, @nombreMedalla);";
-
-                        ConexionMetics.Open();
-
-                        SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-                        comandoConsulta.Parameters.AddWithValue("@idParticipante", idParticipante);
-                        comandoConsulta.Parameters.AddWithValue("@nombreMedalla", nombreMedalla);
-
-                        bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-                        ConexionMetics.Close();
-
-                        Console.WriteLine($"Asignando medalla '{nombreMedalla}' al participante con ID '{idParticipante}'.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al asignar medallas: {ex.Message}");
-                throw;
-            }
+            new webMetics.Services.MedallasCatalogoService(_environment, _configuration).Asignar(nombreMedalla, idsParticipantes);
         }
 
         public bool EliminarMedallaParticipante(string idParticipante, string fileName)
@@ -1218,19 +1124,7 @@ namespace webMetics.Handlers
 
         public bool EliminarMedalla(string fileName)
         {
-            string consulta = "DELETE FROM medallas WHERE nombre_medalla = @nombreMedalla;";
-
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-
-            comandoConsulta.Parameters.AddWithValue("@nombreMedalla", fileName);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            return new webMetics.Services.MedallasCatalogoService(_environment, _configuration).Eliminar(fileName);
         }
 
         // Método para leer un archivo JSON y devolver su contenido como una cadena
