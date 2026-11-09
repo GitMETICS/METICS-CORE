@@ -96,7 +96,7 @@
     <div class="modal fade create-category-modal create-topic-modal" id="modalCrearTema" tabindex="-1" aria-labelledby="modalCrearTemaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="returnToList" value="true" />
@@ -106,7 +106,6 @@
                             <h2 class="modal-title" id="modalCrearTemaLabel">Crear área de competencia</h2>
                             <p>Completa el nombre para registrar una nueva área.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body">
                         @await Html.PartialAsync("_TemaFormFields", ViewBag.OpenEditTemaModal == true ? new webMetics.Models.TemaModel() : (Model ?? new webMetics.Models.TemaModel()))
@@ -131,7 +130,6 @@
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar área</h2>
                             <p>Confirma si deseas quitar esta área de competencia del sistema.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">
                         ¿Estás seguro de que deseas eliminar esta área de competencia? Esta acción no se puede deshacer.
@@ -149,7 +147,7 @@
     <div class="modal fade create-category-modal create-topic-modal" id="modalEditarTema" tabindex="-1" aria-labelledby="modalEditarTemaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                @using (Html.BeginForm("EditarTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                @using (Html.BeginForm("EditarTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="idTema" id="editarTemaId" value="@(Model?.idTema ?? 0)" />
@@ -160,13 +158,12 @@
                             <h2 class="modal-title" id="modalEditarTemaLabel">Editar área de competencia</h2>
                             <p>Actualiza el nombre de esta área.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body">
                         <div class="form-group create-category-field">
                             @Html.Label("nombre", "Nombre", new { @for = "editarTemaNombre" })
                             <span class="create-category-required" aria-hidden="true">*</span>
-                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarTemaNombre", maxlength = "64", autocomplete = "off" })
+                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarTemaNombre", maxlength = "64", autocomplete = "off", required = "required" })
                             @Html.ValidationMessage("nombre", "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -187,6 +184,22 @@ else
 }
 
 <script type="text/javascript">
+    function clearTemaModalFeedback(modalId) {
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(function (field) {
+            if (field.tagName === 'SELECT') field.selectedIndex = 0;
+            else field.value = '';
+            field.classList.remove('input-validation-error');
+        });
+        modal.querySelectorAll('[data-valmsg-for]').forEach(function (message) {
+            message.textContent = '';
+            message.classList.remove('field-validation-error');
+            message.classList.add('field-validation-valid');
+        });
+    }
+
     function actualizarModalEliminar(idTema) {
         document.getElementById("idTema").value = idTema;
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEliminar')).show();
@@ -204,6 +217,7 @@ else
             document.addEventListener('DOMContentLoaded', function () {
                 var createModalElement = document.getElementById('modalCrearTema');
                 if (createModalElement) {
+                    clearTemaModalFeedback('modalEditarTema');
                     bootstrap.Modal.getOrCreateInstance(createModalElement).show();
                 }
             });
@@ -216,6 +230,7 @@ else
             document.addEventListener('DOMContentLoaded', function () {
                 var editModalElement = document.getElementById('modalEditarTema');
                 if (editModalElement) {
+                    clearTemaModalFeedback('modalCrearTema');
                     bootstrap.Modal.getOrCreateInstance(editModalElement).show();
                 }
             });

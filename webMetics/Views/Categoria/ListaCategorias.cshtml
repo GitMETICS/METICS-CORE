@@ -102,7 +102,7 @@
     <div class="modal fade create-category-modal" id="modalCrearCategoria" tabindex="-1" aria-labelledby="modalCrearCategoriaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                @using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                @using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="returnToList" value="true" />
@@ -112,7 +112,6 @@
                             <h2 class="modal-title" id="modalCrearCategoriaLabel">Crear nivel</h2>
                             <p>Completa la información para registrar un nuevo nivel.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body">
                         @await Html.PartialAsync("_CategoriaFormFields", Model ?? new webMetics.Models.CategoriaModel())
@@ -129,7 +128,7 @@
     <div class="modal fade create-category-modal" id="modalEditarCategoria" tabindex="-1" aria-labelledby="modalEditarCategoriaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                @using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                @using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
                 {
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="idCategoria" id="editarCategoriaId" value="@(Model?.idCategoria ?? 0)" />
@@ -140,19 +139,18 @@
                             <h2 class="modal-title" id="modalEditarCategoriaLabel">Editar nivel</h2>
                             <p>Actualiza la información de este nivel.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body">
                         <div class="form-group create-category-field">
                             @Html.Label("nombre", "Nombre", new { @for = "editarCategoriaNombre" })
                             <span class="create-category-required" aria-hidden="true">*</span>
-                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarCategoriaNombre", maxlength = "64", autocomplete = "off" })
+                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarCategoriaNombre", maxlength = "64", autocomplete = "off", required = "required" })
                             @Html.ValidationMessage("nombre", "", new { @class = "text-danger" })
                         </div>
                         <div class="form-group create-category-field">
                             @Html.Label("descripcion", "Descripción", new { @for = "editarCategoriaDescripcion" })
                             <span class="create-category-required" aria-hidden="true">*</span>
-                            @Html.TextArea("descripcion", Model?.descripcion, new { @class = "form-control", id = "editarCategoriaDescripcion", rows = "3", maxlength = "256" })
+                            @Html.TextArea("descripcion", Model?.descripcion, new { @class = "form-control", id = "editarCategoriaDescripcion", rows = "3", maxlength = "256", required = "required" })
                             @Html.ValidationMessage("descripcion", "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -176,7 +174,6 @@
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar nivel</h2>
                             <p>Confirma si deseas quitar este nivel del sistema.</p>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">
                         ¿Estás seguro de que deseas eliminar este nivel? Esta acción no se puede deshacer.
@@ -199,6 +196,22 @@ else
 }
 
 <script type="text/javascript">
+    function clearCategoriaModalFeedback(modalId) {
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(function (field) {
+            if (field.tagName === 'SELECT') field.selectedIndex = 0;
+            else field.value = '';
+            field.classList.remove('input-validation-error');
+        });
+        modal.querySelectorAll('[data-valmsg-for]').forEach(function (message) {
+            message.textContent = '';
+            message.classList.remove('field-validation-error');
+            message.classList.add('field-validation-valid');
+        });
+    }
+
     function actualizarModalEliminar(idCategoria) {
         document.getElementById("idCategoria").value = idCategoria;
         var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
@@ -218,6 +231,7 @@ else
             document.addEventListener('DOMContentLoaded', function () {
                 var createModalElement = document.getElementById('modalCrearCategoria');
                 if (createModalElement) {
+                    clearCategoriaModalFeedback('modalEditarCategoria');
                     bootstrap.Modal.getOrCreateInstance(createModalElement).show();
                 }
             });
@@ -230,6 +244,7 @@ else
             document.addEventListener('DOMContentLoaded', function () {
                 var editModalElement = document.getElementById('modalEditarCategoria');
                 if (editModalElement) {
+                    clearCategoriaModalFeedback('modalCrearCategoria');
                     bootstrap.Modal.getOrCreateInstance(editModalElement).show();
                 }
             });

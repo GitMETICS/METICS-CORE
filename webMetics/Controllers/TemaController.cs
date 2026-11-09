@@ -84,6 +84,20 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Temas = accesoATema.ObtenerTemas();
+                        ViewBag.OpenCreateTemaModal = true;
+                        return View("ListaTemas", tema);
+                    }
+
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(tema);
+                }
+
                 bool exito = accesoATema.CrearTema(tema);
                 if (exito)
                 {
@@ -157,6 +171,20 @@ namespace webMetics.Controllers
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
+
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Temas = accesoATema.ObtenerTemas();
+                        ViewBag.OpenEditTemaModal = true;
+                        return View("ListaTemas", tema);
+                    }
+
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View("EditarTema", tema);
+                }
 
                 bool exito = accesoATema.EditarTema(tema);
                 if (exito)

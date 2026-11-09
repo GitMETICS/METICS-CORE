@@ -97,6 +97,19 @@ namespace webMetics.Controllers
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                        ViewBag.OpenCreateCategoriaModal = true;
+                        return View("ListaCategorias", categoria);
+                    }
+
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(categoria);
+                }
+
                 bool exito = accesoACategoria.CrearCategoria(categoria);
                 if (exito)
                 {
@@ -166,6 +179,19 @@ namespace webMetics.Controllers
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
+
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                        ViewBag.OpenEditCategoriaModal = true;
+                        return View("ListaCategorias", categoria);
+                    }
+
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(categoria);
+                }
 
                 bool exito = accesoACategoria.EditarCategoria(categoria);
                 if (exito)

@@ -3,13 +3,13 @@
 <div class="form-group create-category-field">
     @Html.LabelFor(categoriaModel => categoriaModel.nombre)
     <span class="create-category-required" aria-hidden="true">*</span>
-    @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64", @placeholder = "Ej. Nivel 3", @autocomplete = "off" })
+    @Html.TextBoxFor(categoriaModel => categoriaModel.nombre, new { @class = "form-control", @maxlength = "64", @placeholder = "Ej. Nivel 3", @autocomplete = "off", required = "required" })
     @Html.ValidationMessageFor(categoriaModel => categoriaModel.nombre, "", new { @class = "text-danger" })
 </div>
 
 <div class="form-group create-category-field">
     @Html.LabelFor(categoriaModel => categoriaModel.descripcion)
     <span class="create-category-required" aria-hidden="true">*</span>
-    @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300", @placeholder = "Describe las características del nivel..." })
+    @Html.TextAreaFor(categoriaModel => categoriaModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "300", @placeholder = "Describe las características del nivel...", required = "required" })
     @Html.ValidationMessageFor(categoriaModel => categoriaModel.descripcion, "", new { @class = "text-danger" })
 </div>
