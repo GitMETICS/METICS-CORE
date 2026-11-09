@@ -171,7 +171,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     ¿Está seguro de que desea eliminar este participante?
@@ -367,14 +366,14 @@ else
                     const passwordUrl = participantPasswordUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
 
                     return '<div style="display: inline-block;">' +
-                        '<button type="button" class="action-menu-btn js-action-menu" title="Acciones">' +
+                        '<button type="button" class="action-menu-btn participant-actions-toggle js-action-menu" title="Acciones" aria-label="Opciones del participante">' +
                             '<i class="bi bi-three-dots-vertical"></i>' +
                         '</button>' +
-                        '<div class="action-menu">' +
-                            '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye" style="color: #0090D8;"></i> Ver detalles</a>' +
-                            '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square" style="color: #0090D8;"></i> Editar</a>' +
-                            '<a href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint" style="color: #0090D8;"></i> Credenciales</a>' +
-                            '<a href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key" style="color: #0090D8;"></i> Cambiar contraseña</a>' +
+                        '<div class="action-menu participant-actions-menu">' +
+                            '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye"></i> Ver detalles</a>' +
+                            '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square"></i> Editar</a>' +
+                            '<a href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint"></i> Credenciales</a>' +
+                            '<a href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key"></i> Cambiar contraseña</a>' +
                             '<div class="action-menu-divider"></div>' +
                             '<a href="#" class="delete-option js-delete-participant" data-id-participante="' + escapeHtml(row.idParticipante) + '">' +
                                 '<i class="bi bi-trash"></i> Eliminar' +

@@ -3,195 +3,18 @@
     ViewBag.Title = "Módulos del Participante";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
-    var volverController = "Inscripcion";
-    var volverAction = "VerInscripciones";
-    object volverRouteValues = new { };
-    var volverTexto = "Regresar";
 
-    if (ViewBag.IdGrupo != null)
-    {
-        volverController = "Participante";
-        volverAction = "ListaParticipantes";
-        volverRouteValues = new { idGrupo = ViewBag.IdGrupo };
-        volverTexto = "Regresar a Módulo";
-    }
-    else if (!string.IsNullOrWhiteSpace(urlReferrer) &&
-             urlReferrer.Contains("/Participante/VerParticipantes", StringComparison.OrdinalIgnoreCase))
-    {
-        volverController = "Participante";
-        volverAction = "VerParticipantes";
-    }
 }
 
-<style>
-    .medalla-list-container {
-    max-height: 300px; /* Increased height */
-    overflow-y: auto;
-    border: 0px solid #ccc;
-    padding: 10px;
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 10px; /* Added gap for better spacing */
-    }
 
-    .medalla-item {
-    display: flex; /* Use flexbox for vertical layout */
-    flex-direction: column; /* Stack image and checkbox vertically */
-    align-items: center; /* Center items horizontally */
-    text-align: center;
-    width: 200px;
-    }
-
-    .medalla-image {
-    max-width: 200px; /* Increased image size */
-    max-height: 200px;
-    margin-bottom: 5px;
-    }
-
-    /* La tarjeta y su encabezado usan las clases compartidas
-       .table-card / .table-card-header (site.css). */
-    .participante-detalle-wrapper {
-        overflow-x: auto;
-        width: 100%;
-        background: white;
-    }
-
-    .participante-detalle-table {
-        width: 100%;
-        min-width: 1100px;
-    }
-
-    .body-content .participante-detalle-table .detalle-label {
-        width: 16%;
-        background: #F9F9F9;
-        color: #204C6F;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    .participante-detalle-table .detalle-value {
-        width: 34%;
-    }
-
-    .detalle-empty {
-        color: #777;
-    }
-
-    .detalle-badge {
-        display: inline-block;
-        background: #E3F3FB;
-        border: 1px solid #41ADE7;
-        border-radius: 2px;
-        color: #204C6F;
-        font-size: 12px;
-        margin: 2px 4px 2px 0;
-        padding: 2px 6px;
-    }
-
-    .modulos-detalle-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 18px;
-    }
-
-    .modulos-detalle-card {
-        background: white;
-        border: 1px solid #CCCCCC;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .modulo-detalle-toggle {
-        align-items: center;
-        background: #F9F9F9;
-        border: 0;
-        border-bottom: 1px solid #CCCCCC;
-        color: #204C6F;
-        display: flex;
-        gap: 10px;
-        justify-content: space-between;
-        padding: 11px 14px;
-        text-align: left;
-        width: 100%;
-    }
-
-    .modulo-detalle-toggle:hover {
-        background: #E3F3FB;
-    }
-
-    .modulo-detalle-title {
-        align-items: center;
-        display: flex;
-        gap: 8px;
-        min-width: 0;
-    }
-
-    .modulo-detalle-name {
-        color: #204C6F;
-        font-size: 13px;
-        font-weight: bold;
-        line-height: 1.35;
-    }
-
-    .modulo-detalle-status {
-        background: white;
-        border: 1px solid #CCCCCC;
-        border-radius: 2px;
-        color: #333;
-        flex-shrink: 0;
-        font-size: 12px;
-        padding: 3px 7px;
-    }
-
-    .modulo-detalle-wrapper {
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    .modulo-detalle-table {
-        margin: 0;
-        min-width: 980px;
-        width: 100%;
-    }
-
-    .modulo-detalle-table .form-control {
-        font-size: 12px;
-        max-width: 125px;
-    }
-</style>
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action(volverAction, volverController, volverRouteValues)">
-                    <i class="bi bi-arrow-left"> </i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+        @await Html.PartialAsync("_MeticsToast")
 
         <div class="table-responsive">
             @if (ViewBag.Participante == null)
@@ -203,99 +26,96 @@
                 <!-- Selector de medallas (admin) -->
                 @if (ViewBag.Role == 1)
                 {
-                    <br />
-                    <div class="card">
-                        <div class="card-header" id="medallasHeader">
-                            <h3 class="mb-0">
-                                <button class="bi bi-chevron-down btn text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMedallas" aria-expanded="true" aria-controls="collapseMedallas">
-                                    Asignar Medallas
+                    <section class="medal-catalog-card participant-medal-assignment" aria-labelledby="medallasHeader">
+                        <header class="medal-catalog-header">
+                            <h3 id="medallasHeader" class="medal-assignment-heading">
+                                <button class="medal-assignment-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMedallas" aria-expanded="true" aria-controls="collapseMedallas">
+                                    <span class="medal-catalog-header-icon" aria-hidden="true"><i class="bi bi-award"></i></span>
+                                    <span class="medal-assignment-heading-text"><strong>Asignar medallas</strong><span>Selecciona las medallas que deseas otorgar al participante.</span></span>
+                                    <i class="bi bi-chevron-down medal-assignment-chevron" aria-hidden="true"></i>
                                 </button>
                             </h3>
-                        </div>
-
+                        </header>
                         <div id="collapseMedallas" class="collapse show" aria-labelledby="medallasHeader">
-                            <div class="card-body">
+                            <div class="medal-catalog-body">
                                 <form method="post" asp-controller="Participante" asp-action="AsignarMedallas">
                                     <input type="hidden" name="idParticipante" value="@ViewBag.Participante.idParticipante" />
-
-                                    <div class="d-flex justify-content-between mb-3">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" id="medallaSearch" onkeyup="filterMedals()" placeholder="Ingrese el nombre de la medalla">
-                                            <span class="input-group-text">
-                                                <i class="bi bi-search"></i>
-                                            </span>
-                                        </div>
-                                        <div class="d-flex justify-content-end ms-3">
-                                            <button type="submit" class="btn btn-secondary">Asignar</button>
-                                        </div>
+                                    <div class="medal-catalog-toolbar medal-assignment-toolbar">
+                                        <label class="medal-catalog-search" for="medallaSearch">
+                                            <i class="bi bi-search" aria-hidden="true"></i>
+                                            <input type="search" id="medallaSearch" oninput="filterMedals()" placeholder="Buscar medalla..." aria-label="Buscar medalla para asignar" />
+                                        </label>
+                                        <button type="submit" class="btn btn-success medal-assignment-submit"><i class="bi bi-award" aria-hidden="true"></i> Asignar medallas</button>
                                     </div>
-
-                                    <div class="mb-3" style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                                        <div id="medallaList" class="medalla-list-container">
+                                    <div class="medal-assignment-scroll" tabindex="0" role="region" aria-label="Medallas disponibles para seleccionar">
+                                        <div id="medallaList" class="medal-catalog-grid">
                                             @if (ViewBag.TodasMedallas != null)
                                             {
                                                 @foreach (var medalla in ViewBag.TodasMedallas)
                                                 {
-                                                    <div class="d-flex flex-column">
-                                                        <div class="medalla-item">
-                                                            <img src="~/images/medallas/@medalla" alt="@medalla" class="medalla-image" />
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="selectedMedallas" value="@medalla" id="medalla-@medalla">
-                                                            <label class="form-check-label" for="medalla-@medalla">
-                                                                @medalla
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                    <label class="medal-catalog-item medalla-item medal-assignment-option" for="medalla-@medalla">
+                                                        <input class="form-check-input" type="checkbox" name="selectedMedallas" value="@medalla" id="medalla-@medalla">
+                                                        <span class="medal-catalog-image-wrap"><img src="~/images/medallas/@medalla" alt="@medalla" loading="lazy" /></span>
+                                                        <span class="medal-assignment-name">@medalla</span>
+                                                    </label>
                                                 }
                                             }
                                             else
                                             {
-                                                <p>No hay medallas disponibles.</p>
+                                                <p class="medal-catalog-empty">No hay medallas disponibles.</p>
                                             }
                                         </div>
                                     </div>
                                 </form>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 }
 
-                <!-- Medallas -->
+                <!-- Medallas asignadas al participante -->
                 @if (ViewBag.Medallas != null)
                 {
-                    <br />
-                    <h3 class="">Medallas</h3>
-
-                    <div class="d-flex justify-content-start mt-4">
-                        @foreach (string nombreMedalla in ViewBag.Medallas)
-                        {
-                            <div class="card me-2 h-100" style="width: 300px; height: 300px;">
-                                @if (ViewBag.Role == 1)
-                                {
-                                    <div class="card-header text-muted">
-                                        <div style="float:right">
-                                            <i class="bi bi-trash3 text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')"></i>
-                                        </div>
-                                    </div>
-                                }
-                                @{
-                                    var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
-                                }
-                                @if (medalPath != null)
-                                {
-                                    var normalizedMedalPath = medalPath.Replace('\\', '/');
-                                    var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-
-                                    <div class="card-body">
-                                        <img class="card-img" src="@relativeMedalPath" style="height: 250px; width: 250px;" />
-                                    </div>
-                                }
+                    <section class="medal-catalog-card participant-medal-collection" aria-labelledby="assignedMedalsTitle">
+                        <header class="medal-catalog-header">
+                            <h2 id="assignedMedalsTitle" class="medal-assignment-heading">
+                                <button class="medal-assignment-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAssignedMedals" aria-expanded="true" aria-controls="collapseAssignedMedals">
+                                    <span class="medal-catalog-header-icon" aria-hidden="true"><i class="bi bi-award"></i></span>
+                                    <span class="medal-assignment-heading-text"><strong>Medallas del participante</strong><span>Reconocimientos asignados a este participante.</span></span>
+                                    <i class="bi bi-chevron-down medal-assignment-chevron" aria-hidden="true"></i>
+                                </button>
+                            </h2>
+                        </header>
+                        <div id="collapseAssignedMedals" class="collapse show" aria-labelledby="assignedMedalsTitle">
+                        <div class="medal-catalog-body">
+                            <div class="medal-assignment-scroll" tabindex="0" role="region" aria-label="Medallas del participante">
+                                <div class="medal-catalog-grid">
+                                    @foreach (string nombreMedalla in ViewBag.Medallas)
+                                    {
+                                        <article class="medal-catalog-item">
+                                            @if (ViewBag.Role == 1)
+                                            {
+                                                <button class="participant-medal-remove" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')" aria-label="Eliminar medalla @nombreMedalla" title="Eliminar medalla">
+                                                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                                                </button>
+                                            }
+                                            @{
+                                                var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
+                                            }
+                                            @if (medalPath != null)
+                                            {
+                                                var normalizedMedalPath = medalPath.Replace('\\', '/');
+                                                var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
+                                                <div class="medal-catalog-image-wrap"><img src="@relativeMedalPath" alt="Medalla: @nombreMedalla" loading="lazy" /></div>
+                                            }
+                                            <h3>@nombreMedalla</h3>
+                                        </article>
+                                    }
+                                </div>
                             </div>
-                        }
-                    </div>
+                        </div>
+                        </div>
+                    </section>
                 }
-                <br />
 
                 var nombreCompleto = ViewBag.Participante.nombre;
                 nombreCompleto += " " + ViewBag.Participante.primerApellido;
@@ -310,13 +130,14 @@
                 string ValueOrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
                 string NotificationStatus(int value) => value != 0 ? "Enviada" : "No enviada";
 
-                <div class="table-card">
-                    <div class="table-card-header">
-                    <div class="table-card-heading">
-                        <span class="table-card-title">Datos del participante</span>
-                        <span class="table-card-desc">Información completa registrada en el sistema</span>
-                    </div>
-                    </div>
+                <section class="table-card participant-details-card" aria-labelledby="participantDetailsTitle">
+                    <header class="table-card-header">
+                        <span class="medal-catalog-header-icon" aria-hidden="true"><i class="bi bi-person-vcard"></i></span>
+                        <div class="table-card-heading">
+                            <h2 class="table-card-title" id="participantDetailsTitle">Datos del participante</h2>
+                            <p class="table-card-desc">Información completa registrada en el sistema</p>
+                        </div>
+                    </header>
 
                     <div class="participante-detalle-wrapper table-scroll">
                         <table class="participante-detalle-table data-table">
@@ -388,9 +209,9 @@
                                 </tr>
                                 <tr>
                                     <td class="detalle-label">Total horas inscritas</td>
-                                    <td class="detalle-value">@participante.horasMatriculadas</td>
+                                    <td class="detalle-value"><span class="participant-detail-metric">@participante.horasMatriculadas</span></td>
                                     <td class="detalle-label">Total horas aprobadas</td>
-                                    <td class="detalle-value">@participante.horasAprobadas</td>
+                                    <td class="detalle-value"><span class="participant-detail-metric">@participante.horasAprobadas</span></td>
                                 </tr>
                                 <tr>
                                     <td class="detalle-label">Notificación de límite de horas</td>
@@ -413,7 +234,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </section>
 
                 @if (ViewBag.Inscripciones != null)
                 {
@@ -423,10 +244,11 @@
                             <div class="modulos-detalle-card">
                                 <button class="modulo-detalle-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#detalle-@inscripcion.idInscripcion" aria-expanded="false" aria-controls="detalle-@inscripcion.idInscripcion">
                                     <span class="modulo-detalle-title">
-                                        <i class="bi bi-chevron-down"></i>
+                                        <i class="bi bi-journal-bookmark modulo-detalle-icon" aria-hidden="true"></i>
                                         <span class="modulo-detalle-name">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</span>
                                     </span>
                                     <span class="modulo-detalle-status">@inscripcion.estado</span>
+                                    <i class="bi bi-chevron-down modulo-detalle-chevron" aria-hidden="true"></i>
                                 </button>
 
                                 <div id="detalle-@inscripcion.idInscripcion" class="collapse">
@@ -463,7 +285,7 @@
                                                             <input type="number" min="0" , max="100" class="form-control mx-auto" name="calificacion" id="calificacion">
                                                         </td>
                                                         <td class="text-center">
-                                                            <button type="submit" class="btn btn-secondary bi bi-check-lg" title="Guardar"></button>
+                                                            <button type="submit" class="btn btn-primary bi bi-check-lg modulo-detalle-save" title="Guardar" aria-label="Guardar horas y calificación"></button>
                                                         </td>
                                                     }
                                                 </tr>
@@ -476,10 +298,6 @@
                     </div>
                 }
             }
-            <hr />
-            <div class="d-flex my-4 justify-content-center">
-                <a href="@Url.Action(volverAction, volverController, volverRouteValues)" class="btn btn-secondary btn-block">@volverTexto</a>
-            </div>
         </div>
 
         <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
@@ -487,7 +305,6 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         ¿Está seguro de que desea eliminar esta medalla?
