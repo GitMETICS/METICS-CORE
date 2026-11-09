@@ -22,23 +22,26 @@ namespace webMetics.Handlers
         // Método para ejecutar una consulta SELECT y retornar los resultados en una DataTable
         public DataTable CrearTablaConsulta(SqlCommand comandoConsulta)
         {
-            // Crea un SqlDataAdapter con el comando de consulta proporcionado
-            SqlDataAdapter adaptadorTabla = new SqlDataAdapter(comandoConsulta);
-
-            // Crea una DataTable para almacenar los resultados de la consulta
             DataTable consultaFormatoTabla = new DataTable();
 
-            // Abre la conexión con la base de datos
-            ConexionMetics.Open();
+            try
+            {
+                if (ConexionMetics.State != ConnectionState.Open)
+                {
+                    ConexionMetics.Open();
+                }
 
-            // Rellena la DataTable con los resultados de la consulta
-            int _ = adaptadorTabla.Fill(consultaFormatoTabla);
-
-            // Cierra la conexión con la base de datos
-            ConexionMetics.Close();
-
-            // Retorna la DataTable con los resultados de la consulta
-            return consultaFormatoTabla;
+                using SqlDataAdapter adaptadorTabla = new SqlDataAdapter(comandoConsulta);
+                adaptadorTabla.Fill(consultaFormatoTabla);
+                return consultaFormatoTabla;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed)
+                {
+                    ConexionMetics.Close();
+                }
+            }
         }
     }
 }

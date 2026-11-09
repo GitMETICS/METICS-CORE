@@ -71,49 +71,52 @@ namespace webMetics.Handlers
         {
             string consulta = "INSERT INTO tema(nombre) VALUES (@nombre);";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@nombre", tema.nombre);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@nombre", tema.nombre);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
 
         public bool EditarTema(TemaModel tema)
         {
             string consulta = "UPDATE tema SET nombre = @nombre WHERE id_tema_PK = @idTema;";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@nombre", tema.nombre);
-            comandoConsulta.Parameters.AddWithValue("@idTema", tema.idTema);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@nombre", tema.nombre);
+                comandoConsulta.Parameters.AddWithValue("@idTema", tema.idTema);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
 
         public bool EliminarTema(int idTema)
         {
             string consulta = "DELETE FROM tema WHERE id_tema_PK = @idTema;";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idTema", idTema);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@idTema", idTema);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
     }
 }
