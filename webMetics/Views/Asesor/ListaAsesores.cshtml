@@ -1,3 +1,4 @@
+@model webMetics.Models.AsesorModel
 @using webMetics.Controllers
 
 <!--
@@ -15,21 +16,7 @@
     <div class="contenedor-caja container-fluid table-page-with-divider">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+        @await Html.PartialAsync("_MeticsToast")
 
         <div class="table-responsive">
             @if (ViewBag.Asesores == null)
@@ -46,7 +33,7 @@
                         </div>
                         <div class="table-card-header-actions">
                             <span class="table-card-count">@ViewBag.Asesores.Count facilitadores encontrados</span>
-                            @Html.ActionLink("Crear facilitador(a)", "CrearAsesor", "Asesor", new { }, new { @class = "table-card-action bi bi-plus-lg" })
+                            <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearAsesor">Crear facilitador(a)</button>
                         </div>
                     </div>
 
@@ -105,9 +92,20 @@
                                         <td>@asesor.descripcion</td>
                                         <td>@asesor.telefono</td>
                                         <td class="text-center">
-                                            <a href="@Url.Action("EditarAsesor", "Asesor", new { idAsesor = asesor.idAsesor })" class="icon-action icon-edit" title="Editar">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                            <button type="button"
+                                                    class="icon-action icon-edit bi bi-pencil-square"
+                                                    title="Editar"
+                                                    aria-label="Editar facilitador(a) @nombreCompleto"
+                                                    data-asesor-id="@asesor.idAsesor"
+                                                    data-asesor-nombre="@asesor.nombre"
+                                                    data-asesor-primer-apellido="@asesor.primerApellido"
+                                                    data-asesor-segundo-apellido="@asesor.segundoApellido"
+                                                    data-asesor-correo="@asesor.correo"
+                                                    data-asesor-tipo-identificacion="@asesor.tipoIdentificacion"
+                                                    data-asesor-numero-identificacion="@asesor.numeroIdentificacion"
+                                                    data-asesor-descripcion="@asesor.descripcion"
+                                                    data-asesor-telefono="@asesor.telefono"
+                                                    onclick="openAsesorEditModal(this)"></button>
                                         </td>
                                         <td class="text-center">
                                             <a href="#" onclick="openAsesorDeleteModal('@asesor.idAsesor'); return false;" class="icon-action icon-delete" title="Eliminar">
@@ -126,27 +124,287 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal asesor-form-modal" id="modalCrearAsesor" tabindex="-1" aria-labelledby="modalCrearAsesorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                @using (Html.BeginForm("AgregarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalCrearAsesorLabel">Crear facilitador(a)</h2>
+                            <p>Completa la información para registrar una persona facilitadora.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body asesor-edit-modal-body">
+                        <section class="asesor-edit-section" aria-labelledby="asesorCrearPersonalHeading">
+                            <h3 class="asesor-edit-section-title" id="asesorCrearPersonalHeading">Información personal</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.nombre)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", id = "crearAsesorNombre", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", id = "crearAsesorPrimerApellido", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido)
+                                        @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", id = "crearAsesorSegundoApellido", maxlength = "64", autocomplete = "off" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-select", id = "crearAsesorTipoIdentificacion", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.numeroIdentificacion, new { @class = "form-control", id = "crearAsesorNumeroIdentificacion", maxlength = "64", autocomplete = "off", placeholder = "Seleccione el tipo de identificación...", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="asesor-edit-section" aria-labelledby="asesorCrearContactoHeading">
+                            <h3 class="asesor-edit-section-title" id="asesorCrearContactoHeading">Información de contacto</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.correo)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", id = "crearAsesorCorreo", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.telefono)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", id = "crearAsesorTelefono", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.descripcion)
+                                        @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", id = "crearAsesorDescripcion", maxlength = "256", autocomplete = "off", rows = "2" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="asesor-edit-section" aria-labelledby="asesorCrearSeguridadHeading">
+                            <h3 class="asesor-edit-section-title" id="asesorCrearSeguridadHeading">Seguridad y acceso</h3>
+                            <p class="asesor-edit-section-help">Define la contraseña inicial de la cuenta.</p>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field asesor-password-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.contrasena)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        <div class="input-group">
+                                            @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "crearAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
+                                            <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('crearAsesorPassword', 'crearAsesorPasswordIcon')"><i id="crearAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                        </div>
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field asesor-password-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        <div class="input-group">
+                                            @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "crearAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
+                                            <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('crearAsesorPasswordCheck', 'crearAsesorPasswordCheckIcon')"><i id="crearAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                        </div>
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn create-category-save">Guardar facilitador(a)</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar facilitador(a)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar a este(a) facilitador(a)?
-
-                    @using (Html.BeginForm("EliminarAsesor", "Asesor"))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="idAsesor" name="idAsesor">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("EliminarAsesor", "Asesor"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar facilitador(a)</h2>
+                            <p>Confirma si deseas quitar este(a) facilitador(a) del sistema.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Estás seguro de que deseas eliminar a este(a) facilitador(a)? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idAsesor" name="idAsesor">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar facilitador(a)</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal asesor-edit-modal asesor-form-modal" id="modalEditarAsesor" tabindex="-1" aria-labelledby="modalEditarAsesorLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                @using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(asesorModel => asesorModel.idAsesor, new { id = "editarAsesorId" })
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-person-gear"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEditarAsesorLabel">Editar facilitador(a)</h2>
+                            <p>Actualiza la información de la persona facilitadora.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body asesor-edit-modal-body">
+                        <section class="asesor-edit-section" aria-labelledby="asesorPersonalHeading">
+                            <h3 class="asesor-edit-section-title" id="asesorPersonalHeading">Información personal</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.nombre)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", id = "editarAsesorNombre", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", id = "editarAsesorPrimerApellido", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido)
+                                        @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", id = "editarAsesorSegundoApellido", maxlength = "64", autocomplete = "off" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-select", id = "editarAsesorTipoIdentificacion", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.numeroIdentificacion, new { @class = "form-control", id = "editarAsesorNumeroIdentificacion", maxlength = "64", autocomplete = "off", placeholder = "Seleccione el tipo de identificación...", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="asesor-edit-section" aria-labelledby="asesorContactoHeading">
+                            <h3 class="asesor-edit-section-title" id="asesorContactoHeading">Información de contacto</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.correo)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", id = "editarAsesorCorreo", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.telefono)
+                                        <span class="create-category-required" aria-hidden="true">*</span>
+                                        @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", id = "editarAsesorTelefono", maxlength = "64", autocomplete = "off", required = "required" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group create-category-field">
+                                        @Html.LabelFor(asesorModel => asesorModel.descripcion)
+                                        @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", id = "editarAsesorDescripcion", maxlength = "256", autocomplete = "off", rows = "2" })
+                                        @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        @if (ViewBag.Role == 1)
+                        {
+                            <section class="asesor-edit-section" aria-labelledby="asesorSeguridadHeading">
+                                <div class="asesor-edit-section-heading">
+                                    <h3 class="asesor-edit-section-title" id="asesorSeguridadHeading">Seguridad y acceso</h3>
+                                    <span class="asesor-edit-optional">Opcional al editar</span>
+                                </div>
+                                <p class="asesor-edit-section-help">Completa estos campos únicamente si deseas cambiar la contraseña.</p>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group create-category-field asesor-password-field">
+                                            @Html.Label("contrasena", "Nueva contraseña", new { @for = "editarAsesorPassword" })
+                                            <div class="input-group">
+                                                @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "editarAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off" })
+                                                <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('editarAsesorPassword', 'editarAsesorPasswordIcon')"><i id="editarAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                            </div>
+                                            @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group create-category-field asesor-password-field">
+                                            @Html.Label("confirmarContrasena", "Confirmar contraseña", new { @for = "editarAsesorPasswordCheck" })
+                                            <div class="input-group">
+                                                @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "editarAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off" })
+                                                <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('editarAsesorPasswordCheck', 'editarAsesorPasswordCheckIcon')"><i id="editarAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                            </div>
+                                            @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn create-category-save">Guardar cambios</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -159,16 +417,363 @@ else
 }
 
 <script type="text/javascript">
+    (function () {
+        function initializeAsesorIdentificationSelects() {
+            var selects = Array.prototype.slice.call(document.querySelectorAll(
+                '#crearAsesorTipoIdentificacion, #editarAsesorTipoIdentificacion'
+            ));
+            var instances = [];
+
+            function closeOthers(except) {
+                instances.forEach(function (instance) { if (instance !== except) instance.close(false); });
+            }
+
+            selects.forEach(function (select) {
+                if (select.dataset.customSelectReady === 'true') return;
+
+                var wrapper = document.createElement('div');
+                wrapper.className = 'create-group-custom-select';
+                select.parentNode.insertBefore(wrapper, select);
+                wrapper.appendChild(select);
+                select.classList.add('create-group-native-select');
+                select.setAttribute('aria-hidden', 'true');
+                select.setAttribute('tabindex', '-1');
+                select.dataset.customSelectReady = 'true';
+
+                var trigger = document.createElement('button');
+                trigger.type = 'button';
+                trigger.id = select.id + 'CustomTrigger';
+                trigger.className = 'create-group-select-trigger';
+                trigger.setAttribute('role', 'combobox');
+                trigger.setAttribute('aria-haspopup', 'listbox');
+                trigger.setAttribute('aria-expanded', 'false');
+                trigger.setAttribute('aria-controls', select.id + 'CustomListbox');
+
+                var selectedText = document.createElement('span');
+                selectedText.className = 'create-group-select-value';
+                var arrow = document.createElement('span');
+                arrow.className = 'create-group-select-arrow';
+                arrow.setAttribute('aria-hidden', 'true');
+                trigger.appendChild(selectedText);
+                trigger.appendChild(arrow);
+
+                var panel = document.createElement('div');
+                panel.id = select.id + 'CustomListbox';
+                panel.className = 'create-group-select-panel';
+                panel.setAttribute('role', 'listbox');
+                panel.hidden = true;
+
+                var field = select.closest('.form-group');
+                var label = field ? field.querySelector('label') : null;
+                var message = field ? field.querySelector('[data-valmsg-for="' + select.name + '"]') : null;
+                var identificationInput = select.form
+                    ? select.form.querySelector('input[name="numeroIdentificacion"]')
+                    : null;
+                if (label) {
+                    label.htmlFor = select.id;
+                    label.id = label.id || select.id + 'CustomLabel';
+                    trigger.setAttribute('aria-labelledby', label.id);
+                    label.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        trigger.focus();
+                        toggle();
+                    });
+                }
+                if (message) {
+                    message.id = message.id || select.id + 'CustomValidation';
+                    trigger.setAttribute('aria-describedby', message.id);
+                }
+
+                wrapper.appendChild(trigger);
+                wrapper.appendChild(panel);
+
+                var rows = [];
+                var activeIndex = -1;
+                var isOpen = false;
+                var typeAhead = '';
+                var typeAheadTimer;
+
+                function updateIdentificationExample() {
+                    if (!identificationInput) return;
+                    var selectedOption = select.options[select.selectedIndex];
+                    var selectedType = selectedOption ? selectedOption.text.trim().toLocaleLowerCase() : '';
+                    if (selectedType === 'cédula' || selectedType === 'cedula') {
+                        identificationInput.placeholder = 'Ej. 1-1100-1100';
+                    } else if (selectedType === 'residente') {
+                        identificationInput.placeholder = 'Ej. 123456789012 (DIMEX)';
+                    } else if (selectedType === 'pasaporte') {
+                        identificationInput.placeholder = 'Ej. A12345678';
+                    } else {
+                        identificationInput.placeholder = 'Seleccione el tipo de identificación...';
+                    }
+                }
+
+                function renderOptions() {
+                    panel.replaceChildren();
+                    rows = [];
+                    Array.prototype.forEach.call(select.options, function (option, index) {
+                        var row = document.createElement('div');
+                        row.id = panel.id + 'Option' + index;
+                        row.className = 'create-group-select-option';
+                        row.setAttribute('role', 'option');
+                        row.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+                        row.setAttribute('aria-disabled', option.disabled ? 'true' : 'false');
+                        row.dataset.optionIndex = String(index);
+                        row.textContent = option.text;
+                        if (option.selected) row.classList.add('is-selected');
+                        row.addEventListener('mouseenter', function () { if (!option.disabled) setActive(index); });
+                        row.addEventListener('mousedown', function (event) { event.preventDefault(); });
+                        row.addEventListener('click', function () { if (!option.disabled) choose(index); });
+                        panel.appendChild(row);
+                        rows.push(row);
+                    });
+                }
+
+                function syncFromNative() {
+                    renderOptions();
+                    var option = select.options[select.selectedIndex];
+                    selectedText.textContent = option ? option.text : '';
+                    updateIdentificationExample();
+                    rows.forEach(function (row, index) {
+                        var selected = index === select.selectedIndex;
+                        row.classList.toggle('is-selected', selected);
+                        row.setAttribute('aria-selected', selected ? 'true' : 'false');
+                    });
+                    trigger.disabled = select.disabled;
+                    trigger.setAttribute('aria-disabled', select.disabled ? 'true' : 'false');
+                    var hasError = message && message.classList.contains('field-validation-error') && message.textContent.trim();
+                    trigger.classList.toggle('input-validation-error', !!hasError);
+                    wrapper.classList.toggle('has-validation-error', !!hasError);
+                    trigger.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+                    if (select.disabled) close(false);
+                }
+
+                function setActive(index) {
+                    if (index < 0 || index >= rows.length || select.options[index].disabled) return;
+                    activeIndex = index;
+                    rows.forEach(function (row, rowIndex) { row.classList.toggle('is-active', rowIndex === activeIndex); });
+                    trigger.setAttribute('aria-activedescendant', rows[index].id);
+                    rows[index].scrollIntoView({ block: 'nearest' });
+                }
+
+                function firstEnabled(start, step) {
+                    var index = start;
+                    while (index >= 0 && index < select.options.length) {
+                        if (!select.options[index].disabled) return index;
+                        index += step;
+                    }
+                    return -1;
+                }
+
+                function open() {
+                    if (trigger.disabled || isOpen) return;
+                    closeOthers(instance);
+                    syncFromNative();
+                    panel.hidden = false;
+                    wrapper.classList.add('is-open');
+                    wrapper.setAttribute('aria-expanded', 'true');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    isOpen = true;
+                    var rect = trigger.getBoundingClientRect();
+                    var panelHeight = Math.min(panel.scrollHeight, window.innerHeight - 24);
+                    var roomBelow = window.innerHeight - rect.bottom;
+                    wrapper.classList.toggle('is-open-above', roomBelow < panelHeight + 14 && rect.top > panelHeight + 14);
+                    var selected = select.selectedIndex >= 0 && !select.options[select.selectedIndex].disabled
+                        ? select.selectedIndex : firstEnabled(0, 1);
+                    if (selected >= 0) setActive(selected);
+                }
+
+                function close(returnFocus) {
+                    if (!isOpen) return;
+                    panel.hidden = true;
+                    wrapper.classList.remove('is-open', 'is-open-above');
+                    wrapper.removeAttribute('aria-expanded');
+                    trigger.setAttribute('aria-expanded', 'false');
+                    trigger.removeAttribute('aria-activedescendant');
+                    isOpen = false;
+                    activeIndex = -1;
+                    if (returnFocus) trigger.focus();
+                }
+
+                function choose(index) {
+                    if (index < 0 || index >= select.options.length || select.options[index].disabled) return;
+                    if (select.selectedIndex !== index) {
+                        select.selectedIndex = index;
+                        select.dispatchEvent(new Event('input', { bubbles: true }));
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    syncFromNative();
+                    close(true);
+                }
+
+                function toggle() { if (isOpen) close(false); else open(); }
+
+                function searchByTyping(character) {
+                    var normalized = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                    var repeated = typeAhead && Array.from(typeAhead).every(function (letter) { return letter === normalized; });
+                    typeAhead = repeated ? normalized : typeAhead + normalized;
+                    window.clearTimeout(typeAheadTimer);
+                    typeAheadTimer = window.setTimeout(function () { typeAhead = ''; }, 800);
+                    for (var offset = 1; offset <= select.options.length; offset++) {
+                        var index = (select.selectedIndex + offset + select.options.length) % select.options.length;
+                        var option = select.options[index];
+                        var text = option.text.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                        if (!option.disabled && option.value !== '' && text.startsWith(typeAhead)) { choose(index); return; }
+                    }
+                    if (typeAhead !== normalized) { typeAhead = ''; searchByTyping(character); }
+                }
+
+                var instance = { select: select, close: close };
+                instances.push(instance);
+                select._syncCreateGroupSelect = syncFromNative;
+                trigger.addEventListener('click', toggle);
+                trigger.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') { if (isOpen) { event.preventDefault(); close(true); } return; }
+                    if (event.key === 'Tab') { close(false); return; }
+                    if (event.key.length === 1 && event.key.trim() && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                        event.preventDefault(); searchByTyping(event.key); return;
+                    }
+                    if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].indexOf(event.key) === -1) return;
+                    event.preventDefault();
+                    if (!isOpen) {
+                        open();
+                        if (event.key === 'ArrowDown') setActive(firstEnabled(select.selectedIndex + 1, 1));
+                        if (event.key === 'ArrowUp') setActive(firstEnabled(select.selectedIndex - 1, -1));
+                    } else if (event.key === 'ArrowDown') setActive(firstEnabled(activeIndex + 1, 1));
+                    else if (event.key === 'ArrowUp') setActive(firstEnabled(activeIndex - 1, -1));
+                    else if (event.key === 'Home') setActive(firstEnabled(0, 1));
+                    else if (event.key === 'End') setActive(firstEnabled(select.options.length - 1, -1));
+                    else if (activeIndex >= 0) choose(activeIndex);
+                });
+                select.addEventListener('change', syncFromNative);
+                var disabledObserver = new MutationObserver(syncFromNative);
+                disabledObserver.observe(select, { attributes: true, attributeFilter: ['disabled'] });
+                syncFromNative();
+            });
+
+            document.addEventListener('pointerdown', function (event) {
+                instances.forEach(function (instance) {
+                    if (!instance.select.closest('.create-group-custom-select').contains(event.target)) instance.close(false);
+                });
+            });
+            document.addEventListener('focusin', function (event) {
+                instances.forEach(function (instance) {
+                    if (!instance.select.closest('.create-group-custom-select').contains(event.target)) instance.close(false);
+                });
+            });
+        }
+
+        function syncAsesorSelect(select) {
+            if (select && typeof select._syncCreateGroupSelect === 'function') select._syncCreateGroupSelect();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAsesorIdentificationSelects, { once: true });
+        } else {
+            initializeAsesorIdentificationSelects();
+        }
+
+        // Función para abrir modal de eliminación
+        window.syncAsesorSelect = syncAsesorSelect;
+    })();
+
     // Función para abrir modal de eliminación
     function openAsesorDeleteModal(asesorId) {
         document.getElementById("idAsesor").value = asesorId;
-        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-        deleteModal.show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEliminar')).show();
+    }
+
+    function openAsesorEditModal(button) {
+        var fields = {
+            editarAsesorId: button.dataset.asesorId,
+            editarAsesorNombre: button.dataset.asesorNombre,
+            editarAsesorPrimerApellido: button.dataset.asesorPrimerApellido,
+            editarAsesorSegundoApellido: button.dataset.asesorSegundoApellido,
+            editarAsesorCorreo: button.dataset.asesorCorreo,
+            editarAsesorTipoIdentificacion: button.dataset.asesorTipoIdentificacion,
+            editarAsesorNumeroIdentificacion: button.dataset.asesorNumeroIdentificacion,
+            editarAsesorDescripcion: button.dataset.asesorDescripcion,
+            editarAsesorTelefono: button.dataset.asesorTelefono
+        };
+
+        Object.keys(fields).forEach(function (id) {
+            var input = document.getElementById(id);
+            if (input) {
+                input.value = fields[id] || '';
+                if (input.tagName === 'SELECT') window.syncAsesorSelect(input);
+            }
+        });
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarAsesor')).show();
+    }
+
+    function toggleAsesorPassword(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(iconId);
+        if (!input || !icon) return;
+
+        var showing = input.type === 'password';
+        input.type = showing ? 'text' : 'password';
+        icon.classList.toggle('bi-eye', !showing);
+        icon.classList.toggle('bi-eye-slash', showing);
+    }
+
+    function clearAsesorModalFeedback(modalId) {
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(function (field) {
+            if (field.type === 'checkbox' || field.type === 'radio') {
+                field.checked = false;
+            } else if (field.tagName === 'SELECT') {
+                field.selectedIndex = 0;
+                window.syncAsesorSelect(field);
+            } else {
+                field.value = '';
+            }
+            field.classList.remove('input-validation-error');
+        });
+
+        modal.querySelectorAll('[data-valmsg-for]').forEach(function (message) {
+            message.textContent = '';
+            message.classList.remove('field-validation-error');
+            message.classList.add('field-validation-valid');
+        });
+
+        modal.querySelectorAll('select').forEach(function (field) {
+            window.syncAsesorSelect(field);
+        });
     }
 
     // Función heredada para mantener compatibilidad
     function actualizarModalEliminar(idAsesor) {
         openAsesorDeleteModal(idAsesor);
+    }
+
+    @if (ViewBag.OpenCreateAsesorModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var createModalElement = document.getElementById('modalCrearAsesor');
+                if (createModalElement) {
+                    clearAsesorModalFeedback('modalEditarAsesor');
+                    bootstrap.Modal.getOrCreateInstance(createModalElement).show();
+                }
+            });
+        </text>
+    }
+
+    @if (ViewBag.OpenEditAsesorModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var editModalElement = document.getElementById('modalEditarAsesor');
+                if (editModalElement) {
+                    clearAsesorModalFeedback('modalCrearAsesor');
+                    bootstrap.Modal.getOrCreateInstance(editModalElement).show();
+                }
+            });
+        </text>
     }
 
     MeticsTable.init({
