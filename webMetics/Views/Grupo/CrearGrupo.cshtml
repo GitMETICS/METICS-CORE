@@ -17,7 +17,7 @@
 @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
 {
     <div class="contenedor-caja container-fluid create-group-page table-page-with-divider">
-        @using (Html.BeginForm("CrearGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("CrearGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
         {
             @Html.AntiForgeryToken()
             <h1 metics-page-heading>@ViewBag.Title</h1>
@@ -49,27 +49,27 @@
                     </header>
                     <div class="create-group-card-body">
                         <div class="form-group mt-1 create-group-full-field">
-                            @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                            @Html.LabelFor(grupoModel => grupoModel.nombre) <span class="create-group-required" aria-hidden="true">*</span>
+                            @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @required = "required" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group mt-1 create-group-full-field">
-                            @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
+                            @Html.LabelFor(grupoModel => grupoModel.descripcion)
                             @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "5000", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.numeroGrupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.LabelFor(grupoModel => grupoModel.numeroGrupo) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.numeroGrupo, new { @type = "number", @class = "form-control", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.numeroGrupo, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
-                                <a style="color:red;font-size:22px">*</a>
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad)
+                                <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(
                                          grupoModel => grupoModel.modalidad,
                                          new SelectList(
@@ -79,18 +79,18 @@
                                          "Value",
                                          "Text"),
                                          "Seleccione un tipo de modalidad...",
-                                         new { @class = "form-control", @id = "modalidadSelect" })
+                                         new { @class = "form-control", @id = "modalidadSelect", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @min = "1", @max = "100", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.LabelFor(grupoModel => grupoModel.cupo) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @min = "1", @max = "5000", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
                             </div>
@@ -109,22 +109,22 @@
                     <div class="create-group-card-body">
                         <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.lugar)
                                 @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.enlace, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.enlace)
                                 @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.claveInscripcion, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.claveInscripcion)
                                 @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
+                                @Html.LabelFor(grupoModel => grupoModel.horario)
                                 @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                             </div>
@@ -145,8 +145,8 @@
                         </div>
                     </header>
                     <div class="create-group-card-body">
-                        <div class="form-group mt-1 create-group-competencies">
-                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                        <div class="form-group mt-1 create-group-competencies" data-required-group="TemasSeleccionados">
+                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados) <span class="create-group-required" aria-hidden="true">*</span>
 
                             @{
                                 var temasSeleccionados = Model?.TemasSeleccionados ?? new List<int>();
@@ -169,7 +169,7 @@
 
                         <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.idCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.Label("idCategoria", "Nivel", new { @for = "idCategoria" }) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select", @required = "required" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.idCategoria, "", new { @class = "text-danger" })
                             </div>
@@ -186,7 +186,7 @@
                             else
                             {
                                 <div class="form-group mt-1">
-                                    @Html.Label("asesorSelect", "Facilitador(a)", new { Style = "font-size:22px" })
+                                    @Html.Label("asesorSelect", "Facilitador(a)")
                                     @Html.DropDownListFor(
                                              grupoModel => grupoModel.idAsesor,
                                              new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
@@ -213,13 +213,13 @@
                             <h3 id="createGroupEnrollmentDatesTitle">Período de inscripción</h3>
                             <div class="create-group-field-grid">
                                 <div class="form-group">
-                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion) <span class="create-group-required" aria-hidden="true">*</span>
                                     <br />
                                     @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
                                     @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion) <span class="create-group-required" aria-hidden="true">*</span>
                                     <br />
                                     @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
                                     @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
@@ -231,13 +231,13 @@
                             <h3 id="createGroupExecutionDatesTitle">Inicio y finalización del módulo</h3>
                             <div class="create-group-field-grid">
                                 <div class="form-group">
-                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo) <span class="create-group-required" aria-hidden="true">*</span>
                                     <br />
                                     @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
                                     @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo) <span style="color:red;font-size:22px" aria-hidden="true">*</span>
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo) <span class="create-group-required" aria-hidden="true">*</span>
                                     <br />
                                     @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
                                     @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
@@ -672,7 +672,11 @@ else
                 input.addEventListener('change', renderValue);
                 input.addEventListener('invalid', function (event) {
                     event.preventDefault();
-                    if (validationMessage) validationMessage.textContent = input.validationMessage;
+                    if (validationMessage) {
+                        validationMessage.textContent = input.validity.valueMissing
+                            ? 'Selecciona la fecha indicada.'
+                            : input.validationMessage || 'Selecciona una fecha válida.';
+                    }
                     trigger.setAttribute('aria-invalid', 'true');
                     manualInput.setAttribute('aria-invalid', 'true');
                     wrapper.classList.add('has-validation-error');
@@ -943,7 +947,7 @@ else
                         row.setAttribute('aria-selected', selected ? 'true' : 'false');
                     });
 
-                    if (clearValidation && select.checkValidity() && select.value !== '' && validationMessage) {
+                    if (clearValidation && select.value !== '' && validationMessage) {
                         validationMessage.textContent = '';
                     }
                     var hasValidationMessage = validationMessage && validationMessage.textContent.trim().length > 0;
@@ -1115,7 +1119,9 @@ else
                 });
                 select.addEventListener('invalid', function (event) {
                     event.preventDefault();
-                    if (validationMessage) validationMessage.textContent = select.validationMessage;
+                    if (validationMessage) validationMessage.textContent = select.value === ''
+                        ? 'Selecciona una opción.'
+                        : select.validationMessage || 'Selecciona una opción válida.';
                     trigger.setAttribute('aria-invalid', 'true');
                     wrapper.classList.add('has-validation-error');
                     window.setTimeout(function () { trigger.focus(); }, 0);

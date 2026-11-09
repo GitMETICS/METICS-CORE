@@ -5,7 +5,6 @@
     ViewBag.Title = "Formulario de Participante";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
     var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .OrderBy(a => a)
@@ -14,15 +13,7 @@
 
 @if (ViewBag.Title == "Formulario de Participante")
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
+    <div class="contenedor-caja container-fluid create-participant-page table-page-with-divider">
 
         @using (Html.BeginForm("FormularioParticipante", "Participante", FormMethod.Post, new { enctype = "multipart/form-data", id = "participanteCreateForm" }))
         {
@@ -45,40 +36,31 @@
                 </div>
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group">
-                            @Html.LabelFor(participanteModel => participanteModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+            <div class="create-participant-sections">
+                <section class="create-participant-card" aria-labelledby="participantPersonalTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        <div><h2 id="participantPersonalTitle">Información personal</h2><p>Datos de identificación del participante.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group create-participant-full-field">
+                                @Html.LabelFor(participanteModel => participanteModel.nombre) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(participanteModel => participanteModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.nombre, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.primerApellido) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(participanteModel => participanteModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.primerApellido, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.segundoApellido, new { Style = "font-size:22px" })
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.segundoApellido)
                                 @Html.TextBoxFor(participanteModel => participanteModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.segundoApellido, "", new { @class = "text-danger" })
                             </div>
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.correoAlternativo, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.gradoAcademico, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.gradoAcademico) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(participanteModel => participanteModel.gradoAcademico, new SelectList(new List<string> 
                             { 
                                 "Doctorado - PhD", 
@@ -87,15 +69,14 @@
                                 "Bachillerato - Bach" 
                             }), "Seleccione su grado académico...", new { @class = "form-control" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.gradoAcademico, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(participanteModel => participanteModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
                                 <small class="form-text text-muted">
@@ -103,8 +84,44 @@
                                 </small>
                             </div>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="participantContactTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        <div><h2 id="participantContactTitle">Información de contacto</h2><p>Medios para comunicarse con el participante.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.correo) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(participanteModel => participanteModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.correoAlternativo) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(participanteModel => participanteModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.correoAlternativo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.telefono) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(participanteModel => participanteModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(participanteModel => participanteModel.telefono, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="participantAcademicTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                        <div><h2 id="participantAcademicTitle">Información institucional</h2><p>Clasificación y ubicación académica del participante.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.tipoParticipante) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(
                                      usuarioModel => usuarioModel.tipoParticipante,
                                      new SelectList(
@@ -116,34 +133,29 @@
                                      "Seleccione un tipo de participante...",
                                      new { @class = "form-control" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.tipoParticipante, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.area) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(participanteModel => participanteModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.area, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.departamento) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.unidadAcademica) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.sede, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.sede) <span class="create-participant-required" aria-hidden="true">*</span>
                     @Html.DropDownListFor(participanteModel => participanteModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control", id = "sedeDropdown" })
                             @Html.ValidationMessageFor(participanteModel => participanteModel.sede, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.telefono, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(participanteModel => participanteModel.carrera) <span class="create-participant-required" aria-hidden="true">*</span>
                             <select id="carreraDropdown" class="form-control">
                                 <option value="">Seleccione una carrera...</option>
                             </select>
@@ -155,14 +167,20 @@
                             <small id="carreraPreview" class="form-text text-muted d-none"></small>
                             @Html.HiddenFor(participanteModel => participanteModel.carrera)
                             @Html.ValidationMessageFor(participanteModel => participanteModel.carrera, "", new { @class = "text-danger" })
+                            </div>
                         </div>
-                        <div class="form-group mt-1">
-                            <fieldset class="border rounded p-3">
-                                <legend class="float-none w-auto px-2" style="font-size:22px">Áreas extra</legend>
-                                <small class="form-text text-muted d-block mb-2">
-                                    Opcional. Debe ser diferente al área principal.
-                                </small>
+                    </div>
+                </section>
 
+                <section class="create-participant-card" aria-labelledby="participantExtraAreasTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                        <div><h2 id="participantExtraAreasTitle">Áreas extra</h2><p>Seleccione otras áreas relacionadas, si corresponde.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <fieldset class="create-participant-area-fieldset">
+                            <legend class="visually-hidden">Áreas extra</legend>
+                            <small class="form-text text-muted d-block mb-2">Opcional. Debe ser diferente al área principal.</small>
                                 @{ int areaIndex = 0; }
                                 @foreach (var areaExtra in areasDisponibles)
                                 {
@@ -180,31 +198,37 @@
                                 }
 
                                 @Html.ValidationMessageFor(participanteModel => participanteModel.areasExtra, "", new { @class = "text-danger" })
-                            </fieldset>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br />
+                        </fieldset>
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="participantConditionTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                        <div><h2 id="participantConditionTitle">Condición institucional</h2><p>Indique la condición actual en la institución.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <fieldset class="create-participant-condition-fieldset">
+                            <legend>@Html.DisplayNameFor(participanteModel => participanteModel.condicion) <span class="create-participant-required" aria-hidden="true">*</span></legend>
                             
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Interino(a)") @Html.Label("Profesor(a) Interino(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Instructor(a)") @Html.Label("Profesor(a) Instructor(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Adjunto(a)") @Html.Label("Profesor(a) Adjunto(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Catedrático(a)") @Html.Label("Profesor(a) Catedrático(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Invitado(a)") @Html.Label("Profesor(a) Invitado(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Asociado(a)") @Html.Label("Profesor(a) Asociado(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Otro") @Html.Label("Otro")<br />
+                            <div class="create-participant-condition-grid">
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Interino(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Interino(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Instructor(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Instructor(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Adjunto(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Adjunto(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Catedrático(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Catedrático(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Invitado(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Invitado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Asociado(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Asociado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Otro", new { @class = "form-check-input" }) <span class="form-check-label">Otro</span></label>
+                            </div>
                             @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
-                            
-                        </div>
+                        </fieldset>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" id="guardarBtn" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
-                </div>
+                </section>
+            </div>
+
+            <div class="create-participant-actions">
+                <a href="#" class="create-participant-action-button create-participant-action-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                <input type="submit" id="guardarBtn" class="create-participant-action-button create-participant-action-save" value="Guardar" />
             </div>
         }
     </div>
@@ -237,6 +261,8 @@ else
             .addClass('field-validation-valid');
 
         $('.input-validation-error').removeClass('input-validation-error');
+        $('.participant-select-trigger').removeClass('input-validation-error').removeAttr('aria-invalid');
+        $('.participant-custom-select').removeClass('has-validation-error');
         ocultarPopoverGuardar();
     }
 
@@ -256,6 +282,13 @@ else
 
             if ($campo.length) {
                 $campo.addClass('input-validation-error');
+                var $selectorPersonalizado = $campo.closest('.participant-custom-select');
+                if ($selectorPersonalizado.length) {
+                    $selectorPersonalizado.addClass('has-validation-error');
+                    $selectorPersonalizado.find('.participant-select-trigger')
+                        .addClass('input-validation-error')
+                        .attr('aria-invalid', 'true');
+                }
             }
 
             if ($mensaje.length) {
@@ -526,6 +559,277 @@ else
         });
     }
 
+    // Mejora visual accesible que conserva los <select> originales para el envío
+    // y para los cambios dependientes de área, unidad, sede y carrera.
+    var participanteSelectInstances = [];
+
+    function sincronizarSelectoresParticipante() {
+        participanteSelectInstances.forEach(function (instance) { instance.syncFromNative(); });
+    }
+
+    function inicializarSelectoresParticipante() {
+        var selects = Array.prototype.slice.call(
+            document.querySelectorAll('.create-participant-page select:not([hidden])')
+        );
+
+        function cerrarOtros(excepto) {
+            participanteSelectInstances.forEach(function (instance) {
+                if (instance !== excepto) instance.close(false);
+            });
+        }
+
+        selects.forEach(function (select, index) {
+            if (select.dataset.participantSelectReady === 'true') return;
+
+            var baseId = select.id || select.name || ('participantSelect' + index);
+            var wrapper = document.createElement('div');
+            wrapper.className = 'participant-custom-select';
+            select.parentNode.insertBefore(wrapper, select);
+            wrapper.appendChild(select);
+            select.classList.add('participant-native-select');
+            select.setAttribute('aria-hidden', 'true');
+            select.setAttribute('tabindex', '-1');
+            select.dataset.participantSelectReady = 'true';
+
+            var trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.id = baseId + 'ParticipantTrigger';
+            trigger.className = 'participant-select-trigger';
+            trigger.setAttribute('role', 'combobox');
+            trigger.setAttribute('aria-haspopup', 'listbox');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.setAttribute('aria-controls', baseId + 'ParticipantListbox');
+
+            var value = document.createElement('span');
+            value.className = 'participant-select-value';
+            var arrow = document.createElement('span');
+            arrow.className = 'participant-select-arrow';
+            arrow.setAttribute('aria-hidden', 'true');
+            trigger.appendChild(value);
+            trigger.appendChild(arrow);
+
+            var panel = document.createElement('div');
+            panel.id = baseId + 'ParticipantListbox';
+            panel.className = 'participant-select-panel';
+            panel.setAttribute('role', 'listbox');
+            panel.hidden = true;
+
+            var field = select.closest('.form-group');
+            var label = field ? field.querySelector('label') : null;
+            var validationMessage = field
+                ? field.querySelector('[data-valmsg-for="' + select.name + '"]')
+                : null;
+            if (label) {
+                if (!label.id) label.id = baseId + 'ParticipantLabel';
+                trigger.setAttribute('aria-labelledby', label.id);
+                label.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    if (!trigger.disabled) {
+                        trigger.focus();
+                        toggle();
+                    }
+                });
+            } else {
+                trigger.setAttribute('aria-label', select.name || 'Seleccionar una opción');
+            }
+
+            wrapper.appendChild(trigger);
+            wrapper.appendChild(panel);
+
+            var rows = [];
+            var activeIndex = -1;
+            var isOpen = false;
+            var typeAheadBuffer = '';
+            var typeAheadTimer = null;
+
+            function renderOptions() {
+                panel.replaceChildren();
+                rows = [];
+                Array.prototype.forEach.call(select.options, function (option, optionIndex) {
+                    var row = document.createElement('div');
+                    row.id = panel.id + 'Option' + optionIndex;
+                    row.className = 'participant-select-option';
+                    row.setAttribute('role', 'option');
+                    row.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+                    row.setAttribute('aria-disabled', option.disabled ? 'true' : 'false');
+                    row.textContent = option.text;
+                    if (option.selected) row.classList.add('is-selected');
+                    row.addEventListener('mouseenter', function () {
+                        if (!option.disabled) setActive(optionIndex, false);
+                    });
+                    row.addEventListener('mousedown', function (event) { event.preventDefault(); });
+                    row.addEventListener('click', function () {
+                        if (!option.disabled) choose(optionIndex);
+                    });
+                    panel.appendChild(row);
+                    rows.push(row);
+                });
+            }
+
+            function syncDisabled() {
+                trigger.disabled = select.disabled;
+                trigger.setAttribute('aria-disabled', select.disabled ? 'true' : 'false');
+                if (select.disabled) close(false);
+            }
+
+            function syncFromNative() {
+                renderOptions();
+                var selected = select.options[select.selectedIndex];
+                value.textContent = selected ? selected.text : '';
+                rows.forEach(function (row, rowIndex) {
+                    var isSelected = rowIndex === select.selectedIndex;
+                    row.classList.toggle('is-selected', isSelected);
+                    row.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+                });
+                if (select.value !== '' && validationMessage) {
+                    validationMessage.textContent = '';
+                    validationMessage.classList.remove('field-validation-error');
+                    validationMessage.classList.add('field-validation-valid');
+                    trigger.classList.remove('input-validation-error');
+                    trigger.removeAttribute('aria-invalid');
+                    wrapper.classList.remove('has-validation-error');
+                } else if (validationMessage && validationMessage.textContent.trim()) {
+                    trigger.classList.add('input-validation-error');
+                    trigger.setAttribute('aria-invalid', 'true');
+                    wrapper.classList.add('has-validation-error');
+                }
+                syncDisabled();
+            }
+
+            function setActive(optionIndex, scroll) {
+                if (optionIndex < 0 || optionIndex >= rows.length || select.options[optionIndex].disabled) return;
+                activeIndex = optionIndex;
+                rows.forEach(function (row, rowIndex) { row.classList.toggle('is-active', rowIndex === activeIndex); });
+                trigger.setAttribute('aria-activedescendant', rows[activeIndex].id);
+                if (scroll) rows[activeIndex].scrollIntoView({ block: 'nearest' });
+            }
+
+            function firstEnabled(start, step) {
+                var optionIndex = start;
+                while (optionIndex >= 0 && optionIndex < select.options.length) {
+                    if (!select.options[optionIndex].disabled) return optionIndex;
+                    optionIndex += step;
+                }
+                return -1;
+            }
+
+            function open() {
+                if (trigger.disabled || isOpen) return;
+                cerrarOtros(instance);
+                syncFromNative();
+                panel.hidden = false;
+                wrapper.classList.add('is-open');
+                var card = wrapper.closest('.create-participant-card');
+                if (card) card.classList.add('participant-card-select-open');
+                trigger.setAttribute('aria-expanded', 'true');
+                isOpen = true;
+
+                var rect = trigger.getBoundingClientRect();
+                var panelHeight = Math.min(panel.scrollHeight, window.innerHeight - 24);
+                var roomBelow = window.innerHeight - rect.bottom;
+                wrapper.classList.toggle('is-open-above', roomBelow < panelHeight + 14 && rect.top > panelHeight + 14);
+                var selectedIndex = select.selectedIndex;
+                if (selectedIndex < 0 || select.options[selectedIndex].disabled) selectedIndex = firstEnabled(0, 1);
+                if (selectedIndex >= 0) setActive(selectedIndex, true);
+            }
+
+            function close(returnFocus) {
+                if (!isOpen) return;
+                panel.hidden = true;
+                wrapper.classList.remove('is-open', 'is-open-above');
+                var card = wrapper.closest('.create-participant-card');
+                if (card) card.classList.remove('participant-card-select-open');
+                trigger.setAttribute('aria-expanded', 'false');
+                trigger.removeAttribute('aria-activedescendant');
+                isOpen = false;
+                activeIndex = -1;
+                if (returnFocus) trigger.focus();
+            }
+
+            function choose(optionIndex) {
+                if (optionIndex < 0 || optionIndex >= select.options.length || select.options[optionIndex].disabled) return;
+                if (select.selectedIndex !== optionIndex) {
+                    select.selectedIndex = optionIndex;
+                    select.dispatchEvent(new Event('input', { bubbles: true }));
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                syncFromNative();
+                close(true);
+            }
+
+            function toggle() { if (isOpen) close(false); else open(); }
+
+            function moveActive(step) {
+                var start = activeIndex < 0 ? (step > 0 ? -1 : select.options.length) : activeIndex;
+                var next = firstEnabled(start + step, step);
+                if (next >= 0) setActive(next, true);
+            }
+
+            function searchByTyping(character) {
+                var normalized = character.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                var repeated = typeAheadBuffer && Array.from(typeAheadBuffer).every(function (letter) { return letter === normalized; });
+                typeAheadBuffer = repeated ? normalized : typeAheadBuffer + normalized;
+                window.clearTimeout(typeAheadTimer);
+                typeAheadTimer = window.setTimeout(function () { typeAheadBuffer = ''; }, 800);
+
+                var start = select.selectedIndex;
+                for (var offset = 1; offset <= select.options.length; offset++) {
+                    var optionIndex = (start + offset + select.options.length) % select.options.length;
+                    var option = select.options[optionIndex];
+                    var text = option.text.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+                    if (!option.disabled && option.value !== '' && text.startsWith(typeAheadBuffer)) {
+                        choose(optionIndex);
+                        return;
+                    }
+                }
+                if (typeAheadBuffer !== normalized) {
+                    typeAheadBuffer = normalized;
+                    searchByTyping(character);
+                }
+            }
+
+            var instance = { select: select, close: close, syncFromNative: syncFromNative };
+            participanteSelectInstances.push(instance);
+            trigger.addEventListener('click', toggle);
+            trigger.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') { if (isOpen) { event.preventDefault(); close(true); } return; }
+                if (event.key === 'Tab') { close(false); return; }
+                if (event.key.length === 1 && event.key.trim() && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                    event.preventDefault();
+                    searchByTyping(event.key);
+                    return;
+                }
+                if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].indexOf(event.key) === -1) return;
+                event.preventDefault();
+                if (!isOpen) {
+                    open();
+                    if (event.key === 'ArrowDown') setActive(firstEnabled(select.selectedIndex + 1, 1), true);
+                    if (event.key === 'ArrowUp') setActive(firstEnabled(select.selectedIndex - 1, -1), true);
+                } else if (event.key === 'ArrowDown') moveActive(1);
+                else if (event.key === 'ArrowUp') moveActive(-1);
+                else if (event.key === 'Home') setActive(firstEnabled(0, 1), true);
+                else if (event.key === 'End') setActive(firstEnabled(select.options.length - 1, -1), true);
+                else if (activeIndex >= 0) choose(activeIndex);
+            });
+
+            select.addEventListener('change', syncFromNative);
+            var observer = new MutationObserver(syncFromNative);
+            observer.observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled'] });
+            syncFromNative();
+        });
+
+        document.addEventListener('pointerdown', function (event) {
+            participanteSelectInstances.forEach(function (instance) {
+                if (!instance.select.closest('.participant-custom-select').contains(event.target)) instance.close(false);
+            });
+        });
+        document.addEventListener('focusin', function (event) {
+            participanteSelectInstances.forEach(function (instance) {
+                if (!instance.select.closest('.participant-custom-select').contains(event.target)) instance.close(false);
+            });
+        });
+    }
+
     function rehidratarFormularioInicial() {
         if (!estadoInicial.area) {
             actualizarAreasExtraDisponibles();
@@ -542,9 +846,11 @@ else
 
         actualizarCarreras(estadoInicial.carrera);
         actualizarAreasExtraDisponibles();
+        sincronizarSelectoresParticipante();
     }
 
     $(document).ready(function () {
+        inicializarSelectoresParticipante();
         var $form = $('#participanteCreateForm');
         var $submitButton = $form.find('input[type="submit"]');
         var submitLabel = $submitButton.val();
