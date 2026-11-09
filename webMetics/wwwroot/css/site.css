@@ -1887,6 +1887,14 @@ html.metics-scroll-restore-pending body { visibility: hidden; }
 }
 .metics-toast--error .metics-toast-icon { background: #fde6e4; color: #c83c32; }
 .metics-toast--error .metics-toast-message strong { color: #702a26; }
+.metics-toast--warning.toast {
+    background: linear-gradient(110deg, #fff 12%, #fffaf0 100%);
+    border-color: #ead39a;
+    border-left-color: #d3980c;
+    color: #765710;
+}
+.metics-toast--warning .metics-toast-icon { background: #fff0c2; color: #a97608; }
+.metics-toast--warning .metics-toast-message strong { color: #765710; }
 @media (prefers-reduced-motion: reduce) {
     .metics-toast.toast { animation: none !important; transition: none; }
 }
@@ -3993,13 +4001,16 @@ html body {
 .participant-details-card .participant-detail-metric { font-size: 14px; font-weight: 600; min-width: 38px; text-align: center; }
 @media (max-width: 767.98px) {
     .participant-details-card .participante-detalle-wrapper { margin: 14px 16px 18px; width: calc(100% - 32px); }
-    .participant-details-card .participante-detalle-table { min-width: 0; }
+    .participant-details-card .participante-detalle-table { display: block; min-width: 0; }
+    .participant-details-card .participante-detalle-table thead,
+    .participant-details-card .participante-detalle-table thead tr,
+    .participant-details-card .participante-detalle-table thead th,
     .participant-details-card .participante-detalle-table tbody,
-    .participant-details-card .participante-detalle-table tbody tr { display: block; }
+    .participant-details-card .participante-detalle-table tbody tr { display: block; width: 100%; }
     .participant-details-card .participante-detalle-table tbody tr { border-bottom: 1px solid #e8eef5; }
     .participant-details-card .participante-detalle-table tbody td { border: 0; display: block; padding: 8px 14px; width: 100%; }
-    .participant-details-card .participante-detalle-table .detalle-label { padding-bottom: 4px; }
-    .participant-details-card .participante-detalle-table .detalle-value { padding-bottom: 14px; }
+    .participant-details-card .participante-detalle-table .detalle-label { padding-bottom: 4px; width: 100%; }
+    .participant-details-card .participante-detalle-table .detalle-value { padding-bottom: 14px; width: 100%; }
 }
 :is(.participant-medal-assignment, .participant-medal-collection) .medal-assignment-heading { margin: 0; width: 100%; }
 .medal-assignment-toggle {

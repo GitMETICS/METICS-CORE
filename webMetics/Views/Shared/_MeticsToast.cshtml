@@ -1,6 +1,7 @@
 @{
     var successMessage = ViewData["SuccessMessage"]?.ToString();
     var errorMessage = ViewData["ErrorMessage"]?.ToString();
+    var warningMessage = ViewData["WarningMessage"]?.ToString();
     var successTitle = "Operación completada";
     var successDetail = successMessage;
     string? assignedParticipants = null;
@@ -28,7 +29,7 @@
     }
 }
 
-@if (!string.IsNullOrWhiteSpace(successMessage) || !string.IsNullOrWhiteSpace(errorMessage))
+@if (!string.IsNullOrWhiteSpace(successMessage) || !string.IsNullOrWhiteSpace(errorMessage) || !string.IsNullOrWhiteSpace(warningMessage))
 {
     <div class="metics-toast-region" aria-label="Notificaciones">
         @if (!string.IsNullOrWhiteSpace(successMessage))
@@ -46,6 +47,20 @@
                         {
                             <span class="metics-toast-count"><i class="bi bi-people-fill" aria-hidden="true"></i>@assignedParticipants</span>
                         }
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(warningMessage))
+        {
+            <div class="metics-toast metics-toast--warning toast fade" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="6750">
+                <div class="metics-toast-inner">
+                    <span class="metics-toast-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+                    <div class="metics-toast-message">
+                        <strong>Revisa la información</strong>
+                        <p>@warningMessage</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>
                 </div>

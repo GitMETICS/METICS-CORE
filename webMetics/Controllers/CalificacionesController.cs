@@ -119,8 +119,8 @@ namespace webMetics.Controllers
         /// </summary>
         /// <param name="idGrupo">ID del grupo.</param>
         /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <param name="horasAprobadas">Horas aprobadas (0 = no actualizar); debe ser ≤ cantidadHoras del grupo.</param>
-        /// <param name="calificacion">Calificación (0 = no actualizar); debe estar entre 1 y 100.</param>
+        /// <param name="horasAprobadas">Horas aprobadas (vacío = conservar); acepta 0 hasta cantidadHoras del grupo.</param>
+        /// <param name="calificacion">Calificación (vacío = conservar); acepta valores entre 0 y 100.</param>
         /// <returns>
         /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
         /// Participante/VerDatosParticipante. Sets TempData["successMessage"] o TempData["errorMessage"].
@@ -130,45 +130,41 @@ namespace webMetics.Controllers
         /// Role required: Asesor (2) o Admin (1).
         /// </remarks>
         [HttpPost]
-        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
+        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int? horasAprobadas = null, int? calificacion = null)
         {
+            TempData.Remove("successMessage");
+            TempData.Remove("errorMessage");
+            TempData.Remove("warningMessage");
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-
-                if (horasAprobadas > 0 && horasAprobadas <= grupo.cantidadHoras)
+                if (string.IsNullOrWhiteSpace(GetId()) || GetRole() is not (1 or 2))
+                    TempData["errorMessage"] = "No tiene permisos para actualizar horas y calificaciones.";
+                else if (!ModelState.IsValid)
+                    TempData["errorMessage"] = "Ingresa horas y calificaciones con números enteros válidos.";
+                else
                 {
-                    inscripcion.horasAprobadas = horasAprobadas;
-                    inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
-
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    var saved = new webMetics.Services.CalificacionParticipanteService(_configuration)
+                        .Guardar(idGrupo, idParticipante, horasAprobadas, calificacion);
+                    if (saved) TempData["successMessage"] = "Horas y calificación guardadas correctamente.";
+                    else TempData["warningMessage"] = horasAprobadas == null && calificacion == null
+                        ? "Ingresa las horas aprobadas o la calificación que deseas guardar."
+                        : "No hay cambios para guardar.";
                 }
-
-                if (calificacion > 0 && calificacion <= 100)
-                {
-                    accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-                }
-
-                TempData["successMessage"] = "Datos actualizados.";
             }
-            catch
+            catch (ArgumentException ex)
             {
-                TempData["errorMessage"] = "No se pudo actualizar los datos.";
+                TempData["errorMessage"] = ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "No se pudieron guardar los datos. No se aplicaron cambios.";
             }
 
             var refererUrl = Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(refererUrl))
-            {
-                return Redirect(refererUrl);
-            }
-
+            if (Uri.TryCreate(refererUrl, UriKind.Absolute, out var referer)
+                && Uri.TryCreate($"{Request.Scheme}://{Request.Host}", UriKind.Absolute, out var origin)
+                && referer.Scheme == origin.Scheme && referer.Authority == origin.Authority)
+                return Redirect(referer.PathAndQuery);
             return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
         }
 

@@ -280,10 +280,20 @@ namespace webMetics.Controllers
         [HttpPost]
         public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
         {
+            TempData.Remove("successMessage");
+            TempData.Remove("errorMessage");
+            TempData.Remove("warningMessage");
             // Validar que solo administradores puedan asignar medallas
             if (GetRole() != 1)  // Si no es administrador
             {
                 TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
+                return RedirectToAction("VerDatosParticipante", new { idParticipante });
+            }
+            selectedMedallas = selectedMedallas?.Where(medalla => !string.IsNullOrWhiteSpace(medalla))
+                .Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? new List<string>();
+            if (selectedMedallas.Count == 0)
+            {
+                TempData["warningMessage"] = "Selecciona al menos una medalla antes de asignar.";
                 return RedirectToAction("VerDatosParticipante", new { idParticipante });
             }
             try
@@ -292,21 +302,22 @@ namespace webMetics.Controllers
 
                 if (participante == null)
                 {
-                    ViewBag.ErrorMessage = "Participante no encontrado.";
+                    TempData["errorMessage"] = "Participante no encontrado.";
                     return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                if (selectedMedallas != null && selectedMedallas.Any())
+                var assigned = 0;
+                foreach (var medalla in selectedMedallas)
                 {
-                    foreach (var medalla in selectedMedallas)
+                    if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla))
                     {
-                        if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla)) {
-                            accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla);
-                        }
+                        if (!accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla))
+                            throw new InvalidOperationException("No se pudo asignar la medalla.");
+                        assigned++;
                     }
                 }
-
-                TempData["successMessage"] = "Medallas asignadas correctamente.";
+                if (assigned > 0) TempData["successMessage"] = "Medallas asignadas correctamente.";
+                else TempData["warningMessage"] = "Las medallas seleccionadas ya estaban asignadas al participante.";
             }
             catch (Exception ex)
             {
@@ -1070,6 +1081,8 @@ namespace webMetics.Controllers
             {
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
+
+            ViewBag.WarningMessage = TempData["warningMessage"]?.ToString();
 
             // Si se pasa un idGrupo, se guarda en ViewBag para usarlo en la vista cuando se regresa al grupo
             if (idGrupo != null)
