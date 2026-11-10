@@ -4366,3 +4366,31 @@ html body {
     #credencialesModal .modal-dialog { padding: 8px; margin: 8px; }
     #credencialesModal .modal-content > form { max-height: calc(100dvh - 32px); }
 }
+
+/* Administrator password reset uses the same compact dialog system as credentials. */
+.password-reset-page-description { color: #59708f; margin-bottom: 14px; }
+#passwordResetModal .modal-dialog { max-width: 760px; }
+#passwordResetModal .modal-content > form { height: auto; max-height: calc(100dvh - 64px); }
+#passwordResetModal .modal-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding-top: 22px; padding-bottom: 10px; }
+#passwordResetModal .asesor-edit-section-title { margin-bottom: 6px; }
+#passwordResetModal .password-reset-help { color: #59708f; font-size: 14px; line-height: 1.5; margin: 0 0 20px; }
+#passwordResetModal .password-reset-email-option { background: #f1f6ff; border: 1px solid #dce6f2; border-radius: 10px; margin-top: 4px; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 20px; align-items: center; }
+#passwordResetModal .password-reset-email-option .form-check-input {
+    grid-column: 2; grid-row: 1 / 3; float: none; margin: 0;
+    width: 42px; height: 24px; cursor: pointer;
+    background-color: var(--bs-secondary, #6c757d); border-color: var(--bs-secondary, #6c757d);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    transition: background-color 150ms ease, border-color 150ms ease, background-position 150ms ease;
+}
+#passwordResetModal .password-reset-email-option .form-check-input:checked { background-color: var(--bs-success, #198754); border-color: var(--bs-success, #198754); }
+#passwordResetModal .password-reset-email-option .form-check-input:focus-visible { outline: 2px solid #245b94; outline-offset: 3px; box-shadow: none; }
+#passwordResetModal .password-reset-email-option label { grid-column: 1; grid-row: 1; cursor: pointer; color: #172b49; font-weight: 600; }
+#passwordResetModal .password-reset-email-option p { grid-column: 1; grid-row: 2; color: #59708f; font-size: 13px; line-height: 1.5; margin: 4px 0 0; }
+#passwordResetModal .field-validation-error { color: #c0392b; display: block; font-size: 13px; line-height: 1.4; margin-top: 5px; }
+#passwordResetModal .form-control.input-validation-error { border-color: #c0392b; box-shadow: 0 0 0 3px rgba(192, 57, 43, .1); }
+#passwordResetModal [data-password-reset-error]:empty { display: none; }
+#passwordResetModal .create-category-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+@media (max-width: 575.98px) {
+    #passwordResetModal .modal-dialog { padding: 8px; margin: 8px; }
+    #passwordResetModal .modal-content > form { max-height: calc(100dvh - 32px); }
+}

@@ -1,0 +1,58 @@
+@model webMetics.Models.NewLoginModel
+<div class="modal fade create-category-modal asesor-form-modal password-reset-modal" id="passwordResetModal" tabindex="-1" aria-labelledby="passwordResetModalTitle" aria-hidden="true" data-success="@(ViewBag.SuccessMessage != null ? "true" : "false")">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="@Url.Action("CambiarContrasenaAdmin", "Usuario")" method="post" novalidate data-password-reset-form>
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.id)
+                @Html.HiddenFor(m => m.role)
+                <div class="modal-header create-category-modal-header">
+                    <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-key"></i></div>
+                    <div class="create-category-modal-heading">
+                        <h2 class="modal-title" id="passwordResetModalTitle">Cambiar contraseña</h2>
+                        @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewBag.NombreCompleto)))
+                        {
+                            <p>@ViewBag.NombreCompleto</p>
+                        }
+                    </div>
+                </div>
+                <div class="modal-body create-category-modal-body">
+                    <section class="asesor-edit-section">
+                        <h3 class="asesor-edit-section-title">Nueva contraseña</h3>
+                        <p class="password-reset-help">Establece una contraseña nueva para esta cuenta y confirma que esté escrita correctamente.</p>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6 create-category-field asesor-password-field">
+                                <label for="passwordResetNew">Nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                                <div class="input-group">
+                                    @Html.PasswordFor(m => m.nuevaContrasena, new { id = "passwordResetNew", @class = "form-control", required = "required", autocomplete = "new-password", aria_describedby = "passwordResetNewError" })
+                                    <button type="button" class="btn btn-outline-secondary" data-password-reset-toggle="passwordResetNew" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                </div>
+                                <span id="passwordResetNewError" data-valmsg-for="nuevaContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
+                            </div>
+                            <div class="col-12 col-md-6 create-category-field asesor-password-field">
+                                <label for="passwordResetConfirm">Confirmar nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                                <div class="input-group">
+                                    @Html.PasswordFor(m => m.confirmarContrasena, new { id = "passwordResetConfirm", @class = "form-control", required = "required", autocomplete = "new-password", aria_describedby = "passwordResetConfirmError" })
+                                    <button type="button" class="btn btn-outline-secondary" data-password-reset-toggle="passwordResetConfirm" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                </div>
+                                <span id="passwordResetConfirmError" data-valmsg-for="confirmarContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
+                            </div>
+                            <div class="col-12">
+                                <div class="password-reset-email-option form-check form-switch">
+                                    @Html.CheckBoxFor(m => m.enviarPorCorreo, new { id = "passwordResetSendEmail", @class = "form-check-input", role = "switch", aria_describedby = "passwordResetEmailHelp" })
+                                    <label class="form-check-label" for="passwordResetSendEmail">Enviar contraseña por correo</label>
+                                    <p id="passwordResetEmailHelp">Si la activas, se notificará al usuario con la contraseña nueva.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <p class="text-danger mt-3 mb-0" data-password-reset-error role="alert"></p>
+                </div>
+                <div class="modal-footer create-category-modal-actions">
+                    <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn create-category-save"><i class="bi bi-check-lg" aria-hidden="true"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
