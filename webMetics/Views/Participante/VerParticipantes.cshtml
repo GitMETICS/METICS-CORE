@@ -3,11 +3,15 @@
 @{
     ViewBag.Title = "Participantes";
     PageHeadingBuilder.Configure(ViewContext, Url);
+    ViewData["SuccessMessage"] = ViewBag.SuccessMessage?.ToString();
+    ViewData["ErrorMessage"] = ViewBag.ErrorMessage?.ToString();
+    ViewData["WarningMessage"] = ViewBag.WarningMessage?.ToString();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
     <div class="contenedor-caja container-fluid table-page-with-divider">
+        @await Html.PartialAsync("_MeticsToast")
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
@@ -20,21 +24,6 @@
                 </header>
 
                 <div class="file-management-body">
-                    @if (ViewBag.ErrorMessage != null)
-                    {
-                        <div class="alert alert-dark alert-dismissible fade show file-management-alert" role="alert">
-                            @ViewBag.ErrorMessage
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                    @if (ViewBag.SuccessMessage != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show file-management-alert" role="alert">
-                            @ViewBag.SuccessMessage
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-
                     <section class="file-management-section" aria-labelledby="importParticipantsTitle">
                         <div class="file-section-heading">
                             <i class="bi bi-upload" aria-hidden="true"></i>
@@ -141,7 +130,10 @@
                     <table id="participanteTblCustomers" class="data-table">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-center" style="width: 4%;"></th>
+                                <th scope="col" class="text-center" style="width: 4%;" title="Estado de notificación">
+                                    <i class="bi bi-bell" aria-hidden="true"></i>
+                                    <span class="visually-hidden">Estado de notificación</span>
+                                </th>
                                 <th scope="col" style="width: 14%;">Unidad Académica</th>
                                 <th scope="col" style="width: 24%;">Nombre Completo</th>
                                 <th scope="col" style="width: 23%;">Correo Institucional</th>
@@ -325,7 +317,6 @@ else
         columns: [
             {
                 data: 'correoNotificacionEnviado',
-                orderable: false,
                 searchable: false,
                 className: 'text-center',
                 render: function (data, type, row) {
@@ -372,7 +363,7 @@ else
                         '<div class="action-menu participant-actions-menu">' +
                             '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye"></i> Ver detalles</a>' +
                             '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square"></i> Editar</a>' +
-                            '<a href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint"></i> Credenciales</a>' +
+                            '<a data-credentials-open href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint"></i> Credenciales</a>' +
                             '<a href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key"></i> Cambiar contraseña</a>' +
                             '<div class="action-menu-divider"></div>' +
                             '<a href="#" class="delete-option js-delete-participant" data-id-participante="' + escapeHtml(row.idParticipante) + '">' +
@@ -392,6 +383,11 @@ else
     });
 
     document.getElementById('participanteTblCustomers').addEventListener('click', function (event) {
+        if (event.target.closest('[data-credentials-open]')) {
+            closeActionMenus();
+            return;
+        }
+
         const menuButton = event.target.closest('.js-action-menu');
         if (menuButton) {
             toggleActionMenu(menuButton, event);
@@ -413,3 +409,6 @@ else
         }
     });
 </script>
+
+<script src="/js/credenciales-modal.js" asp-append-version="true"></script>
+<script>document.addEventListener("credentials:saved", function () { participantesTable.ajax.reload(null, false); });</script>

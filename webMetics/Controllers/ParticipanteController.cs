@@ -150,6 +150,7 @@ namespace webMetics.Controllers
                 : 2;
             string sortColumn = sortColumnIndex switch
             {
+                0 => "estadoNotificacion",
                 1 => "unidadAcademica",
                 2 => "nombre",
                 3 => "correo",
@@ -1430,6 +1431,8 @@ namespace webMetics.Controllers
                             message = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra."
                         });
                     }
+
+                    TempData["successMessage"] = "Los datos fueron guardados.";
 
                     return Json(new
                     {

@@ -2,10 +2,9 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Información Personal";
+    ViewBag.Title = "Editar participante";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
     var areasDisponibles = (ViewData["jsonDataAreas"] as List<string> ?? new List<string>())
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .OrderBy(a => a)
@@ -14,196 +13,161 @@
 
 @if (ViewBag.Id != "")
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
-        @using (Html.BeginForm("ActualizarParticipante", "Participante", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data", id = "participanteEditForm" }))
+    <div class="contenedor-caja container-fluid create-participant-page edit-participant-page table-page-with-divider">
+        @using (Html.BeginForm("ActualizarParticipante", "Participante", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data", id = "participanteEditForm", novalidate = "novalidate" }))
         {
             @Html.AntiForgeryToken()
             <h1 metics-page-heading>@ViewBag.Title</h1>
             <hr metics-page-heading />
 
-            if (ViewBag.ErrorMessage != null)
+            @if (ViewBag.ErrorMessage != null)
             {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                ViewData["ErrorMessage"] = ViewBag.ErrorMessage.ToString();
+                @await Html.PartialAsync("_MeticsToast")
             }
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
-                            @Html.HiddenFor(participanteModel => participanteModel.horasMatriculadas, new { })
-                            @Html.HiddenFor(participanteModel => participanteModel.horasAprobadas, new { })
+            @Html.HiddenFor(participanteModel => participanteModel.horasMatriculadas)
+            @Html.HiddenFor(participanteModel => participanteModel.horasAprobadas)
 
-                            @Html.LabelFor(participanteModel => participanteModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.primerApellido, "", new { @class = "text-danger" })
+            <div class="create-participant-sections">
+                <section class="create-participant-card" aria-labelledby="editParticipantPersonalTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        <div><h2 id="editParticipantPersonalTitle">Información personal</h2><p>Datos de identificación del participante.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group create-participant-full-field">
+                                @Html.LabelFor(m => m.nombre) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(m => m.nombre, new { @class = "form-control", maxlength = "64", autocomplete = "off", aria_describedby = "nombre-error" })
+                                @Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger", id = "nombre-error" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.segundoApellido, new { Style = "font-size:22px" })
-                                @Html.TextBoxFor(participanteModel => participanteModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.segundoApellido, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.primerApellido) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(m => m.primerApellido, new { @class = "form-control", maxlength = "64", autocomplete = "off", aria_describedby = "primerApellido-error" })
+                                @Html.ValidationMessageFor(m => m.primerApellido, "", new { @class = "text-danger", id = "primerApellido-error" })
                             </div>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.correo, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.correoAlternativo, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.gradoAcademico, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.gradoAcademico, new SelectList(new List<string> 
-                            { 
-                                "Doctorado - PhD", 
-                                "Maestría - MSc", 
-                                "Licenciatura - Lic", 
-                                "Bachillerato - Bach" 
-                            }), "Seleccione su grado académico...", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.gradoAcademico, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.DropDownListFor(participanteModel => participanteModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.segundoApellido)
+                                @Html.TextBoxFor(m => m.segundoApellido, new { @class = "form-control", maxlength = "64", autocomplete = "off", aria_describedby = "segundoApellido-error" })
+                                @Html.ValidationMessageFor(m => m.segundoApellido, "", new { @class = "text-danger", id = "segundoApellido-error" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(participanteModel => participanteModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                @Html.TextBoxFor(participanteModel => participanteModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.numeroIdentificacion, "", new { @class = "text-danger" })
-                                <small class="form-text text-muted">
-                                    Formato de cédula: 1-1100-1100 (con guiones)
-                                </small>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.gradoAcademico) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(m => m.gradoAcademico, new SelectList(new List<string> { "Doctorado - PhD", "Maestría - MSc", "Licenciatura - Lic", "Bachillerato - Bach" }), "Seleccione su grado académico...", new { @class = "form-control", aria_describedby = "gradoAcademico-error" })
+                                @Html.ValidationMessageFor(m => m.gradoAcademico, "", new { @class = "text-danger", id = "gradoAcademico-error" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.tipoIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(m => m.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control", aria_describedby = "tipoIdentificacion-error" })
+                                @Html.ValidationMessageFor(m => m.tipoIdentificacion, "", new { @class = "text-danger", id = "tipoIdentificacion-error" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.numeroIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(m => m.numeroIdentificacion, new { @class = "form-control", maxlength = "64", autocomplete = "off", aria_describedby = "numeroIdentificacion-hint numeroIdentificacion-error" })
+                                <small id="numeroIdentificacion-hint" class="form-text text-muted">Formato de cédula: 1-1100-1100 (con guiones)</small>
+                                @Html.ValidationMessageFor(m => m.numeroIdentificacion, "", new { @class = "text-danger", id = "numeroIdentificacion-error" })
                             </div>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(
-                                     usuarioModel => usuarioModel.tipoParticipante,
-                                     new SelectList(
-                                     Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))
-                                     .Cast<webMetics.Models.TipoDeParticipantes>()
-                                     .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
-                                     "Value",
-                                     "Text"),
-                                     "Seleccione un tipo de participante...",
-                                     new { @class = "form-control" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.tipoParticipante, "", new { @class = "text-danger" })
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="editParticipantContactTitle">
+                    <header class="create-participant-card-header"><i class="bi bi-envelope" aria-hidden="true"></i><div><h2 id="editParticipantContactTitle">Información de contacto</h2><p>Medios para comunicarse con el participante.</p></div></header>
+                    <div class="create-participant-card-body"><div class="create-participant-field-grid">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.correo) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.TextBoxFor(m => m.correo, new { @class = "form-control", maxlength = "64", autocomplete = "off", @readonly = "readonly", aria_describedby = "correo-error" })
+                            @Html.ValidationMessageFor(m => m.correo, "", new { @class = "text-danger", id = "correo-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.area, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.correoAlternativo) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.TextBoxFor(m => m.correoAlternativo, new { @class = "form-control", maxlength = "64", autocomplete = "off", type = "email", aria_describedby = "correoAlternativo-error" })
+                            @Html.ValidationMessageFor(m => m.correoAlternativo, "", new { @class = "text-danger", id = "correoAlternativo-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.departamento, new SelectList(ViewData["jsonDataDepartamentos"] as List<string> ?? new List<string>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.departamento, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.telefono) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.TextBoxFor(m => m.telefono, new { @class = "form-control", maxlength = "64", minlength = "7", autocomplete = "off", aria_describedby = "telefono-error" })
+                            @Html.ValidationMessageFor(m => m.telefono, "", new { @class = "text-danger", id = "telefono-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.unidadAcademica, new SelectList(ViewData["jsonDataUnidadesAcademicas"] as List<string> ?? new List<string>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.unidadAcademica, "", new { @class = "text-danger" })
+                    </div></div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="editParticipantAcademicTitle">
+                    <header class="create-participant-card-header"><i class="bi bi-mortarboard" aria-hidden="true"></i><div><h2 id="editParticipantAcademicTitle">Información institucional</h2><p>Clasificación y ubicación académica del participante.</p></div></header>
+                    <div class="create-participant-card-body"><div class="create-participant-field-grid">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.tipoParticipante) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.DropDownListFor(m => m.tipoParticipante, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes)).Cast<webMetics.Models.TipoDeParticipantes>().Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }), "Value", "Text"), "Seleccione un tipo de participante...", new { @class = "form-control", aria_describedby = "tipoParticipante-error" })
+                            @Html.ValidationMessageFor(m => m.tipoParticipante, "", new { @class = "text-danger", id = "tipoParticipante-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.sede, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(participanteModel => participanteModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control", id = "sedeDropdown" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.sede, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.area) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.DropDownListFor(m => m.area, new SelectList(areasDisponibles), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown", aria_describedby = "area-error" })
+                            @Html.ValidationMessageFor(m => m.area, "", new { @class = "text-danger", id = "area-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(participanteModel => participanteModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.telefono, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.departamento) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.DropDownListFor(m => m.departamento, new SelectList(ViewData["jsonDataDepartamentos"] as List<string> ?? new List<string>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown", aria_describedby = "departamento-error" })
+                            @Html.ValidationMessageFor(m => m.departamento, "", new { @class = "text-danger", id = "departamento-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            <select id="carreraDropdown" class="form-control">
-                                <option value="">Seleccione una carrera...</option>
-                            </select>
-                            <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
-                                   maxlength="512" placeholder="Escriba el nombre de su carrera" />
-                            <small id="carreraFormato" class="form-text text-muted d-none">
-                                Se guardará en mayúsculas y sin tildes.
-                            </small>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.unidadAcademica) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.DropDownListFor(m => m.unidadAcademica, new SelectList(ViewData["jsonDataUnidadesAcademicas"] as List<string> ?? new List<string>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown", aria_describedby = "unidadAcademica-error" })
+                            @Html.ValidationMessageFor(m => m.unidadAcademica, "", new { @class = "text-danger", id = "unidadAcademica-error" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.sede) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.DropDownListFor(m => m.sede, ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control", id = "sedeDropdown", aria_describedby = "sede-error" })
+                            @Html.ValidationMessageFor(m => m.sede, "", new { @class = "text-danger", id = "sede-error" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.carrera) <span class="create-participant-required" aria-hidden="true">*</span>
+                            <select id="carreraDropdown" class="form-control" aria-describedby="carrera-error"><option value="">Seleccione una carrera...</option></select>
+                            <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none" maxlength="512" placeholder="Escriba el nombre de su carrera" />
+                            <small id="carreraFormato" class="form-text text-muted d-none">Se guardará en mayúsculas y sin tildes.</small>
                             <small id="carreraPreview" class="form-text text-muted d-none"></small>
-                            @Html.HiddenFor(participanteModel => participanteModel.carrera)
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.carrera, "", new { @class = "text-danger" })
+                            @Html.HiddenFor(m => m.carrera)
+                            @Html.ValidationMessageFor(m => m.carrera, "", new { @class = "text-danger", id = "carrera-error" })
                         </div>
-                        <div class="form-group mt-1">
-                            <fieldset class="border rounded p-3">
-                                <legend class="float-none w-auto px-2" style="font-size:22px">Áreas extra</legend>
-                                <small class="form-text text-muted d-block mb-2">
-                                    Opcional. Debe ser diferente al área principal.
-                                </small>
+                    </div></div>
+                </section>
 
-                                @{ int areaIndex = 0; }
-                                @foreach (var areaExtra in areasDisponibles)
+                <section class="create-participant-card" aria-labelledby="editParticipantExtraAreasTitle">
+                    <header class="create-participant-card-header"><i class="bi bi-diagram-3" aria-hidden="true"></i><div><h2 id="editParticipantExtraAreasTitle">Áreas extra</h2><p>Seleccione otras áreas relacionadas, si corresponde.</p></div></header>
+                    <div class="create-participant-card-body">
+                        <fieldset class="create-participant-area-fieldset"><legend class="visually-hidden">Áreas extra</legend><small class="form-text text-muted d-block mb-2">Opcional. Debe ser diferente al área principal.</small>
+                            @{ int areaIndex = 0; }
+                            @foreach (var areaExtra in areasDisponibles)
+                            {
+                                var checkboxId = $"areaExtra_{areaIndex++}";
+                                <div class="form-check"><input class="form-check-input area-extra-checkbox" type="checkbox" name="areasExtra" id="@checkboxId" value="@areaExtra" @(Model?.areasExtra?.Contains(areaExtra, StringComparer.OrdinalIgnoreCase) == true ? "checked" : null) /><label class="form-check-label" for="@checkboxId">@areaExtra</label></div>
+                            }
+                            @Html.ValidationMessageFor(m => m.areasExtra, "", new { @class = "text-danger", id = "areasExtra-error" })
+                        </fieldset>
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="editParticipantConditionTitle">
+                    <header class="create-participant-card-header"><i class="bi bi-person-check" aria-hidden="true"></i><div><h2 id="editParticipantConditionTitle">Condición institucional</h2><p>Indique la condición actual en la institución.</p></div></header>
+                    <div class="create-participant-card-body">
+                        <fieldset class="create-participant-condition-fieldset"><legend>@Html.DisplayNameFor(m => m.condicion) <span class="create-participant-required" aria-hidden="true">*</span></legend>
+                            <div class="create-participant-condition-grid">
+                                @foreach (var condicion in new[] { "Profesor(a) Interino(a)", "Profesor(a) Instructor(a)", "Profesor(a) Adjunto(a)", "Profesor(a) Catedrático(a)", "Profesor(a) Invitado(a)", "Profesor(a) Asociado(a)", "Otro" })
                                 {
-                                    var checkboxId = $"areaExtra_{areaIndex++}";
-                                    <div class="form-check">
-                                        <input
-                                            class="form-check-input area-extra-checkbox"
-                                            type="checkbox"
-                                            name="areasExtra"
-                                            id="@checkboxId"
-                                            value="@areaExtra"
-                                            @(Model?.areasExtra?.Contains(areaExtra, StringComparer.OrdinalIgnoreCase) == true ? "checked" : null) />
-                                        <label class="form-check-label" for="@checkboxId">@areaExtra</label>
-                                    </div>
+                                    var condicionId = "condicion_" + Array.IndexOf(new[] { "Profesor(a) Interino(a)", "Profesor(a) Instructor(a)", "Profesor(a) Adjunto(a)", "Profesor(a) Catedrático(a)", "Profesor(a) Invitado(a)", "Profesor(a) Asociado(a)", "Otro" }, condicion);
+                                    <div class="form-check">@Html.RadioButtonFor(m => m.condicion, condicion, new { @class = "form-check-input", id = condicionId, aria_describedby = "condicion-error" })<label class="form-check-label" for="@condicionId">@condicion</label></div>
                                 }
+                            </div>
+                            @Html.ValidationMessageFor(m => m.condicion, "", new { @class = "text-danger", id = "condicion-error" })
+                        </fieldset>
+                    </div>
+                </section>
+            </div>
 
-                                @Html.ValidationMessageFor(participanteModel => participanteModel.areasExtra, "", new { @class = "text-danger" })
-                            </fieldset>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(participanteModel => participanteModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Interino(a)") @Html.Label("Profesor(a) Interino(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Instructor(a)") @Html.Label("Profesor(a) Instructor(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Adjunto(a)") @Html.Label("Profesor(a) Adjunto(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Catedrático(a)") @Html.Label("Profesor(a) Catedrático(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Invitado(a)") @Html.Label("Profesor(a) Invitado(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Profesor(a) Asociado(a)") @Html.Label("Profesor(a) Asociado(a)")<br />
-                            @Html.RadioButtonFor(participanteModel => participanteModel.condicion, "Otro") @Html.Label("Otro")<br />
-                            @Html.ValidationMessageFor(participanteModel => participanteModel.condicion, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" id="guardarBtn" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
-                </div>
+            <div class="create-participant-actions">
+                <a href="#" class="create-participant-action-button create-participant-action-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                <input type="submit" id="guardarBtn" class="create-participant-action-button create-participant-action-save" value="Guardar" />
             </div>
         }
     </div>
@@ -216,7 +180,6 @@ else
 }
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
 <script type="text/javascript">
     var areasData = {
         carrerasBySeccionAndSede: {}
@@ -238,7 +201,8 @@ else
             .addClass('field-validation-valid');
 
         $('.input-validation-error').removeClass('input-validation-error');
-        ocultarPopoverGuardar();
+        $('#participanteEditForm [aria-invalid="true"]').removeAttr('aria-invalid');
+        $('#participanteEditForm .participant-custom-select').removeClass('has-validation-error');
     }
 
     function mostrarMensajesValidacion(fieldErrors) {
@@ -265,56 +229,133 @@ else
                     .removeClass('field-validation-valid')
                     .addClass('field-validation-error');
             }
+
+            if (fieldName === 'carrera') {
+                var $carreraVisible = $('#carreraPersonalizada').is(':visible')
+                    ? $('#carreraPersonalizada')
+                    : $('#carreraDropdown');
+                $carreraVisible.addClass('input-validation-error').attr('aria-invalid', 'true');
+                if ($mensaje.attr('id')) $carreraVisible.attr('aria-describedby', $mensaje.attr('id'));
+            }
+
+            var $customTrigger = $campo.filter('select').closest('.participant-custom-select').find('.participant-select-trigger');
+            if ($customTrigger.length) {
+                $customTrigger.addClass('input-validation-error').attr('aria-invalid', 'true');
+                $customTrigger.closest('.participant-custom-select').addClass('has-validation-error');
+                if ($mensaje.attr('id')) $customTrigger.attr('aria-describedby', $mensaje.attr('id'));
+            } else if ($campo.length) {
+                $campo.attr('aria-invalid', 'true');
+                if ($mensaje.attr('id')) $campo.attr('aria-describedby', $mensaje.attr('id'));
+            }
         });
+
+        var $firstInvalid = $('#participanteEditForm .input-validation-error').first();
+        if ($firstInvalid.length) {
+            if ($firstInvalid.attr('id') === 'carrera') {
+                $firstInvalid = $('#carreraPersonalizada').is(':visible') ? $('#carreraPersonalizada') : $('#carreraDropdown');
+            } else if ($firstInvalid.is('select')) {
+                $firstInvalid = $firstInvalid.closest('.participant-custom-select').find('.participant-select-trigger');
+            }
+            if ($firstInvalid.length) {
+                $firstInvalid[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                $firstInvalid.trigger('focus');
+            }
+        }
+    }
+
+    function limpiarErrorCampo(campo) {
+        var nombre = campo.name;
+        if (campo.id === 'carreraDropdown' || campo.id === 'carreraPersonalizada') nombre = 'carrera';
+        if (!nombre) return;
+
+        var $mensaje = $('#participanteEditForm [data-valmsg-for="' + nombre + '"]');
+        var $campo = nombre === 'carrera'
+            ? $('#carrera, #carreraDropdown, #carreraPersonalizada')
+            : $('#participanteEditForm [name="' + nombre + '"]');
+        var valorValido = campo.type === 'radio' || campo.type === 'checkbox'
+            ? $campo.is(':checked')
+            : $.trim((nombre === 'carrera' ? $('#carrera').val() : $(campo).val()) || '') !== '';
+
+        if (!valorValido) return;
+        $mensaje.text('').removeClass('field-validation-error').addClass('field-validation-valid');
+        $campo.removeClass('input-validation-error').removeAttr('aria-invalid');
+        $campo.closest('.participant-custom-select').removeClass('has-validation-error')
+            .find('.participant-select-trigger').removeClass('input-validation-error').removeAttr('aria-invalid');
+    }
+
+    function validarRestriccionesLocales() {
+        var form = document.getElementById('participanteEditForm');
+        var errores = {};
+
+        Array.prototype.forEach.call(form.querySelectorAll('input, textarea, select'), function (campo) {
+            if (campo.disabled || campo.readOnly || campo.type === 'hidden' || campo.type === 'radio' || campo.type === 'checkbox') return;
+            var valor = (campo.value || '').trim();
+            if (!valor) return;
+
+            if (campo.type === 'email' && campo.validity.typeMismatch) {
+                errores[campo.name] = [campo.getAttribute('data-val-email') || 'Ingrese un correo electrónico válido.'];
+                return;
+            }
+
+            var longitudMinima = Number(campo.getAttribute('minlength'));
+            if (longitudMinima > 0 && valor.length < longitudMinima) {
+                errores[campo.name] = ['El número de teléfono debe tener al menos ' + longitudMinima + ' caracteres.'];
+            }
+        });
+
+        if (Object.keys(errores).length) {
+            mostrarMensajesValidacion(errores);
+            return false;
+        }
+        return true;
     }
 
     function mostrarErrorGlobal(mensaje) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: mensaje
-        });
+        mostrarToastEdicion(mensaje);
     }
 
-    var guardarPopover = null;
-
-    function escaparHtml(texto) {
-        return $('<div>').text(texto).html();
-    }
-
-    function mostrarPopoverGuardar(mensaje) {
-        if (guardarPopover) {
-            guardarPopover.dispose();
+    function mostrarToastEdicion(mensaje) {
+        var region = document.querySelector('.metics-toast-region');
+        if (!region) {
+            region = document.createElement('div');
+            region.className = 'metics-toast-region';
+            region.setAttribute('aria-label', 'Notificaciones');
+            document.body.appendChild(region);
         }
-        $(document).off('click.guardarPopover');
-        guardarPopover = new bootstrap.Popover(document.getElementById('guardarBtn'), {
-            title: '<i class="bi bi-exclamation-circle-fill text-danger me-1"></i> Error',
-            content: '<span style="font-size:1.3em">' + escaparHtml(mensaje) + '</span>',
-            placement: 'right',
-            trigger: 'manual',
-            html: true,
-            allowList: Object.assign({}, bootstrap.Popover.Default.allowList, {
-                span: ['style']
-            })
-        });
-        var scrollX = window.pageXOffset;
-        var scrollY = window.pageYOffset;
-        guardarPopover.show();
-        window.scrollTo(scrollX, scrollY);
-        $(document).on('click.guardarPopover', function (e) {
-            var $popover = $('.popover');
-            if (!$popover.is(e.target) && $popover.has(e.target).length === 0 &&
-                !$('#guardarBtn').is(e.target)) {
-                ocultarPopoverGuardar();
-            }
-        });
-    }
 
-    function ocultarPopoverGuardar() {
-        $(document).off('click.guardarPopover');
-        if (guardarPopover) {
-            guardarPopover.hide();
-        }
+        var toast = document.createElement('div');
+        toast.className = 'metics-toast metics-toast--error toast fade';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.setAttribute('data-bs-delay', '6750');
+
+        var inner = document.createElement('div');
+        inner.className = 'metics-toast-inner';
+        var icon = document.createElement('span');
+        icon.className = 'metics-toast-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        var iconElement = document.createElement('i');
+        iconElement.className = 'bi bi-exclamation-lg';
+        icon.appendChild(iconElement);
+        var content = document.createElement('div');
+        content.className = 'metics-toast-message';
+        var title = document.createElement('strong');
+        title.textContent = 'No se pudo completar la operación';
+        var detail = document.createElement('p');
+        detail.textContent = mensaje;
+        content.append(title, detail);
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'btn-close';
+        close.setAttribute('aria-label', 'Cerrar notificación');
+        close.addEventListener('click', function () {
+            if (window.bootstrap && window.bootstrap.Toast) window.bootstrap.Toast.getOrCreateInstance(toast).hide();
+        });
+        inner.append(icon, content, close);
+        toast.appendChild(inner);
+        region.appendChild(toast);
+        if (window.bootstrap && window.bootstrap.Toast) window.bootstrap.Toast.getOrCreateInstance(toast).show();
     }
 
     function resetDepartamentos() {
@@ -583,6 +624,9 @@ else
 
         $('#carreraDropdown').on('change', sincronizarCarrera);
         $('#carreraPersonalizada').on('input', sincronizarCarrera);
+        $form.on('input change', ':input', function () {
+            limpiarErrorCampo(this);
+        });
 
         $form.on('submit', function (event) {
             event.preventDefault();
@@ -591,8 +635,10 @@ else
                 return;
             }
 
-            enviandoFormulario = true;
             limpiarMensajesValidacion();
+            if (!validarRestriccionesLocales()) return;
+
+            enviandoFormulario = true;
             $submitButton.prop('disabled', true).val('Guardando...');
 
             $.ajax({
@@ -613,9 +659,8 @@ else
 
                     if (tieneFieldErrors) {
                         mostrarMensajesValidacion(response.fieldErrors);
-                        mostrarPopoverGuardar('Por favor, revise los campos marcados en rojo.');
                     } else if (tieneGlobalErrors) {
-                        mostrarPopoverGuardar(response.globalErrors.join(' '));
+                        mostrarToastEdicion(response.globalErrors.join(' '));
                     }
                 },
                 error: function (xhr) {
@@ -625,11 +670,10 @@ else
 
                     if (tieneFieldErrors) {
                         mostrarMensajesValidacion(response.fieldErrors);
-                        mostrarPopoverGuardar('Por favor, revise los campos marcados en rojo.');
                     } else if (tieneGlobalErrors) {
-                        mostrarPopoverGuardar(response.globalErrors.join(' '));
+                        mostrarToastEdicion(response.globalErrors.join(' '));
                     } else {
-                        mostrarPopoverGuardar(response.message || 'Ocurrió un error inesperado.');
+                        mostrarToastEdicion(response.message || 'Ocurrió un error inesperado.');
                     }
                 },
                 complete: function () {
@@ -640,3 +684,4 @@ else
         });
     });
 </script>
+<script src="~/js/participant-custom-select.js" asp-append-version="true"></script>

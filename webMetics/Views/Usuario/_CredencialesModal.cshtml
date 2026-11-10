@@ -1,0 +1,60 @@
+@model webMetics.Models.NewLoginModel
+<div class="modal fade create-category-modal asesor-form-modal" id="credencialesModal" tabindex="-1" aria-labelledby="credencialesModalTitle" aria-hidden="true" data-success="@(ViewBag.SuccessMessage != null ? "true" : "false")">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="@Url.Action("CambiarCredencialesUsuario", "Usuario")" method="post" novalidate data-credentials-form>
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.oldId)
+                @Html.HiddenFor(m => m.role)
+                <div class="modal-header create-category-modal-header">
+                    <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-fingerprint"></i></div>
+                    <div class="create-category-modal-heading">
+                        <h2 class="modal-title" id="credencialesModalTitle">Actualizar credenciales</h2>
+                        <p>@ViewBag.NombreCompleto</p>
+                    </div>
+                </div>
+                <div class="modal-body create-category-modal-body">
+                    <section class="asesor-edit-section">
+                        <h3 class="asesor-edit-section-title">Datos de acceso</h3>
+                        <p class="credentials-section-help">Actualiza el identificador y establece la nueva contraseña de la cuenta.</p>
+                        <div class="row g-3">
+                            <div class="col-12 create-category-field">
+                                <label for="credencialesId">Nuevo identificador <span class="create-category-required">*</span></label>
+                                @Html.TextBoxFor(m => m.id, new { id = "credencialesId", @class = "form-control", required = "required", maxlength = "64", autocomplete = "off", aria_describedby = "credencialesIdError" })
+                                <span id="credencialesIdError" data-valmsg-for="id" class="text-danger field-validation-valid" aria-live="polite"></span>
+                            </div>
+                            <div class="col-12 col-md-6 create-category-field asesor-password-field">
+                                <label for="credencialesPassword">Nueva contraseña <span class="create-category-required">*</span></label>
+                                <div class="input-group">
+                                    @Html.PasswordFor(m => m.nuevaContrasena, new { id = "credencialesPassword", @class = "form-control", required = "required", maxlength = "64", autocomplete = "new-password", aria_describedby = "credencialesPasswordError" })
+                                    <button type="button" class="btn btn-outline-secondary" data-credentials-toggle="credencialesPassword" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                </div>
+                                <span id="credencialesPasswordError" data-valmsg-for="nuevaContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
+                            </div>
+                            <div class="col-12 col-md-6 create-category-field asesor-password-field">
+                                <label for="credencialesConfirm">Confirmar nueva contraseña <span class="create-category-required">*</span></label>
+                                <div class="input-group">
+                                    @Html.PasswordFor(m => m.confirmarContrasena, new { id = "credencialesConfirm", @class = "form-control", required = "required", maxlength = "64", autocomplete = "new-password", aria_describedby = "credencialesConfirmError" })
+                                    <button type="button" class="btn btn-outline-secondary" data-credentials-toggle="credencialesConfirm" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                </div>
+                                <span id="credencialesConfirmError" data-valmsg-for="confirmarContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
+                            </div>
+                            <div class="col-12">
+                                <div class="credentials-email-option form-check form-switch">
+                                    @Html.CheckBoxFor(m => m.enviarPorCorreo, new { id = "credencialesCorreo", @class = "form-check-input", role = "switch", aria_describedby = "credencialesCorreoHelp" })
+                                    <label class="form-check-label" for="credencialesCorreo">Enviar contraseña por correo</label>
+                                    <p id="credencialesCorreoHelp" class="credentials-email-help">Activa esta opción para notificar las nuevas credenciales al usuario.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <p class="text-danger mt-3 mb-0" data-credentials-error role="alert"></p>
+                </div>
+                <div class="modal-footer create-category-modal-actions">
+                    <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn create-category-save"><i class="bi bi-check-lg" aria-hidden="true"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
