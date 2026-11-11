@@ -8,19 +8,19 @@ a.navbar-brand {
 }
 
 a {
-  color: #0077cc;
+  color: var(--metics-interactive-blue);
 }
 
 .btn-primary {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--metics-action-blue);
+  border-color: var(--metics-action-blue);
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  color: var(--metics-interactive-blue);
+  background-color: var(--metics-soft-blue);
+  border-color: var(--metics-soft-blue);
 }
 
 .border-top {
