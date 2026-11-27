@@ -23,20 +23,7 @@
             <h1 metics-page-heading>@ViewBag.Title</h1>
             <hr metics-page-heading />
 
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            @await Html.PartialAsync("_MeticsToast")
 
             <div class="create-group-sections">
                 <section class="create-group-card" aria-labelledby="createGroupGeneralTitle">
@@ -257,7 +244,13 @@
                     </header>
                     <div class="create-group-card-body">
                         <div class="form-group">
-                            @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
+                            <div class="file-management-controls file-import-controls group-file-picker">
+                                @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "participant-file-input", onchange = "actualizarNombreArchivoGrupo(this)" })
+                                <label for="archivoAdjunto" class="file-management-button file-management-button-secondary file-picker-trigger">
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i>
+                                    <span id="archivoAdjuntoNombre">Elegir archivo</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1176,4 +1169,15 @@ else
             initializeCreateGroupSelects();
         }
     })();
+</script>
+
+<script>
+    // Muestra el nombre del archivo elegido en el selector (solo presentación; el campo y su envío no cambian).
+    function actualizarNombreArchivoGrupo(input) {
+        var etiqueta = document.getElementById('archivoAdjuntoNombre');
+        if (!etiqueta) return;
+        var archivo = input.files && input.files.length ? input.files[0] : null;
+        etiqueta.textContent = archivo ? archivo.name : 'Elegir archivo';
+        etiqueta.title = archivo ? archivo.name : '';
+    }
 </script>

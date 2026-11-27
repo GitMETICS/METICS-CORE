@@ -16,20 +16,8 @@
 @if (!string.IsNullOrEmpty(ViewBag.Id))
 {
     <div class="contenedor-caja container-fluid module-catalog-page">
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+        @* Mensajes como toast del proyecto (copiar, editar, eliminar, inscribirse...). *@
+        @await Html.PartialAsync("_MeticsToast")
 
 
         @if (ViewBag.ListaGrupos == null)
@@ -51,13 +39,14 @@
             {
             
             <div class="d-flex justify-content-between align-items-center mb-3 module-subscribed-toolbar">
-                <!-- Barra de búsqueda -->
-                <div class="w-75 me-2">
-                        <h2>Módulos Inscritos</h2>
-                    @* <form asp-action="BuscarGrupos" asp-controller="Grupo" method="get" class="input-group mb-3">
-                        <input type="text" name="searchTerm" class="form-control" placeholder="Buscar módulo" value="@Context.Request.Query["searchTerm"]" />
-                        <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i></button>
-                    </form> *@
+                <!-- Búsqueda dentro de los módulos inscritos (solo filtra las tarjetas de esta sección) -->
+                <div class="module-enrolled-search-wrap">
+                    @* El título grande de la página ya identifica la sección; este queda solo para lectores de pantalla. *@
+                    <h2 class="visually-hidden">Módulos Inscritos</h2>
+                    <div class="module-search-control module-enrolled-search" role="search">
+                        <span class="module-search-submit" aria-hidden="true"><i class="bi bi-search"></i></span>
+                        <input type="search" id="buscarMisModulos" class="form-control module-search-input" placeholder="Buscar en mis módulos" aria-label="Buscar en mis módulos" autocomplete="off" />
+                    </div>
                 </div>
 
                 <!-- Botón para cambiar entre vista de lista y de cuadrícula -->
@@ -65,8 +54,8 @@
                     <button class="btn module-view-toggle" type="button" id="toggleViewBtn1" onclick="toggleView()"><i class="bi bi-list-ul me-2" aria-hidden="true"></i>Modo lista</button>
                 </div>
             </div>
+            <p class="module-enrolled-empty" id="misModulosSinResultados" role="status" hidden>No hay módulos inscritos que coincidan con la búsqueda.</p>
 
-            <br />
             <div class="view-container" id="viewContainer">
                 <div class="row d-none" id="gridView0">
                     @foreach (var grupo in ViewBag.GruposInscritos)
@@ -146,15 +135,18 @@
                                         </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="module-card-link module-card-detail-wide">
-                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-detail module-card-detail-wide module-card-detail-mv">
+                                                <span class="module-card-detail-label"><span class="module-card-mv-logo" aria-hidden="true"><img src="~/images/images-removebg-preview.png" alt="" /></span>Mediación Virtual</span>
+                                                <span class="module-card-detail-value">
+                                                    <a class="module-card-mv-link" href="@grupo.enlace" target="_blank" rel="noopener noreferrer">Abrir enlace<span class="visually-hidden"> de Mediación Virtual (se abre en otra pestaña)</span> <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                                                </span>
                                             </div>
                                         }
                                     </div>
 
 
                                     <div class="module-card-actions module-enrolled-actions">
-                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
+                                        <button class="btn admin-panel-btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-person-dash" aria-hidden="true"></i> Desinscribirse</button>
                                     </div>
                                 </div>
                                     <div class="card-footer text-muted">
@@ -248,15 +240,18 @@
                                         </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="module-card-link module-card-detail-wide">
-                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-detail module-card-detail-wide module-card-detail-mv">
+                                                <span class="module-card-detail-label"><span class="module-card-mv-logo" aria-hidden="true"><img src="~/images/images-removebg-preview.png" alt="" /></span>Mediación Virtual</span>
+                                                <span class="module-card-detail-value">
+                                                    <a class="module-card-mv-link" href="@grupo.enlace" target="_blank" rel="noopener noreferrer">Abrir enlace<span class="visually-hidden"> de Mediación Virtual (se abre en otra pestaña)</span> <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                                                </span>
                                             </div>
                                         }
                                     </div>
 
 
                                     <div class="module-card-actions module-enrolled-actions">
-                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Desinscribirse</button>
+                                        <button class="btn admin-panel-btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modalDesinscribir" onclick="actualizarModalDesinscribir(@grupo.idGrupo)"><i class="bi bi-person-dash" aria-hidden="true"></i> Desinscribirse</button>
                                     </div>
                                 </div>
                                     <div class="card-footer text-muted">
@@ -433,8 +428,11 @@
                                         </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="module-card-link module-card-detail-wide">
-                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-detail module-card-detail-wide module-card-detail-mv">
+                                                <span class="module-card-detail-label"><span class="module-card-mv-logo" aria-hidden="true"><img src="~/images/images-removebg-preview.png" alt="" /></span>Mediación Virtual</span>
+                                                <span class="module-card-detail-value">
+                                                    <a class="module-card-mv-link" href="@grupo.enlace" target="_blank" rel="noopener noreferrer">Abrir enlace<span class="visually-hidden"> de Mediación Virtual (se abre en otra pestaña)</span> <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                                                </span>
                                             </div>
                                         }
                                     </div>
@@ -444,7 +442,7 @@
                                         @if (ViewBag.Role == 1)
                                         {
                                             <div class="mb-3">
-                                                @Html.ActionLink("    Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @class = "link link-primary bi bi-person-add", @style = "text-decoration:none;" })
+                                                <a class="link link-primary bi bi-person-add" style="text-decoration:none;" href="#" role="button" data-bs-toggle="modal" data-bs-target="#modalInscribirParticipante" data-id-grupo="@grupo.idGrupo" data-nombre-grupo="@grupo.nombre (Grupo @grupo.numeroGrupo)">    Inscribir participante</a>
                                             </div>
                                             <div class="mb-2">
                                                 @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
@@ -469,28 +467,28 @@
                                                         }
                                                         else
                                                         {
-                                                            @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                            <a class="btn admin-panel-btn-primary module-enroll-btn" href="@Url.Action("Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id })"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                        <a class="btn admin-panel-btn-primary module-enroll-btn" href="@Url.Action("Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id })"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                    <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 }
                                             }
                                             else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
                                             {
-                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 <br />
                                                 <small class="text-muted">Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
                                             else
                                             {
-                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 <br />
                                                 <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
@@ -639,8 +637,11 @@
                                         </div>
                                         @if (!string.IsNullOrEmpty(grupo.enlace))
                                         {
-                                            <div class="module-card-link module-card-detail-wide">
-                                                <strong><a href="@grupo.enlace" target="_blank"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Enlace de Mediación Virtual</a></strong>
+                                            <div class="module-card-detail module-card-detail-wide module-card-detail-mv">
+                                                <span class="module-card-detail-label"><span class="module-card-mv-logo" aria-hidden="true"><img src="~/images/images-removebg-preview.png" alt="" /></span>Mediación Virtual</span>
+                                                <span class="module-card-detail-value">
+                                                    <a class="module-card-mv-link" href="@grupo.enlace" target="_blank" rel="noopener noreferrer">Abrir enlace<span class="visually-hidden"> de Mediación Virtual (se abre en otra pestaña)</span> <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                                                </span>
                                             </div>
                                         }
                                     </div>
@@ -650,7 +651,7 @@
                                         @if (ViewBag.Role == 1)
                                         {
                                             <div class="mb-3">
-                                                @Html.ActionLink("    Inscribir participante", "FormularioInscripcionManual", "Inscripcion", new { idGrupo = grupo.idGrupo }, new { @class = "link link-primary bi bi-person-add", @style = "text-decoration:none;" })
+                                                <a class="link link-primary bi bi-person-add" style="text-decoration:none;" href="#" role="button" data-bs-toggle="modal" data-bs-target="#modalInscribirParticipante" data-id-grupo="@grupo.idGrupo" data-nombre-grupo="@grupo.nombre (Grupo @grupo.numeroGrupo)">    Inscribir participante</a>
                                             </div>
                                             <div class="mb-2">
                                                 @Html.ActionLink("Ver participantes", "ListaParticipantes", "Participante", new { idGrupo = grupo.idGrupo }, new { @style = "color:white", @class = "btn btn-primary" })
@@ -675,28 +676,28 @@
                                                         }
                                                         else
                                                         {
-                                                            @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                            <a class="btn admin-panel-btn-primary module-enroll-btn" href="@Url.Action("Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id })"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        @Html.ActionLink("Inscribirse", "Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id }, new { @style = "color:white", @class = "btn btn-primary" })
+                                                        <a class="btn admin-panel-btn-primary module-enroll-btn" href="@Url.Action("Inscribir", "Inscripcion", new { idGrupo = grupo.idGrupo, idParticipante = ViewBag.Id })"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                    <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 }
                                             }
                                             else if (ViewBag.DateNow.Date < fechaInicioInscripcion)
                                             {
-                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 <br />
                                                 <small class="text-muted">Inscripción a partir de @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
                                             else
                                             {
-                                                <a href="#" id="inscripcionButton" class="btn btn-primary disabled">Inscribirse</a>
+                                                <a href="#" id="inscripcionButton" class="btn admin-panel-btn-primary module-enroll-btn disabled" aria-disabled="true"><i class="bi bi-person-plus" aria-hidden="true"></i> Inscribirse</a>
                                                 <br />
                                                 <small class="text-muted">La fecha de inscripción fue del @grupo.fechaInicioInscripcion.ToString("dd/MM/yyyy") al @grupo.fechaFinalizacionInscripcion.ToString("dd/MM/yyyy")</small>
                                             }
@@ -734,84 +735,152 @@
     </div>
 
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    @* Pop ups con el estilo del proyecto: encabezado con ícono, mensaje y acciones con la principal a la derecha. *@
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar módulo</h5>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar este módulo?
-
-                    @using (Html.BeginForm("EliminarGrupo", "Grupo"))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="valueGrupoEliminar" name="idGrupo">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-
+                @using (Html.BeginForm("EliminarGrupo", "Grupo"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar módulo</h2>
+                            <p>Confirma si deseas quitar este módulo del sistema.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar este módulo? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="valueGrupoEliminar" name="idGrupo">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar módulo</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar módulo</h5>
-                </div>
-                <div class="modal-body">
-                    <h8 style="padding-bottom:5px">
+                @using (Html.BeginForm("EditarGrupo", "Grupo", FormMethod.Get, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEditarLabel">Editar módulo</h2>
+                            <p>Abrirá el formulario con los datos actuales del módulo.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
                         ¿Está seguro de que desea editar los datos del módulo?
-                    </h8>
-                    <br />
-                    @using (Html.BeginForm("EditarGrupo", "Grupo", FormMethod.Get, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="valueGrupoEditar" name="idGrupo">
-                            <input type="submit" class="btn btn-primary" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="valueGrupoEditar" name="idGrupo">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn create-category-save">Editar módulo</button>
+                    </div>
+                }
             </div>
-
         </div>
     </div>
 
-    <div class="modal fade" id="modalDesinscribir" tabindex="-1" aria-labelledby="modalDesinscribirLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal category-delete-modal" id="modalDesinscribir" tabindex="-1" aria-labelledby="modalDesinscribirLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarAdjuntoModalLabel">Desinscribirse del módulo</h5>
-                </div>
-                <div class="modal-body">
-                    <h8 style="padding-bottom:5px">
-                        ¿Está seguro de que desea desinscribirse de este módulo?
-                    </h8>
-                    <br />
-                    @using (Html.BeginForm("DesinscribirParticipante", "Inscripcion", FormMethod.Get, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="valueGrupoDesinscribir" name="idGrupo">
-                            <input type="hidden" name="idParticipante" value="@ViewBag.IdParticipante">
-                            <input type="submit" class="btn btn-primary" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("DesinscribirParticipante", "Inscripcion", FormMethod.Get, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-person-dash"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalDesinscribirLabel">Desinscribirse del módulo</h2>
+                            <p>Dejará de estar inscrito(a) en este módulo.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea desinscribirse de este módulo?
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="valueGrupoDesinscribir" name="idGrupo">
+                        <input type="hidden" name="idParticipante" value="@ViewBag.IdParticipante">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Desinscribirse</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
+
+    @* Inscripción manual en pop up: envía el mismo formulario que la página "Inscripción" (FormularioInscripcionManual). *@
+    <div class="modal fade create-category-modal" id="modalInscribirParticipante" tabindex="-1" aria-labelledby="modalInscribirParticipanteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("FormularioInscripcionManual", "Inscripcion", FormMethod.Post, new { enctype = "multipart/form-data", novalidate = "novalidate", id = "formInscribirParticipante" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalInscribirParticipanteLabel">Inscribir participante</h2>
+                            <p id="modalInscribirParticipanteModulo">Módulo</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        <div class="create-category-field mb-0">
+                            <label for="inscribirIdParticipante">Correo institucional <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <input type="email" id="inscribirIdParticipante" name="idParticipante" class="form-control" maxlength="64" autocomplete="off" placeholder="ej. ana.solis@ucr.ac.cr" required aria-describedby="inscribirIdParticipanteAyuda inscribirIdParticipanteError" />
+                            <span class="admin-panel-field-help" id="inscribirIdParticipanteAyuda">Debe corresponder a un participante registrado en METICS.</span>
+                            <span class="text-danger" id="inscribirIdParticipanteError" aria-live="polite"></span>
+                        </div>
+                        <input type="hidden" id="inscribirIdGrupo" name="idGrupo" value="" />
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn create-category-save">Inscribir</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var modal = document.getElementById('modalInscribirParticipante');
+            var formulario = document.getElementById('formInscribirParticipante');
+            if (!modal || !formulario) return;
+            var correo = document.getElementById('inscribirIdParticipante');
+            var aviso = document.getElementById('inscribirIdParticipanteError');
+
+            function limpiar() { correo.classList.remove('is-invalid'); correo.removeAttribute('aria-invalid'); aviso.textContent = ''; }
+
+            modal.addEventListener('show.bs.modal', function (evento) {
+                var origen = evento.relatedTarget;
+                if (!origen) return;
+                document.getElementById('inscribirIdGrupo').value = origen.getAttribute('data-id-grupo') || '';
+                document.getElementById('modalInscribirParticipanteModulo').textContent = origen.getAttribute('data-nombre-grupo') || '';
+                correo.value = '';
+                limpiar();
+            });
+            modal.addEventListener('shown.bs.modal', function () { correo.focus(); });
+            correo.addEventListener('input', limpiar);
+            formulario.addEventListener('submit', function (evento) {
+                var valor = correo.value.trim();
+                correo.value = valor;
+                var mensaje = !valor ? 'Ingrese el correo institucional del participante.'
+                    : !/^[^\s\x40]+\x40[^\s\x40]+\.[^\s\x40]+$/.test(valor) ? 'Ingrese un correo válido.' : '';
+                if (mensaje) {
+                    evento.preventDefault();
+                    correo.classList.add('is-invalid');
+                    correo.setAttribute('aria-invalid', 'true');
+                    aviso.textContent = mensaje;
+                    correo.focus();
+                }
+            });
+        })();
+    </script>
 }
 else
 {
@@ -835,6 +904,37 @@ else
     function actualizarModalDesinscribir(idGrupo) {
         document.getElementById("valueGrupoDesinscribir").value = idGrupo;
     }
+</script>
+
+<script>
+    // Búsqueda en "mis módulos": filtra al instante las tarjetas inscritas (cuadrícula y lista), sin tildes ni mayúsculas.
+    (function () {
+        var campo = document.getElementById('buscarMisModulos');
+        if (!campo) return;
+        var vacio = document.getElementById('misModulosSinResultados');
+
+        function normalizar(texto) {
+            return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function filtrar() {
+            var consulta = normalizar(campo.value.trim());
+            var visiblesEnCuadricula = 0;
+            ['gridView0', 'listView0'].forEach(function (idVista) {
+                var vista = document.getElementById(idVista);
+                if (!vista) return;
+                vista.querySelectorAll('.module-card-item').forEach(function (tarjeta) {
+                    var coincide = !consulta || normalizar(tarjeta.textContent).indexOf(consulta) !== -1;
+                    tarjeta.classList.toggle('module-search-hidden', !coincide);
+                    if (coincide && idVista === 'gridView0') visiblesEnCuadricula++;
+                });
+            });
+            if (vacio) vacio.hidden = !consulta || visiblesEnCuadricula > 0;
+        }
+
+        campo.addEventListener('input', filtrar);
+        campo.addEventListener('search', filtrar);
+    })();
 </script>
 
 <script>
@@ -1107,3 +1207,76 @@ else
         filterModules(currentFilter);
     }
 </script>
+
+@* Resultado de "Inscribirse" en un popup: se llama a la misma acción Inscripcion/Inscribir y se muestra
+   su resultado aquí. Al cerrar, la página se recarga para reflejar la inscripción (igual que al "Regresar"). *@
+<div class="modal fade create-category-modal enroll-result-modal" id="modalResultadoInscripcion" tabindex="-1" aria-labelledby="resultadoInscripcionTitulo" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body create-category-modal-body">
+                <div class="result-card result-card--modal" id="resultadoInscripcionContenido" aria-live="polite">
+                    <span class="result-card-icon is-loading" aria-hidden="true"><span class="spinner-border spinner-border-sm"></span></span>
+                    <p class="result-card-message mb-0">Procesando inscripción…</p>
+                </div>
+            </div>
+            <div class="modal-footer create-category-modal-actions">
+                <button type="button" class="btn create-category-save" data-bs-dismiss="modal" id="resultadoInscripcionCerrar" disabled>Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function () {
+        var modalElemento = document.getElementById('modalResultadoInscripcion');
+        if (!modalElemento) return;
+        var contenido = document.getElementById('resultadoInscripcionContenido');
+        var cerrar = document.getElementById('resultadoInscripcionCerrar');
+        var huboInscripcion = false;
+        var enCurso = false;
+
+        document.addEventListener('click', function (event) {
+            var enlace = event.target.closest('a.module-enroll-btn');
+            if (!enlace || enlace.getAttribute('aria-disabled') === 'true' || enlace.classList.contains('disabled')) return;
+            var href = enlace.getAttribute('href') || '';
+            if (href.indexOf('/Inscripcion/Inscribir') === -1 || !window.bootstrap || !window.fetch) return;
+
+            event.preventDefault();
+            if (enCurso) return;
+            enCurso = true;
+            huboInscripcion = true;
+            cerrar.disabled = true;
+            contenido.className = 'result-card result-card--modal';
+            contenido.innerHTML = '<span class="result-card-icon is-loading" aria-hidden="true"><span class="spinner-border spinner-border-sm"></span></span><p class="result-card-message mb-0">Procesando inscripción…</p>';
+            bootstrap.Modal.getOrCreateInstance(modalElemento).show();
+
+            fetch(href, { credentials: 'same-origin' })
+                .then(function (respuesta) { return respuesta.text().then(function (html) { return { ok: respuesta.ok, url: respuesta.url, html: html }; }); })
+                .then(function (r) {
+                    var doc = new DOMParser().parseFromString(r.html, 'text/html');
+                    var tarjeta = doc.querySelector('.result-card');
+                    if (!r.ok || !tarjeta) {
+                        // Respuesta inesperada (p. ej. sesión vencida): se navega como antes.
+                        window.location.href = r.url || href;
+                        return;
+                    }
+                    var acciones = tarjeta.querySelector('.result-card-actions');
+                    if (acciones) acciones.remove();
+                    contenido.className = tarjeta.className + ' result-card--modal';
+                    contenido.innerHTML = tarjeta.innerHTML;
+                    var titulo = contenido.querySelector('.result-card-title');
+                    if (titulo) titulo.id = 'resultadoInscripcionTitulo';
+                })
+                .catch(function () { window.location.href = href; })
+                .finally(function () {
+                    enCurso = false;
+                    cerrar.disabled = false;
+                    cerrar.focus();
+                });
+        });
+
+        modalElemento.addEventListener('hidden.bs.modal', function () {
+            if (huboInscripcion) window.location.reload();
+        });
+    })();
+</script>
+
