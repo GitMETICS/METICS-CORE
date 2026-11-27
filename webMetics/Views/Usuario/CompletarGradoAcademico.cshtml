@@ -3,68 +3,57 @@
     ViewBag.Title = "Completar Información - Grado Académico";
 }
 
-<div class="contenedor-caja container-fluid">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
-            <div class="card shadow-lg" style="border: none; border-radius: 15px;">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h1 class="mb-2">Actualización Requerida</h1>
-                        <p class="text-muted">Para continuar, complete su grado académico</p>
-                    </div>
+<div class="contenedor-caja container-fluid required-update-page admin-panel-page">
+    @await Html.PartialAsync("_MeticsToast")
 
-                    @if (ViewBag.ErrorMessage != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Error:</strong> @ViewBag.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-
-                    @if (ViewBag.SuccessMessage != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong>Éxito:</strong> @ViewBag.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-
-                    @using (Html.BeginForm("CompletarGradoAcademico", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="mb-4 p-3 bg-light rounded">
-                            <p class="mb-0">
-                                <strong>Correo Institucional:</strong><br />
-                                <span class="text-secondary">@Model.correo</span>
-                            </p>
-                        </div>
-
-                        <div class="form-group mb-4">
-                            @Html.LabelFor(m => m.gradoAcademico, new { @class = "form-label fw-bold" }) <a style="color:red;font-size:22px">*</a>
-                            <small class="d-block mb-2 text-muted">Seleccione su grado académico máximo</small>
-                            @Html.DropDownListFor(m => m.gradoAcademico, new SelectList(new List<string> 
-                            { 
-                                "Doctorado - PhD", 
-                                "Maestría - MSc", 
-                                "Licenciatura - Lic", 
-                                "Bachillerato - Bach" 
-                            }), "Seleccione su grado académico...", new { @class = "form-control", @required = "required", style = "border-radius: 8px; padding: 12px 15px; font-size: 16px;" })
-                            @Html.ValidationMessageFor(m => m.gradoAcademico, "", new { @class = "text-danger small mt-2" })
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary" style="border-radius: 8px; font-weight: 500; padding: 12px; font-size: 16px;">
-                                <i class="bi bi-check-circle me-2"></i>Guardar y Continuar
-                            </button>
-                        </div>
-
-                        <p class="text-center text-muted small mt-3">
-                            Este dato es importante para conocer el perfil académico de nuestros participantes.
-                        </p>
-                    }
-                </div>
+    <section class="admin-panel-card required-update-card" aria-labelledby="actualizacionRequeridaTitulo">
+        <div class="required-update-header">
+            <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-mortarboard"></i></span>
+            <div>
+                <h1 class="required-update-title" id="actualizacionRequeridaTitulo">Actualización requerida</h1>
+                <p class="admin-panel-card-desc">Para continuar, complete su grado académico.</p>
             </div>
         </div>
-    </div>
+
+        @using (Html.BeginForm("CompletarGradoAcademico", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="required-update-account">
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                <div>
+                    <span>Correo institucional</span>
+                    <strong>@Model.correo</strong>
+                </div>
+            </div>
+
+            <div class="required-update-field">
+                @Html.LabelFor(m => m.gradoAcademico) <span class="required-update-required" aria-hidden="true">*</span>
+                <small class="required-update-help">Seleccione su grado académico máximo.</small>
+                @Html.DropDownListFor(m => m.gradoAcademico, new SelectList(new List<string>
+                {
+                    "Doctorado - PhD",
+                    "Maestría - MSc",
+                    "Licenciatura - Lic",
+                    "Bachillerato - Bach"
+                }), "Seleccione su grado académico...", new { @class = "form-control", @required = "required" })
+                @Html.ValidationMessageFor(m => m.gradoAcademico, "", new { @class = "text-danger small" })
+            </div>
+
+            <button type="submit" class="btn admin-panel-btn-primary required-update-submit">
+                <i class="bi bi-check-circle" aria-hidden="true"></i>Guardar y continuar
+            </button>
+
+            <p class="required-update-footnote">Este dato es importante para conocer el perfil académico de nuestros participantes.</p>
+        }
+    </section>
 </div>
+
+<script src="~/js/metics-form-controls.js" asp-append-version="true"></script>
+<script>
+    // Misma lista desplegable que el resto del sistema (solo presentación; el select original se envía igual).
+    (function () {
+        var root = document.querySelector('.required-update-page');
+        if (root && window.MeticsFormControls) MeticsFormControls.initSelects(root);
+    })();
+</script>
