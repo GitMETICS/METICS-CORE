@@ -234,30 +234,38 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            if (string.IsNullOrWhiteSpace(asesor.contrasena))
-            {
-                ModelState.AddModelError(nameof(asesor.contrasena), "La contraseña temporal es obligatoria.");
-            }
-
-            if (string.IsNullOrWhiteSpace(asesor.confirmarContrasena))
-            {
-                ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Confirma la contraseña temporal.");
-            }
-            else if (!string.IsNullOrWhiteSpace(asesor.contrasena)
-                && asesor.contrasena != asesor.confirmarContrasena)
-            {
-                ModelState.AddModelError(nameof(asesor.contrasena), "Las contraseñas ingresadas deben coincidir.");
-                ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Las contraseñas ingresadas deben coincidir.");
-            }
-
             try
             {
+                // La contraseña temporal solo aplica a cuentas nuevas: si el usuario ya existe
+                // (p. ej. un participante que pasa a ser facilitador), se conserva su contraseña.
+                bool usuarioExiste = !string.IsNullOrWhiteSpace(asesor.correo)
+                    && accesoAUsuario.ExisteUsuario(asesor.correo);
+
+                if (!usuarioExiste)
+                {
+                    if (string.IsNullOrWhiteSpace(asesor.contrasena))
+                    {
+                        ModelState.AddModelError(nameof(asesor.contrasena), "La contraseña temporal es obligatoria.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(asesor.confirmarContrasena))
+                    {
+                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Confirma la contraseña temporal.");
+                    }
+                    else if (!string.IsNullOrWhiteSpace(asesor.contrasena)
+                        && asesor.contrasena != asesor.confirmarContrasena)
+                    {
+                        ModelState.AddModelError(nameof(asesor.contrasena), "Las contraseñas ingresadas deben coincidir.");
+                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Las contraseñas ingresadas deben coincidir.");
+                    }
+                }
+
                 if (ModelState.IsValid)
                 {
                     // Aquí se define que el correo es la identificación.
                     asesor.idAsesor = asesor.correo;
 
-                    if (!accesoAUsuario.ExisteUsuario(asesor.idAsesor))
+                    if (!usuarioExiste)
                     {
                         accesoAUsuario.CrearUsuario(asesor.idAsesor, asesor.contrasena!);
                     }
@@ -266,7 +274,9 @@ namespace webMetics.Controllers
                     {
                         accesoAAsesor.CrearAsesor(asesor);
 
-                        TempData["successMessage"] = "El/la facilitador(a) se agregó con éxito.";
+                        TempData["successMessage"] = usuarioExiste
+                            ? "El/la facilitador(a) se agregó con éxito. La cuenta ya existía, así que conserva su contraseña actual."
+                            : "El/la facilitador(a) se agregó con éxito.";
                         return RedirectToAction("ListaAsesores");
 
                     }

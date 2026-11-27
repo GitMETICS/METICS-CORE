@@ -215,14 +215,13 @@
 
                         <section class="asesor-edit-section" aria-labelledby="asesorCrearSeguridadHeading">
                             <h3 class="asesor-edit-section-title" id="asesorCrearSeguridadHeading">Seguridad y acceso</h3>
-                            <p class="asesor-edit-section-help">Define la contraseña inicial de la cuenta.</p>
+                            <p class="asesor-edit-section-help">Define la contraseña inicial de la cuenta. Si el correo ya tiene una cuenta en METICS, déjala en blanco: se conserva su contraseña actual.</p>
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field asesor-password-field">
                                         @Html.LabelFor(asesorModel => asesorModel.contrasena)
-                                        <span class="create-category-required" aria-hidden="true">*</span>
                                         <div class="input-group">
-                                            @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "crearAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
+                                            @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "crearAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off" })
                                             <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('crearAsesorPassword', 'crearAsesorPasswordIcon')"><i id="crearAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                         </div>
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
@@ -231,9 +230,8 @@
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field asesor-password-field">
                                         @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena)
-                                        <span class="create-category-required" aria-hidden="true">*</span>
                                         <div class="input-group">
-                                            @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "crearAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
+                                            @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "crearAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off" })
                                             <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('crearAsesorPasswordCheck', 'crearAsesorPasswordCheckIcon')"><i id="crearAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                         </div>
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
