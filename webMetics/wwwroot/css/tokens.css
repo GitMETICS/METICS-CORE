@@ -1,0 +1,121 @@
+/* Variables del sistema de diseño METICS. Referencia: docs/sistema-de-diseno-metics.md */
+
+:root {
+    /* Marca */
+    --metics-brand-deep: #08284b;
+    --metics-brand-mid: #073766;
+    --metics-brand-end: #0b4b87;
+    --metics-brand-gradient: linear-gradient(112deg, var(--metics-brand-deep) 0%, var(--metics-brand-mid) 52%, var(--metics-brand-end) 100%);
+
+    /* Acción e interacción */
+    --metics-action-blue: #245e98;
+    --metics-action-blue-rgb: 36, 94, 152;
+    --metics-action-hover: #1e4f80;
+    --metics-interactive-blue: #2a5f95;
+    --metics-interactive-blue-rgb: 42, 95, 149;
+    --metics-soft-blue: #dcebfa;
+    --metics-icon-surface: #eef5fc;
+    --metics-navy: #204c6f;
+
+    /* Texto */
+    --metics-ink-title: #14243a;
+    --metics-ink-strong: #172b49;
+    --metics-ink-heading: #1b2c43;
+    --metics-ink-label: #263b57;
+    --metics-ink-control: #27384e;
+    --metics-ink-table-head: #23344b;
+    --metics-ink-body: #42536a;
+    --metics-ink-muted: #526b8b;
+    --metics-ink-muted-alt: #59708f;
+    --metics-ink-breadcrumb: #58718c;
+    --metics-ink-faint: #718096;
+    --metics-ink-on-dark: #ffffff;
+
+    /* Superficies */
+    --metics-surface: #ffffff;
+    --metics-white-rgb: 255, 255, 255;
+    --metics-surface-table-head: #f1f6fc;
+    --metics-surface-toggle: #f2f5fa;
+
+    /* Bordes */
+    --metics-border-card: #e1e8f0;
+    --metics-border-module-card: #d9e2ed;
+    --metics-divider: #e5ebf3;
+    --metics-divider-row: #e8eef5;
+    --metics-border-control: #cbd8e8;
+    --metics-border-select: #d3deeb;
+    --metics-border-search: #d9e2ee;
+    --metics-border-filter: #cbd5e1;
+    --metics-border-modal: #dce6f2;
+
+    /* Peligro */
+    --metics-danger: #c0392b;
+    --metics-danger-rgb: 192, 57, 43;
+    --metics-danger-text: #c02f3d;
+    --metics-danger-badge-text: #bd1738;
+    --metics-danger-badge-fill: #ffe1e6;
+    --metics-danger-icon: #d93030;
+    --metics-danger-icon-fill: #fff0f0;
+    --metics-required-mark: #e3344b;
+
+    /* Notificaciones */
+    --metics-success: #168653;
+    --metics-success-text: #174d2e;
+    --metics-success-tint: #f5fbf7;
+    --metics-success-icon-fill: #def2e3;
+    --metics-success-border: #c8dfd0;
+    --metics-error: #c83c32;
+    --metics-error-text: #742721;
+    --metics-error-tint: #fff7f6;
+    --metics-error-icon-fill: #fde6e4;
+    --metics-error-border: #efcfcc;
+    --metics-warning: #d3980c;
+    --metics-warning-icon: #a97608;
+    --metics-warning-text: #765710;
+    --metics-warning-tint: #fffaf0;
+    --metics-warning-icon-fill: #fff0c2;
+    --metics-warning-border: #ead39a;
+
+    /* Tipografía */
+    --metics-font-sans: Inter, "Segoe UI", Arial, sans-serif;
+
+    /* Espaciado */
+    --metics-space-1: 4px;
+    --metics-space-2: 8px;
+    --metics-space-3: 12px;
+    --metics-space-4: 16px;
+    --metics-space-5: 20px;
+    --metics-space-6: 24px;
+
+    /* Radios */
+    --metics-radius-sm: 7px;
+    --metics-radius-md: 9px;
+    --metics-radius-lg: 10px;
+    --metics-radius-card: 12px;
+    --metics-radius-modal: 20px;
+    --metics-radius-pill: 999px;
+
+    /* Sombras */
+    --metics-shadow-card: 0 4px 18px rgba(25, 54, 86, .06);
+    --metics-shadow-module-card: 0 3px 12px rgba(24, 52, 84, .07);
+    --metics-shadow-menu: 0 14px 30px rgba(25, 54, 86, .16);
+    --metics-shadow-toast: 0 12px 32px rgba(25, 54, 86, .16);
+    --metics-shadow-modal: 0 18px 50px rgba(20, 42, 73, .2);
+    --metics-shadow-focus: 0 0 0 3px rgba(var(--metics-interactive-blue-rgb), .12);
+    --metics-shadow-invalid: 0 0 0 3px rgba(var(--metics-danger-rgb), .12);
+
+    /* Alturas de controles */
+    --metics-control-sm: 40px;
+    --metics-control-md: 44px;
+    --metics-control-lg: 46px;
+    --metics-control-xl: 48px;
+
+    /* Nombres anteriores */
+    --metics-blue: var(--metics-interactive-blue);
+    --metics-blue-light: var(--metics-soft-blue);
+    --metics-cyan: var(--metics-interactive-blue);
+    --metics-red: var(--metics-danger);
+    --metics-border: #cccccc;
+    --metics-border-light: #ececec;
+    --metics-input-border: #bfbfbf;
+}

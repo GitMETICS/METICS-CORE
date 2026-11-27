@@ -295,19 +295,19 @@ else
 
 <style>
     /* Detalles propios de "Editar módulo"; el resto reutiliza el diseño de "Crear módulo". */
-    .edit-group-page .edit-group-current-file { margin-bottom: 20px; }
-    .edit-group-page .edit-group-file-label { color: #172b49; display: block; font-weight: 600; margin-bottom: 8px; }
+    .edit-group-page .edit-group-current-file { margin-bottom: var(--metics-space-5); }
+    .edit-group-page .edit-group-file-label { color: var(--metics-ink-strong); display: block; font-weight: 600; margin-bottom: var(--metics-space-2); }
     .edit-group-page .edit-group-file-row {
         align-items: center;
         background: var(--metics-icon-surface);
         border: 1px solid #dbe7f4;
-        border-radius: 10px;
+        border-radius: var(--metics-radius-lg);
         display: flex;
         gap: 10px;
-        padding: 10px 12px;
+        padding: 10px var(--metics-space-3);
     }
     .edit-group-page .edit-group-file-row > .bi { color: var(--metics-interactive-blue); font-size: 20px; }
-    .edit-group-page .edit-group-file-name { color: #172b49; flex: 1 1 auto; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+    .edit-group-page .edit-group-file-name { color: var(--metics-ink-strong); flex: 1 1 auto; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
     .edit-group-page .edit-group-file-download {
         align-items: center;
         border-radius: 8px;
@@ -320,9 +320,9 @@ else
     }
     .edit-group-page .edit-group-file-download:hover,
     .edit-group-page .edit-group-file-download:focus-visible { background: var(--metics-soft-blue); color: var(--metics-action-hover); }
-    .edit-group-page .edit-group-file-preview { border: 1px solid #dfe7f1; border-radius: 10px; margin-top: 12px; }
-    .edit-group-page .edit-group-file-help { color: #59708f; font-size: 13.5px; margin: 8px 0 0; }
-    .edit-group-page .edit-group-file-help .bi { color: var(--metics-interactive-blue); margin-right: 4px; }
+    .edit-group-page .edit-group-file-preview { border: 1px solid #dfe7f1; border-radius: var(--metics-radius-lg); margin-top: var(--metics-space-3); }
+    .edit-group-page .edit-group-file-help { color: var(--metics-ink-muted-alt); font-size: 13.5px; margin: var(--metics-space-2) 0 0; }
+    .edit-group-page .edit-group-file-help .bi { color: var(--metics-interactive-blue); margin-right: var(--metics-space-1); }
     @@media (max-width: 575.98px) {
         .edit-group-page .edit-group-file-preview { height: 360px; }
     }
