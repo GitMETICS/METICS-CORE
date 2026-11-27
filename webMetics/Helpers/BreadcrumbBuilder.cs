@@ -203,17 +203,6 @@ public static class BreadcrumbBuilder
             case "inscripcion/inscribir":
                 Current("Resultado de inscripción");
                 break;
-            case "calificaciones/vercalificaciones" when role is 1 or 2:
-            case "calificaciones/editarcalificacion" when role is 1 or 2:
-                Module();
-                Page("Participantes", "Participante", "ListaParticipantes", ("idGrupo", idGrupo));
-                if (key.EndsWith("vercalificaciones")) Current("Calificaciones");
-                else
-                {
-                    Page("Calificaciones", "Calificaciones", "VerCalificaciones", ("idGrupo", idGrupo));
-                    Current("Editar calificación");
-                }
-                break;
             case "medallas/listamedallas" when role == 1:
             case "medallas/editarmedalla" when role == 1:
                 Group("Contenido");

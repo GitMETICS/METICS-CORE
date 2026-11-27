@@ -50,67 +50,24 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Muestra la lista de calificaciones de todos los participantes inscritos en un grupo.
+        /// Redirige a la lista de participantes del módulo, que reemplaza la antigua página de calificaciones.
         /// </summary>
-        /// <param name="idGrupo">ID del grupo cuyas calificaciones se muestran.</param>
-        /// <returns>
-        /// View: VerCalificaciones —
-        /// ViewBag.ListaCalificaciones, ViewBag.IdGrupo, ViewBag.Title, ViewBag.NombreGrupo,
-        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler, GrupoHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <returns>Redirects to Participante/ListaParticipantes.</returns>
         public ActionResult VerCalificaciones(int idGrupo)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            ViewBag.ListaCalificaciones = calificaciones;
-            ViewBag.IdGrupo = idGrupo;
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-            ViewBag.Title = "Calificaciones";
-            ViewBag.NombreGrupo = grupo.nombre;
-
-            if (TempData["errorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
-            return View();
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
         /// <summary>
-        /// Muestra el formulario de edición de calificación para un participante específico de un grupo.
+        /// Redirige a la lista de participantes del módulo, donde se editan las calificaciones en línea.
         /// </summary>
         /// <param name="idGrupo">ID del grupo.</param>
-        /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <returns>
-        /// View: EditarCalificacion —
-        /// ViewBag.Calificacion (CalificacionModel), ViewBag.NombreGrupo, ViewBag.Role, ViewBag.Id.
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler, GrupoHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
+        /// <param name="idParticipante">Correo/ID del participante (no se usa).</param>
+        /// <returns>Redirects to Participante/ListaParticipantes.</returns>
         public ActionResult EditarCalificacion(int idGrupo, string idParticipante)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            CalificacionModel calificacion = calificaciones.Find(calificacionModel => calificacionModel.participante.idParticipante == idParticipante);
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-
-            ViewBag.Calificacion = calificacion;
-            ViewBag.NombreGrupo = grupo.nombre;
-
-            return View();
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
         /// <summary>
@@ -286,45 +243,6 @@ namespace webMetics.Controllers
                     message = "Error al actualizar los datos: " + ex.Message
                 });
             }
-        }
-
-        /// <summary>
-        /// Registra o actualiza únicamente la calificación de un participante en un grupo.
-        /// </summary>
-        /// <param name="idGrupo">ID del grupo.</param>
-        /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <param name="calificacion">Calificación a registrar (0–100).</param>
-        /// <returns>
-        /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
-        /// Calificaciones/VerCalificaciones. Sets TempData["successMessage"] o TempData["errorMessage"].
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
-        [HttpPost]
-        public ActionResult SubirCalificacion(int idGrupo, string idParticipante, int calificacion)
-        {
-            try
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-                TempData["successMessage"] = "Calificación actualizada.";
-            }
-            catch
-            {
-                TempData["errorMessage"] = "No se pudo actualizar la calificación.";
-            }
-
-            var refererUrl = Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(refererUrl))
-            {
-                return Redirect(refererUrl);
-            }
-
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
         }
 
         /// <summary>

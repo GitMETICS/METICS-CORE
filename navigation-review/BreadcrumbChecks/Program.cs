@@ -106,13 +106,12 @@ Check(person.Any(i => i.Url == "/Participante/ListaParticipantes?idGrupo=42"), "
 Check(!person.Any(i => i.Url == "/Participante/VerParticipantes"), "El facilitador no enlaza al listado administrativo");
 
 var moduleData = new Dictionary<string, object?> { ["IdGrupo"] = 18, ["NombreGrupo"] = "Mediación virtual" };
-var module = Build("Calificaciones", "EditarCalificacion", 2, data: moduleData);
+var module = Build("Participante", "ListaParticipantes", 2, data: moduleData);
 Check(module.Any(i => i.Label == "Mediación virtual"), "Usar el nombre del módulo disponible");
-Check(module.Any(i => i.Url == "/Calificaciones/VerCalificaciones?idGrupo=18"), "Calificaciones conserva contexto del grupo");
-module = Build("Calificaciones", "EditarCalificacion", 2, model: new { idGrupo = 9 });
+module = Build("Participante", "VerDatosParticipante", 2, model: new { idGrupo = 9 });
 Check(module.Any(i => i.Url == "/Participante/ListaParticipantes?idGrupo=9"), "Recuperar idGrupo del modelo");
-module = Build("Calificaciones", "EditarCalificacion", 2);
-Check(module.All(i => i.Url == null || !i.Url.Contains("ListaParticipantes") && !i.Url.Contains("VerCalificaciones")), "Sin parámetros no generar padres rotos");
+module = Build("Participante", "VerDatosParticipante", 2);
+Check(module.All(i => i.Url == null || !i.Url.Contains("ListaParticipantes")), "Sin parámetros no generar padres rotos");
 Check(Labels(Build("Participante", "BuscarParticipantesDelGrupo", 2, "?idGrupo=42")) == "Inicio > Mis módulos > Módulo > Participantes", "Alias de búsqueda del grupo");
 
 foreach (var action in new[] { "EditarParticipante", "ActualizarParticipante" })
