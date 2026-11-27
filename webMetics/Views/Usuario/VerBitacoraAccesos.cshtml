@@ -1,158 +1,231 @@
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Registro de Accesos";
-    PageHeadingBuilder.Configure(ViewContext, Url);
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: "Inicios de sesión exitosos y fallidos registrados en el sistema.");
+    ViewData["AdminPanelLayout"] = true;
+    ViewData["AdminPanelIcon"] = "bi-clock-history";
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    // Solo presentación: recuerda qué filtro se usó para mantener su pestaña abierta y sus valores visibles.
+    // Las acciones, los parámetros y las consultas son los mismos de siempre.
+    string accionBitacora = (Convert.ToString(ViewContext.RouteData.Values["action"]) ?? "").ToLowerInvariant();
+    string pestanaActiva = accionBitacora == "verbitacoraaccesousuario" ? "usuario"
+        : accionBitacora == "verbitacoraultimoaccesousuario" ? "ultimo"
+        : "fechas";
+    string filtroFechaDesde = Context.Request.Query["fechaDesde"].ToString();
+    string filtroFechaHasta = Context.Request.Query["fechaHasta"].ToString();
+    string filtroEstado = Context.Request.Query["estadoAcceso"].ToString();
+    string filtroUsuario = Context.Request.Query["idUsuario"].ToString();
+    string filtroDiasAtras = Context.Request.Query["diasAtras"].ToString();
+    if (string.IsNullOrWhiteSpace(filtroDiasAtras))
+    {
+        filtroDiasAtras = "30";
+    }
+
+    string descripcionFiltro;
+    if (pestanaActiva == "usuario")
+    {
+        descripcionFiltro = $"Accesos de {filtroUsuario} en los últimos {filtroDiasAtras} días.";
+    }
+    else if (pestanaActiva == "ultimo")
+    {
+        descripcionFiltro = $"Último acceso registrado de {filtroUsuario}.";
+    }
+    else if (accionBitacora == "verbitacoraaccesoporfecha")
+    {
+        // Mismas reglas que aplica el controlador: "hasta" incluye el día completo y,
+        // si solo se indica "hasta", se muestran los 7 días anteriores a esa fecha.
+        bool hayDesdeTexto = BitacoraHorario.IntentarLeerFecha(filtroFechaDesde, out DateTime desdeFiltro);
+        bool hayHastaTexto = BitacoraHorario.IntentarLeerFecha(filtroFechaHasta, out DateTime hastaFiltro);
+        string estadoTexto = filtroEstado == "EXITO" ? "solo exitosos" : filtroEstado == "FRACASO" ? "solo fallidos" : "todos los estados";
+        string rangoTexto;
+        if (hayDesdeTexto && hayHastaTexto)
+        {
+            rangoTexto = $"del {desdeFiltro:dd/MM/yyyy} al {hastaFiltro:dd/MM/yyyy}";
+        }
+        else if (hayHastaTexto)
+        {
+            rangoTexto = $"del {hastaFiltro.AddDays(-7):dd/MM/yyyy} al {hastaFiltro:dd/MM/yyyy}";
+        }
+        else if (hayDesdeTexto)
+        {
+            rangoTexto = $"desde el {desdeFiltro:dd/MM/yyyy} hasta hoy";
+        }
+        else
+        {
+            rangoTexto = "de los últimos 7 días";
+        }
+        descripcionFiltro = $"Accesos {rangoTexto}, {estadoTexto}.";
+    }
+    else
+    {
+        descripcionFiltro = "Accesos de los últimos 7 días.";
+    }
+
+    // Se omiten entradas vacías (por ejemplo, un usuario sin accesos en "Último acceso") para no fallar al dibujar la tabla.
+    var filasBitacora = new List<global::BitacoraAcceso>();
+    if (ViewBag.BitacoraAccesos != null)
+    {
+        foreach (var acceso in ViewBag.BitacoraAccesos)
+        {
+            if (acceso != null)
+            {
+                filasBitacora.Add(acceso);
+            }
+        }
+    }
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja admin-panel-page">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
-        @if (ViewBag.ErrorMessage != null)
-        {
-        <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-            <span>@ViewBag.ErrorMessage</span>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-        <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-            <span>@ViewBag.SuccessMessage</span>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        }
+        <section class="admin-panel-section" aria-label="Registro de accesos">
+            @await Html.PartialAsync("_MeticsToast")
 
-        <div class="access-filter-panel">
-            <h2 class="access-filter-title">Seleccionar Tipo de Vista</h2>
-            <ul class="nav nav-tabs access-filter-tabs" id="bitacoraTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab-fechas" data-bs-toggle="tab" data-bs-target="#form-fechas-pane" type="button" role="tab" aria-controls="form-fechas-pane" aria-selected="true">Por Fechas</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-usuario" data-bs-toggle="tab" data-bs-target="#form-usuario-pane" type="button" role="tab" aria-controls="form-usuario-pane" aria-selected="false">Por Usuario</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-ultimo-acceso" data-bs-toggle="tab" data-bs-target="#form-ultimo-acceso-pane" type="button" role="tab" aria-controls="form-ultimo-acceso-pane" aria-selected="false">Último Acceso</button>
-                </li>
-            </ul>
-
-            <div class="tab-content access-filter-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="form-fechas-pane" role="tabpanel" aria-labelledby="tab-fechas" tabindex="0">
-                    <form action="@Url.Action("VerBitacoraAccesoPorFecha", "Usuario")" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label for="fechaDesde" class="form-label">Fecha Desde</label>
-                                <input type="date" id="fechaDesde" name="fechaDesde" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="fechaHasta" class="form-label">Fecha Hasta</label>
-                                <input type="date" id="fechaHasta" name="fechaHasta" class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="estadoAcceso" class="form-label">Estado de Acceso</label>
-                                <select id="estadoAcceso" name="estadoAcceso" class="form-select">
-                                    <option value="">Todos</option>
-                                    <option value="EXITO">EXITO</option>
-                                    <option value="FRACASO">FRACASO</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="access-filter-actions">
-                            <button type="submit" class="btn btn-primary btn-table-sm">Filtrar</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="tab-pane fade" id="form-usuario-pane" role="tabpanel" aria-labelledby="tab-usuario" tabindex="0">
-                    <form action="@Url.Action("VerBitacoraAccesoUsuario", "Usuario")" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="idUsuario" class="form-label">ID de Usuario</label>
-                                <input type="text" id="idUsuario" name="idUsuario" class="form-control" placeholder="Escriba el ID del usuario">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="diasAtras" class="form-label">Días Atrás</label>
-                                <input type="number" id="diasAtras" name="diasAtras" value="30" class="form-control">
-                            </div>
-                        </div>
-                        <div class="access-filter-actions">
-                            <button type="submit" class="btn btn-primary btn-table-sm">Ver Historial</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="tab-pane fade" id="form-ultimo-acceso-pane" role="tabpanel" aria-labelledby="tab-ultimo-acceso" tabindex="0">
-                    <form action="@Url.Action("VerBitacoraUltimoAccesoUsuario", "Usuario")" method="get">
-                        <div class="row g-3">
-                            <div class="col-md-12">
-                                <label for="idUsuarioUltimo" class="form-label">ID de Usuario</label>
-                                <input type="text" id="idUsuarioUltimo" name="idUsuario" class="form-control" placeholder="Escriba el ID del usuario">
-                            </div>
-                        </div>
-                        <div class="access-filter-actions">
-                            <button type="submit" class="btn btn-primary btn-table-sm">Ver Último Acceso</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        @if (ViewBag.BitacoraAccesos != null)
-        {
-            <div class="table-card">
-                <div class="table-card-header">
-                    <div class="table-card-heading">
-                        <span class="table-card-title">Registro de accesos</span>
-                        <span class="table-card-desc">Historial de accesos registrados en el sistema</span>
+            <div class="admin-panel-card">
+                <div class="admin-panel-card-header">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-funnel"></i></span>
+                    <div>
+                        <h2 class="admin-panel-card-title">Seleccionar tipo de vista</h2>
+                        <p class="admin-panel-card-desc">Filtre los accesos por rango de fechas, por usuario o consulte el último acceso de un usuario.</p>
                     </div>
                 </div>
 
-                <div class="table-scroll table-scroll--fit">
-                    <table id="bitacoraTblCustomers" class="data-table">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 18%;">ID de Acceso</th>
-                                <th scope="col" style="width: 38%;">ID de Usuario</th>
-                                <th scope="col" style="width: 26%;">Fecha y Hora</th>
-                                <th scope="col" style="width: 18%;">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var acceso in ViewBag.BitacoraAccesos)
-                            {
-                                <tr>
-                                    <td>@acceso.IdAccesoPK</td>
-                                    <td>@acceso.IdUsuario</td>
-                                    <td>@acceso.FechaHoraAcceso.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                                    <td>
-                                        <span class="badge rounded-pill @(acceso.EstadoAcceso == "EXITO" ? "text-bg-success" : "text-bg-danger")">
-                                            @acceso.EstadoAcceso
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                <ul class="nav nav-tabs admin-panel-tabs" id="bitacoraTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link @(pestanaActiva == "fechas" ? "active" : "")" id="tab-fechas" data-bs-toggle="tab" data-bs-target="#form-fechas-pane" type="button" role="tab" aria-controls="form-fechas-pane" aria-selected="@(pestanaActiva == "fechas" ? "true" : "false")">Por fechas</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link @(pestanaActiva == "usuario" ? "active" : "")" id="tab-usuario" data-bs-toggle="tab" data-bs-target="#form-usuario-pane" type="button" role="tab" aria-controls="form-usuario-pane" aria-selected="@(pestanaActiva == "usuario" ? "true" : "false")">Por usuario</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link @(pestanaActiva == "ultimo" ? "active" : "")" id="tab-ultimo-acceso" data-bs-toggle="tab" data-bs-target="#form-ultimo-acceso-pane" type="button" role="tab" aria-controls="form-ultimo-acceso-pane" aria-selected="@(pestanaActiva == "ultimo" ? "true" : "false")">Último acceso</button>
+                    </li>
+                </ul>
 
-                <nav id="pagination" class="table-pagination" aria-label="Paginación de bitácora"></nav>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade @(pestanaActiva == "fechas" ? "show active" : "")" id="form-fechas-pane" role="tabpanel" aria-labelledby="tab-fechas" tabindex="0">
+                        <form action="@Url.Action("VerBitacoraAccesoPorFecha", "Usuario")" method="get" id="formBitacoraFechas">
+                            <div class="admin-filter-row admin-filter-row--fechas">
+                                <div class="create-category-field mb-0">
+                                    <label for="fechaDesde" class="form-label">Fecha desde</label>
+                                    <input type="date" id="fechaDesde" name="fechaDesde" class="form-control" value="@filtroFechaDesde">
+                                    <span class="text-danger" id="fechaDesdeError" data-valmsg-for="fechaDesde" aria-live="polite"></span>
+                                </div>
+                                <div class="create-category-field mb-0">
+                                    <label for="fechaHasta" class="form-label">Fecha hasta</label>
+                                    <input type="date" id="fechaHasta" name="fechaHasta" class="form-control" value="@filtroFechaHasta" aria-describedby="fechaHastaAyuda">
+                                    <span class="text-danger" id="fechaHastaError" data-valmsg-for="fechaHasta" aria-live="polite"></span>
+                                </div>
+                                <div class="create-category-field mb-0">
+                                    <label for="estadoAcceso" class="form-label">Estado de acceso</label>
+                                    <select id="estadoAcceso" name="estadoAcceso" class="form-select">
+                                        <option value="">Todos</option>
+                                        <option value="EXITO" selected="@(filtroEstado == "EXITO")">Éxito</option>
+                                        <option value="FRACASO" selected="@(filtroEstado == "FRACASO")">Fallido</option>
+                                    </select>
+                                </div>
+                                <div class="create-category-field mb-0 admin-filter-action">
+                                    <span class="form-label admin-filter-spacer" aria-hidden="true">&nbsp;</span>
+                                    <button type="submit" class="btn admin-panel-btn-primary">Filtrar</button>
+                                </div>
+                            </div>
+                            <p class="admin-panel-field-help admin-filter-note" id="fechaHastaAyuda">La fecha hasta incluye todo ese día. Si deja la fecha desde vacía, se muestran los 7 días anteriores a la fecha hasta.</p>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade @(pestanaActiva == "usuario" ? "show active" : "")" id="form-usuario-pane" role="tabpanel" aria-labelledby="tab-usuario" tabindex="0">
+                        <form action="@Url.Action("VerBitacoraAccesoUsuario", "Usuario")" method="get" data-requiere-usuario="idUsuario">
+                            <div class="admin-filter-row admin-filter-row--usuario">
+                                <div class="create-category-field mb-0">
+                                    <label for="idUsuario" class="form-label">ID de usuario</label>
+                                    <input type="text" id="idUsuario" name="idUsuario" class="form-control" placeholder="Correo completo, ej. ana.solis@ucr.ac.cr" value="@(pestanaActiva == "usuario" ? filtroUsuario : "")" aria-describedby="idUsuarioError">
+                                    <span class="text-danger" id="idUsuarioError" aria-live="polite"></span>
+                                </div>
+                                <div class="create-category-field mb-0">
+                                    <label for="diasAtras" class="form-label">Días atrás</label>
+                                    <input type="number" id="diasAtras" name="diasAtras" value="@filtroDiasAtras" class="form-control">
+                                </div>
+                                <div class="create-category-field mb-0 admin-filter-action">
+                                    <span class="form-label admin-filter-spacer" aria-hidden="true">&nbsp;</span>
+                                    <button type="submit" class="btn admin-panel-btn-primary">Ver historial</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade @(pestanaActiva == "ultimo" ? "show active" : "")" id="form-ultimo-acceso-pane" role="tabpanel" aria-labelledby="tab-ultimo-acceso" tabindex="0">
+                        <form action="@Url.Action("VerBitacoraUltimoAccesoUsuario", "Usuario")" method="get" data-requiere-usuario="idUsuarioUltimo">
+                            <div class="admin-filter-row admin-filter-row--ultimo">
+                                <div class="create-category-field mb-0">
+                                    <label for="idUsuarioUltimo" class="form-label">ID de usuario</label>
+                                    <input type="text" id="idUsuarioUltimo" name="idUsuario" class="form-control" placeholder="Correo completo, ej. ana.solis@ucr.ac.cr" value="@(pestanaActiva == "ultimo" ? filtroUsuario : "")" aria-describedby="idUsuarioUltimoError">
+                                    <span class="text-danger" id="idUsuarioUltimoError" aria-live="polite"></span>
+                                </div>
+                                <div class="create-category-field mb-0 admin-filter-action">
+                                    <span class="form-label admin-filter-spacer" aria-hidden="true">&nbsp;</span>
+                                    <button type="submit" class="btn admin-panel-btn-primary">Ver último acceso</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+            @if (ViewBag.BitacoraAccesos != null)
+            {
+                <div class="table-card admin-panel-table-card">
+                    <div class="table-card-header">
+                        <div class="table-card-heading">
+                            <span class="table-card-title">Registro de accesos</span>
+                            <span class="table-card-desc">@descripcionFiltro</span>
+                        </div>
+                    </div>
+
+                    @if (filasBitacora.Count == 0)
+                    {
+                        <p class="admin-panel-empty">No se encontraron registros de bitácora de accesos para este filtro.</p>
+                    }
+                    else
+                    {
+                        <div class="table-scroll table-scroll--fit">
+                            <table id="bitacoraTblCustomers" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 18%;">ID de acceso</th>
+                                        <th scope="col" style="width: 38%;">ID de usuario</th>
+                                        <th scope="col" style="width: 26%;">Fecha y hora (Costa Rica)</th>
+                                        <th scope="col" style="width: 18%;">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var acceso in filasBitacora)
+                                    {
+                                        string estadoTexto = acceso.EstadoAcceso == "EXITO" ? "Éxito"
+                                            : acceso.EstadoAcceso == "FRACASO" ? "Fallido"
+                                            : acceso.EstadoAcceso;
+                                        <tr>
+                                            <td>@acceso.IdAccesoPK</td>
+                                            <td>@acceso.IdUsuario</td>
+                                            <td>@acceso.FechaHoraAcceso.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td>
+                                                <span class="badge rounded-pill @(acceso.EstadoAcceso == "EXITO" ? "text-bg-success" : "text-bg-danger")">
+                                                    @estadoTexto
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <nav id="pagination" class="table-pagination" aria-label="Paginación de bitácora"></nav>
+                    }
+                </div>
+
+                @* Paginación existente (sin cambios); jQuery ya se carga una sola vez en el layout. *@
             <script>
                 $(document).ready(function () {
                     const rowsPerPage = 50;
@@ -239,13 +312,69 @@
                     showPage(1);
                 });
             </script>
-        }
-        else
-        {
-            <p class="text-muted fst-italic">No se encontraron registros de bitácora de accesos.</p>
-        }
-        
+
+            }
+            else
+            {
+                <p class="admin-panel-empty">No se encontraron registros de bitácora de accesos.</p>
+            }
+        </section>
     </div>
+
+    <script src="~/js/metics-form-controls.js" asp-append-version="true"></script>
+    <script>
+        // Solo interfaz: evita enviar una consulta por usuario sin ID y muestra el aviso junto al campo.
+        // (Enviar "Por usuario" vacío hacía que el servidor devolviera la vista sin sesión y la cerraba.)
+        // Mismo calendario y misma lista desplegable que "Crear módulo" (wwwroot/js/metics-form-controls.js).
+        (function () {
+            var raizFiltros = document.getElementById('myTabContent');
+            var desde = document.getElementById('fechaDesde');
+            var hasta = document.getElementById('fechaHasta');
+
+            // "Hasta" no puede ser anterior a "desde" (y viceversa): el calendario deshabilita esos días
+            // y, si se escribe una fecha fuera de rango, el formulario muestra el aviso junto al campo.
+            function sincronizarRango() {
+                if (!desde || !hasta) return;
+                if (desde.value) hasta.min = desde.value; else hasta.removeAttribute('min');
+                if (hasta.value) desde.max = hasta.value; else desde.removeAttribute('max');
+            }
+            if (desde && hasta) {
+                desde.addEventListener('change', sincronizarRango);
+                hasta.addEventListener('change', sincronizarRango);
+                sincronizarRango();
+            }
+
+            if (window.MeticsFormControls && raizFiltros) {
+                window.MeticsFormControls.initDatePickers(raizFiltros);
+                window.MeticsFormControls.initSelects(raizFiltros);
+            }
+        })();
+
+        document.querySelectorAll('form[data-requiere-usuario]').forEach(function (formulario) {
+            var campo = document.getElementById(formulario.getAttribute('data-requiere-usuario'));
+            var aviso = campo ? document.getElementById(campo.id + 'Error') : null;
+            if (!campo || !aviso) {
+                return;
+            }
+
+            function limpiarAviso() {
+                campo.classList.remove('is-invalid');
+                campo.removeAttribute('aria-invalid');
+                aviso.textContent = '';
+            }
+
+            campo.addEventListener('input', limpiarAviso);
+            formulario.addEventListener('submit', function (evento) {
+                if (campo.value.trim() === '') {
+                    evento.preventDefault();
+                    campo.classList.add('is-invalid');
+                    campo.setAttribute('aria-invalid', 'true');
+                    aviso.textContent = 'Ingrese el ID del usuario que desea consultar.';
+                    campo.focus();
+                }
+            });
+        });
+    </script>
 }
 else
 {

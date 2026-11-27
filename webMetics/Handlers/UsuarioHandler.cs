@@ -584,5 +584,36 @@ namespace webMetics.Handlers
             // Devuelve el objeto de bitácora encontrado, o null si no se encontró ninguno.
             return ultimoAcceso;
         }
+
+        /// <summary>
+        /// Minutos que la hora del servidor SQL (GETDATE) está adelantada respecto a UTC.
+        /// La bitácora guarda la hora con GETDATE(); este valor permite mostrarla en hora de Costa Rica
+        /// sin suponer cómo está configurada la zona del servidor. Solo lectura.
+        /// </summary>
+        /// <returns>Desfase en minutos (0 si no se pudo consultar).</returns>
+        public int ObtenerDesfaseServidorMinutos()
+        {
+            try
+            {
+                using (SqlCommand command = new SqlCommand("SELECT DATEDIFF(MINUTE, GETUTCDATE(), GETDATE());", ConexionMetics))
+                {
+                    ConexionMetics.Open();
+                    object? resultado = command.ExecuteScalar();
+                    return resultado == null || resultado == DBNull.Value ? 0 : Convert.ToInt32(resultado);
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error al consultar el desfase horario del servidor SQL: {ex.Message}");
+                return 0;
+            }
+            finally
+            {
+                if (ConexionMetics.State == ConnectionState.Open)
+                {
+                    ConexionMetics.Close();
+                }
+            }
+        }
     }
 }

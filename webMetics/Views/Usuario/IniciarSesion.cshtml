@@ -1,136 +1,268 @@
-﻿@model webMetics.Models.LoginModel
+@model webMetics.Models.LoginModel
 @{
     ViewBag.Title = "Iniciar sesión";
 }
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+    .body-content:has(.metics-login-page) {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column;
+        margin: 0;
+        max-width: none;
+        padding: 0;
+        width: 100%;
+    }
 
-    <style>
-        .input-wrapper {
-            position: relative;
-        }
+    .body-content:has(.metics-login-page) + .metics-footer { margin-top: 0; }
 
-        .toggle-password {
-            position: absolute;
-            top: 45%;
-            right: 10px;
-            transform: translateY(10%);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
+    .metics-login-page {
+        align-items: center;
+        background-color: #F1F5FB;
+        background-image: url('/images/fondo_login_waves.svg');
+        background-position: center bottom;
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: flex;
+        flex: 1 0 auto;
+        justify-content: center;
+        min-height: 0;
+        padding: 36px 16px;
+        width: 100%;
+    }
 
-        .card {
-            border: none !important;
-            box-shadow: none !important;
-        }
+    .metics-login-shell { margin: 0 auto; max-width: 480px; width: 100%; }
+    .metics-login-card {
+        background: #fff;
+        border: 1px solid #dfe7f0;
+        border-radius: 16px;
+        box-shadow: 0 16px 42px rgba(19, 49, 82, .14);
+        overflow: hidden;
+        width: 100%;
+    }
+    .metics-login-card-header {
+        align-items: center;
+        background: #fff;
+        border-bottom: 1px solid #e6edf5;
+        display: flex;
+        gap: 16px;
+        padding: 24px 30px;
+    }
+    .metics-login-brand-icon {
+        align-items: center;
+        background: #EEF5FC;
+        border-radius: 13px;
+        color: #2A5F95;
+        display: inline-flex;
+        flex: 0 0 50px;
+        height: 50px;
+        justify-content: center;
+    }
+    .metics-login-brand-icon .bi { font-size: 23px; }
+    .metics-login-brand-copy { min-width: 0; }
+    .metics-login-brand-copy p { color: #5f7691; font-size: 13px; font-weight: 600; margin: 0 0 2px; }
+    .metics-login-brand-copy h1 { color: #1b2f49; font-size: 23px; font-weight: 700; line-height: 1.2; margin: 0; }
+    .metics-login-card-body { padding: 26px 30px 28px; }
+    .metics-login-heading { color: #1b2f49; font-size: 22px; font-weight: 700; margin: 0; }
+    .metics-login-subtitle { color: #647991; font-size: 14px; line-height: 1.5; margin: 6px 0 23px; }
+    .metics-login-form { display: grid; gap: 17px; }
+    .metics-login-field { min-width: 0; }
+    .metics-login-label { color: #263c56; display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+    .metics-login-email .form-control,
+    .metics-login-password-wrap .form-control {
+        border-color: #cdd9e7;
+        border-radius: 8px;
+        color: #1b2f49;
+        font-size: 14px;
+        min-height: 46px;
+    }
+    .metics-login-email .form-control:focus,
+    .metics-login-password-wrap .form-control:focus {
+        border-color: #2A5F95;
+        box-shadow: 0 0 0 3px rgba(42, 95, 149, .12);
+    }
+    .metics-login-email .input-group-text {
+        background: #EEF5FC;
+        border-color: #cdd9e7;
+        border-radius: 0 8px 8px 0;
+        color: #2A5F95 !important;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 0 13px;
+    }
+    .metics-login-email .form-control { border-radius: 8px 0 0 8px; }
+    .metics-login-password-wrap { position: relative; }
+    .metics-login-password-wrap .form-control { padding-right: 48px; }
+    .metics-login-password-toggle {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        border-radius: 7px;
+        color: #2A5F95;
+        display: inline-flex;
+        height: 34px;
+        justify-content: center;
+        position: absolute;
+        right: 7px;
+        top: 6px;
+        width: 34px;
+    }
+    .metics-login-password-toggle:hover { background: #EEF5FC; }
+    .metics-login-password-toggle:focus-visible { outline: 2px solid #2A5F95; outline-offset: 1px; }
+    .metics-login-password-toggle .fa { font-size: 15px; }
+    .metics-login-validation { color: #c0392b; display: block; font-size: 12px; line-height: 1.4; margin-top: 5px; }
+    .metics-login-feedback {
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        margin: 0;
+        padding: 10px 12px;
+    }
+    .metics-login-feedback-error { background: #fff1f1; border: 1px solid #f0caca; color: #a52834; }
+    .metics-login-feedback-success { background: #eff9f2; border: 1px solid #cce8d3; color: #236b3b; }
+    .metics-login-note {
+        align-items: flex-start;
+        background: #EEF5FC;
+        border: 1px solid #dce8f5;
+        border-radius: 8px;
+        color: #526987;
+        display: flex;
+        font-size: 12px;
+        gap: 9px;
+        line-height: 1.5;
+        margin: 0;
+        padding: 10px 12px;
+    }
+    .metics-login-note .bi { color: #2A5F95; flex: 0 0 auto; font-size: 15px; margin-top: 1px; }
+    .metics-login-submit {
+        align-items: center;
+        background: #245E98;
+        border: 1px solid #245E98;
+        border-radius: 8px;
+        color: #fff;
+        display: flex;
+        font-size: 15px;
+        font-weight: 600;
+        justify-content: center;
+        min-height: 46px;
+        width: 100%;
+    }
+    .metics-login-submit:hover,
+    .metics-login-submit:focus-visible { background: #1E4F80; border-color: #1E4F80; color: #fff; }
+    .metics-login-card-footer {
+        background: #f8fafd;
+        border-top: 1px solid #e6edf5;
+        padding: 14px 30px 16px;
+    }
+    .metics-login-secondary-links { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metics-login-secondary-link {
+        background: #fff;
+        border: 1px solid #e1e9f2;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        justify-content: center;
+        min-height: 62px;
+        padding: 8px 11px;
+    }
+    .metics-login-secondary-link span { color: #647991; font-size: 11px; line-height: 1.35; }
+    .metics-login-secondary-link a { font-size: 13px; line-height: 1.35; }
+    .metics-login-page a { color: #2A5F95; font-weight: 600; text-underline-offset: 2px; }
+    .metics-login-page a:hover { color: #1E4F80; }
+    .metics-login-support { color: #647991; font-size: 12px; line-height: 1.45; margin: 10px 0 0; text-align: center; }
 
-        .card-footer {
-            border-top: none !important;
-            border-radius: 0 !important;
-        }
+    @@media (max-width: 575.98px) {
+        .metics-login-page { padding: 24px 12px; }
+        .metics-login-card-header { padding: 20px 20px; }
+        .metics-login-card-body { padding: 22px 20px 22px; }
+        .metics-login-card-footer { padding: 16px 20px 18px; }
+        .metics-login-brand-copy h1 { font-size: 21px; }
+    }
+</style>
 
-        input::-ms-reveal,
-        input::-ms-clear {
-            display: none !important;
-        }
-    </style>
-</head>
-
-<body style="background-image: url('/images/fondo_login.svg')">
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="container d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
-            <div class="card shadow" style="width: 450px;">
-                <div class="card-header text-center pt-4 pb-3">
-                    <h3 class="text-center text-secondary"><strong>Sistema de Inscripciones</strong><br />METICS</h3>
+<main class="metics-login-page">
+    <div class="metics-login-shell">
+        <section class="metics-login-card" aria-labelledby="loginHeading">
+            <header class="metics-login-card-header">
+                <span class="metics-login-brand-icon" aria-hidden="true"><i class="bi bi-mortarboard-fill"></i></span>
+                <div class="metics-login-brand-copy">
+                    <p>Sistema de Inscripciones</p>
+                    <h1>METICS</h1>
                 </div>
-                <div class="card-body p-4">
-                    <h4 class="text-center">Iniciar sesión</h4>
-                    <div class="mt-4">
-                        @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                        {
-                            <div class="text-center mb-1">
-                                @Html.LabelFor(loginModel => loginModel.id, new { @class = "text-center" })
+            </header>
 
-                                <div class="input-group">
-                                    @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
-                                    <span class="input-group-text text-secondary"><b>@@ucr.ac.cr</b></span>
-                                </div>
+            <div class="metics-login-card-body">
+                <h2 class="metics-login-heading" id="loginHeading">Iniciar sesión</h2>
+                <p class="metics-login-subtitle">Ingrese con su cuenta institucional para continuar.</p>
 
-                                @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="text-center mb-2 input-wrapper">
-                                @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "text-center" })
-                                @Html.PasswordFor(loginModel => loginModel.contrasena, new { @id = "password", @class = "form-control" })
-                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                                    <i id="toggleIcon" class="fas fa-eye"></i>
-                                </button>
-                                @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "text-danger" })
-                            </div>
-                            @if (ViewBag.ErrorMessage != null)
-                            {
-                                <div class="text-danger text-center">
-                                    @ViewBag.ErrorMessage
-                                </div>
-                            }
-                            else
-                            {
-                                @if (ViewBag.SuccessMessage != null)
-                                {
-                                    <div class="text-success text-center">
-                                        @ViewBag.SuccessMessage
-                                    </div>
-                                }
-                            }
-                            <div class="text-center mb-1" style="font-size: 0.9rem;">
-								<b>Importante:</b> El SIMETICS <u>no</u> utiliza la misma contraseña del correo institucional.
+                @using (Html.BeginForm("IniciarSesion", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", @class = "metics-login-form" }))
+                {
+                    <div class="metics-login-field">
+                        @Html.LabelFor(loginModel => loginModel.id, new { @class = "metics-login-label" })
+                        <div class="input-group metics-login-email">
+                            @Html.TextBoxFor(loginModel => loginModel.id, new { @class = "form-control", @autocomplete = "on" })
+                            <span class="input-group-text"><b>@@ucr.ac.cr</b></span>
+                        </div>
+                        @Html.ValidationMessageFor(loginModel => loginModel.id, "", new { @class = "metics-login-validation" })
+                    </div>
 
-                            </div>
+                    <div class="metics-login-field">
+                        @Html.LabelFor(loginModel => loginModel.contrasena, new { @class = "metics-login-label" })
+                        <div class="metics-login-password-wrap">
+                            @Html.PasswordFor(loginModel => loginModel.contrasena, new { @id = "password", @class = "form-control" })
+                            <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
+                                <i id="toggleIcon" class="bi bi-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        @Html.ValidationMessageFor(loginModel => loginModel.contrasena, "", new { @class = "metics-login-validation" })
+                    </div>
 
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-primary btn-block">Acceder</button>
-                            </div>
-                        }
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="metics-login-feedback metics-login-feedback-error" role="alert">@ViewBag.ErrorMessage</div>
+                    }
+                    else if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="metics-login-feedback metics-login-feedback-success" role="status">@ViewBag.SuccessMessage</div>
+                    }
+
+                    <p class="metics-login-note"><i class="bi bi-info-circle" aria-hidden="true"></i><span><strong>Importante:</strong> El SIMETICS <u>no</u> utiliza la misma contraseña del correo institucional.</span></p>
+
+                    <button type="submit" class="btn metics-login-submit">Acceder</button>
+                }
+            </div>
+
+            <div class="metics-login-card-footer">
+                <div class="metics-login-secondary-links">
+                    <div class="metics-login-secondary-link">
+                        <span>¿Primera vez en METICS?</span>
+                        @Html.ActionLink("Regístrate aquí", "FormularioRegistro", "Usuario", null, new { aria_label = "Formulario de registro" })
+                    </div>
+                    <div class="metics-login-secondary-link">
+                        <span>¿Olvidaste tu contraseña?</span>
+                        @Html.ActionLink("Recupera tu acceso", "FormularioRecuperarContrasena", "Participante", null, new { aria_label = "Recuperar contraseña" })
                     </div>
                 </div>
-                <div class="card-footer text-center pt-2 pb-3" style="background-color: #333333; color: #fff; margin-bottom: 30px;">
-                    <p class="fw-bold" style="font-size: 1rem;margin-top: 10px;">
-                        Si nunca se ha registrado puede
-                        @Html.ActionLink("registrarse aquí", "FormularioRegistro", "Usuario", null, new { @class = "text-white fw-bold text-decoration-underline", aria_label = "Formulario de registro" }).
-                        Si ya lo ha hecho antes, puede enviarse una
-                        @Html.ActionLink("nueva contraseña aquí", "FormularioRecuperarContrasena", "Participante", null, new { @class = "text-white fw-bold text-decoration-underline", aria_label = "Recuperar contraseña" }).
-                        
-                        <br />
-                        Si tiene dudas o consultas, por favor envíelas al correo <a href="mailto:soporte.metics@ucr.ac.cr" class="text-white fw-bold" style="text-decoration: none;">soporte.metics@ucr.ac.cr</a>.
-                        <br />
-                    </p>
-
-                </div>
+                <p class="metics-login-support">¿Dudas? Escríbenos a <a href="mailto:soporte.metics@ucr.ac.cr">soporte.metics@ucr.ac.cr</a>.</p>
             </div>
-        </div>
+        </section>
     </div>
+</main>
 
-    <script>
-        function togglePasswordVisibility() {
-            var passwordInput = document.getElementById('password');
-            var toggleIcon = document.getElementById('toggleIcon');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
+<script>
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById('password');
+        var toggleIcon = document.getElementById('toggleIcon');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove('bi-eye');
+            toggleIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove('bi-eye-slash');
+            toggleIcon.classList.add('bi-eye');
         }
-    </script>
-
-</body>
-</html>
+    }
+</script>

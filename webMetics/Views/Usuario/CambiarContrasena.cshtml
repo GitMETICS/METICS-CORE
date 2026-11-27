@@ -1,177 +1,122 @@
 @model webMetics.Models.NewLoginModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Contraseña";
-    PageHeadingBuilder.Configure(ViewContext, Url);
+    ViewBag.Title = "Cambiar contraseña";
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: "Actualice la contraseña con la que ingresa a METICS.");
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    // Solo el administrador ve esta pantalla dentro del panel; los demás roles la ven sola.
+    bool esPanelAdmin = Convert.ToString(ViewBag.Role) == "1";
+    if (esPanelAdmin)
+    {
+        ViewData["AdminPanelLayout"] = true;
+        ViewData["AdminPanelIcon"] = "bi-key";
+    }
 }
 
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-    <style>
-        .input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .input-wrapper input {
-            padding-right: 50px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(10%);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        input::-ms-reveal,
-        input::-ms-clear {
-            display: none !important;
-        }
-    </style>
-</head>
-<body>
-    @if (ViewBag.Id != "")
-    {
-        <div class="contenedor-caja container-fluid">
-            @if (urlReferrer != null)
-            {
-                <div class="d-flex justify-content-start mb-3">
-                    <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                </div>
-            }
-
-            @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@if (ViewBag.Id != "")
+{
+    <div class="contenedor-caja @(esPanelAdmin ? "admin-panel-page" : "container-fluid account-page")">
+        <section class="@(esPanelAdmin ? "admin-panel-section" : "account-page-content")" aria-labelledby="cambiarContrasenaTitulo">
+            @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", @class = "account-password-form" }))
             {
                 @Html.AntiForgeryToken()
                 <h1 metics-page-heading>@ViewBag.Title</h1>
                 <hr metics-page-heading />
 
-                if (ViewBag.ErrorMessage != null)
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.ErrorMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                if (ViewBag.SuccessMessage != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.SuccessMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
+                @await Html.PartialAsync("_MeticsToast")
 
-                <div class="row mb-1">
-                    <div class="col">
-                        <div class="container">
-                            <div class="row mt-1">
-                                <div class="col input-wrapper">
-                                    @Html.HiddenFor(model => model.id, new { })
-                                    <label style="font-size: 22px">Contraseña actual</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.contrasena, new { @id = "passwordOld", @class = "form-control" })
-                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility3()">
-                                        <i id="toggleIcon3" class="fas fa-eye"></i>
-                                    </button>
-                                    @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col input-wrapper">
-                                    <label style="font-size: 22px">Nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.nuevaContrasena, new { id="password", @class = "form-control" })
-                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                                        <i id="toggleIcon" class="fas fa-eye"></i>
-                                    </button>
-                                    @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col input-wrapper">
-                                    <label style="font-size: 22px">Confirmar nueva contraseña</label> <a style="color:red;font-size:22px">*</a>
-                                    @Html.PasswordFor(model => model.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control" })
-                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
-                                        <i id="toggleIcon2" class="fas fa-eye"></i>
-                                    </button>
-                                    @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
+                <div class="admin-panel-card">
+                    <div class="admin-panel-card-header">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-key"></i></span>
+                        <div>
+                            <h2 class="admin-panel-card-title" id="cambiarContrasenaTitulo">Actualizar contraseña</h2>
+                            <p class="admin-panel-card-desc">Ingrese su contraseña actual y escriba la nueva dos veces para confirmarla.</p>
                         </div>
-                        <div class="row justify-content-center m-4">
-                            <div class="col-auto">
-                                <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
-                                    Cancelar
-                                </a>
+                    </div>
+
+                    @Html.HiddenFor(model => model.id, new { })
+
+                    <div class="row g-3 admin-password-fields">
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="passwordOld">Contraseña actual <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                @Html.PasswordFor(model => model.contrasena, new { @id = "passwordOld", @class = "form-control", autocomplete = "current-password" })
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility3()" aria-label="Mostrar contraseña actual" aria-pressed="false" aria-controls="passwordOld">
+                                    <i id="toggleIcon3" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
                             </div>
-                            <div class="col-auto">
-                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            @Html.ValidationMessageFor(model => model.contrasena, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="password">Nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                @Html.PasswordFor(model => model.nuevaContrasena, new { id = "password", @class = "form-control", autocomplete = "new-password" })
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility()" aria-label="Mostrar nueva contraseña" aria-pressed="false" aria-controls="password">
+                                    <i id="toggleIcon" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
                             </div>
+                            @Html.ValidationMessageFor(model => model.nuevaContrasena, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="passwordCheck">Confirmar nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                @Html.PasswordFor(model => model.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", autocomplete = "new-password" })
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility2()" aria-label="Mostrar confirmación de contraseña" aria-pressed="false" aria-controls="passwordCheck">
+                                    <i id="toggleIcon2" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.confirmarContrasena, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-card-footer">
+                        <p class="admin-panel-required-note"><span class="create-category-required" aria-hidden="true">*</span> Campos obligatorios</p>
+                        <div class="admin-panel-form-actions">
+                            <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn admin-panel-btn-secondary">
+                                Cancelar
+                            </a>
+                            <input type="submit" class="btn admin-panel-btn-primary" value="Guardar cambios" />
                         </div>
                     </div>
                 </div>
             }
-        </div>
+        </section>
+    </div>
+}
+else
+{
+    <script>
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
+    </script>
+}
+
+<script>
+    // Muestra u oculta el contenido de un campo de contraseña conservando los ids originales.
+    function meticsAlternarContrasena(idCampo, idIcono) {
+        var passwordInput = document.getElementById(idCampo);
+        var toggleIcon = document.getElementById(idIcono);
+        if (!passwordInput || !toggleIcon) {
+            return;
+        }
+        var mostrar = passwordInput.type === "password";
+        passwordInput.type = mostrar ? "text" : "password";
+        toggleIcon.classList.toggle('bi-eye', !mostrar);
+        toggleIcon.classList.toggle('bi-eye-slash', mostrar);
+        var boton = toggleIcon.closest('button');
+        if (boton) {
+            boton.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+        }
     }
-    else
-    {
-        <script>
-            window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
-        </script>
+
+    function togglePasswordVisibility() {
+        meticsAlternarContrasena('password', 'toggleIcon');
     }
-    <script>
-        function togglePasswordVisibility() {
-            var passwordInput = document.getElementById('password');
-            var toggleIcon = document.getElementById('toggleIcon');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
-    <script>
-        function togglePasswordVisibility2() {
-            var passwordInput = document.getElementById('passwordCheck');
-            var toggleIcon = document.getElementById('toggleIcon2');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
-    <script>
-        function togglePasswordVisibility3() {
-            var passwordInput = document.getElementById('passwordOld');
-            var toggleIcon = document.getElementById('toggleIcon3');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
-</body>
-</html>
+
+    function togglePasswordVisibility2() {
+        meticsAlternarContrasena('passwordCheck', 'toggleIcon2');
+    }
+
+    function togglePasswordVisibility3() {
+        meticsAlternarContrasena('passwordOld', 'toggleIcon3');
+    }
+</script>

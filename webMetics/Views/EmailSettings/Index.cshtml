@@ -1,89 +1,95 @@
 @model bool
 @{
     ViewBag.Title = "Configuración del Correo";
-    PageHeadingBuilder.Configure(ViewContext, Url);
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    PageHeadingBuilder.Configure(ViewContext, Url, subtitle: "Correo de aviso por límite de horas y envío de correos del sistema.");
+    ViewData["AdminPanelLayout"] = true;
+    ViewData["AdminPanelIcon"] = "bi-envelope";
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
+    <div class="contenedor-caja admin-panel-page">
         <h1 metics-page-heading>@ViewBag.Title</h1>
         <hr metics-page-heading />
 
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        @await Html.PartialAsync("_MeticsToast")
+
+        @{
+            string correoGuardado = ViewBag.CorreoNotificacion?.ToString();
+            string correoActual = !string.IsNullOrEmpty(correoGuardado) ? correoGuardado : "ej., soporte.metics@ucr.ac.cr";
         }
 
-        <div class="mb-3 d-flex justify-content-between w-100">
-            <div class="w-100">
-                @using (Html.BeginForm("UpdateNotificationEmail", "EmailSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        <section class="admin-panel-card" aria-labelledby="correoNotificacionTitulo">
+            <div class="admin-panel-card-header">
+                <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-envelope-at"></i></span>
+                <div>
+                    <h2 class="admin-panel-card-title" id="correoNotificacionTitulo">Correo de notificación</h2>
+                    <p class="admin-panel-card-desc">Recibe un aviso cuando un participante supera el límite de horas aprobadas.</p>
+                </div>
+            </div>
+
+            <p class="admin-panel-current-value">
+                <span class="admin-panel-current-label">Correo actual:</span>
+                @if (!string.IsNullOrEmpty(correoGuardado))
                 {
-                    <form>
-                        <small class="ms-1 text-secondary">Actualizar correo de notificación</small>
-                        <div class="d-flex">
-                            <div class="input-group">
-                                @{
-                                    string correoActual = ViewBag.CorreoNotificacion?.ToString(); // Using null-conditional operator
-                                    correoActual = !string.IsNullOrEmpty(correoActual) ? correoActual : "ej., soporte.metics@ucr.ac.cr";
-
-                                    <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual" oninput="toggleButton()">
-                                }
-                            </div>
-                            <input class="btn btn-outline-secondary ms-2" type="submit" value="Actualizar" id="updateButton" disabled>
-                        </div>
-                    </form>
+                    <strong>@correoGuardado</strong>
                 }
-            </div>
-        </div>
+                else
+                {
+                    <span class="admin-panel-muted">Sin correo configurado</span>
+                }
+            </p>
 
-        <form asp-action="ToggleEmailSending" method="post">
-            <div class="row mb-1">
-                <div class="container">
-                    <div class="form-group mt-1 d-flex justify-content-between w-25 p-3 bg-light rounded">
-                        <label class="form-check-label" for="emailToggle">
-                            Habilitar envío de correos
-                        </label>
-                        <div class="form-check form-switch">
-                            <input type="checkbox"
-                                   class="form-check-input"
-                                   id="emailToggle"
-                                   name="isEnabled"
-                                   value="true"
-                            @(Model ? "checked" : "")
-                                   aria-label="Toggle email sending" />
-                        </div>
+            @using (Html.BeginForm("UpdateNotificationEmail", "EmailSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="create-category-field mb-0">
+                    <label for="correoLimiteHoras">Actualizar correo de notificación</label>
+                    <div class="admin-panel-inline-form">
+                        <input type="text" class="form-control" name="correoLimiteHoras" id="correoLimiteHoras" placeholder="@correoActual" oninput="toggleButton()">
+                        <input class="btn admin-panel-btn-soft" type="submit" value="Actualizar" id="updateButton" disabled>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <form asp-action="ToggleEmailSending" method="post" class="admin-panel-card" aria-labelledby="envioCorreosTitulo">
+            <div class="admin-panel-card-header">
+                <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-send"></i></span>
+                <div>
+                    <h2 class="admin-panel-card-title" id="envioCorreosTitulo">Envío de correos</h2>
+                    <p class="admin-panel-card-desc">Active o desactive el envío de correos del sistema y presione Guardar cambios para aplicar el cambio.</p>
+                </div>
+            </div>
+
+            <div class="admin-email-switch">
+                <div class="admin-email-switch-text">
+                    <label class="form-check-label" for="emailToggle">
+                        Habilitar envío de correos
+                    </label>
+                    <span class="admin-email-switch-help" id="emailToggleAyuda">Si está desactivado, el sistema no envía correos automáticos.</span>
+                </div>
+                <div class="admin-email-switch-control">
+                    <span class="admin-email-switch-state" id="emailToggleEstado" aria-hidden="true">@(Model ? "Activado" : "Desactivado")</span>
+                    <div class="form-check form-switch">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="emailToggle"
+                               name="isEnabled"
+                               value="true"
+                               role="switch"
+                        @(Model ? "checked" : "")
+                               aria-describedby="emailToggleAyuda"
+                               aria-label="Habilitar envío de correos" />
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-center m-4">
-                <div class="col-auto">
-                    <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-block">
+
+            <div class="admin-panel-card-footer admin-panel-card-footer--end">
+                <div class="admin-panel-form-actions">
+                    <a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn admin-panel-btn-secondary">
                         Cancelar
                     </a>
-                </div>
-                <div class="col-auto">
-                    <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                    <input type="submit" class="btn admin-panel-btn-primary" value="Guardar cambios" />
                 </div>
             </div>
         </form>
@@ -107,5 +113,14 @@ else
 
     document.addEventListener("DOMContentLoaded", () => {
         toggleButton();
+
+        // Solo presentación: muestra junto al switch si está activado o desactivado (se aplica al guardar).
+        const emailToggle = document.getElementById("emailToggle");
+        const emailToggleEstado = document.getElementById("emailToggleEstado");
+        if (emailToggle && emailToggleEstado) {
+            emailToggle.addEventListener("change", () => {
+                emailToggleEstado.textContent = emailToggle.checked ? "Activado" : "Desactivado";
+            });
+        }
     });
 </script>

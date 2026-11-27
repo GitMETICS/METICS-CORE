@@ -25,7 +25,7 @@
                                 <label for="passwordResetNew">Nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
                                 <div class="input-group">
                                     @Html.PasswordFor(m => m.nuevaContrasena, new { id = "passwordResetNew", @class = "form-control", required = "required", autocomplete = "new-password", aria_describedby = "passwordResetNewError" })
-                                    <button type="button" class="btn btn-outline-secondary" data-password-reset-toggle="passwordResetNew" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                    <button type="button" class="metics-password-toggle" data-password-reset-toggle="passwordResetNew" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                 </div>
                                 <span id="passwordResetNewError" data-valmsg-for="nuevaContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
                             </div>
@@ -33,7 +33,7 @@
                                 <label for="passwordResetConfirm">Confirmar nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
                                 <div class="input-group">
                                     @Html.PasswordFor(m => m.confirmarContrasena, new { id = "passwordResetConfirm", @class = "form-control", required = "required", autocomplete = "new-password", aria_describedby = "passwordResetConfirmError" })
-                                    <button type="button" class="btn btn-outline-secondary" data-password-reset-toggle="passwordResetConfirm" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+                                    <button type="button" class="metics-password-toggle" data-password-reset-toggle="passwordResetConfirm" aria-label="Mostrar contraseña" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
                                 </div>
                                 <span id="passwordResetConfirmError" data-valmsg-for="confirmarContrasena" class="text-danger field-validation-valid" aria-live="polite"></span>
                             </div>
