@@ -325,7 +325,7 @@ else
                     if (type !== 'display' || row.horasAprobadas < 30) return '';
 
                     if (data !== 0) {
-                        return '<i class="bi bi-bell" style="color: #198754;" title="Notificación enviada"></i>';
+                        return '<i class="bi bi-bell" style="color: var(--metics-success);" title="Notificación enviada"></i>';
                     }
 
                     return '<button type="button" class="text-success bi bi-bell-fill border-0 bg-transparent p-0 js-notify-participant" ' +

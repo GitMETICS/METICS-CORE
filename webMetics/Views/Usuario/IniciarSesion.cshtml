@@ -19,7 +19,7 @@
 
     .metics-login-page {
         align-items: center;
-        background-color: #F1F5FB;
+        background-color: var(--metics-surface-table-head);
         background-image: url('/images/fondo_login_waves.svg');
         background-position: center bottom;
         background-repeat: no-repeat;
@@ -28,54 +28,54 @@
         flex: 1 0 auto;
         justify-content: center;
         min-height: 0;
-        padding: 36px var(--metics-space-4);
+        padding: var(--metics-space-9) var(--metics-space-4);
         width: 100%;
     }
 
     .metics-login-shell { margin: 0 auto; max-width: 480px; width: 100%; }
     .metics-login-card {
         background: var(--metics-surface);
-        border: 1px solid #dfe7f0;
-        border-radius: 16px;
-        box-shadow: 0 16px 42px rgba(19, 49, 82, .14);
+        border: 1px solid var(--metics-border-card);
+        border-radius: var(--metics-radius-xl);
+        box-shadow: var(--metics-shadow-modal);
         overflow: hidden;
         width: 100%;
     }
     .metics-login-card-header {
         align-items: center;
         background: var(--metics-surface);
-        border-bottom: 1px solid #e6edf5;
+        border-bottom: 1px solid var(--metics-divider-row);
         display: flex;
         gap: var(--metics-space-4);
-        padding: var(--metics-space-6) 30px;
+        padding: var(--metics-space-6) var(--metics-space-8);
     }
     .metics-login-brand-icon {
         align-items: center;
         background: var(--metics-icon-surface);
-        border-radius: 13px;
+        border-radius: var(--metics-radius-card);
         color: var(--metics-interactive-blue);
         display: inline-flex;
         flex: 0 0 50px;
         height: 50px;
         justify-content: center;
     }
-    .metics-login-brand-icon .bi { font-size: 23px; }
+    .metics-login-brand-icon .bi { font-size: var(--metics-font-size-2xl); }
     .metics-login-brand-copy { min-width: 0; }
-    .metics-login-brand-copy p { color: #5f7691; font-size: 13px; font-weight: 600; margin: 0 0 2px; }
-    .metics-login-brand-copy h1 { color: #1b2f49; font-size: 23px; font-weight: 700; line-height: 1.2; margin: 0; }
-    .metics-login-card-body { padding: 26px 30px 28px; }
-    .metics-login-heading { color: #1b2f49; font-size: 22px; font-weight: 700; margin: 0; }
-    .metics-login-subtitle { color: #647991; font-size: 14px; line-height: 1.5; margin: 6px 0 23px; }
-    .metics-login-form { display: grid; gap: 17px; }
+    .metics-login-brand-copy p { color: var(--metics-ink-placeholder); font-size: var(--metics-font-size-xs); font-weight: var(--metics-font-weight-semibold); margin: 0 0 var(--metics-space-0-5); }
+    .metics-login-brand-copy h1 { color: var(--metics-ink-heading); font-size: var(--metics-font-size-2xl); font-weight: var(--metics-font-weight-bold); line-height: 1.2; margin: 0; }
+    .metics-login-card-body { padding: var(--metics-space-7) var(--metics-space-8) var(--metics-space-7); }
+    .metics-login-heading { color: var(--metics-ink-heading); font-size: var(--metics-font-size-2xl); font-weight: var(--metics-font-weight-bold); margin: 0; }
+    .metics-login-subtitle { color: var(--metics-ink-muted); font-size: var(--metics-font-size-sm); line-height: 1.5; margin: var(--metics-space-1-5) 0 var(--metics-space-5-5); }
+    .metics-login-form { display: grid; gap: var(--metics-space-4); }
     .metics-login-field { min-width: 0; }
-    .metics-login-label { color: #263c56; display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+    .metics-login-label { color: var(--metics-ink-label); display: block; font-size: var(--metics-font-size-sm); font-weight: var(--metics-font-weight-semibold); margin-bottom: var(--metics-space-1-5); }
     .metics-login-email .form-control,
     .metics-login-password-wrap .form-control {
-        border-color: #cdd9e7;
-        border-radius: 8px;
-        color: #1b2f49;
-        font-size: 14px;
-        min-height: 46px;
+        border-color: var(--metics-border-input);
+        border-radius: var(--metics-radius-md);
+        color: var(--metics-ink-heading);
+        font-size: var(--metics-font-size-sm);
+        min-height: var(--metics-control-lg);
     }
     .metics-login-email .form-control:focus,
     .metics-login-password-wrap .form-control:focus {
@@ -84,16 +84,16 @@
     }
     .metics-login-email .input-group-text {
         background: var(--metics-icon-surface);
-        border-color: #cdd9e7;
-        border-radius: 0 8px 8px 0;
+        border-color: var(--metics-border-input);
+        border-radius: 0 var(--metics-radius-md) var(--metics-radius-md) 0;
         color: var(--metics-interactive-blue) !important;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 0 13px;
+        font-size: var(--metics-font-size-sm);
+        font-weight: var(--metics-font-weight-semibold);
+        padding: 0 var(--metics-space-3);
     }
-    .metics-login-email .form-control { border-radius: 8px 0 0 8px; }
+    .metics-login-email .form-control { border-radius: var(--metics-radius-md) 0 0 var(--metics-radius-md); }
     .metics-login-password-wrap { position: relative; }
-    .metics-login-password-wrap .form-control { padding-right: 48px; }
+    .metics-login-password-wrap .form-control { padding-right: var(--metics-space-12); }
     .metics-login-password-toggle {
         align-items: center;
         background: transparent;
@@ -101,84 +101,84 @@
         border-radius: var(--metics-radius-sm);
         color: var(--metics-interactive-blue);
         display: inline-flex;
-        height: 34px;
+        height: var(--metics-icon-button-sm);
         justify-content: center;
         position: absolute;
         right: 7px;
         top: 6px;
-        width: 34px;
+        width: var(--metics-icon-button-sm);
     }
     .metics-login-password-toggle:hover { background: var(--metics-icon-surface); }
     .metics-login-password-toggle:focus-visible { outline: 2px solid var(--metics-interactive-blue); outline-offset: 1px; }
-    .metics-login-password-toggle .fa { font-size: 15px; }
-    .metics-login-validation { color: var(--metics-danger); display: block; font-size: 12px; line-height: 1.4; margin-top: 5px; }
+    .metics-login-password-toggle .fa { font-size: var(--metics-font-size-md); }
+    .metics-login-validation { color: var(--metics-danger); display: block; font-size: var(--metics-font-size-2xs); line-height: 1.4; margin-top: var(--metics-space-1); }
     .metics-login-feedback {
-        border-radius: 8px;
-        font-size: 13px;
+        border-radius: var(--metics-radius-md);
+        font-size: var(--metics-font-size-xs);
         line-height: 1.45;
         margin: 0;
-        padding: 10px var(--metics-space-3);
+        padding: var(--metics-space-2-5) var(--metics-space-3);
     }
-    .metics-login-feedback-error { background: #fff1f1; border: 1px solid #f0caca; color: #a52834; }
-    .metics-login-feedback-success { background: #eff9f2; border: 1px solid #cce8d3; color: #236b3b; }
+    .metics-login-feedback-error { background: var(--metics-danger-icon-fill); border: 1px solid var(--metics-error-border); color: var(--metics-danger-text); }
+    .metics-login-feedback-success { background: var(--metics-success-tint); border: 1px solid var(--metics-success-border); color: var(--metics-success-text); }
     .metics-login-note {
         align-items: flex-start;
         background: var(--metics-icon-surface);
-        border: 1px solid #dce8f5;
-        border-radius: 8px;
-        color: #526987;
+        border: 1px solid var(--metics-border-modal);
+        border-radius: var(--metics-radius-md);
+        color: var(--metics-ink-muted);
         display: flex;
-        font-size: 12px;
-        gap: 9px;
+        font-size: var(--metics-font-size-2xs);
+        gap: var(--metics-space-2);
         line-height: 1.5;
         margin: 0;
-        padding: 10px var(--metics-space-3);
+        padding: var(--metics-space-2-5) var(--metics-space-3);
     }
-    .metics-login-note .bi { color: var(--metics-interactive-blue); flex: 0 0 auto; font-size: 15px; margin-top: 1px; }
+    .metics-login-note .bi { color: var(--metics-interactive-blue); flex: 0 0 auto; font-size: var(--metics-font-size-md); margin-top: var(--metics-space-0-5); }
     .metics-login-submit {
         align-items: center;
         background: var(--metics-action-blue);
         border: 1px solid var(--metics-action-blue);
-        border-radius: 8px;
+        border-radius: var(--metics-button-radius);
         color: var(--metics-ink-on-dark);
         display: flex;
-        font-size: 15px;
-        font-weight: 600;
+        font-size: var(--metics-button-font-size);
+        font-weight: var(--metics-button-font-weight);
         justify-content: center;
-        min-height: 46px;
+        min-height: var(--metics-control-lg);
         width: 100%;
     }
     .metics-login-submit:hover,
     .metics-login-submit:focus-visible { background: var(--metics-action-hover); border-color: var(--metics-action-hover); color: var(--metics-ink-on-dark); }
     .metics-login-card-footer {
-        background: #f8fafd;
-        border-top: 1px solid #e6edf5;
-        padding: 14px 30px var(--metics-space-4);
+        background: var(--metics-surface-hover);
+        border-top: 1px solid var(--metics-divider-row);
+        padding: var(--metics-space-3-5) var(--metics-space-8) var(--metics-space-4);
     }
-    .metics-login-secondary-links { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .metics-login-secondary-links { display: grid; gap: var(--metics-space-2-5); grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .metics-login-secondary-link {
         background: var(--metics-surface);
-        border: 1px solid #e1e9f2;
-        border-radius: 8px;
+        border: 1px solid var(--metics-border-card);
+        border-radius: var(--metics-radius-md);
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: var(--metics-space-0-5);
         justify-content: center;
         min-height: 62px;
-        padding: var(--metics-space-2) 11px;
+        padding: var(--metics-space-2) var(--metics-space-2-5);
     }
-    .metics-login-secondary-link span { color: #647991; font-size: 11px; line-height: 1.35; }
-    .metics-login-secondary-link a { font-size: 13px; line-height: 1.35; }
-    .metics-login-page a { color: var(--metics-interactive-blue); font-weight: 600; text-underline-offset: 2px; }
+    .metics-login-secondary-link span { color: var(--metics-ink-muted); font-size: var(--metics-font-size-2xs); line-height: 1.35; }
+    .metics-login-secondary-link a { font-size: var(--metics-font-size-xs); line-height: 1.35; }
+    .metics-login-page a { color: var(--metics-interactive-blue); font-weight: var(--metics-font-weight-semibold); text-underline-offset: 2px; }
     .metics-login-page a:hover { color: var(--metics-action-hover); }
-    .metics-login-support { color: #647991; font-size: 12px; line-height: 1.45; margin: 10px 0 0; text-align: center; }
+    .metics-login-support { color: var(--metics-ink-muted); font-size: var(--metics-font-size-2xs); line-height: 1.45; margin: var(--metics-space-2-5) 0 0; text-align: center; }
 
     @@media (max-width: 575.98px) {
         .metics-login-page { padding: var(--metics-space-6) var(--metics-space-3); }
         .metics-login-card-header { padding: var(--metics-space-5) var(--metics-space-5); }
-        .metics-login-card-body { padding: 22px var(--metics-space-5) 22px; }
-        .metics-login-card-footer { padding: var(--metics-space-4) var(--metics-space-5) 18px; }
-        .metics-login-brand-copy h1 { font-size: 21px; }
+        .metics-login-card-body { padding: var(--metics-space-5-5) var(--metics-space-5) var(--metics-space-5-5); }
+        .metics-login-card-footer { padding: var(--metics-space-4) var(--metics-space-5) var(--metics-space-4-5); }
+        .metics-login-brand-copy h1 { font-size: var(--metics-font-size-xl); }
     }
 </style>
 
