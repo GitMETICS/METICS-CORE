@@ -223,7 +223,7 @@
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         <div class="input-group">
                                             @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "crearAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
-                                            <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('crearAsesorPassword', 'crearAsesorPasswordIcon')"><i id="crearAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                            <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('crearAsesorPassword', 'crearAsesorPasswordIcon')"><i id="crearAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                         </div>
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
                                     </div>
@@ -234,7 +234,7 @@
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         <div class="input-group">
                                             @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "crearAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off", required = "required" })
-                                            <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('crearAsesorPasswordCheck', 'crearAsesorPasswordCheckIcon')"><i id="crearAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                            <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('crearAsesorPasswordCheck', 'crearAsesorPasswordCheckIcon')"><i id="crearAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                         </div>
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
                                     </div>
@@ -381,7 +381,7 @@
                                             @Html.Label("contrasena", "Nueva contraseña", new { @for = "editarAsesorPassword" })
                                             <div class="input-group">
                                                 @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "editarAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off" })
-                                                <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('editarAsesorPassword', 'editarAsesorPasswordIcon')"><i id="editarAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                                <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('editarAsesorPassword', 'editarAsesorPasswordIcon')"><i id="editarAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                             </div>
                                             @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
                                         </div>
@@ -391,7 +391,7 @@
                                             @Html.Label("confirmarContrasena", "Confirmar contraseña", new { @for = "editarAsesorPasswordCheck" })
                                             <div class="input-group">
                                                 @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "editarAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off" })
-                                                <button type="button" class="btn btn-outline-secondary" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('editarAsesorPasswordCheck', 'editarAsesorPasswordCheckIcon')"><i id="editarAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
+                                                <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('editarAsesorPasswordCheck', 'editarAsesorPasswordCheckIcon')"><i id="editarAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
                                             </div>
                                             @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
                                         </div>
