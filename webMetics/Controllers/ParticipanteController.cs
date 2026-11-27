@@ -307,22 +307,14 @@ namespace webMetics.Controllers
                     return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                var assigned = 0;
-                foreach (var medalla in selectedMedallas)
-                {
-                    if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla))
-                    {
-                        if (!accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla))
-                            throw new InvalidOperationException("No se pudo asignar la medalla.");
-                        assigned++;
-                    }
-                }
+                // Todas o ninguna: si una medalla falla, no queda ninguna asignada a medias.
+                var assigned = accesoAParticipante.AgregarMedallasParticipante(idParticipante, selectedMedallas);
                 if (assigned > 0) TempData["successMessage"] = "Medallas asignadas correctamente.";
                 else TempData["warningMessage"] = "Las medallas seleccionadas ya estaban asignadas al participante.";
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = $"Error al asignar medallas.";
+                TempData["errorMessage"] = $"No se asignó ninguna medalla: {ex.Message}";
             }
 
             return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });

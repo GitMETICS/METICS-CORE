@@ -192,6 +192,32 @@ public sealed class MedallasCatalogoService
         return (int)command.ExecuteScalar()! > 0;
     });
 
+    /// <summary>
+    /// Asigna varias medallas a un participante en una sola transacción: si alguna no está activa
+    /// o falta su imagen, no se asigna ninguna. Devuelve cuántas asignaciones nuevas se crearon.
+    /// </summary>
+    public int AsignarVarias(string participant, IEnumerable<string> names) => Mutar((connection, transaction) =>
+    {
+        var added = 0;
+        foreach (var name in names.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!File.Exists(RutaImagen(name))) throw new FileNotFoundException($"Falta la imagen de la medalla '{name}'.");
+            using var check = CrearComando(connection, transaction,
+                "SELECT COUNT(*) FROM dbo.catalogo_medallas WHERE nombre_medalla = @nombre AND activa = 1;", name);
+            if ((int)check.ExecuteScalar()! == 0)
+                throw new InvalidOperationException($"La medalla '{name}' no está activa en el catálogo.");
+            using var command = CrearComando(connection, transaction, """
+                INSERT INTO dbo.medallas (id_participante_FK, nombre_medalla)
+                SELECT @participante, @nombre WHERE NOT EXISTS (
+                    SELECT 1 FROM dbo.medallas WHERE id_participante_FK = @participante AND nombre_medalla = @nombre
+                );
+                """, name);
+            command.Parameters.Add("@participante", SqlDbType.NVarChar, 64).Value = participant;
+            added += command.ExecuteNonQuery();
+        }
+        return added;
+    });
+
     public void Asignar(string name, IEnumerable<string> participants) => Mutar((connection, transaction) =>
     {
         if (!File.Exists(RutaImagen(name))) throw new FileNotFoundException("Falta la imagen de la medalla.");
