@@ -307,7 +307,6 @@ namespace webMetics.Controllers
                     return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                // Todas o ninguna: si una medalla falla, no queda ninguna asignada a medias.
                 var assigned = accesoAParticipante.AgregarMedallasParticipante(idParticipante, selectedMedallas);
                 if (assigned > 0) TempData["successMessage"] = "Medallas asignadas correctamente.";
                 else TempData["warningMessage"] = "Las medallas seleccionadas ya estaban asignadas al participante.";

@@ -192,10 +192,6 @@ public sealed class MedallasCatalogoService
         return (int)command.ExecuteScalar()! > 0;
     });
 
-    /// <summary>
-    /// Asigna varias medallas a un participante en una sola transacción: si alguna no está activa
-    /// o falta su imagen, no se asigna ninguna. Devuelve cuántas asignaciones nuevas se crearon.
-    /// </summary>
     public int AsignarVarias(string participant, IEnumerable<string> names) => Mutar((connection, transaction) =>
     {
         var added = 0;

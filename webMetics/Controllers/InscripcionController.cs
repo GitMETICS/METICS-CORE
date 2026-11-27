@@ -92,8 +92,6 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            // Solo medallas activas del catálogo (con imagen): las eliminadas o reemplazadas
-            // conservan su archivo en disco, pero ya no se pueden asignar.
             ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas() ?? new List<string>();
 
 

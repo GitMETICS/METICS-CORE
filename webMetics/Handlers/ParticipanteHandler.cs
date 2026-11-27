@@ -1099,7 +1099,6 @@ namespace webMetics.Handlers
             return true;
         }
 
-        /// <summary>Asigna todas las medallas indicadas o ninguna; devuelve cuántas eran nuevas.</summary>
         public int AgregarMedallasParticipante(string idParticipante, IEnumerable<string> fileNames)
         {
             return new webMetics.Services.MedallasCatalogoService(_environment, _configuration).AsignarVarias(idParticipante, fileNames);

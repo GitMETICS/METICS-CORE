@@ -236,8 +236,6 @@ namespace webMetics.Controllers
 
             try
             {
-                // La contraseña temporal solo aplica a cuentas nuevas: si el usuario ya existe
-                // (p. ej. un participante que pasa a ser facilitador), se conserva su contraseña.
                 bool usuarioExiste = !string.IsNullOrWhiteSpace(asesor.correo)
                     && accesoAUsuario.ExisteUsuario(asesor.correo);
 
@@ -250,7 +248,7 @@ namespace webMetics.Controllers
 
                     if (string.IsNullOrWhiteSpace(asesor.confirmarContrasena))
                     {
-                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Confirma la contraseña temporal.");
+                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Confirme la contraseña temporal.");
                     }
                     else if (!string.IsNullOrWhiteSpace(asesor.contrasena)
                         && asesor.contrasena != asesor.confirmarContrasena)
@@ -275,7 +273,7 @@ namespace webMetics.Controllers
                         accesoAAsesor.CrearAsesor(asesor);
 
                         TempData["successMessage"] = usuarioExiste
-                            ? "El/la facilitador(a) se agregó con éxito. La cuenta ya existía, así que conserva su contraseña actual."
+                            ? "El/la facilitador(a) se agregó con éxito. La cuenta ya existía y se conserva su contraseña actual."
                             : "El/la facilitador(a) se agregó con éxito.";
                         return RedirectToAction("ListaAsesores");
 
