@@ -614,7 +614,8 @@ namespace webMetics.Controllers
         /// </remarks>
         public ActionResult ExportarCalificacionesPDF(int idGrupo, string? searchTerm)
         {
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -679,7 +680,8 @@ namespace webMetics.Controllers
         public ActionResult ExportarCalificacionesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -741,7 +743,8 @@ namespace webMetics.Controllers
         public ActionResult ExportarCalificacionesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -750,7 +753,8 @@ namespace webMetics.Controllers
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
 
-            string sheetName = grupo.nombre.Length > 31 ? grupo.nombre.Substring(0, 31) : grupo.nombre;
+            // Excel no admite [ ] : * ? / \ en el nombre de la hoja ni más de 31 caracteres.
+            string sheetName = NPOI.SS.Util.WorkbookUtil.CreateSafeSheetName(grupo.nombre);
 
             var sheet = workbook.CreateSheet(sheetName);
 
@@ -884,6 +888,13 @@ namespace webMetics.Controllers
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<CalificacionModel> calificaciones = new List<CalificacionModel>();
+
+            // Sin participantes no hay calificaciones que enviar (el handler devuelve null).
+            if (participantes == null || participantes.Count == 0)
+            {
+                TempData["errorMessage"] = "No hay participantes inscritos para enviar calificaciones.";
+                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
+            }
 
             foreach (ParticipanteModel participante in participantes)
             {

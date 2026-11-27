@@ -1368,6 +1368,12 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
             bool isAjaxRequest = IsAjaxRequest();
+            // Participante o asesor editando sus propios datos desde "Mi perfil": se vuelve a su perfil.
+            // VerParticipantes es solo para administradores (con otro rol la página cerraba la sesión).
+            bool volverAlPerfil = GetRole() != 1;
+            string urlDestino = volverAlPerfil
+                ? Url.Action("InformacionPersonal", "Usuario")
+                : Url.Action("VerParticipantes", "Participante");
 
             ValidarAreasExtra(participante);
             ResolverCarrera(participante);
@@ -1437,7 +1443,7 @@ namespace webMetics.Controllers
                     return Json(new
                     {
                         success = true,
-                        redirectUrl = Url.Action("VerParticipantes", "Participante")
+                        redirectUrl = urlDestino
                     });
                 }
 
@@ -1450,7 +1456,7 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra.";
                 }
 
-                return RedirectToAction("VerParticipantes", "Participante");
+                return Redirect(urlDestino);
             }
             catch
             {
@@ -1464,7 +1470,7 @@ namespace webMetics.Controllers
                 }
 
                 TempData["errorMessage"] = "Ocurrió un error al editar los datos.";
-                return RedirectToAction("VerParticipantes", "Participante");
+                return Redirect(urlDestino);
             }
         }
 
