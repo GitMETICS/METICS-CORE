@@ -46,7 +46,7 @@
                                             <i class="bi bi-search" aria-hidden="true"></i>
                                             <input type="search" id="medallaSearch" oninput="filterMedals()" placeholder="Buscar medalla..." aria-label="Buscar medalla para asignar" />
                                         </label>
-                                        <button type="submit" class="btn btn-success medal-assignment-submit"><i class="bi bi-award" aria-hidden="true"></i> Asignar medallas</button>
+                                        <button type="submit" class="btn admin-panel-btn-primary medal-assignment-submit"><i class="bi bi-award" aria-hidden="true"></i> Asignar medallas</button>
                                     </div>
                                     <div class="medal-assignment-scroll" tabindex="0" role="region" aria-label="Medallas disponibles para seleccionar">
                                         <div id="medallaList" class="medal-catalog-grid">
@@ -300,25 +300,28 @@
             }
         </div>
 
-        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Eliminar medalla</h5>
-                    </div>
-                    <div class="modal-body">
-                        ¿Está seguro de que desea eliminar esta medalla?
-                        <br />
-                        @using (Html.BeginForm("EliminarMedallaParticipante", "Medallas"))
-                        {
-                            <div class="modal-footer">
-                                <input type="hidden" id="idParticipante" name="idParticipante" value="@ViewBag.Participante.idParticipante">
-                                <input type="hidden" id="nombreMedalla" name="nombreMedalla">
-                                <input type="submit" class="btn btn-danger" value="Aceptar" />
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    @using (Html.BeginForm("EliminarMedallaParticipante", "Medallas"))
+                    {
+                        <div class="modal-header create-category-modal-header">
+                            <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                            <div class="create-category-modal-heading">
+                                <h2 class="modal-title" id="modalEliminarLabel">Eliminar medalla</h2>
+                                <p>La medalla se quitará de este participante.</p>
                             </div>
-                        }
-                    </div>
+                        </div>
+                        <div class="modal-body create-category-modal-body category-delete-message">
+                            ¿Está seguro de que desea eliminar la medalla <strong id="eliminarMedallaNombre"></strong> de este participante?
+                        </div>
+                        <div class="modal-footer create-category-modal-actions">
+                            <input type="hidden" id="idParticipante" name="idParticipante" value="@ViewBag.Participante.idParticipante">
+                            <input type="hidden" id="nombreMedalla" name="nombreMedalla">
+                            <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn category-delete-confirm">Eliminar medalla</button>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -351,5 +354,8 @@ else
 <script type="text/javascript">
     function actualizarModalEliminar(nombreMedalla) {
         document.getElementById("nombreMedalla").value = nombreMedalla;
+        // Nombre visible: el nombre del archivo de la medalla sin la extensión.
+        var etiquetaNombre = document.getElementById("eliminarMedallaNombre");
+        if (etiquetaNombre) etiquetaNombre.textContent = '«' + String(nombreMedalla || '').replace(/\.[^.]+$/, '').trim() + '»';
     }
 </script>

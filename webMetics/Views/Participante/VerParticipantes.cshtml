@@ -158,26 +158,28 @@
         <input type="hidden" name="searchTerm" value="@Context.Request.Query["searchTerm"]" />
     </form>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar este participante?
-
-                    @using (Html.BeginForm("EliminarParticipante", "Participante"))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="idParticipante" name="idParticipante">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("EliminarParticipante", "Participante"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar participante</h2>
+                            <p>El participante se eliminará del sistema.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar este participante?
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idParticipante" name="idParticipante">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar participante</button>
+                    </div>
+                }
             </div>
         </div>
     </div>

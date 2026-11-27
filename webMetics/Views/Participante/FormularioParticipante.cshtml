@@ -21,20 +21,7 @@
             <h1 metics-page-heading>@ViewBag.Title</h1>
             <hr metics-page-heading />
 
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            @await Html.PartialAsync("_MeticsToast")
 
             <div class="create-participant-sections">
                 <section class="create-participant-card" aria-labelledby="participantPersonalTitle">

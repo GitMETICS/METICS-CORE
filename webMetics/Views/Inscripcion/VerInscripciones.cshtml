@@ -151,13 +151,13 @@
                             </div>
                             <p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Selecciona participantes desde la tabla de inscripciones.</p>
                             <div class="medal-assignment-actions">
-                                <button type="button" class="btn btn-outline-primary" onclick="selectAllParticipants()" aria-pressed="false">
-                                    <i class="bi bi-check-all" aria-hidden="true"></i><span id="selectPageParticipantsText">Seleccionar página</span>
+                                <button type="button" class="btn admin-panel-btn-secondary" onclick="selectAllParticipants()" aria-pressed="false">
+                                    <i class="bi bi-check2-square" aria-hidden="true"></i><span id="selectPageParticipantsText">Seleccionar página</span>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="clearAllParticipants()">
-                                    <i class="bi bi-x-circle" aria-hidden="true"></i>Limpiar
+                                <button type="button" class="btn admin-panel-btn-secondary" onclick="clearAllParticipants()">
+                                    <i class="bi bi-x-lg" aria-hidden="true"></i>Limpiar
                                 </button>
-                                <button type="submit" class="btn btn-success" id="btnAsignarMedallas">
+                                <button type="submit" class="btn admin-panel-btn-primary" id="btnAsignarMedallas">
                                     <i class="bi bi-award" aria-hidden="true"></i>Asignar Medallas
                                 </button>
                             </div>
@@ -232,29 +232,31 @@
     </div>
 
     <!-- Ventana emergente de eliminación -->
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar la inscripción de este participante?
-                    <br />
-                    @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="nombreGrupo" name="nombreGrupo">
-                            <input type="hidden" id="numeroGrupo" name="numeroGrupo">
-                            <input type="hidden" id="idParticipante" name="idParticipante">
-
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar inscripción</h2>
+                            <p>El participante dejará de estar inscrito en este módulo.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar la inscripción de este participante?
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="nombreGrupo" name="nombreGrupo">
+                        <input type="hidden" id="numeroGrupo" name="numeroGrupo">
+                        <input type="hidden" id="idParticipante" name="idParticipante">
+
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar inscripción</button>
+                    </div>
+                }
             </div>
         </div>
     </div>

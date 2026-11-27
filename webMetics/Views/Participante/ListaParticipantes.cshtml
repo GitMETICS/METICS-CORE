@@ -2,539 +2,795 @@
 @{
 	ViewBag.Title = "Participantes";
     PageHeadingBuilder.Configure(ViewContext, Url, subtitle: Convert.ToString(ViewBag.NombreGrupo));
-	var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+	var regresarUrl = ViewBag.Role == 1 ? Url.Action("ListaGruposDisponibles", "Grupo") : Url.Action("MisModulos", "Asesor");
 }
 
 <style>
-	/* La tarjeta, encabezado, barra de controles y búsqueda usan las clases
-	   compartidas .table-card / .table-toolbar / .table-search (site.css).
-	   Aquí solo quedan los estilos propios de esta tabla. */
-	.grupo-participantes-wrapper {
-		background: white;
-		overflow-x: auto;
-		width: 100%;
-	}
+	/* Estilos propios de "Ver participantes" (acotados a .participantes-page).
+	   Tarjetas, botones, popups y toast reutilizan las clases compartidas de site.css. */
+	.contenedor-caja.participantes-page { margin-top: 0; padding-left: 0; padding-right: 0; }
+	.participantes-page .admin-panel-card,
+	.participantes-page .table-card { margin: 0 0 20px; }
+	.participantes-page .admin-panel-card { padding: 22px 26px; }
+	.participantes-page .admin-panel-card + .admin-panel-card { margin-top: 0; }
+	.participantes-page .admin-panel-card-icon { flex-basis: 46px; font-size: 20px; height: 46px; width: 46px; }
+	.participantes-page .admin-panel-card-title { font-size: 18px; }
+	.participantes-page .admin-panel-card-desc { font-size: 14px; }
 
-	#tblCustomers .form-check {
+	/* Encabezado de tarjeta con acción a la derecha */
+	.participantes-card-header {
 		align-items: center;
-		display: flex;
-		justify-content: center;
-		margin: 0;
-		min-height: 20px;
-	}
-
-	#tblCustomers .btn-sm {
-		border-radius: 2px;
-		line-height: 1;
-		min-height: 30px;
-	}
-
-	.grupo-action-list {
+		border-bottom: 1px solid #e6edf5;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 4px;
-		justify-content: center;
+		gap: 14px 18px;
+		justify-content: space-between;
+		margin: 0 0 18px;
+		padding-bottom: 18px;
 	}
+	.participantes-card-header .admin-panel-card-header { align-items: center; flex: 1 1 320px; gap: 14px; margin: 0; min-width: 0; }
+	.participantes-card-header > .btn { align-items: center; display: inline-flex; gap: 6px; white-space: nowrap; }
 
-	.grupo-action-btn {
+	.participantes-grid {
+		display: grid;
+		gap: 22px 30px;
+		grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+	}
+	.participantes-subtitle { color: #172b49; display: block; font-size: 15px; font-weight: 700; margin: 0 0 10px; }
+	.participantes-help { color: #59708f; font-size: 13px; line-height: 1.5; margin: 8px 0 0; }
+	.participantes-help .bi { color: var(--metics-interactive-blue); margin-right: 4px; }
+
+	/* Selector de archivo personalizado (el input nativo queda encima, transparente,
+	   para conservar el clic, el "required" y la validación del navegador). */
+	.participantes-upload { align-items: stretch; display: flex; flex-wrap: wrap; gap: 10px; }
+	.participantes-file {
+		align-items: center;
+		background: #fff;
+		border: 1px solid #cfdbe8;
+		border-radius: 8px;
+		display: flex;
+		flex: 1 1 300px;
+		gap: 12px;
+		min-height: 42px;
+		min-width: 0;
+		padding: 4px 12px 4px 4px;
+		position: relative;
+		transition: border-color .15s ease, box-shadow .15s ease;
+	}
+	.participantes-file input[type="file"] { cursor: pointer; height: 100%; inset: 0; opacity: 0; position: absolute; width: 100%; }
+	.participantes-file-btn {
+		align-items: center;
+		background: var(--metics-icon-surface);
+		border: 1px solid #d3e2f2;
+		border-radius: 6px;
+		color: var(--metics-action-hover);
+		display: inline-flex;
+		flex: 0 0 auto;
+		font-size: 14px;
+		font-weight: 600;
+		gap: 6px;
+		padding: 6px 12px;
+	}
+	.participantes-file-name { color: #7890ad; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.participantes-file.has-file .participantes-file-name { color: #172b49; font-weight: 600; }
+	.participantes-file:hover { border-color: #aebfd2; }
+	.participantes-file:hover .participantes-file-btn { background: var(--metics-soft-blue); }
+	.participantes-file:focus-within { border-color: var(--metics-interactive-blue); box-shadow: 0 0 0 3px rgba(42, 95, 149, .15); }
+	.participantes-upload > .btn { align-items: center; display: inline-flex; gap: 6px; justify-content: center; min-height: 42px; white-space: nowrap; }
+
+	/* Encabezado del listado */
+	.participantes-page .medal-assignment-card { margin: 0 0 20px; }
+	.participantes-more-actions { border-top: 1px solid #e6edf5; display: grid; gap: 8px; margin-top: 16px; padding-top: 14px; }
+	.participantes-more-actions form { margin: 0; }
+	.participantes-more-actions .btn { align-items: center; display: inline-flex; gap: 8px; justify-content: center; min-height: 40px; width: 100%; }
+	.participantes-more-title { color: #59708f; font-size: 13px; font-weight: 600; }
+	.participantes-medal-card .medal-option-card .form-check-input[type="radio"] { border-radius: 50%; }
+	.participantes-list-heading .table-card-title { display: inline; }
+	.participantes-list-heading .table-card-desc { display: block; }
+
+	/* Tabla: misma apariencia que los demás listados (table-card / data-table / icon-action). */
+	/* Tabla con anchos según contenido: las columnas de texto ya no se aplastan ni parten palabras,
+	   y Horas/Calificación ocupan solo lo necesario. Si no cabe, la tabla se desliza de lado. */
+	#tblCustomers { table-layout: auto; width: 100% !important; }
+	/* DataTables fija anchos en línea al iniciar; se anulan para que la tabla quepa en la tarjeta. */
+	#tblCustomers thead th { width: auto !important; }
+	#tblCustomers tbody td { overflow-wrap: normal; vertical-align: middle; word-break: normal; }
+	#tblCustomers th:nth-child(1),
+	#tblCustomers td:nth-child(1) { width: 44px !important; }
+	#tblCustomers td:nth-child(2) { min-width: 110px; }
+	#tblCustomers td:nth-child(3) { min-width: 150px; }
+	#tblCustomers td:nth-child(4) { min-width: 160px; overflow-wrap: anywhere; }
+	#tblCustomers th.participantes-col-num,
+	#tblCustomers td:nth-child(5),
+	#tblCustomers td:nth-child(6),
+	#tblCustomers th.participantes-col-actions,
+	#tblCustomers th.participantes-col-icon { white-space: nowrap; width: 1% !important; }
+	.participantes-editable { align-items: center; display: inline-flex; gap: 6px; justify-content: center; }
+	.participantes-editable > span { color: #172b49; font-weight: 600; min-width: 18px; }
+	.table-card .data-table .participantes-edit-btn { background: transparent; font-size: 14px; height: 30px; width: 30px; }
+	.table-card .data-table .participantes-edit-btn:hover,
+	.table-card .data-table .participantes-edit-btn:focus-visible { background: var(--metics-icon-surface); opacity: 1; }
+	.participantes-list-heading { align-items: center; display: flex; flex: 1 1 320px; gap: 14px; min-width: 0; }
+	.participantes-list-title { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
+	.participantes-list-title .admin-panel-card-title { margin: 0; }
+	.participantes-total {
+		background: var(--metics-soft-blue);
+		border-radius: 999px;
+		color: var(--metics-action-hover);
+		font-size: 13px;
+		font-weight: 700;
+		line-height: 1;
+		padding: 5px 10px;
+	}
+	.participantes-list-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; }
+	.participantes-list-actions .btn { align-items: center; display: inline-flex; gap: 6px; justify-content: center; min-height: 40px; }
+	.participantes-export-menu { border: 1px solid #dfe7f1; border-radius: 10px; box-shadow: 0 8px 24px rgba(16, 38, 64, .12); min-width: 210px; padding: 6px; }
+	.participantes-export-menu .dropdown-item { align-items: center; border-radius: 6px; color: #172b49; display: flex; font-size: 14px; gap: 10px; padding: 8px 10px; }
+	.participantes-export-menu .dropdown-item .bi { color: var(--metics-interactive-blue); font-size: 16px; }
+	.participantes-export-menu .dropdown-item:hover,
+	.participantes-export-menu .dropdown-item:focus { background: var(--metics-icon-surface); color: var(--metics-action-hover); }
+	.participantes-export-menu .dropdown-item:active { background: var(--metics-soft-blue); color: var(--metics-action-hover); }
+	.participantes-list-actions .dropdown-toggle::after { margin-left: 4px; }
+
+	/* Estado vacío */
+	.participantes-empty { align-items: center; display: flex; flex-direction: column; gap: 6px; padding: 34px 20px 38px; text-align: center; }
+	.participantes-empty-icon {
+		align-items: center;
+		background: var(--metics-soft-blue);
+		border-radius: 50%;
+		color: var(--metics-action-blue);
+		display: inline-flex;
+		font-size: 26px;
+		height: 60px;
+		justify-content: center;
+		margin-bottom: 8px;
+		width: 60px;
+	}
+	.participantes-empty-title { color: #172b49; font-size: 17px; font-style: normal; font-weight: 700; margin: 0; }
+	.participantes-empty-text { color: #59708f; font-size: 14px; margin: 0; }
+
+	.participantes-search { margin-bottom: 12px; position: relative; }
+	.participantes-search .bi { color: #7890ad; left: 14px; position: absolute; top: 50%; transform: translateY(-50%); }
+	.participantes-search .form-control { border-color: #cfdbe8; border-radius: 8px; min-height: 42px; padding-left: 40px; }
+	.participantes-search .form-control:focus { border-color: var(--metics-interactive-blue); box-shadow: 0 0 0 3px rgba(42, 95, 149, .15); }
+
+	.participantes-medals {
+		border: 1px solid #e1e9f2;
+		border-radius: 10px;
+		display: grid;
+		gap: 10px;
+		grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+		margin-bottom: 14px;
+		max-height: 300px;
+		overflow-y: auto;
+		padding: 10px;
+		scrollbar-color: #c3d2e3 transparent;
+		scrollbar-width: thin;
+	}
+	.participantes-medal { margin: 0; position: relative; }
+	.participantes-medal input { opacity: 0; pointer-events: none; position: absolute; }
+	.participantes-medal label {
+		align-items: center;
+		background: #fff;
+		border: 1px solid #e1e9f2;
+		border-radius: 10px;
+		color: #33475f;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		font-size: 12.5px;
+		gap: 8px;
+		height: 100%;
+		padding: 12px 8px 10px;
+		text-align: center;
+		transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+		word-break: break-word;
+	}
+	.participantes-medal img { height: 72px; object-fit: contain; width: 72px; }
+	.participantes-medal label:hover { background: var(--metics-icon-surface); border-color: #b9cde3; }
+	.participantes-medal input:checked + label {
+		background: var(--metics-soft-blue);
+		border-color: var(--metics-interactive-blue);
+		box-shadow: 0 0 0 2px rgba(42, 95, 149, .18);
+		color: var(--metics-action-hover);
+		font-weight: 650;
+	}
+	.participantes-medal input:focus-visible + label { outline: 2px solid var(--metics-interactive-blue); outline-offset: 2px; }
+	.participantes-medals-empty { color: #59708f; grid-column: 1 / -1; margin: 0; padding: 18px; text-align: center; }
+
+	.participantes-selection {
+		align-items: center;
+		background: var(--metics-icon-surface);
+		border: 1px solid #dbe7f4;
+		border-radius: 10px;
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 12px;
+		padding: 12px 14px;
+	}
+	.participantes-selection span:first-child { color: #33475f; font-weight: 600; }
+	.participantes-count {
+		background: var(--metics-action-blue);
+		border-radius: 999px;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 700;
+		min-width: 32px;
+		padding: 3px 10px;
+		text-align: center;
+	}
+	.participantes-mass-actions { display: grid; gap: 10px; }
+	.participantes-mass-actions form { margin: 0; }
+	.participantes-mass-actions .btn { align-items: center; display: inline-flex; gap: 8px; justify-content: center; min-height: 40px; width: 100%; }
+	.btn.participantes-btn-danger {
+		--bs-btn-active-bg: #fdecee;
+		--bs-btn-active-border-color: #c0392b;
+		--bs-btn-active-color: #a93226;
+		background: #fff;
+		border: 1px solid #e7b8b4;
+		border-radius: 8px;
+		color: #b03a2e;
+		font-weight: 600;
+	}
+	.btn.participantes-btn-danger:hover,
+	.btn.participantes-btn-danger:focus-visible { background: #fdecee; border-color: #c0392b; color: #a93226; }
+
+	.grupo-participantes-wrapper { background: #fff; overflow-x: auto; width: 100%; }
+	#tblCustomers .form-check { align-items: center; display: flex; justify-content: center; margin: 0; min-height: 20px; }
+	#tblCustomers .form-check-input:checked,
+	#tblCustomers .form-check-input:indeterminate { background-color: var(--metics-action-blue); border-color: var(--metics-action-blue); }
+	#tblCustomers .form-check-input:focus { border-color: var(--metics-interactive-blue); box-shadow: 0 0 0 3px rgba(42, 95, 149, .15); }
+	#tblCustomers .form-control-sm { border-color: #cfdbe8; border-radius: 6px; }
+
+	.participantes-inline-btn { align-items: center; border-radius: 6px; display: inline-flex; height: 32px; justify-content: center; padding: 0; width: 32px; }
+	.btn.participantes-inline-save { background: var(--metics-action-blue); border: 1px solid var(--metics-action-blue); color: #fff; }
+	.btn.participantes-inline-save:hover,
+	.btn.participantes-inline-save:focus-visible { background: var(--metics-action-hover); border-color: var(--metics-action-hover); color: #fff; }
+	.btn.participantes-inline-cancel { background: #fff; border: 1px solid #cfdbe8; color: #33475f; }
+	.btn.participantes-inline-cancel:hover,
+	.btn.participantes-inline-cancel:focus-visible { background: #f3f6fa; border-color: #aebfd2; color: #172b49; }
+
+	.grupo-action-list { display: flex; flex-wrap: nowrap; gap: 4px; justify-content: center; }
+	.grupo-action-btn,
+	.grupo-action-delete {
 		align-items: center;
 		background: transparent;
 		border: 0;
-		border-radius: 2px;
-		color: #0090D8;
+		border-radius: 8px;
+		color: var(--metics-interactive-blue);
 		cursor: pointer;
 		display: inline-flex;
-		font-size: 14px;
-		height: 30px;
+		font-size: 15px;
+		height: 32px;
 		justify-content: center;
 		line-height: 1;
-		min-width: 30px;
-		padding: 5px 8px;
+		padding: 0;
 		text-decoration: none;
+		transition: background-color .15s ease, color .15s ease;
+		width: 32px;
 	}
+	.grupo-action-btn:hover,
+	.grupo-action-btn:focus-visible { background: var(--metics-icon-surface); color: var(--metics-action-hover); }
+	.grupo-action-delete { color: #c0392b; }
+	.grupo-action-delete:hover,
+	.grupo-action-delete:focus-visible { background: #fdecee; color: #a93226; }
 
-	.grupo-action-btn:hover {
-		background: transparent;
-		color: #0090D8;
+	.grupo-participantes-actions { display: flex; justify-content: flex-end; margin: 0 0 16px; }
+
+	@@media (max-width: 991.98px) {
+		.participantes-grid { grid-template-columns: 1fr; }
 	}
-
-	.grupo-action-delete {
-		color: #C0392B;
-		text-decoration: none;
+	@@media (max-width: 767.98px) {
+		.participantes-page .admin-panel-card { padding: 18px 16px; }
+		.participantes-page .table-card-header { align-items: stretch; flex-direction: column; padding: 18px 16px; }
+		.participantes-list-heading,
+		.participantes-card-header .admin-panel-card-header { flex: 0 0 auto; }
+		.participantes-list-actions { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; width: 100%; }
+		.participantes-list-actions .dropdown,
+		.participantes-list-actions .btn { width: 100%; }
+		.participantes-export-menu { min-width: 100%; }
+		.participantes-card-header { align-items: stretch; flex-direction: column; }
+		.participantes-card-header > .btn { justify-content: center; width: 100%; }
+		.participantes-upload { flex-direction: column; }
+		.participantes-file { flex: 0 0 auto; }
+		.participantes-upload > .btn { width: 100%; }
+		.participantes-page .table-toolbar { padding-left: 16px; padding-right: 16px; }
+		.participantes-page .table-search { max-width: none; width: 100%; }
+		.grupo-participantes-wrapper { -webkit-overflow-scrolling: touch; }
+		.participantes-page .grupo-participantes-wrapper { overflow-x: auto; }
+		#tblCustomers { min-width: 760px; }
+		.grupo-participantes-actions .btn { width: 100%; }
 	}
-
-	.grupo-action-delete:hover {
-		color: #C0392B;
-	}
-
-	.grupo-participantes-actions {
-		display: flex;
-		justify-content: flex-end;
-		margin-top: 16px;
+	@@media (max-width: 575.98px) {
+		.participantes-page .admin-panel-card-icon { flex-basis: 40px; font-size: 18px; height: 40px; width: 40px; }
+		.participantes-page .admin-panel-card-title { font-size: 17px; }
+		.participantes-page .admin-panel-card-desc { font-size: 13.5px; }
+		.participantes-file-btn { padding: 6px 10px; }
+		.participantes-medals { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); max-height: 260px; }
+		.participantes-medal img { height: 56px; width: 56px; }
+		.participantes-empty { padding: 26px 16px 30px; }
 	}
 </style>
 
 @if (ViewBag.Role == 1 || ViewBag.Role == 2)
 {
-	<div class="contenedor-caja container-fluid">
-		@if (urlReferrer != null)
-		{
-			<div class="d-flex justify-content-start mb-2">
-				@if (ViewBag.Role == 1)
-				{
-					<a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-						<i class="bi bi-arrow-left"></i>
-					</a>
-				}
-				else if (ViewBag.Role == 2)
-				{
-					<a class="text-dark fs-4" href="@Url.Action("MisModulos", "Asesor")">
-						<i class="bi bi-arrow-left"></i>
-					</a>
-				}
-			</div>
-		}
+	var totalParticipantes = (ViewBag.ListaParticipantes as System.Collections.ICollection)?.Count ?? 0;
 
+	<div class="contenedor-caja container-fluid participantes-page">
 		<div metics-page-heading class="mb-3">
 			<h1 metics-page-heading class="mb-1">@ViewBag.NombreGrupo</h1>
 			<h2 metics-page-heading class="mb-0">@ViewBag.Title</h2>
 		</div>
 		<hr metics-page-heading class="my-2" />
 
-		@if (ViewBag.ErrorMessage != null)
-		{
-			<div class="alert alert-dark alert-dismissible fade show mb-2" role="alert">
-				@ViewBag.ErrorMessage
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		}
-		@if (ViewBag.SuccessMessage != null)
-		{
-			<div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
-				@ViewBag.SuccessMessage
-				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		}
+		@await Html.PartialAsync("_MeticsToast")
 
-		<div class="table-responsive">
-			<!-- SECCIÓN: Carga de Archivo y Exportación -->
-			<div class="card border-0 shadow-sm mb-3">
-				<div class="card-body p-3">
-					<div class="row g-3 align-items-stretch">
-						<!-- Columna Izquierda: Upload -->
-						<div class="col-lg-8 d-flex flex-column">
-							@using (Html.BeginForm("SubirExcelCalificaciones", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
-							{
-								<div class="mb-2 flex-shrink-0">
-									<label class="form-label fw-bold mb-2">Subir Calificaciones</label>
-									<div class="input-group mb-2">
-										<input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" required>
-										<input class="btn btn-secondary" type="submit" value="Subir">
-										<input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
+		<!-- SECCIÓN: Gestión de calificaciones -->
+		<section class="admin-panel-card" aria-labelledby="participantesCalificacionesTitulo">
+			<div class="participantes-card-header">
+				<div class="admin-panel-card-header">
+					<span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-file-earmark-spreadsheet"></i></span>
+					<div>
+						<h2 class="admin-panel-card-title" id="participantesCalificacionesTitulo">Gestión de calificaciones</h2>
+						<p class="admin-panel-card-desc">Importa las horas aprobadas y calificaciones desde un archivo de Excel.</p>
+					</div>
+				</div>
+				<a class="btn admin-panel-btn-secondary btn-sm" href="@Url.Action("DescargarPlantillaSubirCalificaciones", "Calificaciones")"><i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>Descargar plantilla</a>
+			</div>
+
+			@using (Html.BeginForm("SubirExcelCalificaciones", "Calificaciones", FormMethod.Post, new { enctype = "multipart/form-data" }))
+			{
+				<label class="participantes-subtitle" for="file">Archivo de calificaciones</label>
+				<div class="participantes-upload">
+					<div class="participantes-file" id="participantesFile">
+						<span class="participantes-file-btn" aria-hidden="true"><i class="bi bi-paperclip"></i>Seleccionar archivo</span>
+						<span class="participantes-file-name" id="participantesFileName" aria-hidden="true">Ningún archivo seleccionado</span>
+						<input type="file" name="file" id="file" accept=".xls,.xlsx" required>
+					</div>
+					<button class="btn admin-panel-btn-primary" type="submit"><i class="bi bi-upload" aria-hidden="true"></i>Importar calificaciones</button>
+					<input type="hidden" name="idGrupo" id="idGrupo" value="@ViewBag.IdGrupo">
+				</div>
+				<p class="participantes-help">
+					<i class="bi bi-info-circle" aria-hidden="true"></i>Formatos admitidos: <strong>XLS</strong> o <strong>XLSX</strong>. Columnas requeridas: Correo Institucional, Horas Aprobadas y Calificación.
+				</p>
+			}
+		</section>
+
+		@if (ViewBag.ListaParticipantes != null)
+		{
+			<!-- SECCIÓN: Asignación de medallas y acciones masivas -->
+			<form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas"></form>
+			<section class="medal-assignment-card participantes-medal-card" aria-labelledby="medalAssignmentTitle">
+				<header class="medal-assignment-header">
+					<i class="bi bi-award" aria-hidden="true"></i>
+					<div>
+						<h2 id="medalAssignmentTitle">Asignación masiva de medallas</h2>
+						<p>Selecciona una medalla y los participantes a quienes deseas asignarla.</p>
+					</div>
+				</header>
+
+				<div class="medal-assignment-layout">
+					<section class="medal-gallery-section" aria-labelledby="medalGalleryTitle">
+						<label class="medal-section-label" id="medalGalleryTitle" for="medalla-search">Seleccionar medalla</label>
+						<div class="input-group medal-search-group">
+							<input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Buscar medalla..." aria-label="Buscar medalla">
+							<span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
+						</div>
+
+						@if (ViewBag.TodasLasMedallas != null)
+						{
+							<div class="medal-carousel" aria-label="Navegación de medallas">
+								<button type="button" class="medal-carousel-button" id="medalCarouselPrevious" onclick="navigateMedalCarousel(-1)" aria-label="Ver medallas anteriores" aria-controls="medalCarouselViewport" disabled>
+									<i class="bi bi-chevron-left" aria-hidden="true"></i>
+								</button>
+								<div class="medal-gallery-scroll" id="medalCarouselViewport" role="region" aria-label="Galería de medallas" tabindex="0">
+									<div id="medalla-list" class="medalla-list-container" role="radiogroup" aria-label="Medallas disponibles">
+										@foreach (var medalla in ViewBag.TodasLasMedallas)
+										{
+											<div class="medalla-item medal-option-card">
+												<img src="~/images/medallas/@medalla" alt="" class="medalla-image" loading="lazy" />
+												<div class="form-check">
+													<label class="form-check-label" for="medalla_@medalla">
+														<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" id="medalla_@medalla" form="formAsignarMedallas">
+														<span>@medalla</span>
+													</label>
+												</div>
+											</div>
+										}
 									</div>
 								</div>
-
-								<div class="alert alert-light border border-secondary p-2 mb-0 flex-grow-1 d-flex flex-column justify-content-center" role="alert">
-									<small class="text-muted">
-										<i class="bi bi-info-circle me-1"></i>
-										Formato <strong>XLS</strong> o <strong>XLSX</strong>: Correo Institucional, Horas Aprobadas, Calificación
-										<br />
-										@Html.ActionLink("Descargar plantilla", "DescargarPlantillaSubirCalificaciones", "Calificaciones", new { }, new { @class = "btn btn-sm btn-outline-secondary mt-2" })
-									</small>
-								</div>
-							}
-						</div>
-
-						<!-- Columna Derecha: Exportación -->
-						<div class="col-lg-4 d-flex flex-column">
-							<label class="form-label fw-bold mb-2">Exportar Datos</label>
-							<div class="d-grid gap-2 flex-grow-1" style="grid-template-columns: 1fr 1fr;">
-								@Html.ActionLink("   PDF", "ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Excel", "ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Word", "ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-secondary bi bi-download d-flex align-items-center justify-content-center" })
-								@Html.ActionLink("   Enviar", "EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] }, new { @class = "btn btn-outline-primary bi bi-envelope d-flex align-items-center justify-content-center" })
+								<button type="button" class="medal-carousel-button" id="medalCarouselNext" onclick="navigateMedalCarousel(1)" aria-label="Ver más medallas" aria-controls="medalCarouselViewport">
+									<i class="bi bi-chevron-right" aria-hidden="true"></i>
+								</button>
 							</div>
+						}
+						else
+						{
+							<p class="medal-gallery-empty">No hay medallas disponibles.</p>
+						}
+					</section>
+
+					<aside class="medal-assignment-panel" aria-labelledby="assignmentSummaryTitle">
+						<h3 id="assignmentSummaryTitle">Resumen de asignación</h3>
+						@if (ViewBag.Role == 1)
+						{
+							@Html.AntiForgeryToken()
+							<input type="hidden" name="nombreGrupo" value="@ViewBag.NombreGrupo">
+							<input type="hidden" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
+
+							<div class="medal-participant-summary" aria-live="polite" aria-atomic="true">
+								<i class="bi bi-people" aria-hidden="true"></i>
+								<div>
+									<span>Participantes seleccionados</span>
+									<strong id="selectedCount">0</strong>
+								</div>
+							</div>
+						}
+						<p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Selecciona participantes desde el listado de participantes.</p>
+						<div class="medal-assignment-actions">
+							@if (ViewBag.Role == 1)
+							{
+								<button type="button" class="btn admin-panel-btn-secondary" onclick="selectAllParticipants()">
+									<i class="bi bi-check2-square" aria-hidden="true"></i>Seleccionar todo
+								</button>
+								<button type="button" class="btn admin-panel-btn-secondary" onclick="clearAllParticipants()">
+									<i class="bi bi-x-lg" aria-hidden="true"></i>Limpiar
+								</button>
+							}
+							<button type="submit" class="btn admin-panel-btn-primary" id="btnAsignarMedallas" form="formAsignarMedallas">
+								<i class="bi bi-award" aria-hidden="true"></i>Asignar a seleccionados
+							</button>
 						</div>
+
+						@if (ViewBag.Role == 1)
+						{
+							<div class="participantes-more-actions">
+								<span class="participantes-more-title">Otras acciones</span>
+								<form method="post" asp-controller="Inscripcion" asp-action="CambiarEstadoInscritoAIncompleto" id="formCambiarEstado">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo">
+									<button type="button" class="btn admin-panel-btn-soft" id="btnCambiarEstado" onclick="actualizarModalCambiarEstado()">
+										<i class="bi bi-arrow-repeat" aria-hidden="true"></i>Cambiar estado
+									</button>
+								</form>
+
+								<form method="post" asp-controller="Inscripcion" asp-action="EliminarInscripcionMasivo" id="formEliminarInscripciones">
+									<button type="button" class="btn participantes-btn-danger" id="btnEliminarInscripciones" onclick="actualizarModalEliminarMasivo()">
+										<i class="bi bi-trash3" aria-hidden="true"></i>Eliminar inscripciones
+									</button>
+								</form>
+							</div>
+						}
+					</aside>
+				</div>
+			</section>
+		}
+
+		<!-- SECCIÓN: Listado de participantes -->
+		<section class="table-card" aria-labelledby="participantesListadoTitulo">
+			<div class="table-card-header">
+				<div class="table-card-heading participantes-list-heading">
+					<div>
+						<div class="participantes-list-title">
+							<h2 class="table-card-title mb-0" id="participantesListadoTitulo">Listado de participantes</h2>
+							<span class="participantes-total" title="Participantes inscritos">@totalParticipantes</span>
+						</div>
+						<span class="table-card-desc">Personas inscritas en el módulo</span>
 					</div>
+				</div>
+				<div class="participantes-list-actions">
+					<div class="dropdown">
+						<button type="button" class="btn admin-panel-btn-secondary dropdown-toggle" id="participantesExportar" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="bi bi-download" aria-hidden="true"></i>Exportar
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end participantes-export-menu" aria-labelledby="participantesExportar">
+							<li><a class="dropdown-item" href="@Url.Action("ExportarCalificacionesPDF", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] })"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>Documento PDF</a></li>
+							<li><a class="dropdown-item" href="@Url.Action("ExportarCalificacionesExcel", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] })"><i class="bi bi-file-earmark-excel" aria-hidden="true"></i>Microsoft Excel</a></li>
+							<li><a class="dropdown-item" href="@Url.Action("ExportarCalificacionesWord", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] })"><i class="bi bi-file-earmark-word" aria-hidden="true"></i>Microsoft Word</a></li>
+						</ul>
+					</div>
+					<a class="btn admin-panel-btn-soft" href="@Url.Action("EnviarCalificacionesAlCorreo", "Calificaciones", new { idGrupo = ViewBag.IdGrupo, searchTerm = Context.Request.Query["searchTerm"] })"><i class="bi bi-envelope" aria-hidden="true"></i>Enviar</a>
 				</div>
 			</div>
 
 			@if (ViewBag.ListaParticipantes == null)
 			{
-				<h5 class="text-center text-muted my-5">No hay personas inscritas.</h5>
+				<div class="participantes-empty">
+					<span class="participantes-empty-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+					<p class="participantes-empty-title">No hay participantes inscritos</p>
+					<p class="participantes-empty-text">Las personas inscritas en este módulo aparecerán aquí.</p>
+				</div>
 			}
 			else
 			{
-				<!-- SECCIÓN: Acciones Masivas -->
-				<div class="card border-0 shadow-sm mb-3">
-					<div class="card-body p-3">
-						<h5 class="card-title mb-3">
-							<i class="bi bi-gear me-2"></i>Acciones Masivas
-						</h5>
-
-						<div class="row g-3">
-							<!-- Asignación de Medallas -->
-							<div class="col-lg-8">
-								<form method="post" asp-controller="Participante" asp-action="AsignarMedallaMasiva" id="formAsignarMedallas">
-									<label class="form-label fw-bold mb-2">Asignar Medalla</label>
-
-									<div class="input-group mb-2">
-										<input type="text" class="form-control" id="medalla-search" onkeyup="filterMedals()" placeholder="Buscar medalla...">
-										<span class="input-group-text">
-											<i class="bi bi-search"></i>
-										</span>
-									</div>
-
-									<div id="medalla-list" class="d-flex flex-column gap-2 mb-2 p-2 border rounded" style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa;">
-										@if (ViewBag.TodasLasMedallas != null)
-										{
-											@foreach (var medalla in ViewBag.TodasLasMedallas)
-											{
-												<div class="medalla-item d-flex align-items-center gap-3 p-2 border-bottom">
-													<div style="flex-shrink: 0;">
-														<img src="~/images/medallas/@medalla" alt="@medalla" style="width: 250px; height: 250px; object-fit: contain;" />
-													</div>
-													<div class="form-check mb-0 flex-grow-1">
-														<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" id="medalla_@medalla">
-														<label class="form-check-label fw-500" for="medalla_@medalla" style="cursor: pointer; flex-grow: 1;">
-															@medalla
-														</label>
-													</div>
-												</div>
-											}
-										}
-										else
-										{
-											<p class="text-muted mb-0">No hay medallas disponibles.</p>
-										}
-									</div>
-
-									<button type="submit" class="btn btn-success w-100" id="btnAsignarMedallas">
-										<i class="bi bi-award me-1"></i>Asignar a Seleccionados
-									</button>
-								</form>
+				<div class="table-toolbar">
+					<div class="table-toolbar-group">
+						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="table-search" id="formBuscarParticipantesDelGrupo">
+							<div class="table-search-field">
+								<button type="submit" class="table-search-submit" aria-label="Buscar participante">
+									<i class="bi bi-search" aria-hidden="true"></i>
+								</button>
+								<input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" aria-label="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
 							</div>
+						</form>
+						<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" form="formBuscarParticipantesDelGrupo">
 
-							<!-- Eliminación Masiva -->
-							@if (ViewBag.Role == 1)
-							{
-                                <!-- Columna para eliminación masiva -->
-								<div class="col-lg-4 d-flex flex-column justify-content-end">
-									@Html.AntiForgeryToken()
-									<input type="hidden" name="nombreGrupo" value="@ViewBag.NombreGrupo">
-									<input type="hidden" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
-
-									<div class="bg-light p-2 mb-2 rounded border border-secondary">
-										<div class="d-flex justify-content-between align-items-center">
-											<label class="form-label fw-bold mb-0">Seleccionados</label>
-											<span class="badge bg-secondary">
-												<span id="selectedCount">0</span>
-											</span>
-										</div>
-									</div>
-
-									<div class="d-grid gap-2 mb-2">
-										<button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllParticipants()">
-											<i class="bi bi-check-all me-1"></i>Seleccionar Todo
-										</button>
-										<button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAllParticipants()">
-											<i class="bi bi-x-circle me-1"></i>Limpiar
-										</button>
-									
-
-									<form method="post" asp-controller="Inscripcion" asp-action="CambiarEstadoInscritoAIncompleto" id="formCambiarEstado">
-										@Html.AntiForgeryToken()
-										<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo">
-										<button type="button" class="btn btn-warning w-100" id="btnCambiarEstado" onclick="actualizarModalCambiarEstado()">
-											<i class="bi bi-arrow-repeat me-1"></i>Cambiar Estado
-										</button>
-									</form>
-
-									<form method="post" asp-controller="Inscripcion" asp-action="EliminarInscripcionMasivo" id="formEliminarInscripciones">
-										<button type="button" class="btn btn-danger w-100 btn-sm" id="btnEliminarInscripciones" onclick="actualizarModalEliminarMasivo()">
-											<i class="bi bi-trash me-1"></i>Eliminar Inscripciones
-										</button>
-									</form>
-									</div>
-								</div>
-							}
+						<div class="table-pagesize">
+							<label for="participantesPageSize">Mostrar</label>
+							<select id="participantesPageSize">
+								<option value="10">10</option>
+								<option value="25">25</option>
+								<option value="50" selected>50</option>
+								<option value="-1">Todos</option>
+							</select>
+							<label for="participantesPageSize">registros</label>
 						</div>
 					</div>
 				</div>
 
-				<!-- SECCIÓN: Tabla de Participantes -->
-				<div class="table-card mb-3">
-					<div class="table-card-header">
-					<div class="table-card-heading">
-						<span class="table-card-title">Participantes</span>
-						<span class="table-card-desc">Listado de participantes inscritos en el módulo</span>
-					</div>
-					</div>
-
-					<div class="table-toolbar">
-						<form asp-action="BuscarParticipantesDelGrupo" asp-controller="Participante" method="get" class="table-search" id="formBuscarParticipantesDelGrupo">
-							<input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
-							<button class="btn" type="submit"><i class="bi bi-search"></i></button>
-						</form>
-						<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo" form="formBuscarParticipantesDelGrupo">
-					</div>
-
 				<div class="grupo-participantes-wrapper table-scroll">
-							<table class="table data-table mb-0" id="tblCustomers">
-								<thead>
-									<tr>
-										<th class="text-center p-2" style="width:40px;">
-											<div class="form-check">
-												<input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
+					<table class="data-table" id="tblCustomers">
+						<thead>
+							<tr>
+								<th scope="col" class="text-center">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()" aria-label="Seleccionar todos">
+									</div>
+								</th>
+								<th scope="col">Unidad Académica</th>
+								<th scope="col">Nombre completo</th>
+								<th scope="col">Correo Institucional</th>
+								<th scope="col" class="text-center participantes-col-num">Horas</th>
+								<th scope="col" class="text-center participantes-col-num">Calificación</th>
+								<th scope="col" class="text-center participantes-col-actions">Acciones</th>
+								@if (ViewBag.Role == 1)
+								{
+									<th scope="col" class="text-center participantes-col-icon"></th>
+								}
+							</tr>
+						</thead>
+
+						<tbody>
+							@foreach (var participante in ViewBag.ListaParticipantes)
+							{
+								var nombreCompleto = participante.nombre;
+								nombreCompleto += " " + participante.primerApellido;
+								if (participante.segundoApellido != "-")
+								{
+									nombreCompleto += " " + participante.segundoApellido;
+								}
+
+								List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
+								int horasAprobadas = 0;
+								double calificacion = 0;
+
+								if (inscripciones != null)
+								{
+									horasAprobadas = inscripciones
+										.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+										.Select(i => i.horasAprobadas)
+										.FirstOrDefault();
+
+									calificacion = inscripciones
+										.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
+										.Select(i => i.calificacion)
+										.FirstOrDefault();
+								}
+
+								<tr>
+									<td class="text-center">
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input participante-checkbox"
+												   name="participantesSeleccionados"
+												   value="@participante.idParticipante"
+												   id="participante_@participante.idParticipante"
+												   onchange="updateSelectedCount()"
+												   aria-label="Seleccionar a @nombreCompleto">
+										</div>
+									</td>
+									<td>@participante.unidadAcademica</td>
+									<td>@nombreCompleto</td>
+									<td>@participante.correo</td>
+									<td class="text-center">
+										<div class="horas-display" id="horas-display-@participante.idParticipante">
+											<span>@horasAprobadas</span>
+										</div>
+										<form class="horas-form d-none" id="form-horas-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
+											@Html.AntiForgeryToken()
+											<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
+												<input type="number" min="0" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante" aria-label="Horas aprobadas">
+												<button type="submit" class="btn btn-sm participantes-inline-btn participantes-inline-save" title="Guardar" aria-label="Guardar horas">
+													<i class="bi bi-check-lg"></i>
+												</button>
+												<button type="button" class="btn btn-sm participantes-inline-btn participantes-inline-cancel" title="Cancelar" aria-label="Cancelar edición" onclick="cancelarEdicionHoras('@participante.idParticipante')">
+													<i class="bi bi-x-lg"></i>
+												</button>
 											</div>
-										</th>
-										<th class="p-2">Unidad Académica</th>
-										<th class="p-2">Nombre</th>
-										<th class="p-2">Primer Apellido</th>
-										<th class="p-2">Segundo Apellido</th>
-										<th class="p-2">Correo Institucional</th>
-										<th class="text-center p-2" style="width:140px;">Horas</th>
-										<th class="text-center p-2" style="width:140px;">Calificación</th>
-										<th class="text-center p-2" style="width:120px;">Acciones</th>
-										@if (ViewBag.Role == 1)
-										{
-											<th class="text-center p-2" style="width:40px;"></th>
-										}
-									</tr>
-								</thead>
-
-								<tbody>
-									@foreach (var participante in ViewBag.ListaParticipantes)
+										</form>
+									</td>
+									<td class="text-center">
+										<div class="calificacion-display" id="calificacion-display-@participante.idParticipante">
+											<span>@calificacion</span>
+										</div>
+										<form class="calificacion-form d-none" id="form-calificacion-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
+											@Html.AntiForgeryToken()
+											<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
+												<input type="number" min="0" max="100" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante" aria-label="Calificación">
+												<button type="submit" class="btn btn-sm participantes-inline-btn participantes-inline-save" title="Guardar" aria-label="Guardar calificación">
+													<i class="bi bi-check-lg"></i>
+												</button>
+												<button type="button" class="btn btn-sm participantes-inline-btn participantes-inline-cancel" title="Cancelar" aria-label="Cancelar edición" onclick="cancelarEdicionCalificacion('@participante.idParticipante')">
+													<i class="bi bi-x-lg"></i>
+												</button>
+											</div>
+										</form>
+									</td>
+									<td class="text-center">
+										<div class="grupo-action-list">
+											<button type="button" class="grupo-action-btn" title="Editar horas" aria-label="Editar horas" onclick="editarHoras('@participante.idParticipante')">
+												<i class="bi bi-pencil"></i>
+											</button>
+											<button type="button" class="grupo-action-btn" title="Editar calificación" aria-label="Editar calificación" onclick="editarCalificacion('@participante.idParticipante')">
+												<i class="bi bi-pencil-square"></i>
+											</button>
+											<a class="grupo-action-btn" title="Ver detalles" aria-label="Ver detalles" href="@Url.Action("VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo })">
+												<i class="bi bi-search"></i>
+											</a>
+										</div>
+									</td>
+									@if (ViewBag.Role == 1)
 									{
-										var nombreCompleto = participante.nombre;
-										nombreCompleto += " " + participante.primerApellido;
-										if (participante.segundoApellido != "-")
-										{
-											nombreCompleto += " " + participante.segundoApellido;
-										}
-										
-										List<InscripcionModel> inscripciones = ViewBag.Inscripciones as List<InscripcionModel>;
-										int horasAprobadas = 0;
-										double calificacion = 0;
-
-										if (inscripciones != null)
-										{
-											horasAprobadas = inscripciones
-												.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-												.Select(i => i.horasAprobadas)
-												.FirstOrDefault();
-
-											calificacion = inscripciones
-												.Where(i => i.idParticipante == participante.idParticipante && i.idGrupo == ViewBag.IdGrupo)
-												.Select(i => i.calificacion)
-												.FirstOrDefault();
-										}
-
-										<tr>
-											<td class="text-center p-2">
-												<div class="form-check">
-													<input type="checkbox" class="form-check-input participante-checkbox"
-														   name="participantesSeleccionados"
-														   value="@participante.idParticipante"
-														   id="participante_@participante.idParticipante"
-														   onchange="updateSelectedCount()">
-												</div>
-											</td>
-											<td class="p-2">@participante.unidadAcademica</td>
-											<td class="p-2">@participante.nombre</td>
-											<td class="p-2">@participante.primerApellido</td>
-											<td class="p-2">@participante.segundoApellido</td>
-											<td class="p-2">@participante.correo</td>
-											<td class="text-center p-2" style="min-width: 180px;">
-												<div class="horas-display" id="horas-display-@participante.idParticipante">
-													<span>@horasAprobadas</span>
-												</div>
-												<form class="horas-form d-none" id="form-horas-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
-													@Html.AntiForgeryToken()
-													<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
-														<input type="number" min="0" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="horasAprobadas" value="@horasAprobadas" id="input-horas-@participante.idParticipante">
-														<button type="submit" class="btn btn-sm btn-success p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Guardar">
-															<i class="bi bi-check-lg"></i>
-														</button>
-														<button type="button" class="btn btn-sm btn-secondary p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cancelar" onclick="cancelarEdicionHoras('@participante.idParticipante')">
-															<i class="bi bi-x-lg"></i>
-														</button>
-													</div>
-												</form>
-											</td>
-											<td class="text-center p-2" style="min-width: 180px;">
-												<div class="calificacion-display" id="calificacion-display-@participante.idParticipante">
-													<span>@calificacion</span>
-												</div>
-												<form class="calificacion-form d-none" id="form-calificacion-@participante.idParticipante" data-id-participante="@participante.idParticipante" data-id-grupo="@ViewBag.IdGrupo">
-													@Html.AntiForgeryToken()
-													<div class="d-flex align-items-center gap-1 justify-content-center flex-nowrap">
-														<input type="number" min="0" max="100" class="form-control form-control-sm" style="width: 80px; min-width: 80px;" name="calificacion" value="@calificacion" id="input-calificacion-@participante.idParticipante">
-														<button type="submit" class="btn btn-sm btn-success p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Guardar">
-															<i class="bi bi-check-lg"></i>
-														</button>
-														<button type="button" class="btn btn-sm btn-secondary p-0 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Cancelar" onclick="cancelarEdicionCalificacion('@participante.idParticipante')">
-															<i class="bi bi-x-lg"></i>
-														</button>
-													</div>
-												</form>
-											</td>
-											<td class="text-center p-2">
-												<div class="grupo-action-list">
-													<button type="button" class="grupo-action-btn" title="Editar Horas" onclick="editarHoras('@participante.idParticipante')">
-														<i class="bi bi-pencil"></i>
-													</button>
-													<button type="button" class="grupo-action-btn" title="Editar Calificación" onclick="editarCalificacion('@participante.idParticipante')">
-														<i class="bi bi-pencil-square"></i>
-													</button>
-													@Html.ActionLink(" ", "VerDatosParticipante", "Participante", new { idParticipante = participante.idParticipante, idGrupo = ViewBag.IdGrupo }, new { @class = "grupo-action-btn bi bi-search", title = "Ver Detalles" })
-												</div>
-											</td>
-											@if (ViewBag.Role == 1)
-											{
-												<td class="text-center p-2">
-													<a href="#" class="grupo-action-delete" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
-														<i class="bi bi-trash"></i>
-													</a>
-												</td>
-											}
-										</tr>
+										<td class="text-center">
+											<a href="#" class="grupo-action-delete" title="Eliminar inscripción" aria-label="Eliminar inscripción" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminarInscripcion('@ViewBag.NombreGrupo', '@ViewBag.NumeroGrupo', '@participante.idParticipante')">
+												<i class="bi bi-trash3"></i>
+											</a>
+										</td>
 									}
-								</tbody>
-							</table>
-					</div>
+								</tr>
+							}
+						</tbody>
+					</table>
 				</div>
 
-				<div class="grupo-participantes-actions mb-3">
-					@if (ViewBag.Role == 1)
-					{
-						<a href="@Url.Action("ListaGruposDisponibles", "Grupo")" class="btn btn-secondary btn-sm">Regresar</a>
-					}
-					else if (ViewBag.Role == 2)
-					{
-						<a href="@Url.Action("MisModulos", "Asesor")" class="btn btn-secondary btn-sm">Regresar</a>
-					}
-				</div>
+				<div id="participantesTblPaginacion" class="table-pagination"></div>
 			}
-		</div>
+		</section>
+
+		@if (ViewBag.ListaParticipantes != null)
+		{
+			<div class="grupo-participantes-actions">
+				<a href="@regresarUrl" class="btn admin-panel-btn-secondary">Regresar</a>
+			</div>
+		}
 	</div>
-	<!-- Modal para Cambio de Estado -->
-	<div class="modal fade" id="modalCambiarEstado" tabindex="-1" aria-labelledby="modalCambiarEstadoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-sm">
+
+	<!-- Modal para cambio de estado -->
+	<div class="modal fade create-category-modal" id="modalCambiarEstado" tabindex="-1" aria-labelledby="modalCambiarEstadoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="modalCambiarEstadoLabel">Cambiar estado de inscripciones</h5>
-				</div>
-				<div class="modal-body">
-					¿Está seguro de que desea cambiar el estado de <strong><span id="cantidadParticipantesEstado">0</span></strong> inscripción(es)?
-
-					<hr />
-
-					<small class="text-muted">
-						<i class="bi bi-info-circle me-1"></i>
-						Cambiará solo las inscripciones con estado <strong>"Inscrito"</strong> a <strong>"Incompleto"</strong>
-					</small>
-				</div>
-
-				
 				@using (Html.BeginForm("CambiarEstadoInscritoAIncompleto", "Inscripcion"))
 				{
 					@Html.AntiForgeryToken()
-
+					<div class="modal-header create-category-modal-header">
+						<div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-arrow-repeat"></i></div>
+						<div class="create-category-modal-heading">
+							<h2 class="modal-title" id="modalCambiarEstadoLabel">Cambiar estado de inscripciones</h2>
+							<p>Las inscripciones seleccionadas pasarán a estado incompleto.</p>
+						</div>
+					</div>
+					<div class="modal-body create-category-modal-body">
+						¿Está seguro de que desea cambiar el estado de <strong><span id="cantidadParticipantesEstado">0</span></strong> inscripción(es)?
+						<p class="participantes-help mb-0">
+							<i class="bi bi-info-circle" aria-hidden="true"></i>Cambiará solo las inscripciones con estado <strong>"Inscrito"</strong> a <strong>"Incompleto"</strong>.
+						</p>
+					</div>
 					<input type="hidden" name="idGrupo" value="@ViewBag.IdGrupo">
-
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-						<input type="submit" class="btn btn-warning btn-sm" value="Aceptar" />
+					<div class="modal-footer create-category-modal-actions">
+						<button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn create-category-save">Cambiar estado</button>
 					</div>
 				}
 			</div>
 		</div>
 	</div>
 
-	<!-- Modal para Cambio de Estado Inválido -->
-	<div class="modal fade" id="modalCambiarEstadoInvalido" tabindex="-1" aria-labelledby="modalCambiarEstadoInvalidoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-sm">
+	<!-- Modal para cambio de estado inválido -->
+	<div class="modal fade create-category-modal" id="modalCambiarEstadoInvalido" tabindex="-1" aria-labelledby="modalCambiarEstadoInvalidoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="modalCambiarEstadoInvalidoLabel">Aviso</h5>
+				<div class="modal-header create-category-modal-header">
+					<div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-info-circle"></i></div>
+					<div class="create-category-modal-heading">
+						<h2 class="modal-title" id="modalCambiarEstadoInvalidoLabel">Aviso</h2>
+						<p>No hay participantes seleccionados.</p>
+					</div>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body create-category-modal-body">
 					Debe seleccionar al menos un participante para cambiar el estado de inscripciones.
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Aceptar</button>
+				<div class="modal-footer create-category-modal-actions">
+					<button type="button" class="btn create-category-save" data-bs-dismiss="modal">Aceptar</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Modal para Eliminación Individual -->
-	<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-sm">
+	<!-- Modal para eliminación individual -->
+	<div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Eliminar inscripción</h5>
-				</div>
-				<div class="modal-body">
-					¿Está seguro de que desea eliminar la inscripción de este participante?
-					<br />
-					@using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
-					{
-						@Html.AntiForgeryToken()
-
-						<div class="modal-footer">
-							<input type="hidden" id="nombreGrupo" name="nombreGrupo">
-							<input type="hidden" id="numeroGrupo" name="numeroGrupo">
-							<input type="hidden" id="idParticipante" name="idParticipante">
-
-							<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-							<input type="submit" class="btn btn-danger btn-sm" value="Aceptar" />
+				@using (Html.BeginForm("EliminarInscripcion", "Inscripcion"))
+				{
+					@Html.AntiForgeryToken()
+					<div class="modal-header create-category-modal-header">
+						<div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+						<div class="create-category-modal-heading">
+							<h2 class="modal-title" id="modalEliminarLabel">Eliminar inscripción</h2>
+							<p>El participante dejará de estar inscrito en este módulo.</p>
 						</div>
-					}
-				</div>
+					</div>
+					<div class="modal-body create-category-modal-body category-delete-message">
+						¿Está seguro de que desea eliminar la inscripción de este participante?
+					</div>
+					<div class="modal-footer create-category-modal-actions">
+						<input type="hidden" id="nombreGrupo" name="nombreGrupo">
+						<input type="hidden" id="numeroGrupo" name="numeroGrupo">
+						<input type="hidden" id="idParticipante" name="idParticipante">
+
+						<button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn category-delete-confirm">Eliminar inscripción</button>
+					</div>
+				}
 			</div>
 		</div>
 	</div>
 
-	<!-- Modal para Eliminación Masiva -->
-	<div class="modal fade" id="modalEliminarMasivo" tabindex="-1" aria-labelledby="modalEliminarMasivoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-sm">
+	<!-- Modal para eliminación masiva -->
+	<div class="modal fade create-category-modal category-delete-modal" id="modalEliminarMasivo" tabindex="-1" aria-labelledby="modalEliminarMasivoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="modalEliminarMasivoLabel">Eliminar inscripciones</h5>
-				</div>
-				<div class="modal-body">
-					¿Está seguro de que desea eliminar <strong><span id="cantidadParticipantes">0</span></strong> inscripción(es)?
-				</div>
 				@using (Html.BeginForm("EliminarInscripcionesMasivo", "Inscripcion"))
 				{
 					@Html.AntiForgeryToken()
+					<div class="modal-header create-category-modal-header">
+						<div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+						<div class="create-category-modal-heading">
+							<h2 class="modal-title" id="modalEliminarMasivoLabel">Eliminar inscripciones</h2>
+							<p>Los participantes seleccionados dejarán de estar inscritos.</p>
+						</div>
+					</div>
+					<div class="modal-body create-category-modal-body category-delete-message">
+						¿Está seguro de que desea eliminar <strong><span id="cantidadParticipantes">0</span></strong> inscripción(es)?
+					</div>
 
 					<input type="hidden" id="nombreGrupoMasivo" name="nombreGrupo" value="@ViewBag.NombreGrupo">
 					<input type="hidden" id="numeroGrupoMasivo" name="numeroGrupo" value="@ViewBag.NumeroGrupo">
 
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-						<input type="submit" class="btn btn-danger btn-sm" value="Aceptar" />
+					<div class="modal-footer create-category-modal-actions">
+						<button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn category-delete-confirm">Eliminar inscripciones</button>
 					</div>
 				}
 			</div>
 		</div>
 	</div>
 
-	<!-- Modal para Eliminación Fallida -->
-	<div class="modal fade" id="modalEliminarMasivoInvalido" tabindex="-1" aria-labelledby="modalEliminarMasivoInvalidoLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-sm">
+	<!-- Modal para eliminación masiva sin selección -->
+	<div class="modal fade create-category-modal" id="modalEliminarMasivoInvalido" tabindex="-1" aria-labelledby="modalEliminarMasivoInvalidoLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="modalEliminarMasivoInvalidoLabel">Aviso</h5>
+				<div class="modal-header create-category-modal-header">
+					<div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-info-circle"></i></div>
+					<div class="create-category-modal-heading">
+						<h2 class="modal-title" id="modalEliminarMasivoInvalidoLabel">Aviso</h2>
+						<p>No hay participantes seleccionados.</p>
+					</div>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body create-category-modal-body">
 					Debe seleccionar al menos un participante para eliminar inscripciones.
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Aceptar</button>
+				<div class="modal-footer create-category-modal-actions">
+					<button type="button" class="btn create-category-save" data-bs-dismiss="modal">Aceptar</button>
 				</div>
 			</div>
 		</div>
@@ -622,20 +878,35 @@ else
 	}
 
 	function mostrarNotificacion(mensaje, tipo) {
-		const alertDiv = document.createElement('div');
-		alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
-		alertDiv.style.zIndex = '9999';
-		alertDiv.style.maxWidth = '500px';
-		alertDiv.innerHTML = `
-			${mensaje}
-			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-		`;
-		document.body.appendChild(alertDiv);
-
-		// Auto-ocultar después de 4 segundos
-		setTimeout(() => {
-			alertDiv.remove();
-		}, 4000);
+		let region = document.querySelector('.metics-toast-region');
+		if (!region) {
+			region = document.createElement('div');
+			region.className = 'metics-toast-region';
+			region.setAttribute('aria-label', 'Notificaciones');
+			document.body.appendChild(region);
+		}
+		const esExito = tipo === 'success';
+		const toast = document.createElement('div');
+		toast.className = 'metics-toast toast fade' + (esExito ? '' : ' metics-toast--error');
+		toast.setAttribute('role', esExito ? 'status' : 'alert');
+		toast.setAttribute('aria-live', esExito ? 'polite' : 'assertive');
+		toast.setAttribute('aria-atomic', 'true');
+		toast.innerHTML =
+			'<div class="metics-toast-inner">' +
+				'<span class="metics-toast-icon" aria-hidden="true"><i class="bi ' + (esExito ? 'bi-check-lg' : 'bi-exclamation-lg') + '"></i></span>' +
+				'<div class="metics-toast-message"><strong></strong><p></p></div>' +
+				'<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar notificación"></button>' +
+			'</div>';
+		toast.querySelector('strong').textContent = esExito ? 'Operación completada' : 'No se pudo completar la operación';
+		toast.querySelector('p').textContent = mensaje || '';
+		region.appendChild(toast);
+		toast.addEventListener('hidden.bs.toast', function () { toast.remove(); });
+		if (window.bootstrap && window.bootstrap.Toast) {
+			window.bootstrap.Toast.getOrCreateInstance(toast, { delay: esExito ? 4875 : 6750 }).show();
+		} else {
+			toast.classList.add('show');
+			setTimeout(function () { toast.remove(); }, 4000);
+		}
 	}
 
 	function actualizarModalEliminarInscripcion(nombreGrupo, numeroGrupo, idParticipante) {
@@ -646,7 +917,8 @@ else
 
 	function updateSelectedCount() {
 		const checkboxes = document.querySelectorAll('.participante-checkbox:checked');
-		document.getElementById('selectedCount').textContent = checkboxes.length;
+		const selectedCount = document.getElementById('selectedCount');
+		if (selectedCount) selectedCount.textContent = checkboxes.length;
 
 		const allCheckboxes = document.querySelectorAll('.participante-checkbox');
 		const selectAllCheckbox = document.getElementById('selectAllCheckbox');
@@ -733,7 +1005,39 @@ else
 				medallas[i].style.display = "none";
 			}
 		}
+
+		var viewport = document.getElementById('medalCarouselViewport');
+		if (viewport) {
+			viewport.scrollLeft = 0;
+			updateMedalCarouselControls();
+		}
 	}
+
+	// Carrusel de medallas (mismo comportamiento visual que "Ver inscripciones").
+	function navigateMedalCarousel(direction) {
+		const viewport = document.getElementById('medalCarouselViewport');
+		if (!viewport) return;
+		viewport.scrollBy({ left: direction * viewport.clientWidth * 0.8, behavior: 'smooth' });
+	}
+
+	function updateMedalCarouselControls() {
+		const viewport = document.getElementById('medalCarouselViewport');
+		const previousButton = document.getElementById('medalCarouselPrevious');
+		const nextButton = document.getElementById('medalCarouselNext');
+		if (!viewport || !previousButton || !nextButton) return;
+		const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+		previousButton.disabled = viewport.scrollLeft <= 1;
+		nextButton.disabled = viewport.scrollLeft >= maxScroll - 1;
+	}
+
+	(function () {
+		const viewport = document.getElementById('medalCarouselViewport');
+		if (!viewport) return;
+		viewport.addEventListener('scroll', updateMedalCarouselControls, { passive: true });
+		window.addEventListener('resize', updateMedalCarouselControls);
+		window.addEventListener('load', updateMedalCarouselControls);
+		updateMedalCarouselControls();
+	})();
 
 	document.getElementById('formAsignarMedallas').addEventListener('submit', function(e) {
 		// Obtener todos los checkboxes seleccionados
@@ -777,6 +1081,17 @@ else
 
 	document.addEventListener('DOMContentLoaded', function () {
 		updateSelectedCount();
+
+		// Muestra el nombre del archivo elegido en el selector personalizado (solo visual).
+		const inputArchivo = document.getElementById('file');
+		const nombreArchivo = document.getElementById('participantesFileName');
+		if (inputArchivo && nombreArchivo) {
+			inputArchivo.addEventListener('change', function () {
+				const tieneArchivo = this.files && this.files.length > 0;
+				nombreArchivo.textContent = tieneArchivo ? this.files[0].name : 'Ningún archivo seleccionado';
+				document.getElementById('participantesFile').classList.toggle('has-file', tieneArchivo);
+			});
+		}
 
 		// Prevenir submit tradicional y usar AJAX para formularios de horas
 		document.querySelectorAll('.horas-form').forEach(form => {
@@ -824,15 +1139,12 @@ else
 </script>
 
 <script>
-	// DataTables y jQuery se cargan una sola vez en _Layout. Esta tabla conserva
-	// la paginación nativa de DataTables (menú de longitud + "Todos").
-	var table = new DataTable('#tblCustomers', {
-		language: {
-			url: METICS_DT_LANG,
-		},
-		"searching": false,
-		"pageLength": 50,
-		"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
-		"dom": '<"grupo-datatables-top"l>t<"grupo-datatables-bottom"p>'
+	// Misma paginación y selector de registros que los demás listados (MeticsTable, site.js).
+	// Se conservan: 50 registros por defecto, opciones 10/25/50/Todos y sin búsqueda de DataTables.
+	var table = MeticsTable.init({
+		tableId: 'tblCustomers',
+		pageSizeId: 'participantesPageSize',
+		paginationId: 'participantesTblPaginacion',
+		pageLength: 50
 	});
 </script>
