@@ -397,3 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 webMetics/webMetics.csproj.lscache
+
+# Scripts y credenciales de prueba solo locales
+scripts/dev-local/
