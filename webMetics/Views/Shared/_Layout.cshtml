@@ -68,7 +68,7 @@
     <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
-<body>
+<body class="metics-app-shell">
     @{
         string navUserId = Convert.ToString(ViewBag.Id) ?? "";
         string navRoleValue = Convert.ToString(ViewBag.Role) ?? "";
@@ -92,15 +92,25 @@
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
         var breadcrumbs = showNav ? BreadcrumbBuilder.Build(ViewContext, Url) : Array.Empty<BreadcrumbItem>();
         bool hasPageHeading = showNav && ViewData["UseSharedPageHeader"] is true;
-        bool showCreateModuleAction = (navRole == 1 || navRole == 2)
+        // Las pantallas del panel de administración lo solicitan con ViewData["AdminPanelLayout"]; solo aplica al rol administrador.
+        bool useAdminPanelLayout = showNav && navRole == 1 && ViewData["AdminPanelLayout"] is true;
+        string adminPanelIcon = Convert.ToString(ViewData["AdminPanelIcon"]) ?? "";
+        if (string.IsNullOrWhiteSpace(adminPanelIcon))
+        {
+            adminPanelIcon = "bi-gear";
+        }
+        bool showCreateModuleAction = ((navRole == 1 || navRole == 2)
             && currentController == "Grupo"
-            && (currentAction == "ListaGruposDisponibles" || currentAction == "BuscarGrupos");
+            && (currentAction == "ListaGruposDisponibles" || currentAction == "BuscarGrupos"))
+            || (navRole == 2 && currentController == "Asesor" && currentAction == "MisModulos");
+        bool showMyModulesAction = navRole == 2 && !(currentController == "Asesor" && currentAction == "MisModulos");
     }
 
     <header class="metics-unified-header">
         <nav class="navbar metics-navbar-expand metics-tabs-navbar" aria-label="Navegación principal">
             <div class="container-fluid metics-tabs-container">
                 <div class="metics-institutional-brand" aria-label="Universidad de Costa Rica, Vicerrectoría de Docencia y METICS">
+                    <a class="metics-brand-ucr-mobile" href="https://www.ucr.ac.cr/" aria-label="Universidad de Costa Rica"><img src="@Url.Content("~/images/ucr-whitelogo.png")" alt="Logo Universidad de Costa Rica" /></a>
                     <a class="metics-brand-ucr" href="https://www.ucr.ac.cr/" aria-label="Universidad de Costa Rica">
                         <span class="metics-ucr-signature-window" aria-hidden="true">
                             <svg class="metics-ucr-signature-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 651.2514 78" role="img" aria-label="Universidad de Costa Rica">
@@ -122,6 +132,12 @@
 
                     <div class="collapse navbar-collapse metics-tabs-collapse" id="navbarColor01">
                         <div class="metics-tabs-left">
+                            @* Solo móvil (menú hamburguesa): acceso directo al inicio, para todos los roles. *@
+                            <ul class="navbar-nav metics-mobile-home">
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Grupo" && currentAction == "ListaGruposDisponibles" ? "active" : "")" href="@Url.Action("ListaGruposDisponibles", "Grupo")" aria-current="@(currentController == "Grupo" && currentAction == "ListaGruposDisponibles" ? "page" : null)"><i class="bi bi-house-door"></i><span>Inicio</span></a>
+                                </li>
+                            </ul>
                             @if (navRole == 1)
                             {
                                 <ul class="navbar-nav metics-tabs-nav">
@@ -154,35 +170,27 @@
                                     </li>
                                 </ul>
                             }
-                            else if (navRole == 2)
-                            {
-                                <ul class="navbar-nav metics-tabs-nav">
-                                    <li class="nav-item dropdown metics-tab metics-section-facilitator @(isFacilitatorActive ? "active" : "")">
-                                        <a class="nav-link dropdown-toggle" href="#" id="facilitatorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person-workspace"></i><span>Facilitador(a)</span></a>
-                                        <ul class="dropdown-menu metics-tabs-menu metics-section-menu" aria-labelledby="facilitatorDropdown">
-                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("MisModulos", "Asesor")"><span class="metics-menu-icon"><i class="bi bi-journal-text"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Mis módulos</span><span class="metics-menu-description">Consulta los módulos que facilitas</span></span></a></li>
-                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("CrearGrupo", "Grupo")"><span class="metics-menu-icon"><i class="bi bi-journal-plus"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Crear un módulo</span><span class="metics-menu-description">Crea y configura un módulo académico</span></span></a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            }
+                            @* Facilitador(a): "Mis módulos" y "Crear módulo" están como botones en el encabezado de la página. *@
                         </div>
 
                         <div class="metics-tabs-right">
                             <span class="metics-brand-divider metics-account-divider" aria-hidden="true"></span>
                             <ul class="navbar-nav">
-                                <li class="nav-item dropdown metics-account">
-                                    <a class="nav-link dropdown-toggle metics-account-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person-circle"></i><span>@roleLabel</span></a>
+                                <li class="nav-item dropdown metics-account @(navRole != 1 ? "metics-account--direct" : "")">
+                                    <a class="nav-link dropdown-toggle metics-account-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><svg class="metics-account-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"></path></svg><span>@roleLabel</span></a>
                                     <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
-                                        <li><h6 class="dropdown-header">Mi cuenta</h6></li>
-                                        <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-person" })</li>
-                                        <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item bi bi-key" })</li>
                                         @if (navRole == 1)
                                         {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><h6 class="dropdown-header">Configuración</h6></li>
-                                            <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item bi bi-envelope" })</li>
-                                            <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item bi bi-clock-history" })</li>
+                                            @* Administrador: Resumen, Cambiar contraseña, Configuración del correo y Registro de accesos
+                                               están en el menú lateral del panel de administración. *@
+                                            <li><h6 class="dropdown-header">Mi cuenta</h6></li>
+                                            <li>@Html.ActionLink("Panel de administración", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-gear" })</li>
+                                        }
+                                        else
+                                        {
+                                            @* Participante y asesor: sus datos, medallas, módulos y el cambio de contraseña están en "Mi perfil". *@
+                                            <li><h6 class="dropdown-header">Mi cuenta</h6></li>
+                                            <li>@Html.ActionLink("Mi perfil", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-person" })</li>
                                         }
                                         <li><hr class="dropdown-divider"></li>
                                         <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item bi bi-box-arrow-right metics-logout" })</li>
@@ -195,57 +203,133 @@
             </div>
         </nav>
     </header>
-    @if (hasPageHeading)
+    @if (useAdminPanelLayout)
     {
-        <section class="metics-page-header" aria-labelledby="@(ViewData["PageHeadingId"] ?? "pageHeading")">
-            <div class="container metics-page-header-inner">
-                <div class="metics-page-header-content">
+        @* Panel de administración: menú lateral fijo a la izquierda; breadcrumbs y encabezado en la columna derecha. *@
+        <div class="admin-shell">
+            <aside class="admin-shell-sidebar">
+                <partial name="_AdminPanelNav" />
+            </aside>
+            <main class="admin-shell-main">
+                <div class="body-content admin-shell-main-inner">
+                    @* Solo móvil: abre el mismo menú del panel como drawer lateral. *@
+                    <button type="button" class="admin-drawer-toggle" data-bs-toggle="offcanvas" data-bs-target="#adminPanelDrawer" aria-controls="adminPanelDrawer" aria-expanded="false">
+                        <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
+                        <span>Panel de administración</span>
+                        <i class="bi bi-chevron-right admin-drawer-toggle-arrow" aria-hidden="true"></i>
+                    </button>
                     @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
-                    <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
-                    @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                    @if (hasPageHeading)
                     {
-                        <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                        <header class="admin-shell-heading">
+                            <span class="admin-shell-heading-icon" aria-hidden="true"><i class="bi @adminPanelIcon"></i></span>
+                            <div class="admin-shell-heading-text">
+                                <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
+                                @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                                {
+                                    <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                                }
+                            </div>
+                        </header>
+                    }
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+
+        <div class="offcanvas offcanvas-start admin-panel-drawer" tabindex="-1" id="adminPanelDrawer" aria-labelledby="adminPanelDrawerNavTitulo">
+            <button type="button" class="admin-panel-drawer-close" data-bs-dismiss="offcanvas" aria-label="Cerrar menú del panel">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+            <div class="offcanvas-body admin-panel-drawer-body">
+                @await Html.PartialAsync("_AdminPanelNav", null, new ViewDataDictionary(ViewData) { { "AdminPanelNavIdPrefix", "adminPanelDrawerNav" } })
+            </div>
+        </div>
+        <script>
+            // Drawer móvil del panel: se cierra al elegir una opción y si la pantalla pasa a escritorio.
+            (function () {
+                var drawer = document.getElementById('adminPanelDrawer');
+                if (!drawer) return;
+                var toggle = document.querySelector('.admin-drawer-toggle');
+                var desktop = window.matchMedia('(min-width: 992px)');
+                function instancia() { return window.bootstrap ? bootstrap.Offcanvas.getOrCreateInstance(drawer) : null; }
+                drawer.addEventListener('show.bs.offcanvas', function () {
+                    document.body.classList.add('admin-drawer-open');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                });
+                drawer.addEventListener('hidden.bs.offcanvas', function () {
+                    document.body.classList.remove('admin-drawer-open');
+                    if (toggle) { toggle.setAttribute('aria-expanded', 'false'); toggle.focus({ preventScroll: true }); }
+                });
+                drawer.addEventListener('shown.bs.offcanvas', function () {
+                    var activo = drawer.querySelector('.admin-panel-nav-link.is-active') || drawer.querySelector('.admin-panel-drawer-close');
+                    if (activo) activo.focus({ preventScroll: true });
+                });
+                drawer.querySelectorAll('.admin-panel-nav-link').forEach(function (enlace) {
+                    enlace.addEventListener('click', function () { var i = instancia(); if (i) i.hide(); });
+                });
+                function alCambiar(e) { if (e.matches) { var i = instancia(); if (i) i.hide(); } }
+                if (desktop.addEventListener) desktop.addEventListener('change', alCambiar); else desktop.addListener(alCambiar);
+            })();
+        </script>
+    }
+    else
+    {
+        if (hasPageHeading)
+        {
+            <section class="metics-page-header" aria-labelledby="@(ViewData["PageHeadingId"] ?? "pageHeading")">
+                <div class="container metics-page-header-inner">
+                    <div class="metics-page-header-content">
+                        @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                        <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
+                        @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                        {
+                            <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                        }
+                    </div>
+                    @if (showCreateModuleAction)
+                    {
+                        <div class="metics-page-actions" aria-label="Acciones de página">
+                            @if (showMyModulesAction)
+                            {
+                                <a class="btn metics-my-modules" href="@Url.Action("MisModulos", "Asesor")"><i class="bi bi-journal-text" aria-hidden="true"></i>Mis módulos</a>
+                            }
+                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                        </div>
                     }
                 </div>
-                @if (showCreateModuleAction)
-                {
-                    <div class="metics-page-actions" aria-label="Acciones de página">
-                        @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
-                    </div>
-                }
-            </div>
-        </section>
-    }
-    <div class="container body-content @(hasPageHeading ? "metics-has-page-heading" : "")" style="min-height: 100vh">
-        @if (!hasPageHeading && (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2))))
-        {
-            <div class="metics-page-context">
-                @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
-                @if (showNav && showCreateModuleAction)
-                {
-                    <div class="metics-page-actions" aria-label="Acciones de página">
-                        @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
-                    </div>
-                }
-            </div>
-        }
-        @RenderBody()
-    </div>
-
-    <!-- Footer -->
-    <footer class="text-center text-lg-start text-white" id="footer" style="background-color: #3e4551; bottom: 0px; width: 100%; height: 100%;">
-        <div class="container p-4 pb-5">
-            <section class="">
-                <div class="row h-100">
-                    <div class="col-md-4">
-                        <!-- Información de los contactos  -->
-                        @{await Html.RenderPartialAsync("~/Views/Shared/Info.cshtml"); }
-                    </div>                   
-                </div>
             </section>
+        }
+        <div class="container body-content @(hasPageHeading ? "metics-has-page-heading" : "")">
+            @if (!hasPageHeading && (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2))))
+            {
+                <div class="metics-page-context">
+                    @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                    @if (showNav && showCreateModuleAction)
+                    {
+                        <div class="metics-page-actions" aria-label="Acciones de página">
+                            @if (showMyModulesAction)
+                            {
+                                <a class="btn metics-my-modules" href="@Url.Action("MisModulos", "Asesor")"><i class="bi bi-journal-text" aria-hidden="true"></i>Mis módulos</a>
+                            }
+                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                        </div>
+                    }
+                </div>
+            }
+            @RenderBody()
         </div>
-        <div class="text-center p-1">
-            <p>&copy; @DateTime.Now.Year METICS</p>
+    }
+
+    <footer class="metics-footer" id="footer">
+        <div class="container metics-footer-container">
+            <div class="metics-footer-main">
+                <h2 class="metics-footer-heading">Contactos</h2>
+                @{ await Html.RenderPartialAsync("~/Views/Shared/Info.cshtml"); }
+            </div>
+            <div class="metics-footer-bottom">
+                <p>&copy; @DateTime.Now.Year METICS</p>
+            </div>
         </div>
     </footer>
 
@@ -253,6 +337,73 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
     <script src="~/js/metics-header-scroll.js" asp-append-version="true"></script>
     <script src="~/js/metics-dropdown-exclusive.js" asp-append-version="true"></script>
+    <script>
+        // Menú móvil: se cierra al tocar fuera del panel o al presionar Escape.
+        (function () {
+            var panel = document.getElementById('navbarColor01');
+            var boton = document.querySelector('.metics-tabs-toggler');
+            if (!panel || !boton || !window.bootstrap) return;
+            function cerrar() {
+                if (panel.classList.contains('show')) bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).hide();
+            }
+            document.addEventListener('pointerdown', function (e) {
+                if (!panel.contains(e.target) && !boton.contains(e.target)) cerrar();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && panel.classList.contains('show')) { cerrar(); boton.focus(); }
+            });
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @* Botón global "Volver arriba": aparece al pasar 400 px de desplazamiento. *@
+    <button type="button" class="metics-back-to-top" id="meticsBackToTop" aria-label="Volver arriba" title="Volver arriba" data-bs-toggle="tooltip" data-bs-placement="left" hidden>
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+    <script>
+        (function () {
+            var boton = document.getElementById('meticsBackToTop');
+            if (!boton) return;
+            var UMBRAL = 400;
+            var visible = false;
+            var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+            boton.hidden = false;
+
+            function actualizar() {
+                var debeMostrarse = (window.scrollY || document.documentElement.scrollTop) > UMBRAL;
+                if (debeMostrarse === visible) return;
+                visible = debeMostrarse;
+                boton.classList.toggle('is-visible', visible);
+                boton.setAttribute('aria-hidden', visible ? 'false' : 'true');
+                boton.tabIndex = visible ? 0 : -1;
+                if (!visible && window.bootstrap && bootstrap.Tooltip) {
+                    var tip = bootstrap.Tooltip.getInstance(boton);
+                    if (tip) tip.hide();
+                }
+            }
+
+            var pendiente = false;
+            window.addEventListener('scroll', function () {
+                if (pendiente) return;
+                pendiente = true;
+                window.requestAnimationFrame(function () { pendiente = false; actualizar(); });
+            }, { passive: true });
+
+            boton.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: reducirMovimiento.matches ? 'auto' : 'smooth' });
+                boton.blur();
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.bootstrap && bootstrap.Tooltip && window.matchMedia('(hover: hover)').matches) {
+                    bootstrap.Tooltip.getOrCreateInstance(boton);
+                }
+            });
+
+            boton.setAttribute('aria-hidden', 'true');
+            boton.tabIndex = -1;
+            actualizar();
+        })();
+    </script>
 </body>
 </html>

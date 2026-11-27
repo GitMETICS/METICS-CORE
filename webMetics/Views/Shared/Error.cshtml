@@ -1,22 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
-<body>
-    <main class="flex-grow-1 d-flex align-items-center justify-content-center py-5">
-        <div style="max-width: 540px; width: 100%;" class="error-card text-center px-4">
-            <i style="font-size: 4rem; color: var(--metics-interactive-blue);" class="bi bi-exclamation-circle error-icon mb-3 d-block"></i>
-            <h1 class="h3 fw-bold text-dark mb-2">Ocurrió un problema</h1>
-            <p class="text-muted mb-4">
-                Lo sentimos, algo salió mal al procesar su solicitud.<br />
-                Si el problema persiste, comuníquese con el equipo de soporte.
-            </p>
-            <a href="/" class="btn btn-primary px-4" style="background-color: var(--metics-action-blue); border-color: var(--metics-action-blue);">
-                <i class="bi bi-house-door me-2"></i>Volver al inicio
-            </a>
+@{
+    ViewBag.Title = "Ocurrió un problema";
+}
+
+<div class="contenedor-caja container-fluid result-page error-page">
+    <section class="admin-panel-card result-card is-error" aria-labelledby="errorTitulo">
+        <span class="result-card-icon" aria-hidden="true"><i class="bi bi-exclamation-lg"></i></span>
+        <h1 class="result-card-title" id="errorTitulo">Ocurrió un problema</h1>
+        <p class="result-card-message">
+            Lo sentimos, algo salió mal al procesar su solicitud.<br />
+            Si el problema persiste, comuníquese con el equipo de soporte.
+        </p>
+        <div class="result-card-actions">
+            <a href="/" class="btn admin-panel-btn-primary"><i class="bi bi-house-door" aria-hidden="true"></i>Volver al inicio</a>
         </div>
-    </main>
-</body>
-</html>
+    </section>
+</div>
