@@ -1,7 +1,7 @@
 @model webMetics.Models.InscripcionModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Formulario de Inscripción";
+    ViewBag.Title = "Formulario de inscripción";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();

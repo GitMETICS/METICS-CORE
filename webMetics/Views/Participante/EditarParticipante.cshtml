@@ -102,27 +102,27 @@
                             @Html.ValidationMessageFor(m => m.tipoParticipante, "", new { @class = "text-danger", id = "tipoParticipante-error" })
                         </div>
                         <div class="form-group">
-                            @Html.LabelFor(m => m.area) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.LabelFor(m => m.area, new { @for = "areaDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(m => m.area, new SelectList(areasDisponibles), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown", aria_describedby = "area-error" })
                             @Html.ValidationMessageFor(m => m.area, "", new { @class = "text-danger", id = "area-error" })
                         </div>
                         <div class="form-group">
-                            @Html.LabelFor(m => m.departamento) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.LabelFor(m => m.departamento, new { @for = "departamentoDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(m => m.departamento, new SelectList(ViewData["jsonDataDepartamentos"] as List<string> ?? new List<string>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown", aria_describedby = "departamento-error" })
                             @Html.ValidationMessageFor(m => m.departamento, "", new { @class = "text-danger", id = "departamento-error" })
                         </div>
                         <div class="form-group">
-                            @Html.LabelFor(m => m.unidadAcademica) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.LabelFor(m => m.unidadAcademica, new { @for = "seccionDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(m => m.unidadAcademica, new SelectList(ViewData["jsonDataUnidadesAcademicas"] as List<string> ?? new List<string>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown", aria_describedby = "unidadAcademica-error" })
                             @Html.ValidationMessageFor(m => m.unidadAcademica, "", new { @class = "text-danger", id = "unidadAcademica-error" })
                         </div>
                         <div class="form-group">
-                            @Html.LabelFor(m => m.sede) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.LabelFor(m => m.sede, new { @for = "sedeDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                             @Html.DropDownListFor(m => m.sede, ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control", id = "sedeDropdown", aria_describedby = "sede-error" })
                             @Html.ValidationMessageFor(m => m.sede, "", new { @class = "text-danger", id = "sede-error" })
                         </div>
                         <div class="form-group">
-                            @Html.LabelFor(m => m.carrera) <span class="create-participant-required" aria-hidden="true">*</span>
+                            @Html.LabelFor(m => m.carrera, new { @for = "carreraDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                             <select id="carreraDropdown" class="form-control" aria-describedby="carrera-error"><option value="">Seleccione una carrera...</option></select>
                             <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none" maxlength="512" placeholder="Escriba el nombre de su carrera" />
                             <small id="carreraFormato" class="form-text text-muted d-none">Se guardará en mayúsculas y sin tildes.</small>

@@ -32,7 +32,7 @@
                             <span class="table-card-desc">Listado de facilitadores(as) registrados en el sistema</span>
                         </div>
                         <div class="table-card-header-actions">
-                            <span class="table-card-count">@ViewBag.Asesores.Count facilitadores encontrados</span>
+                            <span class="table-card-count" id="asesorCount" data-singular="facilitador encontrado" data-plural="facilitadores encontrados" aria-live="polite">@ViewBag.Asesores.Count facilitadores encontrados</span>
                             <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearAsesor">Crear facilitador(a)</button>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-person-plus"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalCrearAsesorLabel">Crear facilitador(a)</h2>
-                            <p>Completa la información para registrar una persona facilitadora.</p>
+                            <p>Complete la información para registrar una persona facilitadora.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body asesor-edit-modal-body">
@@ -144,7 +144,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.nombre)
+                                        @Html.LabelFor(asesorModel => asesorModel.nombre, new { @for = "crearAsesorNombre" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", id = "crearAsesorNombre", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
@@ -152,7 +152,7 @@
                                 </div>
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido)
+                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { @for = "crearAsesorPrimerApellido" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", id = "crearAsesorPrimerApellido", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
@@ -160,14 +160,14 @@
                                 </div>
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido)
+                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { @for = "crearAsesorSegundoApellido" })
                                         @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", id = "crearAsesorSegundoApellido", maxlength = "64", autocomplete = "off" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion)
+                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion, new { @for = "crearAsesorTipoIdentificacion" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-select", id = "crearAsesorTipoIdentificacion", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
@@ -175,7 +175,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion)
+                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion, new { @for = "crearAsesorNumeroIdentificacion" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.numeroIdentificacion, new { @class = "form-control", id = "crearAsesorNumeroIdentificacion", maxlength = "64", autocomplete = "off", placeholder = "Seleccione el tipo de identificación...", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.numeroIdentificacion, "", new { @class = "text-danger" })
@@ -189,7 +189,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.correo)
+                                        @Html.LabelFor(asesorModel => asesorModel.correo, new { @for = "crearAsesorCorreo" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", id = "crearAsesorCorreo", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
@@ -197,7 +197,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.telefono)
+                                        @Html.LabelFor(asesorModel => asesorModel.telefono, new { @for = "crearAsesorTelefono" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", id = "crearAsesorTelefono", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
@@ -205,7 +205,7 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.descripcion)
+                                        @Html.LabelFor(asesorModel => asesorModel.descripcion, new { @for = "crearAsesorDescripcion" })
                                         @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", id = "crearAsesorDescripcion", maxlength = "256", autocomplete = "off", rows = "2" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
                                     </div>
@@ -219,7 +219,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field asesor-password-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.contrasena)
+                                        @Html.LabelFor(asesorModel => asesorModel.contrasena, new { @for = "crearAsesorPassword" })
                                         <div class="input-group">
                                             @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { id = "crearAsesorPassword", @class = "form-control", maxlength = "64", autocomplete = "off" })
                                             <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar contraseña" onclick="toggleAsesorPassword('crearAsesorPassword', 'crearAsesorPasswordIcon')"><i id="crearAsesorPasswordIcon" class="bi bi-eye" aria-hidden="true"></i></button>
@@ -229,7 +229,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field asesor-password-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena)
+                                        @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { @for = "crearAsesorPasswordCheck" })
                                         <div class="input-group">
                                             @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { id = "crearAsesorPasswordCheck", @class = "form-control", maxlength = "64", autocomplete = "off" })
                                             <button type="button" class="metics-password-toggle" aria-label="Mostrar u ocultar confirmación de contraseña" onclick="toggleAsesorPassword('crearAsesorPasswordCheck', 'crearAsesorPasswordCheckIcon')"><i id="crearAsesorPasswordCheckIcon" class="bi bi-eye" aria-hidden="true"></i></button>
@@ -259,11 +259,11 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar facilitador(a)</h2>
-                            <p>Confirma si deseas quitar este(a) facilitador(a) del sistema.</p>
+                            <p>Confirme si desea quitar este(a) facilitador(a) del sistema.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">
-                        ¿Estás seguro de que deseas eliminar a este(a) facilitador(a)? Esta acción no se puede deshacer.
+                        ¿Está seguro de que desea eliminar a este(a) facilitador(a)? Esta acción no se puede deshacer.
                     </div>
                     <div class="modal-footer create-category-modal-actions">
                         <input type="hidden" id="idAsesor" name="idAsesor">
@@ -296,7 +296,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.nombre)
+                                        @Html.LabelFor(asesorModel => asesorModel.nombre, new { @for = "editarAsesorNombre" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", id = "editarAsesorNombre", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
@@ -304,7 +304,7 @@
                                 </div>
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido)
+                                        @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { @for = "editarAsesorPrimerApellido" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", id = "editarAsesorPrimerApellido", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
@@ -312,14 +312,14 @@
                                 </div>
                                 <div class="col-12 col-md-4">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido)
+                                        @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { @for = "editarAsesorSegundoApellido" })
                                         @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", id = "editarAsesorSegundoApellido", maxlength = "64", autocomplete = "off" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion)
+                                        @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion, new { @for = "editarAsesorTipoIdentificacion" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-select", id = "editarAsesorTipoIdentificacion", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
@@ -327,7 +327,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion)
+                                        @Html.LabelFor(asesorModel => asesorModel.numeroIdentificacion, new { @for = "editarAsesorNumeroIdentificacion" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.numeroIdentificacion, new { @class = "form-control", id = "editarAsesorNumeroIdentificacion", maxlength = "64", autocomplete = "off", placeholder = "Seleccione el tipo de identificación...", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.numeroIdentificacion, "", new { @class = "text-danger" })
@@ -341,7 +341,7 @@
                             <div class="row g-3">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.correo)
+                                        @Html.LabelFor(asesorModel => asesorModel.correo, new { @for = "editarAsesorCorreo" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", id = "editarAsesorCorreo", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
@@ -349,7 +349,7 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.telefono)
+                                        @Html.LabelFor(asesorModel => asesorModel.telefono, new { @for = "editarAsesorTelefono" })
                                         <span class="create-category-required" aria-hidden="true">*</span>
                                         @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", id = "editarAsesorTelefono", maxlength = "64", autocomplete = "off", required = "required" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
@@ -357,7 +357,7 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group create-category-field">
-                                        @Html.LabelFor(asesorModel => asesorModel.descripcion)
+                                        @Html.LabelFor(asesorModel => asesorModel.descripcion, new { @for = "editarAsesorDescripcion" })
                                         @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", id = "editarAsesorDescripcion", maxlength = "256", autocomplete = "off", rows = "2" })
                                         @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
                                     </div>
@@ -372,7 +372,7 @@
                                     <h3 class="asesor-edit-section-title" id="asesorSeguridadHeading">Seguridad y acceso</h3>
                                     <span class="asesor-edit-optional">Opcional al editar</span>
                                 </div>
-                                <p class="asesor-edit-section-help">Completa estos campos únicamente si deseas cambiar la contraseña.</p>
+                                <p class="asesor-edit-section-help">Complete estos campos únicamente si desea cambiar la contraseña.</p>
                                 <div class="row g-3">
                                     <div class="col-12 col-md-6">
                                         <div class="form-group create-category-field asesor-password-field">
@@ -780,6 +780,7 @@ else
         paginationId: 'asesorTblPaginacion',
         searching: true,
         searchInputId: 'asesorBusqueda',
+        countId: 'asesorCount',
         pageLength: 50
     });
 </script>

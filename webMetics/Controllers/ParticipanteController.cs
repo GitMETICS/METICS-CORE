@@ -294,7 +294,7 @@ namespace webMetics.Controllers
                 .Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? new List<string>();
             if (selectedMedallas.Count == 0)
             {
-                TempData["warningMessage"] = "Selecciona al menos una medalla antes de asignar.";
+                TempData["warningMessage"] = "Seleccione al menos una medalla antes de asignar.";
                 return RedirectToAction("VerDatosParticipante", new { idParticipante });
             }
             try

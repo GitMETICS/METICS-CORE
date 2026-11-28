@@ -1,7 +1,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment MedalEnvironment
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar Medalla";
+    ViewBag.Title = "Editar medalla";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();

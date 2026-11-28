@@ -13,8 +13,8 @@
             form.querySelector('[data-valmsg-for="confirmarContrasena"]')
         ];
         const messages = [
-            password.value.trim() ? '' : 'Ingresa la nueva contraseña.',
-            confirmation.value.trim() ? '' : 'Confirma la nueva contraseña.'
+            password.value.trim() ? '' : 'Ingrese la nueva contraseña.',
+            confirmation.value.trim() ? '' : 'Confirme la nueva contraseña.'
         ];
 
         if (!messages[0] && !messages[1] && password.value !== confirmation.value) {
@@ -167,7 +167,7 @@
                 }
             }
         } catch (_) {
-            showClientError('No se pudo confirmar el guardado. Revisa la conexión e inténtalo de nuevo.');
+            showClientError('No se pudo confirmar el guardado. Revise la conexión e inténtelo de nuevo.');
         } finally {
             delete form.dataset.saving;
             buttons.forEach(function (button) { button.disabled = false; });

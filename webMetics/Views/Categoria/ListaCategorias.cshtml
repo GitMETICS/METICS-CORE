@@ -29,7 +29,7 @@
                         <span class="table-card-desc">Listado de niveles registrados en el sistema.</span>
                     </div>
                     <div class="table-card-header-actions">
-                        <span class="table-card-count">@ViewBag.Categorias.Count niveles encontrados</span>
+                        <span class="table-card-count" id="categoriaCount" data-singular="nivel encontrado" data-plural="niveles encontrados" aria-live="polite">@ViewBag.Categorias.Count niveles encontrados</span>
                         <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearCategoria">Crear nivel</button>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-layers"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalCrearCategoriaLabel">Crear nivel</h2>
-                            <p>Completa la información para registrar un nuevo nivel.</p>
+                            <p>Complete la información para registrar un nuevo nivel.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body">
@@ -172,11 +172,11 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar nivel</h2>
-                            <p>Confirma si deseas quitar este nivel del sistema.</p>
+                            <p>Confirme si desea quitar este nivel del sistema.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">
-                        ¿Estás seguro de que deseas eliminar este nivel? Esta acción no se puede deshacer.
+                        ¿Está seguro de que desea eliminar este nivel? Esta acción no se puede deshacer.
                     </div>
                     <div class="modal-footer create-category-modal-actions">
                         <input type="hidden" id="idCategoria" name="idCategoria">
@@ -257,6 +257,7 @@ else
         paginationId: 'categoriaTblPaginacion',
         searching: true,
         searchInputId: 'categoriaBusqueda',
+        countId: 'categoriaCount',
         pageLength: 50
     });
 </script>

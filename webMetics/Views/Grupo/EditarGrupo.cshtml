@@ -3,7 +3,7 @@
 @using webMetics.Helpers
 @{
 
-    ViewBag.Title = "Editar Módulo";
+    ViewBag.Title = "Editar módulo";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -60,7 +60,7 @@
                             </div>
 
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad)
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { @for = "modalidadSelect" })
                                 <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(
                                          grupoModel => grupoModel.modalidad,
@@ -102,22 +102,22 @@
                         <div class="create-group-field-grid">
                             <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.lugar)
-                                @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.enlace)
-                                @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.claveInscripcion)
-                                @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group mt-1">
                                 @Html.LabelFor(grupoModel => grupoModel.horario)
-                                @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off", @id = "horarioText" })
+                                @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -160,7 +160,7 @@
 
                         <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.nombreCategoria) <span class="create-group-required" aria-hidden="true">*</span>
+                                @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { @for = "idCategoria" }) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
                             </div>
@@ -177,7 +177,7 @@
                             else
                             {
                                 <div class="form-group mt-1">
-                                    @Html.LabelFor(grupoModel => grupoModel.nombreAsesor)
+                                    @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { @for = "asesorSelect" })
                                     @Html.DropDownListFor(
                                              grupoModel => grupoModel.idAsesor,
                                              new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
@@ -243,7 +243,7 @@
                         <i class="bi bi-paperclip" aria-hidden="true"></i>
                         <div>
                             <h2 id="editGroupAttachmentTitle">Archivo adjunto</h2>
-                            <p>Consulta el archivo actual o adjunta uno nuevo</p>
+                            <p>Consulte el archivo actual o adjunte uno nuevo</p>
                         </div>
                     </header>
                     <div class="create-group-card-body">
@@ -336,16 +336,16 @@ else
             if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
                 $('#asesorSelect').prop('disabled', true);
                 $('#asesorSelect').val('');
-                $('#horarioText').prop('disabled', true);
-                $('#horarioText').val('');
-                $('#lugarText').prop('disabled', true);
-                $('#lugarText').val('');
+                $('#horario').prop('disabled', true);
+                $('#horario').val('');
+                $('#lugar').prop('disabled', true);
+                $('#lugar').val('');
             } else {
                 if ('@ViewBag.Role' && '@ViewBag.Role' != 2) {
                     $('#asesorSelect').prop('disabled', false);
                 }
-                $('#horarioText').prop('disabled', false);
-                $('#lugarText').prop('disabled', false);
+                $('#horario').prop('disabled', false);
+                $('#lugar').prop('disabled', false);
             }
         }
 

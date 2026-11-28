@@ -714,7 +714,10 @@
 }
 
 :is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child a,
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child button,
 :is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child i {
+    background: none;
+    border: 0;
     color: var(--metics-ink-muted) !important;
     cursor: pointer;
     font-size: var(--metics-font-size-md);
@@ -723,8 +726,31 @@
 }
 
 :is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child a:hover,
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child button:hover,
 :is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child i:hover {
     color: var(--metics-interactive-blue) !important;
+}
+
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child :is(a, button):focus-visible {
+    border-radius: var(--metics-radius-xs);
+    box-shadow: var(--metics-shadow-focus);
+    outline: 0;
+}
+
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child .module-admin-action {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-height: var(--metics-space-6);
+    min-width: var(--metics-space-6);
+}
+
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child .module-admin-action > i {
+    color: inherit !important;
+}
+
+:is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > div:first-child > div:last-child .module-admin-action-hidden {
+    color: var(--metics-danger-badge-text) !important;
 }
 
 :is(#gridView, #gridView0, #listView, #listView0) .module-card-item .card-header > br {
@@ -5423,7 +5449,8 @@ body.metics-app-shell > .admin-shell {
 }
 .module-enrolled-search .module-search-input:focus { box-shadow: none; outline: 0; }
 .module-search-hidden { display: none !important; }
-.module-enrolled-empty {
+.module-enrolled-empty,
+.module-empty-message {
     border: 1px dashed var(--metics-border-select);
     border-radius: var(--metics-radius-card);
     color: var(--metics-ink-muted-alt);

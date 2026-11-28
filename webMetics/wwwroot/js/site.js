@@ -59,8 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             : field.validity.rangeUnderflow || field.validity.rangeOverflow
                                 ? 'El valor debe estar entre ' + (field.min || 'el mínimo permitido') + ' y ' + (field.max || 'el máximo permitido') + '.'
                                 : field.type === 'email'
-                                    ? 'Ingresa un correo electrónico válido.'
-                                    : 'Revisa este valor.';
+                                    ? 'Ingrese un correo electrónico válido.'
+                                    : 'Revise este valor.';
 
                     message.textContent = errorText;
                     message.classList.remove('field-validation-valid');
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // URL del archivo de idioma de DataTables. Pinned a la rama 1.x para que coincida
 // con la versión de DataTables cargada en _Layout (los nombres de clave del archivo
 // 2.x no se mapean sobre el core 1.x y dejarían los textos en inglés).
-var METICS_DT_LANG = '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json';
+var METICS_DT_LANG = 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json';
 
 // Helper compartido para las tablas de listado de administración.
 // Reemplaza el bloque init + render*Pagination + page-size + tooltips que antes
@@ -261,7 +261,7 @@ var MeticsTable = (function () {
         container.appendChild(makePageButton('›', currentPage, table, false, 'Página siguiente', currentPage === pageCount));
     }
 
-    // options: { tableId, pageSizeId, paginationId, searching, searchInputId }
+    // options: { tableId, pageSizeId, paginationId, searching, searchInputId, countId }
     function init(options) {
         var tableElement = document.getElementById(options.tableId);
         if (!tableElement) return null;
@@ -287,6 +287,16 @@ var MeticsTable = (function () {
             var draw = function () { renderPagination(table, pagination); };
             table.on('draw', draw);
             draw();
+        }
+
+        var counter = options.countId ? document.getElementById(options.countId) : null;
+        if (counter) {
+            var updateCount = function () {
+                var total = table.page.info().recordsDisplay;
+                counter.textContent = total + ' ' + (total === 1 ? counter.dataset.singular : counter.dataset.plural);
+            };
+            table.on('draw', updateCount);
+            updateCount();
         }
 
         var pageSize = options.pageSizeId ? document.getElementById(options.pageSizeId) : null;

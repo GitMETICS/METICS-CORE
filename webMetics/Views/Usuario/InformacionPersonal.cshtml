@@ -3,7 +3,7 @@
 @{
     // El rol 1 (administrador) no tiene datos de participante/asesor: su página de cuenta es el panel.
     bool esPanelAdmin = Convert.ToString(ViewBag.Role) == "1";
-    ViewBag.Title = esPanelAdmin ? "Panel de administración" : "Información Personal";
+    ViewBag.Title = esPanelAdmin ? "Panel de administración" : "Información personal";
     if (esPanelAdmin)
     {
         PageHeadingBuilder.Configure(ViewContext, Url, subtitle: "Administre su cuenta y la configuración del sistema desde un solo lugar.");
@@ -111,9 +111,7 @@ else if (!string.IsNullOrEmpty(ViewBag.Id))
                     var medalPath = System.IO.Path.Combine(MedalEnvironment.WebRootPath, "images", "medallas", nombreMedalla);
                     if (webMetics.Services.MedallasCatalogoService.EsNombreValido(nombreMedalla) && System.IO.File.Exists(medalPath))
                     {
-                        string nombreLegible = System.Text.RegularExpressions.Regex.Replace(
-                            System.IO.Path.GetFileNameWithoutExtension(nombreMedalla), "^\\s*\\d*\\.?\\s*Medalla_\\s*", "").Trim();
-                        medallasPerfil.Add(new[] { nombreMedalla, string.IsNullOrWhiteSpace(nombreLegible) ? nombreMedalla : nombreLegible,
+                        medallasPerfil.Add(new[] { nombreMedalla, webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla),
                             Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla)) });
                     }
                 }

@@ -1,7 +1,7 @@
 @model webMetics.Models.TemaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Áreas de Competencia";
+    ViewBag.Title = "Áreas de competencia";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -28,7 +28,7 @@
                         <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
                     </div>
                     <div class="table-card-header-actions">
-                        <span class="table-card-count">@ViewBag.Temas.Count áreas encontradas</span>
+                        <span class="table-card-count" id="temaCount" data-singular="área encontrada" data-plural="áreas encontradas" aria-live="polite">@ViewBag.Temas.Count áreas encontradas</span>
                         <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearTema">Crear área</button>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-collection"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalCrearTemaLabel">Crear área de competencia</h2>
-                            <p>Completa el nombre para registrar una nueva área.</p>
+                            <p>Complete el nombre para registrar una nueva área.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body">
@@ -128,11 +128,11 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar área</h2>
-                            <p>Confirma si deseas quitar esta área de competencia del sistema.</p>
+                            <p>Confirme si desea quitar esta área de competencia del sistema.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">
-                        ¿Estás seguro de que deseas eliminar esta área de competencia? Esta acción no se puede deshacer.
+                        ¿Está seguro de que desea eliminar esta área de competencia? Esta acción no se puede deshacer.
                     </div>
                     <div class="modal-footer create-category-modal-actions">
                         <input type="hidden" id="idTema" name="idTema">
@@ -243,6 +243,7 @@ else
         paginationId: 'temaTblPaginacion',
         searching: true,
         searchInputId: 'temaBusqueda',
+        countId: 'temaCount',
         pageLength: 50
     });
 </script>

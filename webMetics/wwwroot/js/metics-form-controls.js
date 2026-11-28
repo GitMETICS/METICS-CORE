@@ -395,10 +395,10 @@
             input.addEventListener('invalid', function (event) {
                 event.preventDefault();
                 var message;
-                if (input.validity.valueMissing) message = 'Selecciona la fecha indicada.';
+                if (input.validity.valueMissing) message = 'Seleccione la fecha indicada.';
                 else if (input.validity.rangeUnderflow && parseDate(input.min)) message = 'La fecha no puede ser anterior al ' + formatDisplay(parseDate(input.min)) + '.';
                 else if (input.validity.rangeOverflow && parseDate(input.max)) message = 'La fecha no puede ser posterior al ' + formatDisplay(parseDate(input.max)) + '.';
-                else message = manualError || input.validationMessage || 'Selecciona una fecha válida.';
+                else message = manualError || input.validationMessage || 'Seleccione una fecha válida.';
                 setValidationText(message);
                 trigger.setAttribute('aria-invalid', 'true');
                 manualInput.setAttribute('aria-invalid', 'true');
@@ -729,8 +729,8 @@
             select.addEventListener('invalid', function (event) {
                 event.preventDefault();
                 if (validationMessage) validationMessage.textContent = select.value === ''
-                    ? 'Selecciona una opción.'
-                    : select.validationMessage || 'Selecciona una opción válida.';
+                    ? 'Seleccione una opción.'
+                    : select.validationMessage || 'Seleccione una opción válida.';
                 trigger.setAttribute('aria-invalid', 'true');
                 wrapper.classList.add('has-validation-error');
                 window.setTimeout(function () { trigger.focus(); }, 0);

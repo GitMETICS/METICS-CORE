@@ -21,6 +21,17 @@ public sealed class MedallasCatalogoService
         && name.IndexOfAny(Path.GetInvalidFileNameChars()) < 0
         && new[] { ".png", ".jpg", ".jpeg" }.Contains(Path.GetExtension(name), StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Nombre legible de una medalla a partir de su archivo: "1.Medalla_ Fundamentos.png" → "Fundamentos".</summary>
+    public static string NombreVisible(string? archivo)
+    {
+        if (string.IsNullOrWhiteSpace(archivo)) return string.Empty;
+        var original = Path.GetFileNameWithoutExtension(archivo.Trim());
+        var nombre = System.Text.RegularExpressions.Regex.Replace(original, @"^\s*\d+\s*\.\s*", "");
+        nombre = System.Text.RegularExpressions.Regex.Replace(nombre, @"^Medalla_\s*", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        nombre = System.Text.RegularExpressions.Regex.Replace(nombre.Replace('_', ' '), @"\s+", " ").Trim();
+        return nombre.Length == 0 ? original : nombre;
+    }
+
     public string RutaImagen(string name)
     {
         if (!EsNombreValido(name)) throw new ArgumentException("El nombre de la imagen no es válido.", nameof(name));

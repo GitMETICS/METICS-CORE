@@ -2,11 +2,11 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Formulario de Registro";
+    ViewBag.Title = "Formulario de registro";
 
 }
 
-@if (ViewBag.Title == "Formulario de Registro")
+@if (ViewBag.Title == "Formulario de registro")
 {
     <div class="contenedor-caja container-fluid create-participant-page registro-page admin-panel-page">
         @using (Html.BeginForm("FormularioRegistro", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "registroForm" }))
@@ -121,17 +121,17 @@
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(usuarioModel => usuarioModel.area) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.LabelFor(usuarioModel => usuarioModel.area, new { @for = "areaDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(usuarioModel => usuarioModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.area, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(usuarioModel => usuarioModel.departamento) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { @for = "departamentoDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { @for = "seccionDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(usuarioModel => usuarioModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
                             </div>
@@ -141,7 +141,7 @@
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.sede, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(usuarioModel => usuarioModel.carrera) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.LabelFor(usuarioModel => usuarioModel.carrera, new { @for = "carreraDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                 <select id="carreraDropdown" class="form-control">
                                     <option value="">Seleccione una carrera...</option>
                                 </select>
@@ -168,13 +168,13 @@
                         <fieldset class="create-participant-condition-fieldset">
                             <legend>@Html.DisplayNameFor(usuarioModel => usuarioModel.condicion) <span class="create-participant-required" aria-hidden="true">*</span></legend>
                             <div class="create-participant-condition-grid">
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Interino(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Interino(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Instructor(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Instructor(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Adjunto(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Adjunto(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Catedrático(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Catedrático(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Invitado(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Invitado(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Asociado(a)", new { @class = "form-check-input" }) <span class="form-check-label">Profesor(a) Asociado(a)</span></label>
-                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Otro", new { @class = "form-check-input" }) <span class="form-check-label">Otro</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Interino(a)", new { @class = "form-check-input", @id = "condicion_1" }) <span class="form-check-label">Profesor(a) Interino(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Instructor(a)", new { @class = "form-check-input", @id = "condicion_2" }) <span class="form-check-label">Profesor(a) Instructor(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Adjunto(a)", new { @class = "form-check-input", @id = "condicion_3" }) <span class="form-check-label">Profesor(a) Adjunto(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Catedrático(a)", new { @class = "form-check-input", @id = "condicion_4" }) <span class="form-check-label">Profesor(a) Catedrático(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Invitado(a)", new { @class = "form-check-input", @id = "condicion_5" }) <span class="form-check-label">Profesor(a) Invitado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Asociado(a)", new { @class = "form-check-input", @id = "condicion_6" }) <span class="form-check-label">Profesor(a) Asociado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Otro", new { @class = "form-check-input", @id = "condicion_7" }) <span class="form-check-label">Otro</span></label>
                             </div>
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.condicion, "", new { @class = "text-danger" })
                         </fieldset>

@@ -97,14 +97,14 @@ namespace webMetics.Controllers
                 if (string.IsNullOrWhiteSpace(GetId()) || GetRole() is not (1 or 2))
                     TempData["errorMessage"] = "No tiene permisos para actualizar horas y calificaciones.";
                 else if (!ModelState.IsValid)
-                    TempData["errorMessage"] = "Ingresa horas y calificaciones con números enteros válidos.";
+                    TempData["errorMessage"] = "Ingrese horas y calificaciones con números enteros válidos.";
                 else
                 {
                     var saved = new webMetics.Services.CalificacionParticipanteService(_configuration)
                         .Guardar(idGrupo, idParticipante, horasAprobadas, calificacion);
                     if (saved) TempData["successMessage"] = "Horas y calificación guardadas correctamente.";
                     else TempData["warningMessage"] = horasAprobadas == null && calificacion == null
-                        ? "Ingresa las horas aprobadas o la calificación que deseas guardar."
+                        ? "Ingrese las horas aprobadas o la calificación que desea guardar."
                         : "No hay cambios para guardar.";
                 }
             }

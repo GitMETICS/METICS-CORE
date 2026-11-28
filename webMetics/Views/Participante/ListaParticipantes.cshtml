@@ -332,7 +332,7 @@
 					<span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-file-earmark-spreadsheet"></i></span>
 					<div>
 						<h2 class="admin-panel-card-title" id="participantesCalificacionesTitulo">Gestión de calificaciones</h2>
-						<p class="admin-panel-card-desc">Importa las horas aprobadas y calificaciones desde un archivo de Excel.</p>
+						<p class="admin-panel-card-desc">Importe las horas aprobadas y calificaciones desde un archivo de Excel.</p>
 					</div>
 				</div>
 				<a class="btn admin-panel-btn-secondary btn-sm" href="@Url.Action("DescargarPlantillaSubirCalificaciones", "Calificaciones")"><i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>Descargar plantilla</a>
@@ -365,7 +365,7 @@
 					<i class="bi bi-award" aria-hidden="true"></i>
 					<div>
 						<h2 id="medalAssignmentTitle">Asignación masiva de medallas</h2>
-						<p>Selecciona una medalla y los participantes a quienes deseas asignarla.</p>
+						<p>Seleccione una medalla y los participantes a quienes desea asignarla.</p>
 					</div>
 				</header>
 
@@ -390,9 +390,9 @@
 											<div class="medalla-item medal-option-card">
 												<img src="~/images/medallas/@medalla" alt="" class="medalla-image" loading="lazy" />
 												<div class="form-check">
-													<label class="form-check-label" for="medalla_@medalla">
-														<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" id="medalla_@medalla" form="formAsignarMedallas">
-														<span>@medalla</span>
+													<label class="form-check-label">
+														<input class="form-check-input" type="radio" name="nombreMedalla" value="@medalla" form="formAsignarMedallas">
+														<span>@webMetics.Services.MedallasCatalogoService.NombreVisible((string)medalla)</span>
 													</label>
 												</div>
 											</div>
@@ -426,7 +426,7 @@
 								</div>
 							</div>
 						}
-						<p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Selecciona participantes desde el listado de participantes.</p>
+						<p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Seleccione participantes desde el listado de participantes.</p>
 						<div class="medal-assignment-actions">
 							@if (ViewBag.Role == 1)
 							{

@@ -4,7 +4,7 @@
     Vista del formulario para editar los datos de un asesor
 -->
 @{
-    ViewBag.Title = "Editar Facilitador(a)";
+    ViewBag.Title = "Editar facilitador(a)";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -104,7 +104,7 @@
                         <div class="create-participant-card-body">
                             <div class="create-participant-field-grid">
                                 <div class="form-group">
-                                    @Html.LabelFor(asesorModel => asesorModel.contrasena) <span class="create-participant-required" aria-hidden="true">*</span>
+                                    @Html.LabelFor(asesorModel => asesorModel.contrasena, new { @for = "password" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                     <div class="edit-asesor-password">
                                         @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                         <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
@@ -114,7 +114,7 @@
                                     @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena) <span class="create-participant-required" aria-hidden="true">*</span>
+                                    @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { @for = "passwordCheck" }) <span class="create-participant-required" aria-hidden="true">*</span>
                                     <div class="edit-asesor-password">
                                         @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                         <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility2()" aria-label="Mostrar u ocultar confirmación de contraseña">

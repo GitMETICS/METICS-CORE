@@ -6,7 +6,7 @@
     Vista para mostrar la lista de los modulos de un asesor
 -->
 @{
-    ViewBag.Title = "Mis Módulos";
+    ViewBag.Title = "Mis módulos";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -66,17 +66,17 @@
                                                     <span class="badge bg-info">Inscripciones: @(grupo.cupoActual)</span>
                                                 </div>
                                                 <div style="float:right">
-                                                    <i class="bi bi-pencil-square" type="button" role="button" tabindex="0" aria-label="Editar módulo" title="Editar módulo" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModalEditar(@grupo.idGrupo)"></i>
+                                                    <button type="button" class="module-admin-action" data-bs-toggle="modal" data-bs-target="#modalEditar" onclick="actualizarModalEditar(@grupo.idGrupo)" aria-label="Editar módulo @grupo.nombre" title="Editar módulo"><i class="bi bi-pencil-square" aria-hidden="true"></i></button>
                                                     @if (ViewBag.Role == 1)
                                                     {
-                                                        <i class="bi bi-trash3" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@grupo.idGrupo)"></i>
+                                                        <button type="button" class="module-admin-action" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(@grupo.idGrupo)" aria-label="Eliminar módulo @grupo.nombre" title="Eliminar módulo"><i class="bi bi-trash3" aria-hidden="true"></i></button>
                                                         if (grupo.esVisible == true)
                                                         {
-                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })" onclick="opacarGrupo(@grupo.idGrupo)"><i class="bi bi-eye"></i></a>
+                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })" class="module-admin-action" aria-label="Ocultar módulo @grupo.nombre" title="Ocultar módulo"><i class="bi bi-eye" aria-hidden="true"></i></a>
                                                         }
                                                         else
                                                         {
-                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })"><i class="bi bi-eye-slash"></i></a>
+                                                            <a href="@Url.Action("CambiarEstadoVisible", "Grupo", new { idGrupo = grupo.idGrupo })" class="module-admin-action module-admin-action-hidden" aria-label="Mostrar módulo @grupo.nombre" title="Mostrar módulo"><i class="bi bi-eye-slash" aria-hidden="true"></i></a>
                                                         }
                                                     }
                                                 </div>
@@ -213,7 +213,7 @@
                         <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
                         <div class="create-category-modal-heading">
                             <h2 class="modal-title" id="modalEliminarLabel">Eliminar módulo</h2>
-                            <p>Confirma si deseas quitar este módulo del sistema.</p>
+                            <p>Confirme si desea quitar este módulo del sistema.</p>
                         </div>
                     </div>
                     <div class="modal-body create-category-modal-body category-delete-message">

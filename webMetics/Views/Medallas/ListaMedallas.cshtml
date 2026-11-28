@@ -1,6 +1,6 @@
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Lista de Medallas";
+    ViewBag.Title = "Lista de medallas";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -15,7 +15,7 @@
         <section class="file-management-card medal-file-management" aria-labelledby="medallaFileManagementTitle">
             <header class="file-management-header">
                 <h2 id="medallaFileManagementTitle">Gestión de medallas</h2>
-                <p>Agrega imágenes al catálogo de medallas</p>
+                <p>Agregue imágenes al catálogo de medallas</p>
             </header>
             <div class="file-management-body">
                 <section class="file-management-section" aria-labelledby="medallaUploadTitle">
@@ -23,7 +23,7 @@
                         <i class="bi bi-upload" aria-hidden="true"></i>
                         <div>
                             <h3 id="medallaUploadTitle">Subir medalla</h3>
-                            <p>Selecciona la imagen que deseas agregar</p>
+                            <p>Seleccione la imagen que desea agregar</p>
                         </div>
                     </div>
 
@@ -54,7 +54,7 @@
                 <span class="medal-catalog-header-icon" aria-hidden="true"><i class="bi bi-images"></i></span>
                 <div>
                     <h2 id="medalCatalogTitle">Medallas registradas</h2>
-                    <p>Consulta y administra las medallas disponibles.</p>
+                    <p>Consulte y administre las medallas disponibles.</p>
                 </div>
             </header>
 
@@ -84,19 +84,19 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
-                                                <button type="button" class="dropdown-item medal-catalog-edit" data-medal-name="@nombreMedalla" data-medal-src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla))" data-bs-toggle="modal" data-bs-target="#modalEditarMedalla"><i class="bi bi-pencil-square" aria-hidden="true"></i><span>Editar</span></button>
+                                                <button type="button" class="dropdown-item medal-catalog-edit" data-medal-name="@nombreMedalla" data-medal-display="@webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)" data-medal-src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla))" data-bs-toggle="modal" data-bs-target="#modalEditarMedalla"><i class="bi bi-pencil-square" aria-hidden="true"></i><span>Editar</span></button>
                                             </li>
                                             <li>
-                                                <button type="button" class="dropdown-item medal-catalog-delete" data-medal-name="@nombreMedalla" data-bs-toggle="modal" data-bs-target="#modalEliminar"><i class="bi bi-trash3" aria-hidden="true"></i><span>Eliminar</span></button>
+                                                <button type="button" class="dropdown-item medal-catalog-delete" data-medal-name="@nombreMedalla" data-medal-display="@webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)" data-bs-toggle="modal" data-bs-target="#modalEliminar"><i class="bi bi-trash3" aria-hidden="true"></i><span>Eliminar</span></button>
                                             </li>
                                         </ul>
                                     </div>
                                 }
 
                                 <div class="medal-catalog-image-wrap">
-                                    <img src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla))" alt="Medalla: @nombreMedalla" loading="lazy" />
+                                    <img src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla))" alt="" loading="lazy" />
                                 </div>
-                                <h3 title="@nombreMedalla">@nombreMedalla</h3>
+                                <h3 title="@nombreMedalla">@webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)</h3>
                             </article>
                         }
                     </div>
@@ -215,11 +215,10 @@ else
         button.addEventListener('click', function () {
             var nombre = button.dataset.medalName || '';
             document.getElementById('editarMedallaNombreInput').value = nombre;
-            // Nombre visible: el nombre del archivo de imagen sin la extensión (el campo enviado no cambia).
-            document.getElementById('editarMedallaNombre').textContent = nombre.replace(/\.[^.]+$/, '').trim();
+            document.getElementById('editarMedallaNombre').textContent = button.dataset.medalDisplay || '';
             var imagen = document.getElementById('editarMedallaImagen');
             imagen.src = button.dataset.medalSrc || '';
-            imagen.alt = 'Medalla: ' + nombre.replace(/\.[^.]+$/, '').trim();
+            imagen.alt = 'Medalla: ' + (button.dataset.medalDisplay || '');
             var archivo = document.getElementById('editarMedallaArchivo');
             archivo.value = '';
             updateEditarMedallaFileName(archivo);
@@ -229,9 +228,7 @@ else
     document.querySelectorAll('.medal-catalog-delete').forEach(function (button) {
         button.addEventListener('click', function () {
             document.getElementById('nombreMedalla').value = button.dataset.medalName || '';
-            // Nombre visible: el nombre del archivo de imagen sin la extensión (.png, .jpg...).
-            var nombreVisible = (button.dataset.medalName || '').replace(/\.[^.]+$/, '').trim();
-            document.getElementById('eliminarMedallaNombre').textContent = '«' + nombreVisible + '»';
+            document.getElementById('eliminarMedallaNombre').textContent = '«' + (button.dataset.medalDisplay || '') + '»';
         });
     });
 

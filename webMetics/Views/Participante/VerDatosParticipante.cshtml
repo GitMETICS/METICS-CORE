@@ -1,7 +1,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment MedalEnvironment
 @model webMetics.Models.ParticipanteModel
 @{
-    ViewBag.Title = "Módulos del Participante";
+    ViewBag.Title = "Módulos del participante";
     PageHeadingBuilder.Configure(ViewContext, Url);
 
 
@@ -32,7 +32,7 @@
                             <h3 id="medallasHeader" class="medal-assignment-heading">
                                 <button class="medal-assignment-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMedallas" aria-expanded="true" aria-controls="collapseMedallas">
                                     <span class="medal-catalog-header-icon" aria-hidden="true"><i class="bi bi-award"></i></span>
-                                    <span class="medal-assignment-heading-text"><strong>Asignar medallas</strong><span>Selecciona las medallas que deseas otorgar al participante.</span></span>
+                                    <span class="medal-assignment-heading-text"><strong>Asignar medallas</strong><span>Seleccione las medallas que desea otorgar al participante.</span></span>
                                     <i class="bi bi-chevron-down medal-assignment-chevron" aria-hidden="true"></i>
                                 </button>
                             </h3>
@@ -54,10 +54,10 @@
                                             {
                                                 @foreach (var medalla in ViewBag.TodasMedallas)
                                                 {
-                                                    <label class="medal-catalog-item medalla-item medal-assignment-option" for="medalla-@medalla">
-                                                        <input class="form-check-input" type="checkbox" name="selectedMedallas" value="@medalla" id="medalla-@medalla">
-                                                        <span class="medal-catalog-image-wrap"><img src="~/images/medallas/@medalla" alt="@medalla" loading="lazy" /></span>
-                                                        <span class="medal-assignment-name">@medalla</span>
+                                                    <label class="medal-catalog-item medalla-item medal-assignment-option">
+                                                        <input class="form-check-input" type="checkbox" name="selectedMedallas" value="@medalla">
+                                                        <span class="medal-catalog-image-wrap"><img src="~/images/medallas/@medalla" alt="" loading="lazy" /></span>
+                                                        <span class="medal-assignment-name">@webMetics.Services.MedallasCatalogoService.NombreVisible((string)medalla)</span>
                                                     </label>
                                                 }
                                             }
@@ -95,7 +95,7 @@
                                         <article class="medal-catalog-item">
                                             @if (ViewBag.Role == 1)
                                             {
-                                                <button class="participant-medal-remove" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar('@nombreMedalla')" aria-label="Eliminar medalla @nombreMedalla" title="Eliminar medalla">
+                                                <button class="participant-medal-remove" type="button" data-bs-toggle="modal" data-bs-target="#modalEliminar" onclick="actualizarModalEliminar(this)" data-medal-file="@nombreMedalla" data-medal-name="@webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)" aria-label="Eliminar medalla @webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)" title="Eliminar medalla">
                                                     <i class="bi bi-trash3" aria-hidden="true"></i>
                                                 </button>
                                             }
@@ -105,9 +105,9 @@
                                             @if (webMetics.Services.MedallasCatalogoService.EsNombreValido(nombreMedalla) && System.IO.File.Exists(medalPath))
                                             {
                                                 var relativeMedalPath = Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla));
-                                                <div class="medal-catalog-image-wrap"><img src="@relativeMedalPath" alt="Medalla: @nombreMedalla" loading="lazy" /></div>
+                                                <div class="medal-catalog-image-wrap"><img src="@relativeMedalPath" alt="" loading="lazy" /></div>
                                             }
-                                            <h3>@nombreMedalla</h3>
+                                            <h3>@webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla)</h3>
                                         </article>
                                     }
                                 </div>
@@ -352,10 +352,9 @@ else
     }
 </script>
 <script type="text/javascript">
-    function actualizarModalEliminar(nombreMedalla) {
-        document.getElementById("nombreMedalla").value = nombreMedalla;
-        // Nombre visible: el nombre del archivo de la medalla sin la extensión.
+    function actualizarModalEliminar(boton) {
+        document.getElementById("nombreMedalla").value = boton.dataset.medalFile || '';
         var etiquetaNombre = document.getElementById("eliminarMedallaNombre");
-        if (etiquetaNombre) etiquetaNombre.textContent = '«' + String(nombreMedalla || '').replace(/\.[^.]+$/, '').trim() + '»';
+        if (etiquetaNombre) etiquetaNombre.textContent = '«' + (boton.dataset.medalName || '') + '»';
     }
 </script>

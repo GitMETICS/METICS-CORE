@@ -16,7 +16,7 @@
             <section class="file-management-card" aria-labelledby="inscripcionFileManagementTitle">
                 <header class="file-management-header">
                     <h2 id="inscripcionFileManagementTitle">Gestión de archivos</h2>
-                    <p>Importa y exporta información de inscripciones</p>
+                    <p>Importe y exporte información de inscripciones</p>
                 </header>
 
                 <div class="file-management-body">
@@ -60,7 +60,7 @@
                             <i class="bi bi-download" aria-hidden="true"></i>
                             <div>
                                 <h3 id="exportInscripcionesTitle">Exportar inscripciones</h3>
-                                <p>Descarga los datos en el formato que necesites</p>
+                                <p>Descargue los datos en el formato que necesite</p>
                             </div>
                         </div>
 
@@ -95,7 +95,7 @@
                         <i class="bi bi-award" aria-hidden="true"></i>
                         <div>
                             <h2 id="medalAssignmentTitle">Asignación masiva de medallas</h2>
-                            <p>Selecciona las medallas y los participantes a quienes deseas asignarlas.</p>
+                            <p>Seleccione las medallas y los participantes a quienes desea asignarlas.</p>
                         </div>
                     </header>
 
@@ -118,11 +118,11 @@
                                             @foreach (var medalla in ViewBag.TodasLasMedallas)
                                             {
                                                 <div class="medalla-item medal-option-card">
-                                                    <img src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString((string)medalla))" alt="Medalla: @medalla" class="medalla-image" />
+                                                    <img src="@Url.Content("~/images/medallas/" + Uri.EscapeDataString((string)medalla))" alt="" class="medalla-image" />
                                                     <div class="form-check">
                                                         <label class="form-check-label">
-                                                            <input class="form-check-input" type="checkbox" id="medallaSeleccionada" name="nombreMedalla" value="@medalla" aria-label="Seleccionar medalla @medalla">
-                                                            <span>@medalla</span>
+                                                            <input class="form-check-input" type="checkbox" name="nombreMedalla" value="@medalla">
+                                                            <span>@webMetics.Services.MedallasCatalogoService.NombreVisible((string)medalla)</span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -149,7 +149,7 @@
                                     <strong id="selectedCount">0</strong>
                                 </div>
                             </div>
-                            <p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Selecciona participantes desde la tabla de inscripciones.</p>
+                            <p class="medal-selection-hint"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> Seleccione participantes desde la tabla de inscripciones.</p>
                             <div class="medal-assignment-actions">
                                 <button type="button" class="btn admin-panel-btn-secondary" onclick="selectAllParticipants()" aria-pressed="false">
                                     <i class="bi bi-check2-square" aria-hidden="true"></i><span id="selectPageParticipantsText">Seleccionar página</span>
@@ -194,8 +194,8 @@
                             </div>
 
                             <form asp-action="VerInscripciones" asp-controller="Inscripcion" method="get" class="table-search">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" />
-                                <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar inscripción" aria-label="Buscar inscripción" value="@Context.Request.Query["searchTerm"]" />
+                                <button class="btn" type="submit" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>
                             </form>
                         </div>
                     </div>
@@ -206,7 +206,7 @@
                                 <tr>
                                     <th scope="col" class="text-center" style="width: 3%;">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox" onchange="toggleAllParticipants()">
+                                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox" aria-label="Seleccionar todas las inscripciones" onchange="toggleAllParticipants()">
                                         </div>
                                     </th>
                                     <th scope="col" style="width: 8%;">Nombre</th>
@@ -482,6 +482,7 @@
                             '<input type="checkbox" class="form-check-input participant-checkbox" ' +
                             'id="participante_' + row.idInscripcion + '" ' +
                             'data-participant-id="' + participantId + '" ' +
+                            'aria-label="Seleccionar a ' + escapeHtml([row.nombre, row.primerApellido, row.segundoApellido].filter(Boolean).join(' ')) + '" ' +
                             'onchange="handleParticipantSelection(this)">' +
                             '</div>';
                     }

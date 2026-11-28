@@ -2,7 +2,7 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Crear Módulo";
+    ViewBag.Title = "Crear módulo";
     PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
@@ -55,7 +55,7 @@
                             </div>
 
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad)
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { @for = "modalidadSelect" })
                                 <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(
                                          grupoModel => grupoModel.modalidad,
@@ -667,8 +667,8 @@ else
                     event.preventDefault();
                     if (validationMessage) {
                         validationMessage.textContent = input.validity.valueMissing
-                            ? 'Selecciona la fecha indicada.'
-                            : input.validationMessage || 'Selecciona una fecha válida.';
+                            ? 'Seleccione la fecha indicada.'
+                            : input.validationMessage || 'Seleccione una fecha válida.';
                     }
                     trigger.setAttribute('aria-invalid', 'true');
                     manualInput.setAttribute('aria-invalid', 'true');
@@ -1113,8 +1113,8 @@ else
                 select.addEventListener('invalid', function (event) {
                     event.preventDefault();
                     if (validationMessage) validationMessage.textContent = select.value === ''
-                        ? 'Selecciona una opción.'
-                        : select.validationMessage || 'Selecciona una opción válida.';
+                        ? 'Seleccione una opción.'
+                        : select.validationMessage || 'Seleccione una opción válida.';
                     trigger.setAttribute('aria-invalid', 'true');
                     wrapper.classList.add('has-validation-error');
                     window.setTimeout(function () { trigger.focus(); }, 0);

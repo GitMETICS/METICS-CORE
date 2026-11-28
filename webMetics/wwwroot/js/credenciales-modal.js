@@ -5,7 +5,7 @@
     let loading = false;
     function validateCredentials(form) {
         const fields = [form.elements.id, form.elements.nuevaContrasena, form.elements.confirmarContrasena];
-        const messages = ['El identificador es obligatorio.', 'La nueva contraseña es obligatoria.', 'Confirma la nueva contraseña.'];
+        const messages = ['El identificador es obligatorio.', 'La nueva contraseña es obligatoria.', 'Confirme la nueva contraseña.'];
         let firstInvalid = null;
         fields.forEach(function (field, index) {
             let message = !field.value.trim() ? messages[index] : '';
@@ -100,10 +100,10 @@
                 password.value = ''; confirmation.value = '';
                 bootstrap.Modal.getInstance(form.closest('.modal')).hide();
             } else {
-                error.textContent = page.querySelector('.metics-toast-message p')?.textContent || 'No se pudieron actualizar las credenciales. Revisa los datos e inténtalo de nuevo.';
+                error.textContent = page.querySelector('.metics-toast-message p')?.textContent || 'No se pudieron actualizar las credenciales. Revise los datos e inténtelo de nuevo.';
             }
         } catch (_) {
-            error.textContent = 'No se pudo confirmar el guardado. Revisa la conexión y verifica los datos antes de volver a intentarlo.';
+            error.textContent = 'No se pudo confirmar el guardado. Revise la conexión y verifique los datos antes de volver a intentarlo.';
         } finally {
             delete form.dataset.saving;
             buttons.forEach(button => { button.disabled = false; });

@@ -67,8 +67,8 @@
 
     <!-- DataTables se carga una sola vez (versión 1.13.x) para todas las vistas de listado.
          El helper compartido MeticsTable vive en site.js. -->
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-    <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body class="metics-app-shell">
@@ -80,11 +80,11 @@
         string currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]) ?? "";
         string currentAction = Convert.ToString(ViewContext.RouteData.Values["action"]) ?? "";
         bool showNav = !string.IsNullOrEmpty(navUserId)
-            && ViewBag.Title != "Formulario de Registro"
+            && ViewBag.Title != "Formulario de registro"
             && ViewBag.Title != "Iniciar sesión"
-            && ViewBag.Title != "Recuperar Contraseña"
-            && ViewBag.Title != "Completar Información - Correo Alternativo"
-            && ViewBag.Title != "Completar Información - Grado Académico";
+            && ViewBag.Title != "Recuperar contraseña"
+            && ViewBag.Title != "Completar información - Correo alternativo"
+            && ViewBag.Title != "Completar información - Grado académico";
         bool isAcademicActive = currentController == "Categoria" || currentController == "Tema";
         bool isPeopleActive = currentController == "Participante" || (currentController == "Asesor" && currentAction != "MisModulos");
         bool isInscriptionActive = currentController == "Inscripcion";
@@ -372,8 +372,18 @@
             var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
             boton.hidden = false;
 
+            function tapaUnControl() {
+                var r = boton.getBoundingClientRect();
+                var puntos = [[r.left + r.width / 2, r.top + r.height / 2], [r.left + 4, r.top + 4], [r.right - 4, r.top + 4], [r.left + 4, r.bottom - 4], [r.right - 4, r.bottom - 4]];
+                return puntos.some(function (p) {
+                    return document.elementsFromPoint(p[0], p[1]).some(function (el) {
+                        return !boton.contains(el) && el.closest('a[href], button, input, select, textarea, label');
+                    });
+                });
+            }
+
             function actualizar() {
-                var debeMostrarse = (window.scrollY || document.documentElement.scrollTop) > UMBRAL;
+                var debeMostrarse = (window.scrollY || document.documentElement.scrollTop) > UMBRAL && !tapaUnControl();
                 if (debeMostrarse === visible) return;
                 visible = debeMostrarse;
                 boton.classList.toggle('is-visible', visible);
