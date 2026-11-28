@@ -2,97 +2,82 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Recuperar Contraseña";
+    ViewBag.Title = "Recuperar contraseña";
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-<!DOCTYPE html>
-<html lang="en">
+@if (ViewBag.Id != "")
+{
+    <div class="contenedor-caja container-fluid required-update-page admin-panel-page">
+        @await Html.PartialAsync("_MeticsToast")
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-    <style>
-        .input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-            .input-wrapper input {
-                padding-right: 50px;
-            }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(10%);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        input::-ms-reveal,
-        input::-ms-clear {
-            display: none !important;
-        }
-    </style>
-</head>
-<body>
-    @if (ViewBag.Id != "")
-    {
-        <div class="contenedor-caja container-fluid">
-            @if (urlReferrer != null)
-            {
-                <div class="d-flex justify-content-start mb-3">
-                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
+        <section class="admin-panel-card required-update-card" aria-labelledby="recuperarContrasenaTitulo">
+            <div class="required-update-header">
+                <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-key"></i></span>
+                <div>
+                    <h1 class="required-update-title" id="recuperarContrasenaTitulo">Recuperar contraseña</h1>
+                    <p class="admin-panel-card-desc">Ingrese su correo institucional para recuperar el acceso a su cuenta.</p>
                 </div>
-            }
+            </div>
 
-            @using (Html.BeginForm("RecuperarContrasena", "Participante", FormMethod.Post))
+            @using (Html.BeginForm("RecuperarContrasena", "Participante", FormMethod.Post, new { id = "recuperarContrasenaForm" }))
             {
                 @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title</h1>
-                <hr />
 
-                if (ViewBag.ErrorMessage != null)
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.ErrorMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                if (ViewBag.SuccessMessage != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.SuccessMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-
-                <div class="row mb-1">
-                    <div class="col">
-                        <div class="container">
-                            <div class="row mt-1">
-                                <div class="col input-wrapper">
-                                    @Html.LabelFor(model => model.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo institucional" })
-                                    @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center my-4">
-                            <button type="submit" class="btn btn-primary btn-block">Recuperar Contraseña</button>
-                        </div>
-                    </div>
+                <div class="required-update-field">
+                    @Html.LabelFor(model => model.correo) <span class="required-update-required" aria-hidden="true">*</span>
+                    @Html.TextBoxFor(model => model.correo, new { @class = "form-control", @type = "email", @placeholder = "Ingrese su correo institucional" })
+                    @Html.ValidationMessageFor(model => model.correo, "", new { @class = "text-danger", id = "recuperarCorreoError" })
                 </div>
+
+                <button type="submit" class="btn admin-panel-btn-primary required-update-submit">
+                    <i class="bi bi-envelope" aria-hidden="true"></i>Recuperar contraseña
+                </button>
+
+                @if (urlReferrer != null)
+                {
+                    <a href="#" class="btn admin-panel-btn-secondary required-update-submit required-update-back" onclick="history.go(-1); return false;">Volver</a>
+                }
             }
-        </div>
-    }
-</body>
-</html>
+        </section>
+    </div>
+}
+
+<script>
+    // Campo obligatorio: si el correo está vacío no se envía el formulario y se muestra el aviso.
+    (function () {
+        var form = document.getElementById('recuperarContrasenaForm');
+        if (!form) return;
+        var input = form.querySelector('input[name="correo"]');
+        var mensaje = document.getElementById('recuperarCorreoError');
+        if (!input || !mensaje) return;
+
+        function mostrar(texto) {
+            mensaje.textContent = texto;
+            mensaje.classList.remove('field-validation-valid');
+            mensaje.classList.add('field-validation-error');
+            input.classList.add('input-validation-error');
+            input.setAttribute('aria-invalid', 'true');
+        }
+        function limpiar() {
+            mensaje.textContent = '';
+            mensaje.classList.remove('field-validation-error');
+            mensaje.classList.add('field-validation-valid');
+            input.classList.remove('input-validation-error');
+            input.removeAttribute('aria-invalid');
+        }
+
+        input.setAttribute('aria-describedby', 'recuperarCorreoError');
+        form.addEventListener('submit', function (event) {
+            if (!input.value.trim()) {
+                event.preventDefault();
+                mostrar('Debe completar este campo obligatorio.');
+                input.focus();
+            }
+        });
+        input.addEventListener('input', function () {
+            if (input.value.trim()) limpiar();
+        });
+    })();
+</script>

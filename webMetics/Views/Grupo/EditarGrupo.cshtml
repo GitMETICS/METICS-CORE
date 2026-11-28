@@ -1,11 +1,10 @@
-﻿@model webMetics.Models.GrupoModel
+@model webMetics.Models.GrupoModel
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
 
-    ViewBag.Title = "Editar Módulo";
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    ViewBag.Title = "Editar módulo";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
 @{
@@ -18,64 +17,51 @@
 
 @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid create-group-page table-page-with-divider edit-group-page">
         @using (Html.BeginForm("EditarGrupo", "Grupo", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            @await Html.PartialAsync("_MeticsToast")
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
-                            @Html.HiddenFor(grupoModel => grupoModel.idGrupo, new { })
-                            @Html.HiddenFor(grupoModel => grupoModel.cupoActual, new { })
-                            @Html.HiddenFor(grupoModel => grupoModel.esVisible, new { })
+            @Html.HiddenFor(grupoModel => grupoModel.idGrupo, new { })
+            @Html.HiddenFor(grupoModel => grupoModel.cupoActual, new { })
+            @Html.HiddenFor(grupoModel => grupoModel.esVisible, new { })
 
-                            @Html.LabelFor(grupoModel => grupoModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+            <div class="create-group-sections">
+                <section class="create-group-card" aria-labelledby="editGroupGeneralTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="editGroupGeneralTitle">Información general</h2>
+                            <p>Datos principales del módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="form-group mt-1 create-group-full-field">
+                            @Html.LabelFor(grupoModel => grupoModel.nombre) <span class="create-group-required" aria-hidden="true">*</span>
                             @Html.TextBoxFor(grupoModel => grupoModel.nombre, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.nombre, "", new { @class = "text-danger" })
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.descripcion, new { Style = "font-size:22px" })
+
+                        <div class="form-group mt-1 create-group-full-field">
+                            @Html.LabelFor(grupoModel => grupoModel.descripcion)
                             @Html.TextAreaFor(grupoModel => grupoModel.descripcion, new { @class = "form-control", @rows = "3", @maxlength = "5000", @autocomplete = "off" })
                             @Html.ValidationMessageFor(grupoModel => grupoModel.descripcion, "", new { @class = "text-danger" })
                         </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.numeroGrupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+
+                        <div class="create-group-field-grid">
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.numeroGrupo) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.numeroGrupo, new { @type = "number", @class = "form-control", @min = "1", @max = "100", @value = "" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.numeroGrupo, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { Style = "font-size:22px" })
-                                <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.modalidad, new { @for = "modalidadSelect" })
+                                <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(
                                          grupoModel => grupoModel.modalidad,
                                          new SelectList(
@@ -89,159 +75,213 @@
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.modalidad, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.cantidadHoras) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cantidadHoras, new { @type = "number", @class = "form-control", @min = "0", @value = "" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cantidadHoras, "", new { @class = "text-danger" })
                             </div>
 
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.cupo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.cupo) <span class="create-group-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(grupoModel => grupoModel.cupo, new { @type = "number", @class = "form-control", @min = "0", @value = "" })
                                 @Html.ValidationMessageFor(grupoModel => grupoModel.cupo, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.lugar, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
+                    </div>
+                </section>
+
+                <section class="create-group-card" aria-labelledby="editGroupLocationTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="editGroupLocationTitle">Ubicación y acceso</h2>
+                            <p>Información para acceder y participar en el módulo</p>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.enlace, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.claveInscripcion, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off", @id = "lugarText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.horario, new { Style = "font-size:22px" })
-                            @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off", @id = "horarioText" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
-                        </div>
-
-
-                        @{
-                            var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
-                            var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
-                        }
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-
-                            @foreach (var item in temas)
-                            {
-                                bool isChecked = temasSeleccionados.Any(t => t.Value == item.Value);
-
-                                <div class="form-check">
-                                    <input type="checkbox" name="TemasSeleccionados" value="@item.Value" class="form-check-input" @(isChecked ? "checked" : "") />
-                                    <label class="form-check-label">@item.Text</label>
-                                </div>
-                            }
-
-                            @Html.ValidationMessageFor(model => model.TemasSeleccionados, "", new { @class = "text-danger" })
-
-                        </div>
-
-
-                        <!-- Dropdown para categorías -->
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
-                            @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
-                        </div>
-
-                        @if (ViewBag.Role == 2)
-                        {
-                            @Html.DropDownListFor(
-                                     grupoModel => grupoModel.idAsesor,
-                                     new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text", defaultAsesorId),
-                                     "Seleccione un(a) facilitador(a)...",
-                                     new { @class = "form-select", @hidden = true }
-                                     )
-                        }
-                        else
-                        {
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="create-group-field-grid">
                             <div class="form-group mt-1">
-                                @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { Style = "font-size:22px" })
-                                @Html.DropDownListFor(
-                                         grupoModel => grupoModel.idAsesor,
-                                         new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
-                                         "Seleccione un(a) facilitador(a)...",
-                                         new { @class = "form-select", @id = "asesorSelect" }
-                                         )
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
+                                @Html.LabelFor(grupoModel => grupoModel.lugar)
+                                @Html.TextBoxFor(grupoModel => grupoModel.lugar, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.lugar, "", new { @class = "text-danger" })
                             </div>
-                        }
-
-                        <br />
-                        <div class="row mt-3">
-                            <h4>Fechas de inscripción</h4>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.enlace)
+                                @Html.TextBoxFor(grupoModel => grupoModel.enlace, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.enlace, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.claveInscripcion)
+                                @Html.TextBoxFor(grupoModel => grupoModel.claveInscripcion, new { @class = "form-control", @maxlength = "1000", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.claveInscripcion, "", new { @class = "text-danger" })
                             </div>
-                        </div>
-                        <div class="row mt-3">
-                            <h4>Fechas del módulo</h4>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="col">
-                                @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
-                                <br />
-                                @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
-                                @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-
-                        <br />
-                        <div class="row mt-3">
-                            @if (ViewBag.Adjunto != null && ViewBag.Adjunto.Length > 0)
-                            {
-                                <h4>Archivo actual</h4>
-                                <div class="d-flex align-items-center">
-                                    @Html.ActionLink(" ", "DescargarArchivo", "Grupo", new { idGrupo = Model.idGrupo }, new { @class = "text-muted bi bi-download me-2" })
-                                    <span class="text-muted">@Model.nombreArchivo</span>
-                                </div>
-                                <iframe class="my-2 rounded" id="pdfPreview" src="data:application/pdf;base64,@(ViewBag.Adjunto)" width="100%" height="500" style="border: none;"></iframe>
-                            }
-                            <h5 class="mt-4">Adjuntar nuevo archivo</h5>
-                            <div class="mb-4 bg-light p-3 rounded">
-                                <div class="d-flex align-text-center">
-                                    <h6><i class="bi bi-exclamation-circle-fill me-2 text-secondary"></i></h6>
-                                    <small class="text-muted">Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.</small>
-                                </div>
-                                <div class="form-group">
-                                    @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "form-control" })
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row justify-content-center m-4">
-                            <div class="col-auto">
-                                <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                            </div>
-                            <div class="col-auto">
-                                <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.horario)
+                                @Html.TextBoxFor(grupoModel => grupoModel.horario, new { @placeholder = "Ejemplo: L - V de 7am a 9am", @class = "form-control", @maxlength = "200", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.horario, "", new { @class = "text-danger" })
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                @{
+                    var temas = ViewData["Temas"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
+                    var temasSeleccionados = ViewData["TemasSeleccionadosCheckList"] as List<SelectListItem> ?? new List<SelectListItem>(); // Default to an empty list if null
+                    var indiceTema = 0;
+                }
+
+                <section class="create-group-card" aria-labelledby="editGroupClassificationTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="editGroupClassificationTitle">Clasificación académica</h2>
+                            <p>Competencias, nivel y facilitación del módulo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        <div class="form-group mt-1 create-group-competencies">
+                            @Html.LabelFor(grupoModel => grupoModel.TemasSeleccionados) <span class="create-group-required" aria-hidden="true">*</span>
+
+                            <div class="create-group-checkbox-grid">
+                                @foreach (var item in temas)
+                                {
+                                    bool isChecked = temasSeleccionados.Any(t => t.Value == item.Value);
+                                    var idCheckboxTema = $"competencia_{indiceTema++}";
+
+                                    <div class="form-check">
+                                        <input type="checkbox" id="@idCheckboxTema" name="TemasSeleccionados" value="@item.Value" class="form-check-input" @(isChecked ? "checked" : "") />
+                                        <label class="form-check-label" for="@idCheckboxTema">@item.Text</label>
+                                    </div>
+                                }
+                            </div>
+
+                            @Html.ValidationMessageFor(model => model.TemasSeleccionados, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="create-group-field-grid">
+                            <div class="form-group mt-1">
+                                @Html.LabelFor(grupoModel => grupoModel.nombreCategoria, new { @for = "idCategoria" }) <span class="create-group-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(grupoModel => grupoModel.idCategoria, ViewData["Categorias"] as List<SelectListItem>, "Seleccione un nivel...", new { @class = "form-select" })
+                                @Html.ValidationMessageFor(grupoModel => grupoModel.nombreCategoria, "", new { @class = "text-danger" })
+                            </div>
+
+                            @if (ViewBag.Role == 2)
+                            {
+                                @Html.DropDownListFor(
+                                         grupoModel => grupoModel.idAsesor,
+                                         new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text", defaultAsesorId),
+                                         "Seleccione un(a) facilitador(a)...",
+                                         new { @class = "form-select", @hidden = true }
+                                         )
+                            }
+                            else
+                            {
+                                <div class="form-group mt-1">
+                                    @Html.LabelFor(grupoModel => grupoModel.nombreAsesor, new { @for = "asesorSelect" })
+                                    @Html.DropDownListFor(
+                                             grupoModel => grupoModel.idAsesor,
+                                             new SelectList(ViewData["Asesores"] as List<SelectListItem>, "Value", "Text"),
+                                             "Seleccione un(a) facilitador(a)...",
+                                             new { @class = "form-select", @id = "asesorSelect" }
+                                             )
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.nombreAsesor, "", new { @class = "text-danger" })
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+
+                <section class="create-group-card" aria-labelledby="editGroupDatesTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="editGroupDatesTitle">Fechas del módulo</h2>
+                            <p>Define los períodos de inscripción y ejecución</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body create-group-date-groups">
+                        <section class="create-group-date-block" aria-labelledby="editGroupEnrollmentDatesTitle">
+                            <h3 id="editGroupEnrollmentDatesTitle">Fechas de inscripción</h3>
+                            <div class="create-group-field-grid">
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioInscripcion)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioInscripcion, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionInscripcion)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionInscripcion, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="create-group-date-block" aria-labelledby="editGroupExecutionDatesTitle">
+                            <h3 id="editGroupExecutionDatesTitle">Fechas del módulo</h3>
+                            <div class="create-group-field-grid">
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaInicioGrupo)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaInicioGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaInicioGrupo, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(grupoModel => grupoModel.fechaFinalizacionGrupo)
+                                    <br />
+                                    @Html.EditorFor(grupoModel => grupoModel.fechaFinalizacionGrupo, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(grupoModel => grupoModel.fechaFinalizacionGrupo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="create-group-card" aria-labelledby="editGroupAttachmentTitle">
+                    <header class="create-group-card-header">
+                        <i class="bi bi-paperclip" aria-hidden="true"></i>
+                        <div>
+                            <h2 id="editGroupAttachmentTitle">Archivo adjunto</h2>
+                            <p>Consulte el archivo actual o adjunte uno nuevo</p>
+                        </div>
+                    </header>
+                    <div class="create-group-card-body">
+                        @if (ViewBag.Adjunto != null && ViewBag.Adjunto.Length > 0)
+                        {
+                            <div class="edit-group-current-file">
+                                <span class="edit-group-file-label">Archivo actual</span>
+                                <div class="edit-group-file-row">
+                                    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+                                    <span class="edit-group-file-name">@Model.nombreArchivo</span>
+                                    <a class="edit-group-file-download" href="@Url.Action("DescargarArchivo", "Grupo", new { idGrupo = Model.idGrupo })" title="Descargar archivo" aria-label="Descargar archivo">
+                                        <i class="bi bi-download" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                                <iframe class="edit-group-file-preview" id="pdfPreview" src="data:application/pdf;base64,@(ViewBag.Adjunto)" width="100%" height="500" title="Vista previa del archivo actual"></iframe>
+                            </div>
+                        }
+
+                        <div class="form-group">
+                            @Html.Label("archivoAdjunto", "Adjuntar nuevo archivo", new { @for = "archivoAdjunto" })
+                            <div class="file-management-controls file-import-controls group-file-picker">
+                                @Html.TextBoxFor(grupoModel => grupoModel.archivoAdjunto, null, new { type = "file", @class = "participant-file-input", onchange = "actualizarNombreArchivoGrupo(this)" })
+                                <label for="archivoAdjunto" class="file-management-button file-management-button-secondary file-picker-trigger">
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i>
+                                    <span id="archivoAdjuntoNombre">Elegir archivo</span>
+                                </label>
+                            </div>
+                            <p class="edit-group-file-help">
+                                <i class="bi bi-info-circle" aria-hidden="true"></i>Subir un archivo en formato <strong>PDF</strong> menor a 5 MB.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="create-group-actions">
+                <a href="#" class="btn create-group-action-button create-group-action-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                <input type="submit" class="btn btn-primary create-group-action-button create-group-action-save" value="Guardar" />
             </div>
         }
     </div>
@@ -253,6 +293,41 @@ else
     </script>
 }
 
+<style>
+    /* Detalles propios de "Editar módulo"; el resto reutiliza el diseño de "Crear módulo". */
+    .edit-group-page .edit-group-current-file { margin-bottom: var(--metics-space-5); }
+    .edit-group-page .edit-group-file-label { color: var(--metics-ink-strong); display: block; font-weight: var(--metics-font-weight-semibold); margin-bottom: var(--metics-space-2); }
+    .edit-group-page .edit-group-file-row {
+        align-items: center;
+        background: var(--metics-icon-surface);
+        border: 1px solid var(--metics-border-modal);
+        border-radius: var(--metics-radius-lg);
+        display: flex;
+        gap: var(--metics-space-2-5);
+        padding: var(--metics-space-2-5) var(--metics-space-3);
+    }
+    .edit-group-page .edit-group-file-row > .bi { color: var(--metics-interactive-blue); font-size: var(--metics-font-size-xl); }
+    .edit-group-page .edit-group-file-name { color: var(--metics-ink-strong); flex: 1 1 auto; font-weight: var(--metics-font-weight-semibold); min-width: 0; overflow-wrap: anywhere; }
+    .edit-group-page .edit-group-file-download {
+        align-items: center;
+        border-radius: var(--metics-radius-md);
+        color: var(--metics-interactive-blue);
+        display: inline-flex;
+        height: var(--metics-icon-button-sm);
+        justify-content: center;
+        text-decoration: none;
+        width: var(--metics-icon-button-sm);
+    }
+    .edit-group-page .edit-group-file-download:hover,
+    .edit-group-page .edit-group-file-download:focus-visible { background: var(--metics-soft-blue); color: var(--metics-action-hover); }
+    .edit-group-page .edit-group-file-preview { border: 1px solid var(--metics-border-card); border-radius: var(--metics-radius-lg); margin-top: var(--metics-space-3); }
+    .edit-group-page .edit-group-file-help { color: var(--metics-ink-muted-alt); font-size: var(--metics-font-size-xs); margin: var(--metics-space-2) 0 0; }
+    .edit-group-page .edit-group-file-help .bi { color: var(--metics-interactive-blue); margin-right: var(--metics-space-1); }
+    @@media (max-width: 575.98px) {
+        .edit-group-page .edit-group-file-preview { height: 360px; }
+    }
+</style>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -261,19 +336,19 @@ else
             if (modalidadSeleccionada === '@webMetics.Models.TipoModalidad.Autogestionado') {
                 $('#asesorSelect').prop('disabled', true);
                 $('#asesorSelect').val('');
-                $('#horarioText').prop('disabled', true);
-                $('#horarioText').val('');
-                $('#lugarText').prop('disabled', true);
-                $('#lugarText').val('');
+                $('#horario').prop('disabled', true);
+                $('#horario').val('');
+                $('#lugar').prop('disabled', true);
+                $('#lugar').val('');
             } else {
                 if ('@ViewBag.Role' && '@ViewBag.Role' != 2) {
                     $('#asesorSelect').prop('disabled', false);
                 }
-                $('#horarioText').prop('disabled', false);
-                $('#lugarText').prop('disabled', false);
+                $('#horario').prop('disabled', false);
+                $('#lugar').prop('disabled', false);
             }
         }
-        
+
         verificarModalidad();
 
         // Llamar a la función cuando cambie la modalidad
@@ -284,4 +359,25 @@ else
             deshabilitarAsesor();
         });
     });
+</script>
+<script src="~/js/metics-form-controls.js" asp-append-version="true"></script>
+<script>
+    // Mismo calendario y misma lista desplegable que "Crear módulo" (solo presentación).
+    (function () {
+        var root = document.querySelector('.edit-group-page');
+        if (!root || !window.MeticsFormControls) return;
+        MeticsFormControls.initDatePickers(root);
+        MeticsFormControls.initSelects(root);
+    })();
+</script>
+
+<script>
+    // Muestra el nombre del archivo elegido en el selector (solo presentación; el campo y su envío no cambian).
+    function actualizarNombreArchivoGrupo(input) {
+        var etiqueta = document.getElementById('archivoAdjuntoNombre');
+        if (!etiqueta) return;
+        var archivo = input.files && input.files.length ? input.files[0] : null;
+        etiqueta.textContent = archivo ? archivo.name : 'Elegir archivo';
+        etiqueta.title = archivo ? archivo.name : '';
+    }
 </script>

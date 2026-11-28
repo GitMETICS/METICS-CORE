@@ -1,458 +1,520 @@
-﻿@using webMetics.Controllers
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment MedalEnvironment
+@using webMetics.Controllers
 @{
-    ViewBag.Title = "Información Personal";
+    // El rol 1 (administrador) no tiene datos de participante/asesor: su página de cuenta es el panel.
+    bool esPanelAdmin = Convert.ToString(ViewBag.Role) == "1";
+    ViewBag.Title = esPanelAdmin ? "Panel de administración" : "Información personal";
+    if (esPanelAdmin)
+    {
+        PageHeadingBuilder.Configure(ViewContext, Url, subtitle: "Administre su cuenta y la configuración del sistema desde un solo lugar.");
+        ViewData["AdminPanelLayout"] = true;
+        ViewData["AdminPanelIcon"] = "bi-grid";
+    }
+    else
+    {
+        PageHeadingBuilder.Configure(ViewContext, Url);
+    }
 
     var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+
+    // Mensajes que llegan por redirección (guardar datos, cambiar contraseña desde el perfil): se muestran con el toast.
+    if (ViewData["SuccessMessage"] == null && TempData["successMessage"] != null) ViewData["SuccessMessage"] = TempData["successMessage"];
+    if (ViewData["ErrorMessage"] == null && TempData["errorMessage"] != null) ViewData["ErrorMessage"] = TempData["errorMessage"];
 }
 
-@if (!string.IsNullOrEmpty(ViewBag.Id))
+@if (!string.IsNullOrEmpty(ViewBag.Id) && esPanelAdmin)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
+    <div class="contenedor-caja admin-panel-page">
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
+
+        @await Html.PartialAsync("_MeticsToast")
+
+        <section class="admin-panel-card" aria-labelledby="adminPanelCuentaTitulo">
+            <div class="admin-panel-card-header">
+                <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+                <div>
+                    <h2 class="admin-panel-card-title" id="adminPanelCuentaTitulo">Mi cuenta</h2>
+                    <p class="admin-panel-card-desc">Cuenta con la que inició sesión en el sistema.</p>
+                </div>
+            </div>
+            <dl class="admin-account-details">
+                <div class="admin-account-item">
+                    <dt>Correo institucional</dt>
+                    <dd class="admin-account-email">@ViewBag.Id</dd>
+                </div>
+                <div class="admin-account-item">
+                    <dt>Rol</dt>
+                    <dd><span class="admin-account-role"><i class="bi bi-shield-check" aria-hidden="true"></i>Administrador</span></dd>
+                </div>
+            </dl>
+        </section>
+
+        <section aria-labelledby="adminPanelOpcionesTitulo">
+            <h2 class="admin-panel-section-title" id="adminPanelOpcionesTitulo">Opciones del panel</h2>
+            <div class="admin-panel-shortcuts">
+                <a class="admin-panel-shortcut" href="@Url.Action("CambiarContrasena", "Usuario")">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-key"></i></span>
+                    <span class="admin-panel-shortcut-title">Cambiar contraseña</span>
+                    <span class="admin-panel-shortcut-desc">Actualice la contraseña con la que ingresa a METICS.</span>
+                    <span class="admin-panel-shortcut-action">Abrir</span>
+                </a>
+                <a class="admin-panel-shortcut" href="@Url.Action("Index", "EmailSettings")">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-envelope"></i></span>
+                    <span class="admin-panel-shortcut-title">Configuración del correo</span>
+                    <span class="admin-panel-shortcut-desc">Defina el correo de aviso por límite de horas y habilite o deshabilite el envío de correos.</span>
+                    <span class="admin-panel-shortcut-action">Abrir</span>
+                </a>
+                <a class="admin-panel-shortcut" href="@Url.Action("VerBitacoraAccesos", "Usuario")">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-clock-history"></i></span>
+                    <span class="admin-panel-shortcut-title">Registro de accesos</span>
+                    <span class="admin-panel-shortcut-desc">Consulte los inicios de sesión exitosos y fallidos por fechas o por usuario.</span>
+                    <span class="admin-panel-shortcut-action">Abrir</span>
                 </a>
             </div>
-        }
+        </section>
+    </div>
+}
+else if (!string.IsNullOrEmpty(ViewBag.Id))
+{
+    @* Participante y asesor: página "Mi cuenta" en tarjetas. Muestra los mismos datos que la tabla anterior. *@
+    bool esAsesorPerfil = Convert.ToString(ViewBag.Role) == "2";
 
-        <h1>@ViewBag.Title</h1>
-        <hr />
+    <div class="contenedor-caja container-fluid profile-page">
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
 
-        @if (ViewBag.ErrorMessage != null)
+        @await Html.PartialAsync("_MeticsToast")
+
+        @if (ViewBag.Usuario == null)
         {
-            <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="admin-panel-card">
+                <p class="admin-panel-empty mb-0">Sus datos no están disponibles.</p>
             </div>
         }
-        @if (ViewBag.SuccessMessage != null)
+        else
         {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+            string nombrePerfil = Convert.ToString(ViewBag.Usuario.nombre) ?? "";
+            string primerApellidoPerfil = Convert.ToString(ViewBag.Usuario.primerApellido) ?? "";
+            string segundoApellidoPerfil = Convert.ToString(ViewBag.Usuario.segundoApellido) ?? "";
+            string nombreCompleto = (nombrePerfil + " " + primerApellidoPerfil + " " + segundoApellidoPerfil).Trim();
+            string iniciales = ((nombrePerfil.Length > 0 ? nombrePerfil.Substring(0, 1) : "") + (primerApellidoPerfil.Length > 0 ? primerApellidoPerfil.Substring(0, 1) : "")).ToUpperInvariant();
+            bool tieneParticipante = ViewBag.Participante != null;
+            string condicionPerfil = tieneParticipante ? Convert.ToString(ViewBag.Participante.condicion) : null;
 
-        <div class="table-responsive">
-
-            @if (ViewBag.Usuario == null)
+            // Medallas: solo las imágenes válidas del catálogo (las demás antes se mostraban como un recuadro vacío).
+            var medallasPerfil = new List<string[]>(); // [archivo, nombre legible, ruta]
+            if (tieneParticipante && ViewBag.Medallas != null)
             {
-                <h5 class="text-center">Sus datos no están disponibles.</h5>
-            }
-            else
-            {
-                var nombreCompleto = ViewBag.Usuario.nombre;
-                nombreCompleto += " " + ViewBag.Usuario.primerApellido;
-                nombreCompleto += " " + ViewBag.Usuario.segundoApellido;
-
-                <div>
-                    <table class="table table-striped" id="tblCustomers">
-                        <thead>
-                            <tr>
-                                <th scope="col">Nombre Completo</th>
-                                <th scope="col">Identificación</th>
-
-                                @if (ViewBag.Participante != null)
-                                {
-                                    <th scope="col">Unidad Académica</th>
-                                }
-                                
-                                <th scope="col">Correo Institucional</th>
-                                <th scope="col">Correo Alternativo</th>
-                                <th scope="col">Grado Académico</th>
-
-                                @if (ViewBag.Participante != null)
-                                {
-                                    <th scope="col">Condición</th>
-                                }
-                                
-                                <th scope="col" style="width:10%">Teléfono</th>
-
-                                @if (ViewBag.Participante != null)
-                                {
-                                    <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Inscritas</th>
-                                    <th class="text-center" scope="col" style="width: 7.5%">Total Horas<br>Aprobadas</th>
-                                    <td scope="col" style="width: 3.33%;"></td>
-                                }
-                                else
-                                {
-                                    <td scope="col" style="width: 3.33%;"></td>
-                                }
-
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td class="">@nombreCompleto</td>
-                                <td class="">@ViewBag.Usuario.numeroIdentificacion</td>
-
-                                @if (ViewBag.Participante != null)
-                                {
-                                    <td class="">@ViewBag.Participante.unidadAcademica</td>
-                                }
-
-                                @if (ViewBag.Usuario.correo != null)
-                                {
-                                    <td class="">@ViewBag.Usuario.correo</td>
-                                }
-
-                                @if (ViewBag.Usuario.correoAlternativo != null)
-                                {
-                                    <td class="">@ViewBag.Usuario.correoAlternativo</td>
-                                }
-                                else
-                                {
-                                    <td class="text-muted">-</td>
-                                }
-
-                                @if (ViewBag.Usuario.gradoAcademico != null)
-                                {
-                                    <td class="">@ViewBag.Usuario.gradoAcademico</td>
-                                }
-                                else
-                                {
-                                    <td class="text-muted">-</td>
-                                }
-
-                                @if (ViewBag.Participante != null && ViewBag.Participante.condicion != null)
-                                {
-                                    <td class="">@ViewBag.Participante.condicion</td>
-                                }
-
-                                @if (ViewBag.Usuario.telefono != null)
-                                {
-                                    <td class="">@ViewBag.Usuario.telefono</td>
-                                }
-
-                                @if (ViewBag.Participante != null)
-                                {
-                                    <td class="my-3 text-center" style="width: 7.5%">
-                                        <span>@(ViewBag.Participante.horasMatriculadas ?? 0)</span>
-                                    </td>
-
-                                    <td class="my-3 text-center" scope="col" style="width: 7.5%">
-                                        <span>@(ViewBag.Participante.horasAprobadas ?? 0)</span>
-                                    </td>
-
-                                    <td class="">
-                                        @Html.ActionLink(" ", "EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante }, new { @class = "text-secondary bi bi-pencil-square" })
-                                    </td>
-                                }
-                                else
-                                {
-                                    <td class="">
-                                        @Html.ActionLink(" ", "EditarAsesor", "Asesor", new { idAsesor = ViewBag.Id }, new { @class = "text-secondary bi bi-pencil-square" })
-                                    </td>
-                                }
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-
-                @if (ViewBag.Inscripciones == null)
+                foreach (string nombreMedalla in ViewBag.Medallas)
                 {
-                    <br />
-                    <h5 class="text-center">No tiene módulos inscritos.</h5>
-
-                    @if (ViewBag.Role == 2)
+                    var medalPath = System.IO.Path.Combine(MedalEnvironment.WebRootPath, "images", "medallas", nombreMedalla);
+                    if (webMetics.Services.MedallasCatalogoService.EsNombreValido(nombreMedalla) && System.IO.File.Exists(medalPath))
                     {
-                        @if (ViewBag.ListaGruposAsesor == null)
-                        {
-                            <br />
-                            <hr />
-                            <br />
-                            <h5 class="text-center">No tiene módulos creados.</h5>
-                        }
-                        else
-                        {
-                            <!-- Módulos asesor -->
-                            <br />
-                            <div class="mt-4">
-                                <h3 class="">Módulos creados</h3>
-                                <table class="table table-striped" id="tblCustomers">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Módulos</th>
-                                            <th class="text-center" scope="col" style="width: 15%">Horas del<br>Módulo</th>
-                                            <th class="text-center" scope="col" style="width: 15%">Cupo</th>
-                                            <th class="text-center" scope="col" style="width: 15%">Cupo Actual</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody class="align-middle">
-                                        <tr>
-                                            <td>
-                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                {
-                                                    <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-                                                    <br />
-                                                }
-                                            </td>
-                                            <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                {
-                                                    @grupo.cantidadHoras
-                                                    <br />
-                                                }
-                                            </td>
-                                            <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                {
-                                                    @grupo.cupo
-                                                    <br />
-                                                }
-                                            </td>
-                                            <td class="text-center">
-                                                @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                {
-                                                    @grupo.cupoActual
-                                                    <br />
-                                                }
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
+                        medallasPerfil.Add(new[] { nombreMedalla, webMetics.Services.MedallasCatalogoService.NombreVisible(nombreMedalla),
+                            Url.Content("~/images/medallas/" + Uri.EscapeDataString(nombreMedalla)) });
                     }
                 }
-                else
+            }
+
+            // Módulos del participante separados por estado (mismos datos y cálculos que las tablas anteriores).
+            var modulosInscritos = new List<dynamic>();
+            var modulosIncompletos = new List<dynamic>();
+            var modulosAprobados = new List<dynamic>();
+            if (ViewBag.Inscripciones != null)
+            {
+                foreach (var inscripcion in ViewBag.Inscripciones)
                 {
-                    @if (ViewBag.Participante != null)
+                    if (inscripcion.estado == "Inscrito") { modulosInscritos.Add(inscripcion); }
+                    else if (inscripcion.estado == "Incompleto") { modulosIncompletos.Add(inscripcion); }
+                    else if (inscripcion.estado == "Aprobado") { modulosAprobados.Add(inscripcion); }
+                }
+            }
+            int modulosCreados = 0;
+            if (ViewBag.ListaGruposAsesor != null)
+            {
+                foreach (var grupoAsesor in ViewBag.ListaGruposAsesor) { modulosCreados++; }
+            }
+
+            <section class="admin-panel-card profile-hero" aria-labelledby="perfilNombre">
+                <div class="profile-hero-identity">
+                    <span class="profile-avatar" aria-hidden="true">@iniciales</span>
+                    <div class="profile-hero-text">
+                        <h2 class="profile-hero-name" id="perfilNombre">@nombreCompleto</h2>
+                        <p class="profile-hero-email">@(ViewBag.Usuario.correo ?? ViewBag.Id)</p>
+                        <div class="profile-hero-chips">
+                            <span class="profile-chip"><i class="bi @(esAsesorPerfil ? "bi-person-workspace" : "bi-person")" aria-hidden="true"></i>@(esAsesorPerfil ? "Facilitador(a)" : "Participante")</span>
+                            @if (!string.IsNullOrWhiteSpace(condicionPerfil))
+                            {
+                                <span class="profile-chip profile-chip--neutral">@condicionPerfil</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-hero-actions">
+                    @if (tieneParticipante)
                     {
-                        <!-- Medallas -->
-                        @if (ViewBag.Medallas != null)
+                        <a class="btn admin-panel-btn-secondary" href="@Url.Action("EditarParticipante", "Participante", new { idParticipante = ViewBag.Participante.idParticipante, breadcrumbOrigin = "account" })"><i class="bi bi-pencil-square" aria-hidden="true"></i>Editar datos</a>
+                    }
+                    else
+                    {
+                        <a class="btn admin-panel-btn-secondary" href="@Url.Action("EditarAsesor", "Asesor", new { idAsesor = ViewBag.Id, breadcrumbOrigin = "account" })"><i class="bi bi-pencil-square" aria-hidden="true"></i>Editar datos</a>
+                    }
+                    <a class="btn admin-panel-btn-primary" href="#seguridad"><i class="bi bi-key" aria-hidden="true"></i>Cambiar contraseña</a>
+                </div>
+            </section>
+
+            <div class="profile-stats">
+                @if (tieneParticipante)
+                {
+                    <div class="profile-stat">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+                        <div><span class="profile-stat-value">@(ViewBag.Participante.horasMatriculadas ?? 0)</span><span class="profile-stat-label">Total de horas inscritas</span></div>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-patch-check"></i></span>
+                        <div><span class="profile-stat-value">@(ViewBag.Participante.horasAprobadas ?? 0)</span><span class="profile-stat-label">Total de horas aprobadas</span></div>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-award"></i></span>
+                        <div><span class="profile-stat-value">@medallasPerfil.Count</span><span class="profile-stat-label">Medallas obtenidas</span></div>
+                    </div>
+                }
+                @if (esAsesorPerfil)
+                {
+                    <div class="profile-stat">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-collection"></i></span>
+                        <div><span class="profile-stat-value">@modulosCreados</span><span class="profile-stat-label">Módulos creados</span></div>
+                    </div>
+                }
+            </div>
+
+            <section class="admin-panel-card" aria-labelledby="perfilDatosTitulo">
+                <div class="admin-panel-card-header">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-person-vcard"></i></span>
+                    <div>
+                        <h2 class="admin-panel-card-title" id="perfilDatosTitulo">Datos personales</h2>
+                        <p class="admin-panel-card-desc">Información registrada en su cuenta.</p>
+                    </div>
+                </div>
+                <dl class="profile-details">
+                    <div><dt>Nombre completo</dt><dd>@nombreCompleto</dd></div>
+                    <div><dt>Identificación</dt><dd>@(ViewBag.Usuario.numeroIdentificacion ?? "-")</dd></div>
+                    @if (tieneParticipante)
+                    {
+                        <div><dt>Unidad académica</dt><dd>@(ViewBag.Participante.unidadAcademica ?? "-")</dd></div>
+                    }
+                    <div><dt>Correo institucional</dt><dd>@(ViewBag.Usuario.correo ?? "-")</dd></div>
+                    <div><dt>Correo alternativo</dt><dd>@(ViewBag.Usuario.correoAlternativo ?? "-")</dd></div>
+                    <div><dt>Grado académico</dt><dd>@(ViewBag.Usuario.gradoAcademico ?? "-")</dd></div>
+                    @if (tieneParticipante)
+                    {
+                        <div><dt>Condición</dt><dd>@(string.IsNullOrWhiteSpace(condicionPerfil) ? "-" : condicionPerfil)</dd></div>
+                    }
+                    <div><dt>Teléfono</dt><dd>@(ViewBag.Usuario.telefono ?? "-")</dd></div>
+                </dl>
+            </section>
+
+            <section class="admin-panel-card" id="seguridad" aria-labelledby="perfilSeguridadTitulo">
+                <div class="admin-panel-card-header">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+                    <div>
+                        <h2 class="admin-panel-card-title" id="perfilSeguridadTitulo">Cambiar contraseña</h2>
+                        <p class="admin-panel-card-desc">Ingrese su contraseña actual y escriba la nueva dos veces para confirmarla.</p>
+                    </div>
+                </div>
+                @using (Html.BeginForm("CambiarContrasena", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", @class = "account-password-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@ViewBag.Id" />
+                    <input type="hidden" name="origen" value="perfil" />
+                    <div class="row g-3 admin-password-fields">
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="passwordOld">Contraseña actual <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                <input type="password" id="passwordOld" name="contrasena" class="form-control" autocomplete="current-password" />
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility3()" aria-label="Mostrar contraseña actual" aria-pressed="false" aria-controls="passwordOld">
+                                    <i id="toggleIcon3" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="password">Nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                <input type="password" id="password" name="nuevaContrasena" class="form-control" autocomplete="new-password" />
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility()" aria-label="Mostrar nueva contraseña" aria-pressed="false" aria-controls="password">
+                                    <i id="toggleIcon" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 create-category-field account-password-field">
+                            <label for="passwordCheck">Confirmar nueva contraseña <span class="create-category-required" aria-hidden="true">*</span></label>
+                            <div class="input-group">
+                                <input type="password" id="passwordCheck" name="confirmarContrasena" class="form-control" autocomplete="new-password" />
+                                <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility2()" aria-label="Mostrar confirmación de contraseña" aria-pressed="false" aria-controls="passwordCheck">
+                                    <i id="toggleIcon2" class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-panel-card-footer">
+                        <p class="admin-panel-required-note"><span class="create-category-required" aria-hidden="true">*</span> Campos obligatorios</p>
+                        <div class="admin-panel-form-actions">
+                            <input type="submit" class="btn admin-panel-btn-primary" value="Guardar cambios" />
+                        </div>
+                    </div>
+                }
+            </section>
+
+            @if (tieneParticipante)
+            {
+                <section class="admin-panel-card" aria-labelledby="perfilMedallasTitulo">
+                    <div class="admin-panel-card-header">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-award"></i></span>
+                        <div>
+                            <h2 class="admin-panel-card-title" id="perfilMedallasTitulo">Medallas</h2>
+                            <p class="admin-panel-card-desc">Haga clic en una medalla para verla en tamaño completo.</p>
+                        </div>
+                        @if (medallasPerfil.Count > 0)
                         {
-                            <br />
-                            <h3 class="">Medallas</h3>
-                            <div class="d-flex justify-content-start mt-4">
-                                @foreach (string nombreMedalla in ViewBag.Medallas)
+                            <div class="profile-medals-nav" hidden>
+                                <button type="button" class="profile-medals-arrow" data-medallas-mover="-1" aria-controls="perfilMedallas" aria-label="Ver medallas anteriores"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+                                <button type="button" class="profile-medals-arrow" data-medallas-mover="1" aria-controls="perfilMedallas" aria-label="Ver más medallas"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                            </div>
+                        }
+                    </div>
+                    @if (medallasPerfil.Count == 0)
+                    {
+                        <p class="admin-panel-empty">Aún no tiene medallas.</p>
+                    }
+                    else
+                    {
+                        <div class="profile-medals" id="perfilMedallas" tabindex="0" role="group" aria-label="Medallas obtenidas">
+                            @foreach (var medalla in medallasPerfil)
+                            {
+                                <button type="button" class="profile-medal" data-bs-toggle="modal" data-bs-target="#perfilMedallaModal" data-medalla-src="@medalla[2]" data-medalla-nombre="@medalla[1]">
+                                    <span class="profile-medal-image"><img src="@medalla[2]" alt="Medalla: @medalla[1]" loading="lazy" /></span>
+                                    <span class="profile-medal-name">@medalla[1]</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+
+            @if (ViewBag.Inscripciones == null)
+            {
+                <section class="admin-panel-card" aria-label="Mis módulos">
+                    <p class="admin-panel-empty">No tiene módulos inscritos.</p>
+                </section>
+            }
+            else if (tieneParticipante)
+            {
+                var pestanasModulos = new[]
+                {
+                    (Clave: "inscritos", Titulo: "Inscritos", Vacio: "No tiene módulos inscritos en curso.", Lista: modulosInscritos),
+                    (Clave: "incompletos", Titulo: "Incompletos", Vacio: "No tiene módulos incompletos.", Lista: modulosIncompletos),
+                    (Clave: "aprobados", Titulo: "Aprobados", Vacio: "Aún no tiene módulos aprobados.", Lista: modulosAprobados)
+                };
+
+                <section class="admin-panel-card" aria-labelledby="perfilModulosTitulo">
+                    <div class="admin-panel-card-header">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-journal-check"></i></span>
+                        <div>
+                            <h2 class="admin-panel-card-title" id="perfilModulosTitulo">Mis módulos</h2>
+                            <p class="admin-panel-card-desc">Módulos en los que se ha inscrito, según su estado.</p>
+                        </div>
+                    </div>
+                    <ul class="nav nav-tabs admin-panel-tabs" role="tablist">
+                        @for (int indicePestana = 0; indicePestana < pestanasModulos.Length; indicePestana++)
+                        {
+                            var pestana = pestanasModulos[indicePestana];
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link @(indicePestana == 0 ? "active" : "")" id="tab-modulos-@pestana.Clave" data-bs-toggle="tab" data-bs-target="#panel-modulos-@pestana.Clave" type="button" role="tab" aria-controls="panel-modulos-@pestana.Clave" aria-selected="@(indicePestana == 0 ? "true" : "false")">
+                                    @pestana.Titulo <span class="profile-tab-count">@pestana.Lista.Count</span>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                    <div class="tab-content">
+                        @for (int indicePestana = 0; indicePestana < pestanasModulos.Length; indicePestana++)
+                        {
+                            var pestana = pestanasModulos[indicePestana];
+                            <div class="tab-pane fade @(indicePestana == 0 ? "show active" : "")" id="panel-modulos-@pestana.Clave" role="tabpanel" aria-labelledby="tab-modulos-@pestana.Clave" tabindex="0">
+                                @if (pestana.Lista.Count == 0)
                                 {
-                                    <div class="card me-2" style="height: 305px;">
-                                        @{
-                                            var medalPath = Directory.EnumerateFiles("wwwroot/images/medallas", nombreMedalla).FirstOrDefault();
-                                        }
-                                        @if (medalPath != null)
-                                        {
-                                            var normalizedMedalPath = medalPath.Replace('\\', '/');
-                                            var relativeMedalPath = normalizedMedalPath.Replace("wwwroot/", "/", StringComparison.OrdinalIgnoreCase);
-                                            <img class="card-img" src="@relativeMedalPath" style="height: 300px;" />
-                                        }
+                                    <p class="admin-panel-empty profile-empty-tab">@pestana.Vacio</p>
+                                }
+                                else
+                                {
+                                    <div class="table-scroll table-scroll--fit profile-table">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Módulo</th>
+                                                    <th scope="col" class="text-center">Horas inscritas</th>
+                                                    <th scope="col" class="text-center">Horas aprobadas</th>
+                                                    <th scope="col" class="text-center">Calificación</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var inscripcion in pestana.Lista)
+                                                {
+                                                    <tr>
+                                                        <td class="profile-cell-title" data-label="Módulo">@inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)</td>
+                                                        @if (pestana.Clave == "aprobados")
+                                                        {
+                                                            @* Mismo cálculo que mostraba la tabla anterior de módulos aprobados. *@
+                                                            <td class="text-center" data-label="Horas inscritas">@(((inscripcion.horasMatriculadas - inscripcion.horasAprobadas) ?? 0))</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="text-center" data-label="Horas inscritas">@((inscripcion.horasMatriculadas ?? 0))</td>
+                                                        }
+                                                        <td class="text-center" data-label="Horas aprobadas">@((inscripcion.horasAprobadas ?? 0))</td>
+                                                        <td class="text-center" data-label="Calificación">@((inscripcion.calificacion ?? 0))</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     </div>
                                 }
                             </div>
                         }
-
-                        <!-- Módulos Participante -->
-                        <br />
-                        <div class="mt-4">
-                            <h3 class="">Módulos Aprobados</h3>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="width: 25%">Módulos Aprobados</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <td class="my-3" colspan="4">
-                                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                                            {
-                                                if (inscripcion.estado == "Aprobado")
-                                                {
-                                                    <table class="w-100">
-                                                        <tr>
-                                                            <td class="my-2" style="width: 25%">
-                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
-                                                            </td>
-
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @(((inscripcion.horasMatriculadas - inscripcion.horasAprobadas) ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasAprobadas ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.calificacion ?? 0))
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                }
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <br />
-                        <hr />
-                        <div class="mt-4">
-                            <h3 class="">Módulos Inscritos</h3>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="width: 25%">Módulos Inscritos</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
-                                        
-                                    </tr>
-                                </thead>
-
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <td class="my-3" colspan="4">
-                                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                                            {
-                                                if (inscripcion.estado == "Inscrito")
-                                                {
-                                                    <table class="w-100">
-                                                        <tr>
-                                                            <td class="my-2" style="width: 25%">
-                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasMatriculadas ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasAprobadas ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.calificacion ?? 0))
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                }
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <br />
-                        <hr />
-                        <div class="mt-4">
-                            <h3 class="">Módulos Incompletos</h3>
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" style="width: 25%">Módulos Incompletos</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Inscritas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Horas<br>Aprobadas</th>
-                                        <th class="text-center" scope="col" style="width: 7.5%">Calificación</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <td class="my-3" colspan="4">
-                                            @foreach (var inscripcion in ViewBag.Inscripciones)
-                                            {
-                                                if (inscripcion.estado == "Incompleto")
-                                                {
-                                                    <table class="w-100">
-                                                        <tr>
-                                                            <td class="my-2" style="width: 25%">
-                                                                <i class="bi bi-check"></i> @inscripcion.nombreGrupo (Grupo @inscripcion.numeroGrupo)
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasMatriculadas ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.horasAprobadas ?? 0))
-                                                            </td>
-                                                            <td class="my-2 text-center" style="width: 7.5%">
-                                                                @((inscripcion.calificacion ?? 0))
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                }
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        @if (ViewBag.Role == 2)
-                        {
-                            @if (ViewBag.ListaGruposAsesor == null)
-                            {
-                                <br />
-                                <hr />
-                                <br />
-                                <h5 class="text-center">No tiene módulos creados.</h5>
-                            }
-                            else
-                            {
-                                <!-- Módulos asesor -->
-                                <br />
-                                <div class="mt-4">
-                                    <h3 class="">Módulos creados</h3>
-                                    <table class="table table-striped" id="tblCustomers">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Módulos</th>
-                                                <th class="text-center" scope="col" style="width: 15%">Horas del<br>Módulo</th>
-                                                <th class="text-center" scope="col" style="width: 15%">Cupo</th>
-                                                <th class="text-center" scope="col" style="width: 15%">Cupo Actual</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody class="align-middle">
-                                            <tr>
-                                                <td>
-                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                    {
-                                                        <span>@grupo.nombre (Grupo @grupo.idGrupo)</span>
-                                                        <br />
-                                                    }
-                                                </td>
-                                                <td class="text-center">
-                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                    {
-                                                        @grupo.cantidadHoras
-                                                        <br />
-                                                    }
-                                                </td>
-                                                <td class="text-center">
-                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                    {
-                                                        @grupo.cupo
-                                                        <br />
-                                                    }
-                                                </td>
-                                                <td class="text-center">
-                                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
-                                                    {
-                                                        @grupo.cupoActual
-                                                        <br />
-                                                    }
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                        }
-                    }
-                }
+                    </div>
+                </section>
             }
-            <div class="d-flex justify-content-center my-4">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
-            </div>
-        </div>
+
+            @if (esAsesorPerfil)
+            {
+                <section class="admin-panel-card" aria-labelledby="perfilCreadosTitulo">
+                    <div class="admin-panel-card-header">
+                        <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-collection"></i></span>
+                        <div>
+                            <h2 class="admin-panel-card-title" id="perfilCreadosTitulo">Módulos creados</h2>
+                            <p class="admin-panel-card-desc">Módulos que usted facilita.</p>
+                        </div>
+                    </div>
+                    @if (ViewBag.ListaGruposAsesor == null)
+                    {
+                        <p class="admin-panel-empty">No tiene módulos creados.</p>
+                    }
+                    else
+                    {
+                        <div class="table-scroll table-scroll--fit profile-table">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Módulo</th>
+                                        <th scope="col" class="text-center">Horas del módulo</th>
+                                        <th scope="col" class="text-center">Cupo</th>
+                                        <th scope="col" class="text-center">Cupo actual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var grupo in ViewBag.ListaGruposAsesor)
+                                    {
+                                        <tr>
+                                            <td class="profile-cell-title" data-label="Módulo">@grupo.nombre (Grupo @grupo.idGrupo)</td>
+                                            <td class="text-center" data-label="Horas del módulo">@grupo.cantidadHoras</td>
+                                            <td class="text-center" data-label="Cupo">@grupo.cupo</td>
+                                            <td class="text-center" data-label="Cupo actual">@grupo.cupoActual</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </section>
+            }
+
+            @if (tieneParticipante && medallasPerfil.Count > 0)
+            {
+                <div class="modal fade profile-medal-modal" id="perfilMedallaModal" tabindex="-1" aria-labelledby="perfilMedallaModalTitulo" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title" id="perfilMedallaModalTitulo">Medalla</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img id="perfilMedallaModalImagen" src="" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
     </div>
+
+    <script>
+        // Al volver de "Cambiar contraseña" (#seguridad), el mensaje se muestra dentro de esa tarjeta.
+        (function () {
+            if (window.location.hash !== '#seguridad') return;
+            var tarjeta = document.getElementById('seguridad');
+            var encabezado = tarjeta ? tarjeta.querySelector('.admin-panel-card-header') : null;
+            if (!encabezado) return;
+            document.querySelectorAll('.profile-page > .alert').forEach(function (alerta) {
+                encabezado.insertAdjacentElement('afterend', alerta);
+            });
+        })();
+
+        // Medallas en una fila: los botones ‹ › aparecen solo si hay más medallas de las que caben.
+        (function () {
+            var fila = document.getElementById('perfilMedallas');
+            var nav = document.querySelector('.profile-medals-nav');
+            if (!fila || !nav) return;
+            var botones = nav.querySelectorAll('[data-medallas-mover]');
+
+            function actualizar() {
+                var hayMas = fila.scrollWidth > fila.clientWidth + 2;
+                nav.hidden = !hayMas;
+                botones[0].disabled = fila.scrollLeft <= 2;
+                botones[1].disabled = fila.scrollLeft + fila.clientWidth >= fila.scrollWidth - 2;
+            }
+            botones.forEach(function (boton) {
+                boton.addEventListener('click', function () {
+                    var paso = Math.max(fila.clientWidth * 0.8, 160) * Number(boton.getAttribute('data-medallas-mover'));
+                    fila.scrollBy({ left: paso, behavior: 'smooth' });
+                });
+            });
+            fila.addEventListener('scroll', actualizar, { passive: true });
+            window.addEventListener('resize', actualizar);
+            window.addEventListener('load', actualizar);
+            actualizar();
+        })();
+
+        // Medalla ampliada: toma la imagen y el nombre del botón que abrió el modal.
+        (function () {
+            var modal = document.getElementById('perfilMedallaModal');
+            if (!modal) return;
+            modal.addEventListener('show.bs.modal', function (evento) {
+                var origen = evento.relatedTarget;
+                if (!origen) return;
+                var nombre = origen.getAttribute('data-medalla-nombre') || 'Medalla';
+                document.getElementById('perfilMedallaModalTitulo').textContent = nombre;
+                var imagen = document.getElementById('perfilMedallaModalImagen');
+                imagen.src = origen.getAttribute('data-medalla-src') || '';
+                imagen.alt = 'Medalla: ' + nombre;
+            });
+        })();
+
+        // Muestra u oculta el contenido de un campo de contraseña (mismos ids que la pantalla Cambiar contraseña).
+        function meticsAlternarContrasena(idCampo, idIcono) {
+            var passwordInput = document.getElementById(idCampo);
+            var toggleIcon = document.getElementById(idIcono);
+            if (!passwordInput || !toggleIcon) return;
+            var mostrar = passwordInput.type === "password";
+            passwordInput.type = mostrar ? "text" : "password";
+            toggleIcon.classList.toggle('bi-eye', !mostrar);
+            toggleIcon.classList.toggle('bi-eye-slash', mostrar);
+            var boton = toggleIcon.closest('button');
+            if (boton) boton.setAttribute('aria-pressed', mostrar ? 'true' : 'false');
+        }
+        function togglePasswordVisibility() { meticsAlternarContrasena('password', 'toggleIcon'); }
+        function togglePasswordVisibility2() { meticsAlternarContrasena('passwordCheck', 'toggleIcon2'); }
+        function togglePasswordVisibility3() { meticsAlternarContrasena('passwordOld', 'toggleIcon3'); }
+    </script>
 }
 else
 {

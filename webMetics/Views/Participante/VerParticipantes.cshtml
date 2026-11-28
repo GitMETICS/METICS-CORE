@@ -2,85 +2,117 @@
 @using System.Text.Json
 @{
     ViewBag.Title = "Participantes";
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    PageHeadingBuilder.Configure(ViewContext, Url);
+    ViewData["SuccessMessage"] = ViewBag.SuccessMessage?.ToString();
+    ViewData["ErrorMessage"] = ViewBag.ErrorMessage?.ToString();
+    ViewData["WarningMessage"] = ViewBag.WarningMessage?.ToString();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
-        <h1>@ViewBag.Title</h1>
-        <hr />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+    <div class="contenedor-caja container-fluid table-page-with-divider">
+        @await Html.PartialAsync("_MeticsToast")
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
 
         <div style="padding-bottom: 220px;">
 
-            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <small class="text-secondary" style="display: block; margin-bottom: 8px;">Subir lista de participantes</small>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                            <input type="file" class="form-control" name="file" id="file" accept=".xls,.xlsx" style="font-size: 12px; flex: 1; min-width: 200px;" required>
-                            <input class="btn btn-secondary" type="submit" value="Subir" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">
+            <section class="file-management-card" aria-labelledby="fileManagementTitle">
+                <header class="file-management-header">
+                    <h2 id="fileManagementTitle">Gestión de archivos</h2>
+                    <p>Importe y exporte información de participantes</p>
+                </header>
+
+                <div class="file-management-body">
+                    <section class="file-management-section" aria-labelledby="importParticipantsTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-upload" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="importParticipantsTitle">Importar participantes</h3>
+                                <p>Carga un archivo Excel al sistema</p>
+                            </div>
                         </div>
-                    }
+
+                        @using (Html.BeginForm("SubirArchivoExcelParticipantes", "Participante", FormMethod.Post, new { enctype = "multipart/form-data", @class = "participant-import-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="file-management-controls file-import-controls">
+                                <input type="file" class="participant-file-input" name="file" id="participantFileInput" accept=".xls,.xlsx" required aria-label="Seleccionar archivo Excel de participantes" onchange="updateParticipantFileName(this)">
+                                <label for="participantFileInput" class="file-management-button file-management-button-secondary file-picker-trigger">
+                                    <i class="bi bi-paperclip" aria-hidden="true"></i>
+                                    <span id="participantFileName">Elegir archivo</span>
+                                </label>
+                                <button class="file-management-button file-management-button-primary" type="submit">
+                                    <i class="bi bi-upload" aria-hidden="true"></i>
+                                    Subir
+                                </button>
+                            </div>
+                        }
+
+                        <div class="file-management-note file-requirements-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas</strong>.</p>
+                            <a href="@Url.Action("DescargarPlantillaSubirParticipantes", "Participante")" class="file-management-download-link">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar plantilla
+                            </a>
+                        </div>
+                    </section>
+
+                    <section class="file-management-section file-export-section" aria-labelledby="exportParticipantsTitle">
+                        <div class="file-section-heading">
+                            <i class="bi bi-download" aria-hidden="true"></i>
+                            <div>
+                                <h3 id="exportParticipantsTitle">Exportar participantes</h3>
+                                <p>Descargue los datos en el formato que necesite</p>
+                            </div>
+                        </div>
+
+                        <div class="file-management-controls file-export-controls">
+                            <label class="visually-hidden" for="participantExportFormat">Formato de exportación</label>
+                            <select id="participantExportFormat" class="file-management-select">
+                                <option value="@Url.Action("ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">PDF</option>
+                                <option value="@Url.Action("ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">Excel 1</option>
+                                <option value="@Url.Action("ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })">Excel 2</option>
+                                <option value="@Url.Action("ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" selected>Word</option>
+                            </select>
+                            <button type="button" id="downloadParticipantsExport" class="file-management-button file-management-button-secondary">
+                                <i class="bi bi-download" aria-hidden="true"></i>
+                                Descargar
+                            </button>
+                        </div>
+
+                        <div class="file-management-note file-export-note">
+                            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                            <p>Formatos disponibles para descargar: PDF, Excel 1, Excel 2 y Word.</p>
+                        </div>
+                    </section>
                 </div>
-
-                <div style="flex-shrink: 0;">
-                    <small class="text-secondary" style="display: block; margin-bottom: 8px;">Exportar datos:</small>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="@Url.Action("ExportarParticipantesPDF", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">PDF</a>
-                        <a href="@Url.Action("ExportarParticipantesExcel", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 1</a>
-                        <a href="@Url.Action("ExportarParticipantesExcel2", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Excel 2</a>
-                        <a href="@Url.Action("ExportarParticipantesWord", "Participante", new { searchTerm = Context.Request.Query["searchTerm"] })" class="btn btn-outline-secondary bi bi-download" style="font-size: 12px; padding: 4px 12px; white-space: nowrap;">Word</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-light p-3 rounded d-flex" style="gap: 10px; margin-bottom: 20px;">
-                <h4><i class="bi bi-exclamation-circle-fill me-2 p-0 text-secondary" style="font-size: 16px; line-height: 1; flex-shrink: 0;"></i></h4>
-                <small class="text-muted" style="flex: 1;">
-                    Subir un archivo en formato <strong>XLS</strong> o <strong>XLSX</strong> con las siguientes columnas: <strong>Unidad Académica, Nombre, Primer Apellido, Segundo Apellido, Correo Institucional, Horas Aprobadas</strong>
-                    <br />
-                    <a href="@Url.Action("DescargarPlantillaSubirParticipantes", "Participante")" class="btn btn-small btn-outline-secondary mt-2" style="font-size: 12px; padding: 4px 8px;">Descargar plantilla</a>
-                </small>
-            </div>
-
-
+            </section>
 
             <div class="table-card">
                 <div class="table-card-header">
-                    <span class="table-card-title">Participantes</span>
-                    <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
+                    <div class="table-card-heading">
+                        <span class="table-card-title">Participantes</span>
+                        <span class="table-card-desc">Listado de participantes registrados en el sistema</span>
+                    </div>
+                    <div class="table-card-header-actions">
+                        <span id="participantesCount" class="table-card-count" aria-live="polite">Cargando participantes…</span>
+                        @Html.ActionLink("Agregar participante", "FormularioParticipante", "Participante", new { }, new { @class = "table-card-action bi bi-person-plus" })
+                    </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
+                        <form asp-action="VerParticipantes" asp-controller="Participante" method="get" class="table-search">
+                            <div class="table-search-field">
+                                <button type="submit" class="table-search-submit" aria-label="Buscar participante">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                </button>
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" aria-label="Buscar participante" />
+                            </div>
+                        </form>
+
                         <div class="table-pagesize">
                             <label for="participantePageSize">Mostrar</label>
                             <select id="participantePageSize">
@@ -91,15 +123,6 @@
                             </select>
                             <label for="participantePageSize">registros</label>
                         </div>
-
-                        <form asp-action="VerParticipantes" asp-controller="Participante" method="get" class="table-search">
-                            <input type="text" name="searchTerm" class="form-control" placeholder="Buscar participante" value="@Context.Request.Query["searchTerm"]" />
-                            <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-                        </form>
-                    </div>
-
-                    <div>
-                        @Html.ActionLink("  Agregar Participante", "FormularioParticipante", "Participante", new { }, new { @class = "btn btn-primary bi bi-person-plus btn-table-sm" })
                     </div>
                 </div>
 
@@ -107,7 +130,10 @@
                     <table id="participanteTblCustomers" class="data-table">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-center" style="width: 4%;"></th>
+                                <th scope="col" class="text-center" style="width: 4%;" title="Estado de notificación">
+                                    <i class="bi bi-bell" aria-hidden="true"></i>
+                                    <span class="visually-hidden">Estado de notificación</span>
+                                </th>
                                 <th scope="col" style="width: 14%;">Unidad Académica</th>
                                 <th scope="col" style="width: 24%;">Nombre Completo</th>
                                 <th scope="col" style="width: 23%;">Correo Institucional</th>
@@ -132,27 +158,28 @@
         <input type="hidden" name="searchTerm" value="@Context.Request.Query["searchTerm"]" />
     </form>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar participante</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar este participante?
-
-                    @using (Html.BeginForm("EliminarParticipante", "Participante"))
-                    {
-                        @Html.AntiForgeryToken()
-
-                        <div class="modal-footer">
-                            <input type="hidden" id="idParticipante" name="idParticipante">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" onclick="" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("EliminarParticipante", "Participante"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar participante</h2>
+                            <p>El participante se eliminará del sistema.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar este participante?
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idParticipante" name="idParticipante">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar participante</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -166,6 +193,26 @@ else
 }
 
 <script type="text/javascript">
+    function updateParticipantFileName(fileInput) {
+        const fileNameLabel = document.getElementById('participantFileName');
+        if (!fileNameLabel) return;
+
+        const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0] : null;
+        fileNameLabel.textContent = selectedFile ? selectedFile.name : 'Elegir archivo';
+        fileNameLabel.title = selectedFile ? selectedFile.name : '';
+    }
+
+    const downloadParticipantsExport = document.getElementById('downloadParticipantsExport');
+    const participantExportFormat = document.getElementById('participantExportFormat');
+    if (downloadParticipantsExport && participantExportFormat) {
+        downloadParticipantsExport.addEventListener('click', function () {
+            const exportUrl = participantExportFormat.value;
+            if (exportUrl) {
+                window.location.assign(exportUrl);
+            }
+        });
+    }
+
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, character => ({
             '&': '&amp;',
@@ -272,14 +319,13 @@ else
         columns: [
             {
                 data: 'correoNotificacionEnviado',
-                orderable: false,
                 searchable: false,
                 className: 'text-center',
                 render: function (data, type, row) {
                     if (type !== 'display' || row.horasAprobadas < 30) return '';
 
                     if (data !== 0) {
-                        return '<i class="bi bi-bell" style="color: #198754;" title="Notificación enviada"></i>';
+                        return '<i class="bi bi-bell" style="color: var(--metics-success);" title="Notificación enviada"></i>';
                     }
 
                     return '<button type="button" class="text-success bi bi-bell-fill border-0 bg-transparent p-0 js-notify-participant" ' +
@@ -307,20 +353,20 @@ else
                     const participantId = encodeURIComponent(row.idParticipante);
                     const fullName = participantFullName(row);
                     const encodedName = encodeURIComponent(fullName);
-                    const detailsUrl = participantDetailsUrl + '?idParticipante=' + participantId;
-                    const editUrl = participantEditUrl + '?idParticipante=' + participantId;
+                    const detailsUrl = participantDetailsUrl + '?idParticipante=' + participantId + '&breadcrumbOrigin=participants';
+                    const editUrl = participantEditUrl + '?idParticipante=' + participantId + '&breadcrumbOrigin=participants';
                     const credentialsUrl = participantCredentialsUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
                     const passwordUrl = participantPasswordUrl + '?idUsuario=' + participantId + '&nombreCompleto=' + encodedName;
 
                     return '<div style="display: inline-block;">' +
-                        '<button type="button" class="action-menu-btn js-action-menu" title="Acciones">' +
+                        '<button type="button" class="action-menu-btn participant-actions-toggle js-action-menu" title="Acciones" aria-label="Opciones del participante">' +
                             '<i class="bi bi-three-dots-vertical"></i>' +
                         '</button>' +
-                        '<div class="action-menu">' +
-                            '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye" style="color: #0090D8;"></i> Ver detalles</a>' +
-                            '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square" style="color: #0090D8;"></i> Editar</a>' +
-                            '<a href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint" style="color: #0090D8;"></i> Credenciales</a>' +
-                            '<a href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key" style="color: #0090D8;"></i> Cambiar contraseña</a>' +
+                        '<div class="action-menu participant-actions-menu">' +
+                            '<a href="' + escapeHtml(detailsUrl) + '"><i class="bi bi-eye"></i> Ver detalles</a>' +
+                            '<a href="' + escapeHtml(editUrl) + '"><i class="bi bi-pencil-square"></i> Editar</a>' +
+                            '<a data-credentials-open href="' + escapeHtml(credentialsUrl) + '"><i class="bi bi-fingerprint"></i> Credenciales</a>' +
+                            '<a data-password-reset-open href="' + escapeHtml(passwordUrl) + '"><i class="bi bi-key"></i> Cambiar contraseña</a>' +
                             '<div class="action-menu-divider"></div>' +
                             '<a href="#" class="delete-option js-delete-participant" data-id-participante="' + escapeHtml(row.idParticipante) + '">' +
                                 '<i class="bi bi-trash"></i> Eliminar' +
@@ -330,10 +376,25 @@ else
                 }
             }
         ],
-        onDraw: closeActionMenus
+        onDraw: function (api) {
+            closeActionMenus();
+            const count = api.page.info().recordsDisplay;
+            document.getElementById('participantesCount').textContent = count +
+                (count === 1 ? ' participante encontrado' : ' participantes encontrados');
+        }
     });
 
     document.getElementById('participanteTblCustomers').addEventListener('click', function (event) {
+        if (event.target.closest('[data-credentials-open]')) {
+            closeActionMenus();
+            return;
+        }
+
+        if (event.target.closest('[data-password-reset-open]')) {
+            closeActionMenus();
+            return;
+        }
+
         const menuButton = event.target.closest('.js-action-menu');
         if (menuButton) {
             toggleActionMenu(menuButton, event);
@@ -355,3 +416,7 @@ else
         }
     });
 </script>
+
+<script src="/js/credenciales-modal.js" asp-append-version="true"></script>
+<script src="/js/password-reset-modal.js" asp-append-version="true"></script>
+<script>document.addEventListener("credentials:saved", function () { participantesTable.ajax.reload(null, false); });</script>

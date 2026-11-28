@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using webMetics.Handlers;
+using webMetics.Helpers;
 using webMetics.Models;
 using webMetics.Services;
 
@@ -380,14 +381,29 @@ namespace webMetics.Controllers
             const int RolUsuarioAdmin = 1;
             const int RolUsuarioAsesor = 2;
 
-            int role = GetRole();
             string idUsuario = GetId();
+            if (string.IsNullOrWhiteSpace(idUsuario)
+                || !int.TryParse(Request.Cookies["rolUsuario"], out int role)
+                || role < RolUsuarioParticipante || role > RolUsuarioAsesor)
+            {
+                return RedirectToAction("CerrarSesion");
+            }
 
             ParticipanteModel participante = accesoAParticipante.ObtenerParticipante(idUsuario);
+            if (role == RolUsuarioParticipante && participante == null)
+            {
+                TempData["errorMessage"] = "No se pudo cargar su perfil. Inicie sesión nuevamente.";
+                return RedirectToAction("CerrarSesion");
+            }
             List<InscripcionModel> inscripciones = accesoAInscripcion.ObtenerInscripcionesParticipante(idUsuario);
             List<GrupoModel> gruposParticipante = accesoAGrupo.ObtenerListaGruposParticipante(idUsuario);
 
             AsesorModel asesor = accesoAAsesor.ObtenerAsesor(idUsuario);
+            if (role == RolUsuarioAsesor && asesor == null)
+            {
+                TempData["errorMessage"] = "No se pudo cargar su perfil. Inicie sesión nuevamente.";
+                return RedirectToAction("CerrarSesion");
+            }
             List<GrupoModel> gruposAsesor = accesoAGrupo.ObtenerListaGruposAsesor(idUsuario);
 
             switch (role)
@@ -1107,8 +1123,12 @@ namespace webMetics.Controllers
         /// Handlers: UsuarioHandler.
         /// Role required: Any (autenticado).
         /// </remarks>
+        /// <param name="origen">
+        /// "perfil" cuando el formulario se envía desde Información personal: en ese caso se vuelve a esa
+        /// página con el mismo mensaje. Cualquier otro valor conserva el comportamiento original.
+        /// </param>
         [HttpPost]
-        public ActionResult CambiarContrasena(NewLoginModel usuario)
+        public ActionResult CambiarContrasena(NewLoginModel usuario, string? origen = null)
         {
             if (accesoAUsuario.AutenticarUsuario(usuario.id, usuario.contrasena))
             {
@@ -1126,6 +1146,11 @@ namespace webMetics.Controllers
             else
             {
                 TempData["errorMessage"] = "Contraseña actual incorrecta.";
+            }
+
+            if (string.Equals(origen, "perfil", StringComparison.Ordinal))
+            {
+                return Redirect(Url.Action("InformacionPersonal", "Usuario") + "#seguridad");
             }
 
             return RedirectToAction("CambiarContrasena", new { id = GetId() });
@@ -1253,7 +1278,7 @@ namespace webMetics.Controllers
             int role = GetRole();
             string idUsuario = GetId();
 
-            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(null, null, null);
+            List<BitacoraAcceso> accesos = ConvertirHorasACostaRica(accesoAUsuario.SelectBitacoraAccesosPorFecha(null, null, null));
 
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
@@ -1281,12 +1306,16 @@ namespace webMetics.Controllers
         [HttpGet]
         public ActionResult VerBitacoraAccesoUsuario(string idUsuario, int diasAtras = 30)
         {
-            if (string.IsNullOrEmpty(idUsuario))
+            if (string.IsNullOrWhiteSpace(idUsuario))
             {
+                // Antes se devolvía la vista sin datos de sesión y la vista cerraba la sesión.
+                ViewBag.Id = GetId();
+                ViewBag.Role = GetRole();
+                ViewBag.ErrorMessage = "Ingrese el ID del usuario que desea consultar.";
                 return View("VerBitacoraAccesos");
             }
 
-            List<BitacoraAcceso> accesos = accesoAUsuario.SelectBitacoraAccesoUsuario(idUsuario, diasAtras);
+            List<BitacoraAcceso> accesos = ConvertirHorasACostaRica(accesoAUsuario.SelectBitacoraAccesoUsuario(idUsuario.Trim(), diasAtras));
 
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
@@ -1300,7 +1329,8 @@ namespace webMetics.Controllers
 
         /// <summary>
         /// Muestra la bitácora de accesos filtrada por rango de fechas y/o estado (EXITO / FRACASO).
-        /// Si fechaDesde es null se usa 1 semana atrás; si fechaHasta es null se usa la fecha actual.
+        /// Las fechas son días en hora de Costa Rica; "hasta" incluye el día completo. Si solo se indica
+        /// "hasta", se usan los 7 días anteriores; si no hay fechas, los últimos 7 días hasta ahora.
         /// </summary>
         /// <param name="fechaDesde">Fecha inicial del rango (formato string compatible con SQL).</param>
         /// <param name="fechaHasta">Fecha final del rango.</param>
@@ -1318,11 +1348,37 @@ namespace webMetics.Controllers
         {
             List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
 
-            // Si fechaDesde es null se selecciona 1 semana antes
-            // Si fechaHasta es null se selecciona fecha actual
-            // Si estadoAcceso es null no hay filtro
-            accesos = accesoAUsuario.SelectBitacoraAccesosPorFecha(fechaDesde, fechaHasta, estadoAcceso);
-            
+            // Las fechas del filtro son días en hora de Costa Rica (yyyy-MM-dd):
+            //  - "Desde" empieza a las 00:00 de ese día y "Hasta" termina a las 23:59:59.999 (incluye el día completo).
+            //  - Si solo se indica "Hasta", se consultan los 7 días anteriores a esa fecha.
+            //  - Sin fechas, el procedimiento usa su valor por defecto: últimos 7 días hasta ahora.
+            // Si estadoAcceso es null no hay filtro.
+            int desfaseServidor = accesoAUsuario.ObtenerDesfaseServidorMinutos();
+            string? desdeServidor = fechaDesde;
+            string? hastaServidor = fechaHasta;
+            bool hayDesde = BitacoraHorario.IntentarLeerFecha(fechaDesde, out DateTime desdeCostaRica);
+            bool hayHasta = BitacoraHorario.IntentarLeerFecha(fechaHasta, out DateTime hastaCostaRica);
+
+            if (hayHasta && !hayDesde && string.IsNullOrWhiteSpace(fechaDesde))
+            {
+                desdeCostaRica = hastaCostaRica.AddDays(-7);
+                hayDesde = true;
+            }
+            if (hayDesde)
+            {
+                desdeServidor = BitacoraHorario.FormatearParaServidor(
+                    BitacoraHorario.CostaRicaAServidor(desdeCostaRica.Date, desfaseServidor));
+            }
+            if (hayHasta)
+            {
+                hastaServidor = BitacoraHorario.FormatearParaServidor(
+                    BitacoraHorario.CostaRicaAServidor(hastaCostaRica.Date.AddDays(1).AddMilliseconds(-1), desfaseServidor));
+            }
+
+            accesos = ConvertirHorasACostaRica(
+                accesoAUsuario.SelectBitacoraAccesosPorFecha(desdeServidor, hastaServidor, estadoAcceso),
+                desfaseServidor);
+
 
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
@@ -1350,11 +1406,12 @@ namespace webMetics.Controllers
             BitacoraAcceso ultimoAcceso = null;
             List<BitacoraAcceso> accesos = new List<BitacoraAcceso>();
 
-            if (!string.IsNullOrEmpty(idUsuario))
+            if (!string.IsNullOrWhiteSpace(idUsuario))
             {
-                ultimoAcceso = accesoAUsuario.SelectUltimoAccesoUsuario(idUsuario);
+                ultimoAcceso = accesoAUsuario.SelectUltimoAccesoUsuario(idUsuario.Trim());
 
                 accesos.Add(ultimoAcceso);
+                accesos = ConvertirHorasACostaRica(accesos);
             }
 
             ViewBag.Id = GetId();
@@ -1405,6 +1462,29 @@ namespace webMetics.Controllers
         }
 
         /// <summary>Obtiene el rol del usuario actual desde la cookie "rolUsuario".</summary>
+        /// <summary>
+        /// Muestra las horas de la bitácora en hora de Costa Rica (la base de datos las guarda con GETDATE()).
+        /// Los elementos nulos se conservan tal cual.
+        /// </summary>
+        private List<BitacoraAcceso> ConvertirHorasACostaRica(List<BitacoraAcceso> accesos, int? desfaseServidorMinutos = null)
+        {
+            if (accesos == null || accesos.Count == 0)
+            {
+                return accesos;
+            }
+
+            int desfase = desfaseServidorMinutos ?? accesoAUsuario.ObtenerDesfaseServidorMinutos();
+            foreach (BitacoraAcceso acceso in accesos)
+            {
+                if (acceso != null)
+                {
+                    acceso.FechaHoraAcceso = BitacoraHorario.ServidorACostaRica(acceso.FechaHoraAcceso, desfase);
+                }
+            }
+
+            return accesos;
+        }
+
         private int GetRole()
         {
             int role = 0;

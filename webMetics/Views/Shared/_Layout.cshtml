@@ -1,60 +1,77 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
     Aqui se encuentra el Header y Footer del sitio web que se comparte para cada vista del sitio
 //-->
 @using webMetics.Controllers
+@using webMetics.Helpers
 
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/png" href="@Url.Content("~/images/ucr-logo_azul.png")" asp-append-version="true" />
+    <link rel="apple-touch-icon" href="@Url.Content("~/images/ucr-logo_azul.png")" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" />
+    <link rel="stylesheet" href="~/css/tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+    <script>
+        (function () {
+            const storageKey = 'metics-inscripcion-assignment-scroll';
+            try {
+                if (!window.location.pathname.toLowerCase().endsWith('/inscripcion/verinscripciones')) {
+                    sessionStorage.removeItem(storageKey);
+                    return;
+                }
+
+                const savedPosition = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+                if (!savedPosition || !Number.isFinite(savedPosition.top) || !Number.isFinite(savedPosition.savedAt) || Date.now() - savedPosition.savedAt > 30000) {
+                    sessionStorage.removeItem(storageKey);
+                    return;
+                }
+
+                history.scrollRestoration = 'manual';
+                document.documentElement.classList.add('metics-scroll-restore-pending');
+                let restored = false;
+                let fallbackTimer;
+                window.__meticsFinishScrollRestore = function () {
+                    if (restored) return;
+                    restored = true;
+                    window.clearTimeout(fallbackTimer);
+                    requestAnimationFrame(function () {
+                        window.scrollTo(0, savedPosition.top);
+                        sessionStorage.removeItem(storageKey);
+                        document.documentElement.classList.remove('metics-scroll-restore-pending');
+                        history.scrollRestoration = 'auto';
+                        window.__meticsFinishScrollRestore = null;
+                        document.dispatchEvent(new Event('metics:scroll-restored'));
+                    });
+                };
+                document.addEventListener('DOMContentLoaded', function () {
+                    fallbackTimer = window.setTimeout(window.__meticsFinishScrollRestore, 1800);
+                }, { once: true });
+            } catch (error) {
+                document.documentElement.classList.remove('metics-scroll-restore-pending');
+            }
+        })();
+    </script>
 
     <!-- jQuery se carga una sola vez en el head para que esté disponible en todas las vistas (DataTables, etc.) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <!-- DataTables se carga una sola vez (versión 1.13.x) para todas las vistas de listado.
          El helper compartido MeticsTable vive en site.js. -->
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-    <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
-<body>
-    <div style="background-color: #095998; height: 95px;">
-        <div class="logo-container">
-            <div class="d-flex justify-content-between align-items-center" style="position: relative; z-index: 0;">
-
-                <div class="logo-link ms-4 py-2">
-                    <a href="https://www.ucr.ac.cr/">
-                        <img src="@Url.Content("~/images/ucr.svg")" style="height: 65px; width: auto;" alt="Logo Universidad de Costa Rica" />
-                    </a>
-                </div>
-
-                <div class="d-flex justify-content-end align-items-center">
-                    <div class="logo-link me-3 py-2">
-                        <a href="https://vd.ucr.ac.cr/" style="display: block;">
-                            <img src="@Url.Content("~/images/VD-01.png")" style="height: 56px; width: auto;" alt="Logo Vicerrectoria de Docencia" />
-                        </a>
-                    </div>
-
-                    <div class="logo-link me-4 py-2">
-                        <a href="https://metics.ucr.ac.cr/es/">
-                            <img src="@Url.Content("~/images/METICS-01.png")" style="height: 65px; width: auto;" alt="Logo METICS" />
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
-
-
+<body class="metics-app-shell">
     @{
         string navUserId = Convert.ToString(ViewBag.Id) ?? "";
         string navRoleValue = Convert.ToString(ViewBag.Role) ?? "";
@@ -63,183 +80,343 @@
         string currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]) ?? "";
         string currentAction = Convert.ToString(ViewContext.RouteData.Values["action"]) ?? "";
         bool showNav = !string.IsNullOrEmpty(navUserId)
-            && ViewBag.Title != "Formulario de Registro"
+            && ViewBag.Title != "Formulario de registro"
             && ViewBag.Title != "Iniciar sesión"
-            && ViewBag.Title != "Recuperar Contraseña"
-            && ViewBag.Title != "Completar Información - Correo Alternativo"
-            && ViewBag.Title != "Completar Información - Grado Académico";
-        bool isAcademicActive = currentController == "Categoria" || (currentController == "Tema" && currentAction != "CrearTema");
+            && ViewBag.Title != "Recuperar contraseña"
+            && ViewBag.Title != "Completar información - Correo alternativo"
+            && ViewBag.Title != "Completar información - Grado académico";
+        bool isAcademicActive = currentController == "Categoria" || currentController == "Tema";
         bool isPeopleActive = currentController == "Participante" || (currentController == "Asesor" && currentAction != "MisModulos");
         bool isInscriptionActive = currentController == "Inscripcion";
         bool isContentActive = currentController == "Medallas"
-            || (currentController == "Tema" && currentAction == "CrearTema")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
-        bool isHomeActive = currentController == "Grupo" && currentAction == "ListaGruposDisponibles";
         bool isFacilitatorActive = (currentController == "Asesor" && currentAction == "MisModulos")
             || (currentController == "Grupo" && currentAction == "CrearGrupo");
         string roleLabel = navRole == 1 ? "Administrador" : navRole == 2 ? "Facilitador(a)" : "Participante";
+        var breadcrumbs = showNav ? BreadcrumbBuilder.Build(ViewContext, Url) : Array.Empty<BreadcrumbItem>();
+        bool hasPageHeading = showNav && ViewData["UseSharedPageHeader"] is true;
+        // Las pantallas del panel de administración lo solicitan con ViewData["AdminPanelLayout"]; solo aplica al rol administrador.
+        bool useAdminPanelLayout = showNav && navRole == 1 && ViewData["AdminPanelLayout"] is true;
+        string adminPanelIcon = Convert.ToString(ViewData["AdminPanelIcon"]) ?? "";
+        if (string.IsNullOrWhiteSpace(adminPanelIcon))
+        {
+            adminPanelIcon = "bi-gear";
+        }
+        bool showCreateModuleAction = ((navRole == 1 || navRole == 2)
+            && currentController == "Grupo"
+            && (currentAction == "ListaGruposDisponibles" || currentAction == "BuscarGrupos"))
+            || (navRole == 2 && currentController == "Asesor" && currentAction == "MisModulos");
+        bool showMyModulesAction = navRole == 2 && !(currentController == "Asesor" && currentAction == "MisModulos");
     }
 
-    @if (showNav)
-    {
-        <nav class="navbar navbar-expand-lg metics-tabs-navbar">
+    <header class="metics-unified-header">
+        <nav class="navbar metics-navbar-expand metics-tabs-navbar" aria-label="Navegación principal">
             <div class="container-fluid metics-tabs-container">
-                <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse metics-tabs-collapse" id="navbarColor01">
-                    <div class="metics-tabs-left">
-                        @if (navRole == 1)
-                        {
-                            <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item dropdown metics-settings-tab">
-                                    <a class="nav-link metics-icon-tab" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Configuración" aria-label="Configuración">
-                                        <i class="bi bi-gear"></i>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="settingsDropdown">
-                                        <li>@Html.ActionLink("Configuración del correo", "Index", "EmailSettings", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Registro de accesos", "VerBitacoraAccesos", "Usuario", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item dropdown metics-tab @(isAcademicActive ? "active" : "")">
-                                    <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-list-ul"></i>
-                                        <span>Gestión académica</span>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="academicDropdown">
-                                        <li>@Html.ActionLink("Niveles", "ListaCategorias", "Categoria", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Áreas de competencia", "ListaTemas", "Tema", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item dropdown metics-tab @(isPeopleActive ? "active" : "")">
-                                    <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-people"></i>
-                                        <span>Personas</span>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="peopleDropdown">
-                                        <li>@Html.ActionLink("Lista de facilitadores(as)", "ListaAsesores", "Asesor", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Lista de participantes", "VerParticipantes", "Participante", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item dropdown metics-tab @(isInscriptionActive ? "active" : "")">
-                                    <a class="nav-link dropdown-toggle" href="#" id="inscriptionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-card-checklist"></i>
-                                        <span>Inscripciones</span>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="inscriptionDropdown">
-                                        <li>@Html.ActionLink("Lista de inscripciones", "VerInscripciones", "Inscripcion", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item dropdown metics-tab @(isContentActive ? "active" : "")">
-                                    <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-file-earmark-plus"></i>
-                                        <span>Contenido</span>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="contentDropdown">
-                                        <li>@Html.ActionLink("Crear un área de competencia", "CrearTema", "Tema", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>@Html.ActionLink("Medallas", "ListaMedallas", "Medallas", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        }
-                        else if (navRole == 2)
-                        {
-                            <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item dropdown metics-tab @(isFacilitatorActive ? "active" : "")">
-                                    <a class="nav-link dropdown-toggle" href="#" id="facilitatorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-person-workspace"></i>
-                                        <span>Facilitador(a)</span>
-                                    </a>
-                                    <ul class="dropdown-menu metics-tabs-menu" aria-labelledby="facilitatorDropdown">
-                                        <li>@Html.ActionLink("Mis módulos", "MisModulos", "Asesor", new { }, new { @class = "dropdown-item" })</li>
-                                        <li>@Html.ActionLink("Crear un módulo", "CrearGrupo", "Grupo", new { }, new { @class = "dropdown-item" })</li>
-                                    </ul>
-                                </li>
-
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        }
-                        else
-                        {
-                            <ul class="navbar-nav metics-tabs-nav">
-                                <li class="nav-item metics-tab @(isHomeActive ? "active" : "")">
-                                    <a class="nav-link" asp-controller="Grupo" asp-action="ListaGruposDisponibles" title="Inicio">
-                                        <i class="bi bi-house-door-fill"></i>
-                                        <span>Inicio</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        }
-                    </div>
-
-                    <div class="metics-tabs-right">
-                        @if (navRole == 1 || navRole == 2)
-                        {
-                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-secondary metics-create-module bi bi-plus-lg" })
-                        }
-
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown metics-account">
-                                <a class="nav-link dropdown-toggle metics-account-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i>
-                                    <span>@roleLabel</span>
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
-                                    <li>@Html.ActionLink("Información personal", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item" })</li>
-                                    <li>@Html.ActionLink("Cambiar contraseña", "CambiarContrasena", "Usuario", null, new { @class = "dropdown-item" })</li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item metics-logout" })</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="metics-institutional-brand" aria-label="Universidad de Costa Rica, Vicerrectoría de Docencia y METICS">
+                    <a class="metics-brand-ucr-mobile" href="https://www.ucr.ac.cr/" aria-label="Universidad de Costa Rica"><img src="@Url.Content("~/images/ucr-whitelogo.png")" alt="Logo Universidad de Costa Rica" /></a>
+                    <a class="metics-brand-ucr" href="https://www.ucr.ac.cr/" aria-label="Universidad de Costa Rica">
+                        <span class="metics-ucr-signature-window" aria-hidden="true">
+                            <svg class="metics-ucr-signature-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 651.2514 78" role="img" aria-label="Universidad de Costa Rica">
+                                <use class="metics-ucr-wordmark" href="@Url.Content("~/images/firma-ucr-c.svg")#textoUCR"></use>
+                                <use class="metics-ucr-crest" href="@Url.Content("~/images/firma-ucr-c.svg")#escudo"></use>
+                                <use class="metics-ucr-crest-text" href="@Url.Content("~/images/firma-ucr-c.svg")#escudotexto"></use>
+                            </svg>
+                        </span>
+                    </a>
+                    <span class="metics-brand-divider" aria-hidden="true"></span>
+                    <a class="metics-brand-vd" href="https://vd.ucr.ac.cr/"><img src="@Url.Content("~/images/VD-01.png")" alt="Logo Vicerrectoria de Docencia" /></a>
+                    <a class="metics-brand-metics" href="https://metics.ucr.ac.cr/es/"><img src="@Url.Content("~/images/METICS-01.png")" alt="Logo METICS" /></a>
                 </div>
+                @if (showNav)
+                {
+                    <button class="navbar-toggler metics-tabs-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Abrir o cerrar navegación">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse metics-tabs-collapse" id="navbarColor01">
+                        <div class="metics-tabs-left">
+                            @* Solo móvil (menú hamburguesa): acceso directo al inicio, para todos los roles. *@
+                            <ul class="navbar-nav metics-mobile-home">
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Grupo" && currentAction == "ListaGruposDisponibles" ? "active" : "")" href="@Url.Action("ListaGruposDisponibles", "Grupo")" aria-current="@(currentController == "Grupo" && currentAction == "ListaGruposDisponibles" ? "page" : null)"><i class="bi bi-house-door"></i><span>Inicio</span></a>
+                                </li>
+                            </ul>
+                            @if (navRole == 1)
+                            {
+                                <ul class="navbar-nav metics-tabs-nav">
+                                    <li class="nav-item dropdown metics-tab metics-section-academic @(isAcademicActive ? "active" : "")">
+                                        <a class="nav-link dropdown-toggle" href="#" id="academicDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-list-ul"></i><span>Gestión académica</span></a>
+                                        <ul class="dropdown-menu metics-tabs-menu metics-section-menu" aria-labelledby="academicDropdown">
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("ListaCategorias", "Categoria")"><span class="metics-menu-icon"><i class="bi bi-diagram-3"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Niveles</span><span class="metics-menu-description">Gestiona los niveles del sistema</span></span></a></li>
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("ListaTemas", "Tema")"><span class="metics-menu-icon"><i class="bi bi-collection"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Áreas de competencia</span><span class="metics-menu-description">Administra las áreas de competencia</span></span></a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item dropdown metics-tab metics-section-people @(isPeopleActive ? "active" : "")">
+                                        <a class="nav-link dropdown-toggle" href="#" id="peopleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-people"></i><span>Personas</span></a>
+                                        <ul class="dropdown-menu metics-tabs-menu metics-section-menu" aria-labelledby="peopleDropdown">
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("ListaAsesores", "Asesor")"><span class="metics-menu-icon"><i class="bi bi-person-badge"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Lista de facilitadores(as)</span><span class="metics-menu-description">Administra las cuentas de facilitadores</span></span></a></li>
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("VerParticipantes", "Participante")"><span class="metics-menu-icon"><i class="bi bi-people"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Lista de participantes</span><span class="metics-menu-description">Consulta y gestiona participantes</span></span></a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item dropdown metics-tab metics-section-inscriptions @(isInscriptionActive ? "active" : "")">
+                                        <a class="nav-link dropdown-toggle" href="#" id="inscriptionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-card-checklist"></i><span>Inscripciones</span></a>
+                                        <ul class="dropdown-menu metics-tabs-menu metics-section-menu" aria-labelledby="inscriptionDropdown">
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("VerInscripciones", "Inscripcion")"><span class="metics-menu-icon"><i class="bi bi-card-checklist"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Lista de inscripciones</span><span class="metics-menu-description">Revisa solicitudes y estados de inscripción</span></span></a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item dropdown metics-tab metics-section-content @(isContentActive ? "active" : "")">
+                                        <a class="nav-link dropdown-toggle" href="#" id="contentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-file-earmark-plus"></i><span>Contenido</span></a>
+                                        <ul class="dropdown-menu metics-tabs-menu metics-section-menu" aria-labelledby="contentDropdown">
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("CrearGrupo", "Grupo")"><span class="metics-menu-icon"><i class="bi bi-journal-plus"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Crear un módulo</span><span class="metics-menu-description">Crea y configura módulos académicos</span></span></a></li>
+                                            <li><a class="dropdown-item metics-menu-card" href="@Url.Action("ListaMedallas", "Medallas")"><span class="metics-menu-icon"><i class="bi bi-award"></i></span><span class="metics-menu-copy"><span class="metics-menu-title">Medallas</span><span class="metics-menu-description">Administra el catálogo de medallas</span></span></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            }
+                            @* Facilitador(a): "Mis módulos" y "Crear módulo" están como botones en el encabezado de la página. *@
+                        </div>
+
+                        <div class="metics-tabs-right">
+                            <span class="metics-brand-divider metics-account-divider" aria-hidden="true"></span>
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown metics-account @(navRole != 1 ? "metics-account--direct" : "")">
+                                    <a class="nav-link dropdown-toggle metics-account-link" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><svg class="metics-account-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"></path></svg><span>@roleLabel</span></a>
+                                    <ul class="dropdown-menu dropdown-menu-end metics-tabs-menu" aria-labelledby="accountDropdown">
+                                        @if (navRole == 1)
+                                        {
+                                            @* Administrador: Resumen, Cambiar contraseña, Configuración del correo y Registro de accesos
+                                               están en el menú lateral del panel de administración. *@
+                                            <li><h6 class="dropdown-header">Mi cuenta</h6></li>
+                                            <li>@Html.ActionLink("Panel de administración", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-gear" })</li>
+                                        }
+                                        else
+                                        {
+                                            @* Participante y asesor: sus datos, medallas, módulos y el cambio de contraseña están en "Mi perfil". *@
+                                            <li><h6 class="dropdown-header">Mi cuenta</h6></li>
+                                            <li>@Html.ActionLink("Mi perfil", "InformacionPersonal", "Usuario", new { }, new { @class = "dropdown-item bi bi-person" })</li>
+                                        }
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>@Html.ActionLink("Cerrar sesión", "CerrarSesion", "Usuario", new { }, new { @class = "dropdown-item bi bi-box-arrow-right metics-logout" })</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
             </div>
         </nav>
-    }
-    <div class="container body-content" style="min-height: 100vh">
-        @RenderBody()
-    </div>
+    </header>
+    @if (useAdminPanelLayout)
+    {
+        @* Panel de administración: menú lateral fijo a la izquierda; breadcrumbs y encabezado en la columna derecha. *@
+        <div class="admin-shell">
+            <aside class="admin-shell-sidebar">
+                <partial name="_AdminPanelNav" />
+            </aside>
+            <main class="admin-shell-main">
+                <div class="body-content admin-shell-main-inner">
+                    @* Solo móvil: abre el mismo menú del panel como drawer lateral. *@
+                    <button type="button" class="admin-drawer-toggle" data-bs-toggle="offcanvas" data-bs-target="#adminPanelDrawer" aria-controls="adminPanelDrawer" aria-expanded="false">
+                        <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
+                        <span>Panel de administración</span>
+                        <i class="bi bi-chevron-right admin-drawer-toggle-arrow" aria-hidden="true"></i>
+                    </button>
+                    @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                    @if (hasPageHeading)
+                    {
+                        <header class="admin-shell-heading">
+                            <span class="admin-shell-heading-icon" aria-hidden="true"><i class="bi @adminPanelIcon"></i></span>
+                            <div class="admin-shell-heading-text">
+                                <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
+                                @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                                {
+                                    <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                                }
+                            </div>
+                        </header>
+                    }
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
 
-    <!-- Footer -->
-    <footer class="text-center text-lg-start text-white" id="footer" style="background-color: #3e4551; bottom: 0px; width: 100%; height: 100%;">
-        <div class="container p-4 pb-5">
-            <section class="">
-                <div class="row h-100">
-                    <div class="col-md-4">
-                        <!-- Información de los contactos  -->
-                        @{await Html.RenderPartialAsync("~/Views/Shared/Info.cshtml"); }
-                    </div>                   
+        <div class="offcanvas offcanvas-start admin-panel-drawer" tabindex="-1" id="adminPanelDrawer" aria-labelledby="adminPanelDrawerNavTitulo">
+            <button type="button" class="admin-panel-drawer-close" data-bs-dismiss="offcanvas" aria-label="Cerrar menú del panel">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+            <div class="offcanvas-body admin-panel-drawer-body">
+                @await Html.PartialAsync("_AdminPanelNav", null, new ViewDataDictionary(ViewData) { { "AdminPanelNavIdPrefix", "adminPanelDrawerNav" } })
+            </div>
+        </div>
+        <script>
+            // Drawer móvil del panel: se cierra al elegir una opción y si la pantalla pasa a escritorio.
+            (function () {
+                var drawer = document.getElementById('adminPanelDrawer');
+                if (!drawer) return;
+                var toggle = document.querySelector('.admin-drawer-toggle');
+                var desktop = window.matchMedia('(min-width: 992px)');
+                function instancia() { return window.bootstrap ? bootstrap.Offcanvas.getOrCreateInstance(drawer) : null; }
+                drawer.addEventListener('show.bs.offcanvas', function () {
+                    document.body.classList.add('admin-drawer-open');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                });
+                drawer.addEventListener('hidden.bs.offcanvas', function () {
+                    document.body.classList.remove('admin-drawer-open');
+                    if (toggle) { toggle.setAttribute('aria-expanded', 'false'); toggle.focus({ preventScroll: true }); }
+                });
+                drawer.addEventListener('shown.bs.offcanvas', function () {
+                    var activo = drawer.querySelector('.admin-panel-nav-link.is-active') || drawer.querySelector('.admin-panel-drawer-close');
+                    if (activo) activo.focus({ preventScroll: true });
+                });
+                drawer.querySelectorAll('.admin-panel-nav-link').forEach(function (enlace) {
+                    enlace.addEventListener('click', function () { var i = instancia(); if (i) i.hide(); });
+                });
+                function alCambiar(e) { if (e.matches) { var i = instancia(); if (i) i.hide(); } }
+                if (desktop.addEventListener) desktop.addEventListener('change', alCambiar); else desktop.addListener(alCambiar);
+            })();
+        </script>
+    }
+    else
+    {
+        if (hasPageHeading)
+        {
+            <section class="metics-page-header" aria-labelledby="@(ViewData["PageHeadingId"] ?? "pageHeading")">
+                <div class="container metics-page-header-inner">
+                    <div class="metics-page-header-content">
+                        @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                        <h1 id="@(ViewData["PageHeadingId"] ?? "pageHeading")">@ViewData["PageHeading"]</h1>
+                        @if (!string.IsNullOrWhiteSpace(Convert.ToString(ViewData["PageSubheading"])))
+                        {
+                            <p class="metics-page-subheading">@ViewData["PageSubheading"]</p>
+                        }
+                    </div>
+                    @if (showCreateModuleAction)
+                    {
+                        <div class="metics-page-actions" aria-label="Acciones de página">
+                            @if (showMyModulesAction)
+                            {
+                                <a class="btn metics-my-modules" href="@Url.Action("MisModulos", "Asesor")"><i class="bi bi-journal-text" aria-hidden="true"></i>Mis módulos</a>
+                            }
+                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                        </div>
+                    }
                 </div>
             </section>
+        }
+        <div class="container body-content @(hasPageHeading ? "metics-has-page-heading" : "")">
+            @if (!hasPageHeading && (breadcrumbs.Count > 0 || (showNav && (navRole == 1 || navRole == 2))))
+            {
+                <div class="metics-page-context">
+                    @await Html.PartialAsync("_Breadcrumbs", breadcrumbs)
+                    @if (showNav && showCreateModuleAction)
+                    {
+                        <div class="metics-page-actions" aria-label="Acciones de página">
+                            @if (showMyModulesAction)
+                            {
+                                <a class="btn metics-my-modules" href="@Url.Action("MisModulos", "Asesor")"><i class="bi bi-journal-text" aria-hidden="true"></i>Mis módulos</a>
+                            }
+                            @Html.ActionLink("Crear módulo", "CrearGrupo", "Grupo", new { }, new { @class = "btn btn-primary metics-create-module bi bi-plus-lg" })
+                        </div>
+                    }
+                </div>
+            }
+            @RenderBody()
         </div>
-        <div class="text-center p-1">
-            <p>&copy; @DateTime.Now.Year METICS</p>
+    }
+
+    <footer class="metics-footer" id="footer">
+        <div class="container metics-footer-container">
+            <div class="metics-footer-main">
+                <h2 class="metics-footer-heading">Contactos</h2>
+                @{ await Html.RenderPartialAsync("~/Views/Shared/Info.cshtml"); }
+            </div>
+            <div class="metics-footer-bottom">
+                <p>&copy; @DateTime.Now.Year METICS</p>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <script src="~/js/metics-header-scroll.js" asp-append-version="true"></script>
+    <script src="~/js/metics-dropdown-exclusive.js" asp-append-version="true"></script>
+    <script>
+        // Menú móvil: se cierra al tocar fuera del panel o al presionar Escape.
+        (function () {
+            var panel = document.getElementById('navbarColor01');
+            var boton = document.querySelector('.metics-tabs-toggler');
+            if (!panel || !boton || !window.bootstrap) return;
+            function cerrar() {
+                if (panel.classList.contains('show')) bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).hide();
+            }
+            document.addEventListener('pointerdown', function (e) {
+                if (!panel.contains(e.target) && !boton.contains(e.target)) cerrar();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && panel.classList.contains('show')) { cerrar(); boton.focus(); }
+            });
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @* Botón global "Volver arriba": aparece al pasar 400 px de desplazamiento. *@
+    <button type="button" class="metics-back-to-top" id="meticsBackToTop" aria-label="Volver arriba" title="Volver arriba" data-bs-toggle="tooltip" data-bs-placement="left" hidden>
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+    <script>
+        (function () {
+            var boton = document.getElementById('meticsBackToTop');
+            if (!boton) return;
+            var UMBRAL = 400;
+            var visible = false;
+            var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+            boton.hidden = false;
+
+            function tapaUnControl() {
+                var r = boton.getBoundingClientRect();
+                var puntos = [[r.left + r.width / 2, r.top + r.height / 2], [r.left + 4, r.top + 4], [r.right - 4, r.top + 4], [r.left + 4, r.bottom - 4], [r.right - 4, r.bottom - 4]];
+                return puntos.some(function (p) {
+                    return document.elementsFromPoint(p[0], p[1]).some(function (el) {
+                        return !boton.contains(el) && el.closest('a[href], button, input, select, textarea, label');
+                    });
+                });
+            }
+
+            function actualizar() {
+                var debeMostrarse = (window.scrollY || document.documentElement.scrollTop) > UMBRAL && !tapaUnControl();
+                if (debeMostrarse === visible) return;
+                visible = debeMostrarse;
+                boton.classList.toggle('is-visible', visible);
+                boton.setAttribute('aria-hidden', visible ? 'false' : 'true');
+                boton.tabIndex = visible ? 0 : -1;
+                if (!visible && window.bootstrap && bootstrap.Tooltip) {
+                    var tip = bootstrap.Tooltip.getInstance(boton);
+                    if (tip) tip.hide();
+                }
+            }
+
+            var pendiente = false;
+            window.addEventListener('scroll', function () {
+                if (pendiente) return;
+                pendiente = true;
+                window.requestAnimationFrame(function () { pendiente = false; actualizar(); });
+            }, { passive: true });
+
+            boton.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: reducirMovimiento.matches ? 'auto' : 'smooth' });
+                boton.blur();
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.bootstrap && bootstrap.Tooltip && window.matchMedia('(hover: hover)').matches) {
+                    bootstrap.Tooltip.getOrCreateInstance(boton);
+                }
+            });
+
+            boton.setAttribute('aria-hidden', 'true');
+            boton.tabIndex = -1;
+            actualizar();
+        })();
+    </script>
 </body>
 </html>

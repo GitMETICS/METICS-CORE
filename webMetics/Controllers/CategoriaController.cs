@@ -90,12 +90,25 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult CrearCategoria(CategoriaModel categoria)
+        public ActionResult CrearCategoria(CategoriaModel categoria, bool returnToList = false)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
+
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                        ViewBag.OpenCreateCategoriaModal = true;
+                        return View("ListaCategorias", categoria);
+                    }
+
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(categoria);
+                }
 
                 bool exito = accesoACategoria.CrearCategoria(categoria);
                 if (exito)
@@ -104,12 +117,30 @@ namespace webMetics.Controllers
                     return RedirectToAction("ListaCategorias");
                 }
 
+                if (returnToList)
+                {
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo crear el nivel.";
+                    ViewBag.OpenCreateCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
+                }
+
                 ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
 
                 return View(categoria);
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo crear el nivel.";
+                    ViewBag.OpenCreateCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
+                }
+
                 TempData["errorMessage"] = "No se pudo crear el nivel.";
                 return RedirectToAction("ListaCategorias");
             }
@@ -142,18 +173,39 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult EditarCategoria(CategoriaModel categoria)
+        public ActionResult EditarCategoria(CategoriaModel categoria, bool returnToList = false)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                        ViewBag.OpenEditCategoriaModal = true;
+                        return View("ListaCategorias", categoria);
+                    }
+
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(categoria);
+                }
+
                 bool exito = accesoACategoria.EditarCategoria(categoria);
                 if (exito)
                 {
                     TempData["successMessage"] = "Se editó el nivel.";
                     return RedirectToAction("ListaCategorias");
+                }
+
+                if (returnToList)
+                {
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo editar el nivel.";
+                    ViewBag.OpenEditCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
                 }
 
                 ViewBag.ErrorMessage = "No se pudo editar el nivel.";
@@ -163,6 +215,16 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Categorias = accesoACategoria.ObtenerCategorias();
+                    ViewBag.ErrorMessage = "No se pudo editar el nivel.";
+                    ViewBag.OpenEditCategoriaModal = true;
+                    return View("ListaCategorias", categoria);
+                }
+
                 TempData["errorMessage"] = "No se pudo editar el nivel.";
                 return RedirectToAction("ListaCategorias");
             }

@@ -77,17 +77,18 @@ namespace webMetics.Handlers
                 "INSERT INTO categoria (nombre, descripcion) " +
                 "VALUES (@nombre, @descripcion)";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@nombre", categoria.nombre);
-            comandoConsulta.Parameters.AddWithValue("@descripcion", categoria.descripcion);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@nombre", categoria.nombre);
+                comandoConsulta.Parameters.AddWithValue("@descripcion", categoria.descripcion);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
 
         public bool EditarCategoria(CategoriaModel categoria)
@@ -96,34 +97,36 @@ namespace webMetics.Handlers
                 "UPDATE categoria SET nombre = @nombre, descripcion = @descripcion " +
                 "WHERE id_categoria_PK = @idCategoria";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@nombre", categoria.nombre);
-            comandoConsulta.Parameters.AddWithValue("@descripcion", categoria.descripcion);
-            comandoConsulta.Parameters.AddWithValue("@idCategoria", categoria.idCategoria);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@nombre", categoria.nombre);
+                comandoConsulta.Parameters.AddWithValue("@descripcion", categoria.descripcion);
+                comandoConsulta.Parameters.AddWithValue("@idCategoria", categoria.idCategoria);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
 
         public bool EliminarCategoria(int idCategoria)
         {
             string consulta = "DELETE FROM categoria WHERE id_categoria_PK = @idCategoria";
 
-            ConexionMetics.Open();
-
-            SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
-            comandoConsulta.Parameters.AddWithValue("@idCategoria", idCategoria);
-
-            bool exito = comandoConsulta.ExecuteNonQuery() >= 1;
-
-            ConexionMetics.Close();
-
-            return exito;
+            try
+            {
+                ConexionMetics.Open();
+                using SqlCommand comandoConsulta = new SqlCommand(consulta, ConexionMetics);
+                comandoConsulta.Parameters.AddWithValue("@idCategoria", idCategoria);
+                return comandoConsulta.ExecuteNonQuery() >= 1;
+            }
+            finally
+            {
+                if (ConexionMetics.State != ConnectionState.Closed) ConexionMetics.Close();
+            }
         }
     }
 }

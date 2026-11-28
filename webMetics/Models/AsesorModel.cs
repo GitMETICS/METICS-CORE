@@ -23,9 +23,11 @@ namespace webMetics.Models
         [Display(Name = "Correo Institucional")]
         public required string correo { get; set; }
 
+        [Required(ErrorMessage = "Seleccione un tipo de identificación.")]
         [Display(Name = "Tipo de Identificación")]
         public string? tipoIdentificacion { get; set; }
 
+        [Required(ErrorMessage = "Es necesario ingresar un número de identificación.")]
         [Display(Name = "Número de Identificación")]
         public string? numeroIdentificacion { get; set; }
 

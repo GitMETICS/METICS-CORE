@@ -92,7 +92,7 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas();
+            ViewBag.TodasLasMedallas = accesoAParticipante.ObtenerTodasMedallas() ?? new List<string>();
 
 
             // Manejar los mensajes de TempData
@@ -245,8 +245,7 @@ namespace webMetics.Controllers
         /// </summary>
         /// <param name="idGrupo">Identificador del grupo en el que se inscribirá el participante.</param>
         /// <returns>
-        /// View: FormularioInscripcionManual —
-        /// ViewBag.IdGrupo, ViewBag.NombreGrupo, ViewBag.NumeroGrupo, ViewBag.Role, ViewBag.Id.
+        /// Redirects to Asesor/MisModulos (rol 2) o Grupo/ListaGruposDisponibles; la inscripción manual se hace en el popup.
         /// </returns>
         /// <remarks>
         /// Handlers: GrupoHandler.
@@ -257,13 +256,14 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
+            // La inscripción manual se hace desde el popup "Inscribir participante" en Inicio y Mis módulos;
+            // la página anterior se eliminó, así que esta dirección regresa a la lista correspondiente.
+            if (GetRole() == 2)
+            {
+                return RedirectToAction("MisModulos", "Asesor");
+            }
 
-            ViewBag.IdGrupo = idGrupo;
-            ViewBag.NombreGrupo = grupo.nombre;
-            ViewBag.NumeroGrupo = grupo.numeroGrupo;
-
-            return View("FormularioInscripcionManual");
+            return RedirectToAction("ListaGruposDisponibles", "Grupo");
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace webMetics.Controllers
         /// <param name="inscripcion">Modelo con idGrupo e idParticipante.</param>
         /// <returns>
         /// Redirects to Asesor/MisModulos (rol 2) o Grupo/ListaGruposDisponibles (rol 1) on success.
-        /// View: FormularioInscripcionManual con errores si ModelState es inválido.
+        /// Si ModelState es inválido, redirige a la misma lista con TempData["errorMessage"].
         /// Sets TempData["errorMessage"] si el participante no existe.
         /// </returns>
         /// <remarks>
@@ -316,7 +316,14 @@ namespace webMetics.Controllers
             }
             else
             {
-                return View("FormularioInscripcionManual", inscripcion);
+                // Sin la página anterior: se vuelve a la lista con el aviso (el popup ya exige el correo).
+                TempData["errorMessage"] = "Debe indicar el correo institucional del participante.";
+                if (rolUsuario == 2)
+                {
+                    return RedirectToAction("MisModulos", "Asesor");
+                }
+
+                return RedirectToAction("ListaGruposDisponibles", "Grupo");
             }
         }
         /// <summary>
@@ -381,6 +388,12 @@ namespace webMetics.Controllers
                         accesoAParticipante.CrearParticipante(nuevoParticipante);
 
                         participante = nuevoParticipante;
+                    }
+                    else if (participanteAux != null)
+                    {
+                        // El asesor ya tiene su registro de participante (p. ej. de una inscripción anterior):
+                        // se usa para el comprobante y el correo, que antes quedaban con participante = null.
+                        participante = participanteAux;
                     }
                 }
                 
@@ -1284,7 +1297,8 @@ namespace webMetics.Controllers
 
             XSSFWorkbook workbook = new XSSFWorkbook();
 
-            string sheetName = grupo.nombre.Length > 31 ? grupo.nombre.Substring(0, 31) : grupo.nombre;
+            // Excel no admite [ ] : * ? / \ en el nombre de la hoja ni más de 31 caracteres.
+            string sheetName = NPOI.SS.Util.WorkbookUtil.CreateSafeSheetName(grupo.nombre);
             var sheet = workbook.CreateSheet(sheetName);
 
             // Crear estilos para el encabezado
@@ -1806,7 +1820,7 @@ namespace webMetics.Controllers
 
             if (HttpContext.Request.Cookies.ContainsKey("idUsuario"))
             {
-                id = Convert.ToString(Request.Cookies["idUsuario"]);
+                id = Request.Cookies["idUsuario"] ?? "";
             }
 
             return id;

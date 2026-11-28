@@ -1,57 +1,47 @@
+@model webMetics.Models.TemaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Áreas de Competencia";
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    ViewBag.Title = "Áreas de competencia";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
-        <h1>@ViewBag.Title</h1>
-        <hr />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+    <div class="contenedor-caja container-fluid table-page-with-divider">
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
+        @await Html.PartialAsync("_MeticsToast")
 
         @if (ViewBag.Temas == null)
         {
             <h5 class="text-center mb-4">No hay temas.</h5>
             <div class="text-center">
-                @Html.ActionLink("  Crear Área de Competencia", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearTema">Crear área</button>
             </div>
         }
         else
         {
             <div class="table-card">
                 <div class="table-card-header">
-                    <span class="table-card-title">Áreas de Competencia</span>
-                    <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
+                    <div class="table-card-heading">
+                        <span class="table-card-title">Áreas de Competencia</span>
+                        <span class="table-card-desc">Listado de áreas de competencia registradas en el sistema</span>
+                    </div>
+                    <div class="table-card-header-actions">
+                        <span class="table-card-count" id="temaCount" data-singular="área encontrada" data-plural="áreas encontradas" aria-live="polite">@ViewBag.Temas.Count áreas encontradas</span>
+                        <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearTema">Crear área</button>
+                    </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
+                        <div class="table-search">
+                            <div class="table-search-field">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                <input type="search" id="temaBusqueda" class="form-control" placeholder="Buscar área de competencia" aria-label="Buscar área de competencia" />
+                            </div>
+                        </div>
+
                         <div class="table-pagesize">
                             <label for="temaPageSize">Mostrar</label>
                             <select id="temaPageSize">
@@ -62,15 +52,6 @@
                             </select>
                             <label for="temaPageSize">registros</label>
                         </div>
-
-                        <div class="table-search">
-                            <input type="text" id="temaBusqueda" class="form-control" placeholder="Buscar área de competencia" />
-                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        @Html.ActionLink("  Crear Área", "CrearTema", "Tema", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
                     </div>
                 </div>
 
@@ -90,7 +71,13 @@
                                 <tr>
                                     <td>@tema.nombre</td>
                                     <td class="text-center">
-                                        @Html.ActionLink("", "EditarTema", "Tema", new { idTema = tema.idTema }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
+                                        <button type="button"
+                                                class="icon-action icon-edit bi bi-pencil-square"
+                                                title="Editar"
+                                                aria-label="Editar @tema.nombre"
+                                                data-topic-id="@tema.idTema"
+                                                data-topic-name="@tema.nombre"
+                                                onclick="abrirModalEditarTema(this)"></button>
                                     </td>
                                     <td class="text-center">
                                         <a href="#" onclick="actualizarModalEliminar('@tema.idTema'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
@@ -106,25 +93,85 @@
         }
     </div>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal create-topic-modal" id="modalCrearTema" tabindex="-1" aria-labelledby="modalCrearTemaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Área de competencia</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta área de competencia?
-                    <br />
+                @using (Html.BeginForm("CrearTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-collection"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalCrearTemaLabel">Crear área de competencia</h2>
+                            <p>Complete el nombre para registrar una nueva área.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        @await Html.PartialAsync("_TemaFormFields", ViewBag.OpenEditTemaModal == true ? new webMetics.Models.TemaModel() : (Model ?? new webMetics.Models.TemaModel()))
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar área</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal create-topic-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
                     @using (Html.BeginForm("EliminarTema", "Tema"))
                     {
-                        <div class="modal-footer">
-                            <input type="hidden" id="idTema" name="idTema">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar área</h2>
+                            <p>Confirme si desea quitar esta área de competencia del sistema.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar esta área de competencia? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idTema" name="idTema">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar área</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal create-topic-modal" id="modalEditarTema" tabindex="-1" aria-labelledby="modalEditarTemaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("EditarTema", "Tema", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="idTema" id="editarTemaId" value="@(Model?.idTema ?? 0)" />
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEditarTemaLabel">Editar área de competencia</h2>
+                            <p>Actualiza el nombre de esta área.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        <div class="form-group create-category-field">
+                            @Html.Label("nombre", "Nombre", new { @for = "editarTemaNombre" })
+                            <span class="create-category-required" aria-hidden="true">*</span>
+                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarTemaNombre", maxlength = "64", autocomplete = "off", required = "required" })
+                            @Html.ValidationMessage("nombre", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar cambios</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -137,10 +184,57 @@ else
 }
 
 <script type="text/javascript">
+    function clearTemaModalFeedback(modalId) {
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(function (field) {
+            if (field.tagName === 'SELECT') field.selectedIndex = 0;
+            else field.value = '';
+            field.classList.remove('input-validation-error');
+        });
+        modal.querySelectorAll('[data-valmsg-for]').forEach(function (message) {
+            message.textContent = '';
+            message.classList.remove('field-validation-error');
+            message.classList.add('field-validation-valid');
+        });
+    }
+
     function actualizarModalEliminar(idTema) {
         document.getElementById("idTema").value = idTema;
-        var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-        deleteModal.show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEliminar')).show();
+    }
+
+    function abrirModalEditarTema(button) {
+        document.getElementById('editarTemaId').value = button.dataset.topicId || '';
+        document.getElementById('editarTemaNombre').value = button.dataset.topicName || '';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarTema')).show();
+    }
+
+    @if (ViewBag.OpenCreateTemaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var createModalElement = document.getElementById('modalCrearTema');
+                if (createModalElement) {
+                    clearTemaModalFeedback('modalEditarTema');
+                    bootstrap.Modal.getOrCreateInstance(createModalElement).show();
+                }
+            });
+        </text>
+    }
+
+    @if (ViewBag.OpenEditTemaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var editModalElement = document.getElementById('modalEditarTema');
+                if (editModalElement) {
+                    clearTemaModalFeedback('modalCrearTema');
+                    bootstrap.Modal.getOrCreateInstance(editModalElement).show();
+                }
+            });
+        </text>
     }
 
     MeticsTable.init({
@@ -149,6 +243,7 @@ else
         paginationId: 'temaTblPaginacion',
         searching: true,
         searchInputId: 'temaBusqueda',
+        countId: 'temaCount',
         pageLength: 50
     });
 </script>

@@ -1,23 +1,19 @@
-﻿<html>
-<head>
-</head>
-<body>
-    <div class="card text-center" style="margin-top:5%">
-        <div class="card-header">
-            <h2>@ViewBag.Titulo</h2>
+﻿@{
+    string tituloRegistro = Convert.ToString(ViewBag.Titulo) ?? "";
+    bool registroRealizado = tituloRegistro == "Registro realizado";
+}
+
+<div class="contenedor-caja container-fluid result-page">
+    <section class="admin-panel-card result-card @(registroRealizado ? "is-success" : "is-error")" aria-labelledby="resultadoRegistroTitulo">
+        <span class="result-card-icon" aria-hidden="true"><i class="bi @(registroRealizado ? "bi-check-lg" : "bi-x-lg")"></i></span>
+        <h1 class="result-card-title" id="resultadoRegistroTitulo">@ViewBag.Titulo</h1>
+        <p class="result-card-message" role="status">@ViewBag.Message</p>
+        @if (ViewBag.Correo != null)
+        {
+            <p class="result-card-email"><i class="bi bi-envelope" aria-hidden="true"></i>@ViewBag.Correo</p>
+        }
+        <div class="result-card-actions">
+            <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn admin-panel-btn-primary">Regresar</a>
         </div>
-        <div class="card-body">
-            <h5> @ViewBag.Message</h5>
-            @if (ViewBag.Correo != null)
-            {
-                <p>@ViewBag.Correo</p>
-            }
-        </div>
-        <div class="card-footer text-muted">
-            <div class="d-flex justify-content-center">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+    </section>
+</div>

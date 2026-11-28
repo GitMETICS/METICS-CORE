@@ -1,35 +1,41 @@
 ﻿@{
     ViewBag.Title = "Inscribir";
+
+    string tituloResultado = Convert.ToString(ViewBag.Titulo) ?? "";
+    string mensajeResultado = Convert.ToString(ViewBag.Message) ?? "";
+    bool inscripcionRealizada = tituloResultado == "Inscripción realizada";
+    bool avisoCorreo = inscripcionRealizada && mensajeResultado.Contains("error", StringComparison.OrdinalIgnoreCase);
+    string estadoResultado = !inscripcionRealizada ? "is-error" : avisoCorreo ? "is-warning" : "is-success";
+    string iconoResultado = !inscripcionRealizada ? "bi-x-lg" : avisoCorreo ? "bi-exclamation-lg" : "bi-check-lg";
 }
 
-<html>
-<head>
-</head>
-<body>
-    <div class="card text-center" style="margin-top:5%">
-        <div class="card-header">
-            <h2>@ViewBag.Titulo</h2>
+<div class="contenedor-caja container-fluid result-page">
+    <section class="admin-panel-card result-card @estadoResultado" aria-labelledby="resultadoInscripcionTitulo">
+        <span class="result-card-icon" aria-hidden="true"><i class="bi @iconoResultado"></i></span>
+        <h1 class="result-card-title" id="resultadoInscripcionTitulo">@ViewBag.Titulo</h1>
+        <p class="result-card-message" role="status">@ViewBag.Message</p>
+
+        @if (ViewBag.Participante != null)
+        {
+            <p class="result-card-email"><i class="bi bi-envelope" aria-hidden="true"></i>@ViewBag.Participante.correo</p>
+        }
+
+        @if (ViewBag.Grupo != null)
+        {
+            <dl class="result-card-details">
+                <div>
+                    <dt><i class="bi bi-link-45deg" aria-hidden="true"></i>Enlace</dt>
+                    <dd>@ViewBag.Grupo.enlace</dd>
+                </div>
+                <div>
+                    <dt><i class="bi bi-key" aria-hidden="true"></i>Contraseña</dt>
+                    <dd>@ViewBag.Grupo.claveInscripcion</dd>
+                </div>
+            </dl>
+        }
+
+        <div class="result-card-actions">
+            <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn admin-panel-btn-primary"><i class="bi bi-arrow-left" aria-hidden="true"></i>Regresar</a>
         </div>
-        <div class="card-body">
-            <h5>@ViewBag.Message</h5>
-            @if (ViewBag.Participante != null)
-            {
-                <p>@ViewBag.Participante.correo</p>
-            }
-            @if (ViewBag.Grupo != null)
-            {
-                <p class="mb-0">
-                    <strong>Enlace:</strong> <span>@ViewBag.Grupo.enlace</span><br>
-                    <strong>Contraseña:</strong> <span>@ViewBag.Grupo.claveInscripcion</span>
-                </p>
-            }
-            
-        </div>
-        <div class="card-footer text-muted">
-            <div class="d-flex justify-content-center">
-                <a asp-action="ListaGruposDisponibles" asp-controller="Grupo" class="btn btn-primary">Regresar</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+    </section>
+</div>

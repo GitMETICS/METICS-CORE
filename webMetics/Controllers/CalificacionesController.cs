@@ -50,67 +50,24 @@ namespace webMetics.Controllers
         }
 
         /// <summary>
-        /// Muestra la lista de calificaciones de todos los participantes inscritos en un grupo.
+        /// Redirige a la lista de participantes del módulo, que reemplaza la antigua página de calificaciones.
         /// </summary>
-        /// <param name="idGrupo">ID del grupo cuyas calificaciones se muestran.</param>
-        /// <returns>
-        /// View: VerCalificaciones —
-        /// ViewBag.ListaCalificaciones, ViewBag.IdGrupo, ViewBag.Title, ViewBag.NombreGrupo,
-        /// ViewBag.Role, ViewBag.Id, ViewBag.ErrorMessage, ViewBag.SuccessMessage.
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler, GrupoHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
+        /// <param name="idGrupo">ID del grupo.</param>
+        /// <returns>Redirects to Participante/ListaParticipantes.</returns>
         public ActionResult VerCalificaciones(int idGrupo)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            ViewBag.ListaCalificaciones = calificaciones;
-            ViewBag.IdGrupo = idGrupo;
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-            ViewBag.Title = "Calificaciones";
-            ViewBag.NombreGrupo = grupo.nombre;
-
-            if (TempData["errorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["errorMessage"].ToString();
-            }
-            if (TempData["successMessage"] != null)
-            {
-                ViewBag.SuccessMessage = TempData["successMessage"].ToString();
-            }
-            return View();
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
         /// <summary>
-        /// Muestra el formulario de edición de calificación para un participante específico de un grupo.
+        /// Redirige a la lista de participantes del módulo, donde se editan las calificaciones en línea.
         /// </summary>
         /// <param name="idGrupo">ID del grupo.</param>
-        /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <returns>
-        /// View: EditarCalificacion —
-        /// ViewBag.Calificacion (CalificacionModel), ViewBag.NombreGrupo, ViewBag.Role, ViewBag.Id.
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler, GrupoHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
+        /// <param name="idParticipante">Correo/ID del participante (no se usa).</param>
+        /// <returns>Redirects to Participante/ListaParticipantes.</returns>
         public ActionResult EditarCalificacion(int idGrupo, string idParticipante)
         {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
-            CalificacionModel calificacion = calificaciones.Find(calificacionModel => calificacionModel.participante.idParticipante == idParticipante);
-            GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-
-            ViewBag.Calificacion = calificacion;
-            ViewBag.NombreGrupo = grupo.nombre;
-
-            return View();
+            return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
         }
 
         /// <summary>
@@ -119,8 +76,8 @@ namespace webMetics.Controllers
         /// </summary>
         /// <param name="idGrupo">ID del grupo.</param>
         /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <param name="horasAprobadas">Horas aprobadas (0 = no actualizar); debe ser ≤ cantidadHoras del grupo.</param>
-        /// <param name="calificacion">Calificación (0 = no actualizar); debe estar entre 1 y 100.</param>
+        /// <param name="horasAprobadas">Horas aprobadas (vacío = conservar); acepta 0 hasta cantidadHoras del grupo.</param>
+        /// <param name="calificacion">Calificación (vacío = conservar); acepta valores entre 0 y 100.</param>
         /// <returns>
         /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
         /// Participante/VerDatosParticipante. Sets TempData["successMessage"] o TempData["errorMessage"].
@@ -130,45 +87,41 @@ namespace webMetics.Controllers
         /// Role required: Asesor (2) o Admin (1).
         /// </remarks>
         [HttpPost]
-        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int horasAprobadas = 0, int calificacion = 0)
+        public ActionResult SubirHorasAprobadasYCalificacion(int idGrupo, string idParticipante, int? horasAprobadas = null, int? calificacion = null)
         {
+            TempData.Remove("successMessage");
+            TempData.Remove("errorMessage");
+            TempData.Remove("warningMessage");
             try
             {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
-                InscripcionModel inscripcion = accesoAInscripcion.ObtenerInscripcionParticipante(grupo.idGrupo, idParticipante);
-
-                if (horasAprobadas > 0 && horasAprobadas <= grupo.cantidadHoras)
+                if (string.IsNullOrWhiteSpace(GetId()) || GetRole() is not (1 or 2))
+                    TempData["errorMessage"] = "No tiene permisos para actualizar horas y calificaciones.";
+                else if (!ModelState.IsValid)
+                    TempData["errorMessage"] = "Ingrese horas y calificaciones con números enteros válidos.";
+                else
                 {
-                    inscripcion.horasAprobadas = horasAprobadas;
-                    inscripcion.horasMatriculadas = Math.Max(0, grupo.cantidadHoras - inscripcion.horasAprobadas);
-                    inscripcion.estado = accesoAInscripcion.CambiarEstadoDeInscripcion(inscripcion);
-                    accesoAInscripcion.EditarInscripcion(inscripcion);
-
-                    accesoAParticipante.ActualizarHorasAprobadasParticipante(idParticipante);
-                    accesoAParticipante.ActualizarHorasMatriculadasParticipante(idParticipante);
+                    var saved = new webMetics.Services.CalificacionParticipanteService(_configuration)
+                        .Guardar(idGrupo, idParticipante, horasAprobadas, calificacion);
+                    if (saved) TempData["successMessage"] = "Horas y calificación guardadas correctamente.";
+                    else TempData["warningMessage"] = horasAprobadas == null && calificacion == null
+                        ? "Ingrese las horas aprobadas o la calificación que desea guardar."
+                        : "No hay cambios para guardar.";
                 }
-
-                if (calificacion > 0 && calificacion <= 100)
-                {
-                    accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-                }
-
-                TempData["successMessage"] = "Datos actualizados.";
             }
-            catch
+            catch (ArgumentException ex)
             {
-                TempData["errorMessage"] = "No se pudo actualizar los datos.";
+                TempData["errorMessage"] = ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["errorMessage"] = "No se pudieron guardar los datos. No se aplicaron cambios.";
             }
 
             var refererUrl = Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(refererUrl))
-            {
-                return Redirect(refererUrl);
-            }
-
+            if (Uri.TryCreate(refererUrl, UriKind.Absolute, out var referer)
+                && Uri.TryCreate($"{Request.Scheme}://{Request.Host}", UriKind.Absolute, out var origin)
+                && referer.Scheme == origin.Scheme && referer.Authority == origin.Authority)
+                return Redirect(referer.PathAndQuery);
             return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
         }
 
@@ -290,45 +243,6 @@ namespace webMetics.Controllers
                     message = "Error al actualizar los datos: " + ex.Message
                 });
             }
-        }
-
-        /// <summary>
-        /// Registra o actualiza únicamente la calificación de un participante en un grupo.
-        /// </summary>
-        /// <param name="idGrupo">ID del grupo.</param>
-        /// <param name="idParticipante">Correo/ID del participante.</param>
-        /// <param name="calificacion">Calificación a registrar (0–100).</param>
-        /// <returns>
-        /// Redirects to la URL referente (Referer) si está disponible; de lo contrario redirige a
-        /// Calificaciones/VerCalificaciones. Sets TempData["successMessage"] o TempData["errorMessage"].
-        /// </returns>
-        /// <remarks>
-        /// Handlers: CalificacionesHandler.
-        /// Role required: Asesor (2) o Admin (1).
-        /// </remarks>
-        [HttpPost]
-        public ActionResult SubirCalificacion(int idGrupo, string idParticipante, int calificacion)
-        {
-            try
-            {
-                ViewBag.Role = GetRole();
-                ViewBag.Id = GetId();
-
-                accesoACalificaciones.IngresarNota(idGrupo, idParticipante, calificacion);
-                TempData["successMessage"] = "Calificación actualizada.";
-            }
-            catch
-            {
-                TempData["errorMessage"] = "No se pudo actualizar la calificación.";
-            }
-
-            var refererUrl = Request.Headers["Referer"].ToString();
-            if (!string.IsNullOrEmpty(refererUrl))
-            {
-                return Redirect(refererUrl);
-            }
-
-            return RedirectToAction("VerCalificaciones", "Calificaciones", new { idGrupo = idGrupo });
         }
 
         /// <summary>
@@ -618,7 +532,8 @@ namespace webMetics.Controllers
         /// </remarks>
         public ActionResult ExportarCalificacionesPDF(int idGrupo, string? searchTerm)
         {
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -683,7 +598,8 @@ namespace webMetics.Controllers
         public ActionResult ExportarCalificacionesWord(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -745,7 +661,8 @@ namespace webMetics.Controllers
         public ActionResult ExportarCalificacionesExcel(int idGrupo, string? searchTerm)
         {
             // Obtener la lista de participantes del grupo y la información del grupo
-            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo);
+            // Si el módulo no tiene calificaciones, el handler devuelve null; se exporta el documento vacío.
+            List<CalificacionModel> calificaciones = accesoACalificaciones.ObtenerListaCalificaciones(idGrupo) ?? new List<CalificacionModel>();
             if (!string.IsNullOrEmpty(searchTerm))
                 calificaciones = FiltrarCalificaciones(calificaciones, searchTerm);
 
@@ -754,7 +671,8 @@ namespace webMetics.Controllers
             // Creamos el archivo de Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
 
-            string sheetName = grupo.nombre.Length > 31 ? grupo.nombre.Substring(0, 31) : grupo.nombre;
+            // Excel no admite [ ] : * ? / \ en el nombre de la hoja ni más de 31 caracteres.
+            string sheetName = NPOI.SS.Util.WorkbookUtil.CreateSafeSheetName(grupo.nombre);
 
             var sheet = workbook.CreateSheet(sheetName);
 
@@ -888,6 +806,13 @@ namespace webMetics.Controllers
             GrupoModel grupo = accesoAGrupo.ObtenerGrupo(idGrupo);
             List<ParticipanteModel> participantes = accesoAParticipante.ObtenerParticipantesDelGrupo(idGrupo);
             List<CalificacionModel> calificaciones = new List<CalificacionModel>();
+
+            // Sin participantes no hay calificaciones que enviar (el handler devuelve null).
+            if (participantes == null || participantes.Count == 0)
+            {
+                TempData["errorMessage"] = "No hay participantes inscritos para enviar calificaciones.";
+                return RedirectToAction("ListaParticipantes", "Participante", new { idGrupo });
+            }
 
             foreach (ParticipanteModel participante in participantes)
             {

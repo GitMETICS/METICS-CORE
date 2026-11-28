@@ -1406,7 +1406,7 @@ BEGIN
     SET @SortColumn = CASE
         WHEN @SortColumn IN (
             N'unidadAcademica', N'nombre', N'correo',
-            N'horasMatriculadas', N'horasAprobadas'
+            N'horasMatriculadas', N'horasAprobadas', N'estadoNotificacion'
         ) THEN @SortColumn
         ELSE N'nombre'
     END;
@@ -1475,6 +1475,20 @@ BEGIN
         CASE WHEN @SortColumn = N'horasMatriculadas' AND @SortDirection = N'desc' THEN ISNULL(p.total_horas_matriculadas, 0) END DESC,
         CASE WHEN @SortColumn = N'horasAprobadas' AND @SortDirection = N'asc' THEN ISNULL(p.total_horas_aprobadas, 0) END ASC,
         CASE WHEN @SortColumn = N'horasAprobadas' AND @SortDirection = N'desc' THEN ISNULL(p.total_horas_aprobadas, 0) END DESC,
+        CASE WHEN @SortColumn = N'estadoNotificacion' AND @SortDirection = N'asc' THEN
+            CASE
+                WHEN ISNULL(p.total_horas_aprobadas, 0) < 30 THEN 2
+                WHEN ISNULL(p.correo_notificacion_enviado, 0) = 0 THEN 0
+                ELSE 1
+            END
+        END ASC,
+        CASE WHEN @SortColumn = N'estadoNotificacion' AND @SortDirection = N'desc' THEN
+            CASE
+                WHEN ISNULL(p.total_horas_aprobadas, 0) < 30 THEN 2
+                WHEN ISNULL(p.correo_notificacion_enviado, 0) = 0 THEN 0
+                ELSE 1
+            END
+        END DESC,
         p.id_participante_PK ASC
     OFFSET @Offset ROWS
     FETCH NEXT @PageSize ROWS ONLY;

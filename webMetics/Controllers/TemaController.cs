@@ -69,24 +69,6 @@ namespace webMetics.Controllers
             return View();
         }
 
-        /// <summary>Muestra el formulario para registrar una nueva área de competencia.</summary>
-        /// <returns>
-        /// View: CrearTema —
-        /// ViewData["Temas"] (SelectListItem), ViewData["Categorias"] (SelectListItem),
-        /// ViewBag.Role, ViewBag.Id.
-        /// </returns>
-        /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
-        public ActionResult CrearTema()
-        {
-            ViewBag.Role = GetRole();
-            ViewBag.Id = GetId();
-
-            ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-            ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
-
-            return View();
-        }
-
         /// <summary>Procesa el formulario de creación de área de competencia.</summary>
         /// <param name="tema">Datos del tema a crear.</param>
         /// <returns>
@@ -95,18 +77,40 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult CrearTema(TemaModel tema)
+        public ActionResult CrearTema(TemaModel tema, bool returnToList = false)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Temas = accesoATema.ObtenerTemas();
+                        ViewBag.OpenCreateTemaModal = true;
+                        return View("ListaTemas", tema);
+                    }
+
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View(tema);
+                }
+
                 bool exito = accesoATema.CrearTema(tema);
                 if (exito)
                 {
                     TempData["successMessage"] = "Se creó el área de competencia.";
                     return RedirectToAction("ListaTemas");
+                }
+
+                if (returnToList)
+                {
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo crear el área de competencia.";
+                    ViewBag.OpenCreateTemaModal = true;
+                    return View("ListaTemas", tema);
                 }
 
                 ViewBag.ErrorMessage = "No se pudo crear el área de competencia.";
@@ -117,6 +121,16 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo crear el área de competencia.";
+                    ViewBag.OpenCreateTemaModal = true;
+                    return View("ListaTemas", tema);
+                }
+
                 TempData["errorMessage"] = "No se pudo crear el área de competencia.";
                 return RedirectToAction("ListaTemas");
             }
@@ -151,18 +165,40 @@ namespace webMetics.Controllers
         /// </returns>
         /// <remarks>Handlers: TemaHandler, CategoriaHandler. Role required: Admin (1).</remarks>
         [HttpPost]
-        public ActionResult EditarTema(TemaModel tema)
+        public ActionResult EditarTema(TemaModel tema, bool returnToList = false)
         {
             try
             {
                 ViewBag.Role = GetRole();
                 ViewBag.Id = GetId();
 
+                if (!ModelState.IsValid)
+                {
+                    if (returnToList)
+                    {
+                        ViewBag.Temas = accesoATema.ObtenerTemas();
+                        ViewBag.OpenEditTemaModal = true;
+                        return View("ListaTemas", tema);
+                    }
+
+                    ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
+                    ViewData["Categorias"] = accesoACategoria.ObtenerListaSeleccionCategorias();
+                    return View("EditarTema", tema);
+                }
+
                 bool exito = accesoATema.EditarTema(tema);
                 if (exito)
                 {
                     TempData["successMessage"] = "Se editó el área de competencia.";
                     return RedirectToAction("ListaTemas");
+                }
+
+                if (returnToList)
+                {
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
+                    ViewBag.OpenEditTemaModal = true;
+                    return View("ListaTemas", tema);
                 }
 
                 ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
@@ -173,6 +209,16 @@ namespace webMetics.Controllers
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Role = GetRole();
+                    ViewBag.Id = GetId();
+                    ViewBag.Temas = accesoATema.ObtenerTemas();
+                    ViewBag.ErrorMessage = "No se pudo editar el área de competencia.";
+                    ViewBag.OpenEditTemaModal = true;
+                    return View("ListaTemas", tema);
+                }
+
                 TempData["errorMessage"] = "No se pudo editar el área de competencia.";
                 return RedirectToAction("ListaTemas");
             }

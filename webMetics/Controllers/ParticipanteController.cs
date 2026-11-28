@@ -150,6 +150,7 @@ namespace webMetics.Controllers
                 : 2;
             string sortColumn = sortColumnIndex switch
             {
+                0 => "estadoNotificacion",
                 1 => "unidadAcademica",
                 2 => "nombre",
                 3 => "correo",
@@ -280,10 +281,20 @@ namespace webMetics.Controllers
         [HttpPost]
         public IActionResult AsignarMedallas(string idParticipante, List<string> selectedMedallas)
         {
+            TempData.Remove("successMessage");
+            TempData.Remove("errorMessage");
+            TempData.Remove("warningMessage");
             // Validar que solo administradores puedan asignar medallas
             if (GetRole() != 1)  // Si no es administrador
             {
                 TempData["errorMessage"] = "No tiene permisos para asignar medallas.";
+                return RedirectToAction("VerDatosParticipante", new { idParticipante });
+            }
+            selectedMedallas = selectedMedallas?.Where(medalla => !string.IsNullOrWhiteSpace(medalla))
+                .Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? new List<string>();
+            if (selectedMedallas.Count == 0)
+            {
+                TempData["warningMessage"] = "Seleccione al menos una medalla antes de asignar.";
                 return RedirectToAction("VerDatosParticipante", new { idParticipante });
             }
             try
@@ -292,25 +303,17 @@ namespace webMetics.Controllers
 
                 if (participante == null)
                 {
-                    ViewBag.ErrorMessage = "Participante no encontrado.";
+                    TempData["errorMessage"] = "Participante no encontrado.";
                     return RedirectToAction("VerDatosParticipante", "Participante", new { idParticipante });
                 }
 
-                if (selectedMedallas != null && selectedMedallas.Any())
-                {
-                    foreach (var medalla in selectedMedallas)
-                    {
-                        if (!accesoAParticipante.ParticipanteTieneMedalla(idParticipante, medalla)) {
-                            accesoAParticipante.AgregarMedallaParticipante(idParticipante, medalla);
-                        }
-                    }
-                }
-
-                TempData["successMessage"] = "Medallas asignadas correctamente.";
+                var assigned = accesoAParticipante.AgregarMedallasParticipante(idParticipante, selectedMedallas);
+                if (assigned > 0) TempData["successMessage"] = "Medallas asignadas correctamente.";
+                else TempData["warningMessage"] = "Las medallas seleccionadas ya estaban asignadas al participante.";
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = $"Error al asignar medallas.";
+                TempData["errorMessage"] = $"No se asignó ninguna medalla: {ex.Message}";
             }
 
             return RedirectToAction("VerDatosParticipante", new { idParticipante = idParticipante });
@@ -1071,6 +1074,8 @@ namespace webMetics.Controllers
                 ViewBag.SuccessMessage = TempData["successMessage"].ToString();
             }
 
+            ViewBag.WarningMessage = TempData["warningMessage"]?.ToString();
+
             // Si se pasa un idGrupo, se guarda en ViewBag para usarlo en la vista cuando se regresa al grupo
             if (idGrupo != null)
             {
@@ -1354,6 +1359,12 @@ namespace webMetics.Controllers
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
             bool isAjaxRequest = IsAjaxRequest();
+            // Participante o asesor editando sus propios datos desde "Mi perfil": se vuelve a su perfil.
+            // VerParticipantes es solo para administradores (con otro rol la página cerraba la sesión).
+            bool volverAlPerfil = GetRole() != 1;
+            string urlDestino = volverAlPerfil
+                ? Url.Action("InformacionPersonal", "Usuario")
+                : Url.Action("VerParticipantes", "Participante");
 
             ValidarAreasExtra(participante);
             ResolverCarrera(participante);
@@ -1418,10 +1429,12 @@ namespace webMetics.Controllers
                         });
                     }
 
+                    TempData["successMessage"] = "Los datos fueron guardados.";
+
                     return Json(new
                     {
                         success = true,
-                        redirectUrl = Url.Action("VerParticipantes", "Participante")
+                        redirectUrl = urlDestino
                     });
                 }
 
@@ -1434,7 +1447,7 @@ namespace webMetics.Controllers
                     TempData["errorMessage"] = "Los datos se actualizaron, pero ocurrió un error al guardar las áreas extra.";
                 }
 
-                return RedirectToAction("VerParticipantes", "Participante");
+                return Redirect(urlDestino);
             }
             catch
             {
@@ -1448,7 +1461,7 @@ namespace webMetics.Controllers
                 }
 
                 TempData["errorMessage"] = "Ocurrió un error al editar los datos.";
-                return RedirectToAction("VerParticipantes", "Participante");
+                return Redirect(urlDestino);
             }
         }
 

@@ -2,99 +2,64 @@
 @using webMetics.Controllers
 @using webMetics.Helpers
 @{
-    ViewBag.Title = "Formulario de Registro";
+    ViewBag.Title = "Formulario de registro";
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
-@if (ViewBag.Title == "Formulario de Registro")
+@if (ViewBag.Title == "Formulario de registro")
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid create-participant-page registro-page admin-panel-page">
         @using (Html.BeginForm("FormularioRegistro", "Usuario", FormMethod.Post, new { enctype = "multipart/form-data", id = "registroForm" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <header class="registro-heading">
+                <h1>@ViewBag.Title</h1>
+                <p>Complete sus datos para crear su cuenta en METICS.</p>
+            </header>
 
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            @await Html.PartialAsync("_MeticsToast")
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+            <div class="create-participant-sections">
+                <section class="create-participant-card" aria-labelledby="registroPersonalTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        <div><h2 id="registroPersonalTitle">Información personal</h2><p>Datos de identificación.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group create-participant-full-field">
+                                @Html.LabelFor(usuarioModel => usuarioModel.nombre) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.nombre, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.primerApellido) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(usuarioModel => usuarioModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.primerApellido, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.segundoApellido, new { Style = "font-size:22px" })
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.segundoApellido)
                                 @Html.TextBoxFor(usuarioModel => usuarioModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.segundoApellido, "", new { @class = "text-danger" })
                             </div>
-                        </div>
-                        <div class="form-group mt-1">
-                            <div class="form-group mt-1">
-                                @Html.LabelFor(usuarioModel => usuarioModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                <div class="input-group">
-                                    @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    <span class="input-group-text"><b>@@ucr.ac.cr</b></span>
-                                </div>
-                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.gradoAcademico) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(usuarioModel => usuarioModel.gradoAcademico, new SelectList(new List<string>
+                                {
+                                    "Doctorado - PhD",
+                                    "Maestría - MSc",
+                                    "Licenciatura - Lic",
+                                    "Bachillerato - Bach"
+                                }), "Seleccione su grado académico...", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.gradoAcademico, "", new { @class = "text-danger" })
                             </div>
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.correoAlternativo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.correoAlternativo, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.gradoAcademico, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.gradoAcademico, new SelectList(new List<string> 
-                            { 
-                                "Doctorado - PhD", 
-                                "Maestría - MSc", 
-                                "Licenciatura - Lic", 
-                                "Bachillerato - Bach" 
-                            }), "Seleccione su grado académico...", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.gradoAcademico, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="row mt-1">
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.tipoIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.DropDownListFor(usuarioModel => usuarioModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoIdentificacion, "", new { @class = "text-danger" })
                             </div>
-                            <div class="col">
-                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
                                 <small class="form-text text-muted">
@@ -102,84 +67,124 @@
                                 </small>
                             </div>
                         </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.tipoParticipante, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(
-                                     usuarioModel => usuarioModel.tipoParticipante,
-                                     new SelectList(
-                                     Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))
-                                     .Cast<webMetics.Models.TipoDeParticipantes>()
-                                     .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
-                                     "Value",
-                                     "Text"),
-                                     "Seleccione un tipo de participante...",
-                                     new { @class = "form-control" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.area, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.area, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
-                        </div>
+                    </div>
+                </section>
 
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.sede, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.DropDownListFor(usuarioModel => usuarioModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.sede, "", new { @class = "text-danger" })
+                <section class="create-participant-card" aria-labelledby="registroContactTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        <div><h2 id="registroContactTitle">Información de contacto</h2><p>Medios para comunicarnos con usted.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.correo) <span class="create-participant-required" aria-hidden="true">*</span>
+                                <div class="input-group registro-email-group">
+                                    @Html.TextBoxFor(usuarioModel => usuarioModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                    <span class="input-group-text">@@ucr.ac.cr</span>
+                                </div>
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.correo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.correoAlternativo) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.correoAlternativo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @type = "email" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.correoAlternativo, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.telefono) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.telefono, "", new { @class = "text-danger" })
+                            </div>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.carrera, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            <select id="carreraDropdown" class="form-control">
-                                <option value="">Seleccione una carrera...</option>
-                            </select>
-                            <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
-                                   maxlength="512" autocomplete="off"
-                                   placeholder="Escriba el nombre de su carrera" />
-                            <small id="carreraFormato" class="form-text text-muted d-none">
-                                Se guardará en mayúsculas y sin tildes.
-                            </small>
-                            <small id="carreraPreview" class="form-text text-muted d-none"></small>
-                            @Html.HiddenFor(usuarioModel => usuarioModel.carrera)
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.carrera, "", new { @class = "text-danger" })
+                <section class="create-participant-card" aria-labelledby="registroAcademicTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-mortarboard" aria-hidden="true"></i>
+                        <div><h2 id="registroAcademicTitle">Información institucional</h2><p>Clasificación y ubicación académica.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.tipoParticipante) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(
+                                         usuarioModel => usuarioModel.tipoParticipante,
+                                         new SelectList(
+                                         Enum.GetValues(typeof(webMetics.Models.TipoDeParticipantes))
+                                         .Cast<webMetics.Models.TipoDeParticipantes>()
+                                         .Select(e => new { Value = e, Text = EnumHelper.GetDisplayName(e) }),
+                                         "Value",
+                                         "Text"),
+                                         "Seleccione un tipo de participante...",
+                                         new { @class = "form-control" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.tipoParticipante, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.area, new { @for = "areaDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(usuarioModel => usuarioModel.area, new SelectList(ViewData["jsonDataAreas"] as List<string>), "Seleccione un área...", new { @class = "form-control", id = "areaDropdown" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.area, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.departamento, new { @for = "departamentoDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(usuarioModel => usuarioModel.departamento, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione un departamento...", new { @class = "form-control", id = "departamentoDropdown" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.departamento, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.unidadAcademica, new { @for = "seccionDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(usuarioModel => usuarioModel.unidadAcademica, new SelectList(Enumerable.Empty<SelectListItem>()), "Seleccione una unidad académica...", new { @class = "form-control", id = "seccionDropdown" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.unidadAcademica, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.sede) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(usuarioModel => usuarioModel.sede, webMetics.Controllers.ParticipanteController.GetSedes(), "Seleccione una sede y recinto...", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.sede, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.carrera, new { @for = "carreraDropdown" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                <select id="carreraDropdown" class="form-control">
+                                    <option value="">Seleccione una carrera...</option>
+                                </select>
+                                <input type="text" id="carreraPersonalizada" class="form-control mt-2 d-none"
+                                       maxlength="512" autocomplete="off"
+                                       placeholder="Escriba el nombre de su carrera" />
+                                <small id="carreraFormato" class="form-text text-muted d-none">
+                                    Se guardará en mayúsculas y sin tildes.
+                                </small>
+                                <small id="carreraPreview" class="form-text text-muted d-none"></small>
+                                @Html.HiddenFor(usuarioModel => usuarioModel.carrera)
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.carrera, "", new { @class = "text-danger" })
+                            </div>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(usuarioModel => usuarioModel.telefono, new { @class = "form-control", @maxlength = "64", @minlength = "7", @autocomplete = "off" })
-                            @Html.ValidationMessageFor(usuarioModel => usuarioModel.telefono, "", new { @class = "text-danger" })
-                        </div>
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(usuarioModel => usuarioModel.condicion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a><br/>
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Interino(a)") @Html.Label("Profesor(a) Interino(a)")<br/>
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Instructor(a)") @Html.Label("Profesor(a) Instructor(a)")<br/>
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Adjunto(a)") @Html.Label("Profesor(a) Adjunto(a)")<br />
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Catedrático(a)") @Html.Label("Profesor(a) Catedrático(a)")<br />
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Invitado(a)") @Html.Label("Profesor(a) Invitado(a)")<br />
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Asociado(a)") @Html.Label("Profesor(a) Asociado(a)")<br />
-                            @Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Otro") @Html.Label("Otro")<br />
+                <section class="create-participant-card" aria-labelledby="registroConditionTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-check" aria-hidden="true"></i>
+                        <div><h2 id="registroConditionTitle">Condición institucional</h2><p>Indique su condición actual en la institución.</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <fieldset class="create-participant-condition-fieldset">
+                            <legend>@Html.DisplayNameFor(usuarioModel => usuarioModel.condicion) <span class="create-participant-required" aria-hidden="true">*</span></legend>
+                            <div class="create-participant-condition-grid">
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Interino(a)", new { @class = "form-check-input", @id = "condicion_1" }) <span class="form-check-label">Profesor(a) Interino(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Instructor(a)", new { @class = "form-check-input", @id = "condicion_2" }) <span class="form-check-label">Profesor(a) Instructor(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Adjunto(a)", new { @class = "form-check-input", @id = "condicion_3" }) <span class="form-check-label">Profesor(a) Adjunto(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Catedrático(a)", new { @class = "form-check-input", @id = "condicion_4" }) <span class="form-check-label">Profesor(a) Catedrático(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Invitado(a)", new { @class = "form-check-input", @id = "condicion_5" }) <span class="form-check-label">Profesor(a) Invitado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Profesor(a) Asociado(a)", new { @class = "form-check-input", @id = "condicion_6" }) <span class="form-check-label">Profesor(a) Asociado(a)</span></label>
+                                <label class="form-check">@Html.RadioButtonFor(usuarioModel => usuarioModel.condicion, "Otro", new { @class = "form-check-input", @id = "condicion_7" }) <span class="form-check-label">Otro</span></label>
+                            </div>
                             @Html.ValidationMessageFor(usuarioModel => usuarioModel.condicion, "", new { @class = "text-danger" })
-                        </div>
+                        </fieldset>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
-                </div>
+                </section>
+            </div>
+
+            <div class="create-participant-actions">
+                <a href="#" class="create-participant-action-button create-participant-action-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                <input type="submit" class="create-participant-action-button create-participant-action-save" value="Crear cuenta" />
             </div>
         }
     </div>
@@ -193,6 +198,15 @@ else
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/metics-form-controls.js" asp-append-version="true"></script>
+    <script>
+        // Mismas listas desplegables del sistema (solo presentación; los selects originales siguen
+        // siendo los que se llenan por AJAX, se validan y se envían).
+        (function () {
+            var root = document.querySelector('.registro-page');
+            if (root && window.MeticsFormControls) MeticsFormControls.initSelects(root);
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {

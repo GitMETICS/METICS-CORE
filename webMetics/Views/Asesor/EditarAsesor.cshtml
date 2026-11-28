@@ -1,106 +1,80 @@
-﻿@model webMetics.Models.AsesorModel
+@model webMetics.Models.AsesorModel
 @using webMetics.Controllers
 <!--
     Vista del formulario para editar los datos de un asesor
 -->
 @{
-    ViewBag.Title = "Editar Facilitador(a)";
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    ViewBag.Title = "Editar facilitador(a)";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 }
 
-<!DOCTYPE html>
-<html lang="en">
+@if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
+{
+    <div class="contenedor-caja container-fluid create-participant-page edit-participant-page table-page-with-divider admin-panel-page edit-asesor-page">
+        @using (Html.BeginForm("ActualizarAsesor", "Asesor", new { breadcrumbOrigin = Context.Request.Query["breadcrumbOrigin"].ToString() }, FormMethod.Post, null, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+            @await Html.PartialAsync("_MeticsToast")
 
-    <style>
-        .input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
+            @Html.HiddenFor(asesorModel => asesorModel.idAsesor, new { })
 
-            .input-wrapper input {
-                padding-right: 50px;
-            }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            transform: translateY(10%);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        input::-ms-reveal,
-        input::-ms-clear {
-            display: none !important;
-        }
-    </style>
-</head>
-<body>
-    @if (ViewBag.Id != "" && (ViewBag.Role == 1 || ViewBag.Role == 2))
-    {
-        <div class="contenedor-caja container-fluid">
-            @if (urlReferrer != null)
-            {
-                <div class="d-flex justify-content-start mb-3">
-                    <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                </div>
-            }
-
-            @using (Html.BeginForm("ActualizarAsesor", "Asesor", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-                <h1>@ViewBag.Title</h1>
-                <hr />
-
-                if (ViewBag.ErrorMessage != null)
-                {
-                    <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.ErrorMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                if (ViewBag.SuccessMessage != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                        <span>@ViewBag.SuccessMessage</span>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-
-                <div class="row mb-1">
-                    <div class="col">
-                        <div class="container">
-                            <div class="form-group">
-                                @Html.HiddenFor(asesorModel => asesorModel.idAsesor, new { })
-
-                                @Html.LabelFor(asesorModel => asesorModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+            <div class="create-participant-sections">
+                <section class="create-participant-card" aria-labelledby="asesorPersonalTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i>
+                        <div><h2 id="asesorPersonalTitle">Información personal</h2><p>Datos de identificación del/la facilitador(a).</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group create-participant-full-field">
+                                @Html.LabelFor(asesorModel => asesorModel.nombre) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(asesorModel => asesorModel.nombre, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.nombre, "", new { @class = "text-danger" })
                             </div>
-                            <div class="row mt-1">
-                                <div class="col">
-                                    @Html.LabelFor(asesorModel => asesorModel.primerApellido, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col">
-                                    @Html.LabelFor(asesorModel => asesorModel.segundoApellido, new { Style = "font-size:22px" })
-                                    @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
-                                </div>
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.primerApellido) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(asesorModel => asesorModel.primerApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.primerApellido, "", new { @class = "text-danger" })
                             </div>
                             <div class="form-group">
-                                @Html.LabelFor(asesorModel => asesorModel.correo, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                                @Html.LabelFor(asesorModel => asesorModel.segundoApellido)
+                                @Html.TextBoxFor(asesorModel => asesorModel.segundoApellido, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.segundoApellido, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion) <span class="create-participant-required" aria-hidden="true">*</span>
+                                @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
+                                <small class="form-text text-muted">
+                                    Formato de cédula: 1-1100-1100 (con guiones)
+                                </small>
+                            </div>
+                            <div class="form-group create-participant-full-field">
+                                @Html.LabelFor(asesorModel => asesorModel.descripcion)
+                                @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off", @rows = "3" })
+                                @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="create-participant-card" aria-labelledby="asesorContactTitle">
+                    <header class="create-participant-card-header">
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
+                        <div><h2 id="asesorContactTitle">Información de contacto</h2><p>Medios para comunicarse con el/la facilitador(a).</p></div>
+                    </header>
+                    <div class="create-participant-card-body">
+                        <div class="create-participant-field-grid">
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.correo) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @if (ViewBag.Role == 1)
                                 {
                                     @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
@@ -109,105 +83,125 @@
                                 {
                                     @Html.TextBoxFor(asesorModel => asesorModel.correo, new { @class = "form-control", @maxlength = "64", @autocomplete = "off", @readonly = "readonly" })
                                 }
-
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.correo, "", new { @class = "text-danger" })
                             </div>
-                            <div class="row mt-1">
-                                <div class="col">
-                                    @Html.LabelFor(asesorModel => asesorModel.tipoIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.DropDownListFor(asesorModel => asesorModel.tipoIdentificacion, new SelectList(Enum.GetValues(typeof(webMetics.Models.TipoIdentificacion))), "Seleccione su tipo de identificación...", new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(asesorModel => asesorModel.tipoIdentificacion, "", new { @class = "text-danger" })
-                                </div>
-                                <div class="col">
-                                    @Html.LabelFor(usuarioModel => usuarioModel.numeroIdentificacion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                    @Html.TextBoxFor(usuarioModel => usuarioModel.numeroIdentificacion, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                    @Html.ValidationMessageFor(usuarioModel => usuarioModel.numeroIdentificacion, "", new { @class = "text-danger" })
-                                    <small class="form-text text-muted">
-                                        Formato de cédula: 1-1100-1100 (con guiones)
-                                    </small>
-                                </div>
-                            </div>
-                            <div class="form-group mt-1">
-                                @Html.LabelFor(asesorModel => asesorModel.descripcion, new { Style = "font-size:22px" })
-                                @Html.TextAreaFor(asesorModel => asesorModel.descripcion, new { @class = "form-control", @maxlength = "256", @autocomplete = "off" })
-                                @Html.ValidationMessageFor(asesorModel => asesorModel.descripcion, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="form-group mt-1">
-                                @Html.LabelFor(asesorModel => asesorModel.telefono, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
+                            <div class="form-group">
+                                @Html.LabelFor(asesorModel => asesorModel.telefono) <span class="create-participant-required" aria-hidden="true">*</span>
                                 @Html.TextBoxFor(asesorModel => asesorModel.telefono, new { @class = "form-control", @maxlength = "64", @autocomplete = "off" })
                                 @Html.ValidationMessageFor(asesorModel => asesorModel.telefono, "", new { @class = "text-danger" })
                             </div>
-                            @if (ViewBag.Role == 1) 
-                            {
-                                <div class="row mt-2">
-                                    <div class="col input-wrapper">
-                                        @Html.LabelFor(asesorModel => asesorModel.contrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                        @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
-                                            <i id="toggleIcon" class="fas fa-eye"></i>
-                                        </button>
-                                        @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
-                                    </div>
-                                    <div class="col input-wrapper">
-                                        @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                                        @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
-                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility2()">
-                                            <i id="toggleIcon2" class="fas fa-eye"></i>
-                                        </button>
-                                        @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
-                                    </div>
-                                </div>
-                            }
                         </div>
                     </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <script>
-            window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
-        </script>
-    }
+                </section>
 
-    <script>
-        function togglePasswordVisibility() {
-            var passwordInput = document.getElementById('password');
-            var toggleIcon = document.getElementById('toggleIcon');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
+                @if (ViewBag.Role == 1)
+                {
+                    <section class="create-participant-card" aria-labelledby="asesorSecurityTitle">
+                        <header class="create-participant-card-header">
+                            <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                            <div><h2 id="asesorSecurityTitle">Seguridad</h2><p>Contraseña de acceso del/la facilitador(a).</p></div>
+                        </header>
+                        <div class="create-participant-card-body">
+                            <div class="create-participant-field-grid">
+                                <div class="form-group">
+                                    @Html.LabelFor(asesorModel => asesorModel.contrasena, new { @for = "password" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                    <div class="edit-asesor-password">
+                                        @Html.PasswordFor(asesorModel => asesorModel.contrasena, new { @id = "password", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                        <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
+                                            <i id="toggleIcon" class="bi bi-eye" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.contrasena, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(asesorModel => asesorModel.confirmarContrasena, new { @for = "passwordCheck" }) <span class="create-participant-required" aria-hidden="true">*</span>
+                                    <div class="edit-asesor-password">
+                                        @Html.PasswordFor(asesorModel => asesorModel.confirmarContrasena, new { @id = "passwordCheck", @class = "form-control", @maxlength = "64", @autocomplete = "off" })
+                                        <button type="button" class="metics-password-toggle" onclick="togglePasswordVisibility2()" aria-label="Mostrar u ocultar confirmación de contraseña">
+                                            <i id="toggleIcon2" class="bi bi-eye" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    @Html.ValidationMessageFor(asesorModel => asesorModel.confirmarContrasena, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                }
+            </div>
+
+            <div class="create-participant-actions">
+                <a href="#" class="create-participant-action-button create-participant-action-cancel" onclick="history.go(-1); return false;">Cancelar</a>
+                <input type="submit" class="create-participant-action-button create-participant-action-save" value="Guardar" />
+            </div>
         }
-    </script>
+    </div>
+}
+else
+{
     <script>
-        function togglePasswordVisibility2() {
-            var passwordInput = document.getElementById('passwordCheck');
-            var toggleIcon = document.getElementById('toggleIcon2');
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
+        window.location.href = '@Url.Action("CerrarSesion", "Usuario")';
     </script>
-</body>
-</html>
+}
+
+<style>
+    .edit-asesor-password { position: relative; }
+    .edit-asesor-password .form-control { padding-right: var(--metics-space-12); }
+    .edit-asesor-password-toggle {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        border-radius: var(--metics-radius-sm);
+        color: var(--metics-ink-muted-alt);
+        display: inline-flex;
+        height: var(--metics-icon-button-sm);
+        justify-content: center;
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: var(--metics-icon-button-sm);
+    }
+    .edit-asesor-password-toggle:hover,
+    .edit-asesor-password-toggle:focus-visible { background: var(--metics-icon-surface); color: var(--metics-interactive-blue); }
+    .edit-asesor-page input::-ms-reveal,
+    .edit-asesor-page input::-ms-clear { display: none !important; }
+</style>
+
+<script>
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById('password');
+        var toggleIcon = document.getElementById('toggleIcon');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove('bi-eye');
+            toggleIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove('bi-eye-slash');
+            toggleIcon.classList.add('bi-eye');
+        }
+    }
+</script>
+<script>
+    function togglePasswordVisibility2() {
+        var passwordInput = document.getElementById('passwordCheck');
+        var toggleIcon = document.getElementById('toggleIcon2');
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleIcon.classList.remove('bi-eye');
+            toggleIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = "password";
+            toggleIcon.classList.remove('bi-eye-slash');
+            toggleIcon.classList.add('bi-eye');
+        }
+    }
+</script>
+<script src="~/js/metics-form-controls.js" asp-append-version="true"></script>
+<script>
+    // Misma lista desplegable que el resto del sistema (solo presentación).
+    (function () {
+        var root = document.querySelector('.edit-asesor-page');
+        if (root && window.MeticsFormControls) MeticsFormControls.initSelects(root);
+    })();
+</script>

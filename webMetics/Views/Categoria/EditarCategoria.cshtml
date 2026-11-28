@@ -1,71 +1,49 @@
-﻿@model webMetics.Models.CategoriaModel
+@model webMetics.Models.CategoriaModel
 @using webMetics.Controllers
 @{
-    ViewBag.Title = "Editar Nivel";
+    ViewBag.Title = "Editar nivel";
+    PageHeadingBuilder.Configure(ViewContext, Url);
 
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
 }
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" onclick="history.go(-1); return false;" href="#">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
+    <div class="contenedor-caja container-fluid required-update-page admin-panel-page category-form-page">
         @using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
-            <h1>@ViewBag.Title</h1>
-            <hr />
+            <h1 metics-page-heading>@ViewBag.Title</h1>
+            <hr metics-page-heading />
 
-            if (ViewBag.ErrorMessage != null)
-            {
-                <div class="alert alert-dark alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.ErrorMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-            if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show mx-2" role="alert">
-                    <span>@ViewBag.SuccessMessage</span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
+            @await Html.PartialAsync("_MeticsToast")
 
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="container">
-                        <div class="form-group mt-1">
-                            @Html.HiddenFor(categoriaModel => categoriaModel.idCategoria)
-
-                            @Html.LabelFor(temaModel => temaModel.nombre, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64" })
-                            @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="form-group mt-1">
-                            @Html.LabelFor(temaModel => temaModel.descripcion, new { Style = "font-size:22px" }) <a style="color:red;font-size:22px">*</a>
-                            @Html.TextAreaFor(temaModel => temaModel.descripcion, new { @class = "form-control", @maxlength = "256" })
-                            @Html.ValidationMessageFor(temaModel => temaModel.descripcion, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="row justify-content-center m-4">
-                        <div class="col-auto">
-                            <a href="#" class="btn btn-secondary btn-block" onclick="history.go(-1); return false;">Cancelar</a>
-                        </div>
-                        <div class="col-auto">
-                            <input type="submit" class="btn btn-primary btn-block" value="Guardar" />
-                        </div>
+            <section class="admin-panel-card required-update-card" aria-labelledby="formularioTitulo">
+                <div class="required-update-header">
+                    <span class="admin-panel-card-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+                    <div>
+                        <h2 class="required-update-title" id="formularioTitulo">Editar nivel</h2>
+                        <p class="admin-panel-card-desc">Actualice el nombre y la descripción del nivel.</p>
                     </div>
                 </div>
-            </div>
+                @Html.HiddenFor(categoriaModel => categoriaModel.idCategoria)
+
+                <div class="form-group create-category-field required-update-field">
+                    @Html.LabelFor(temaModel => temaModel.nombre) <span class="required-update-required" aria-hidden="true">*</span>
+                    @Html.TextBoxFor(temaModel => temaModel.nombre, new { @class = "form-control", @maxlength = "64" })
+                    @Html.ValidationMessageFor(temaModel => temaModel.nombre, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group create-category-field required-update-field">
+                    @Html.LabelFor(temaModel => temaModel.descripcion) <span class="required-update-required" aria-hidden="true">*</span>
+                    @Html.TextAreaFor(temaModel => temaModel.descripcion, new { @class = "form-control", @maxlength = "256" })
+                    @Html.ValidationMessageFor(temaModel => temaModel.descripcion, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="category-form-actions">
+                    <a href="#" class="btn admin-panel-btn-secondary" onclick="history.go(-1); return false;">Cancelar</a>
+                    <input type="submit" class="btn admin-panel-btn-primary" value="Guardar" />
+                </div>
+            </section>
         }
     </div>
 }

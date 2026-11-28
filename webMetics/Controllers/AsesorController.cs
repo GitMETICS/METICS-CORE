@@ -229,42 +229,65 @@ namespace webMetics.Controllers
         /// Role required: Admin (1).
         /// </remarks>
         [HttpPost]
-        public ActionResult AgregarAsesor(AsesorModel asesor)
+        public ActionResult AgregarAsesor(AsesorModel asesor, bool returnToList = false)
         {
             ViewBag.Role = GetRole();
             ViewBag.Id = GetId();
 
             try
             {
+                bool usuarioExiste = !string.IsNullOrWhiteSpace(asesor.correo)
+                    && accesoAUsuario.ExisteUsuario(asesor.correo);
+
+                if (!usuarioExiste)
+                {
+                    if (string.IsNullOrWhiteSpace(asesor.contrasena))
+                    {
+                        ModelState.AddModelError(nameof(asesor.contrasena), "La contraseña temporal es obligatoria.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(asesor.confirmarContrasena))
+                    {
+                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Confirme la contraseña temporal.");
+                    }
+                    else if (!string.IsNullOrWhiteSpace(asesor.contrasena)
+                        && asesor.contrasena != asesor.confirmarContrasena)
+                    {
+                        ModelState.AddModelError(nameof(asesor.contrasena), "Las contraseñas ingresadas deben coincidir.");
+                        ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Las contraseñas ingresadas deben coincidir.");
+                    }
+                }
+
                 if (ModelState.IsValid)
                 {
                     // Aquí se define que el correo es la identificación.
                     asesor.idAsesor = asesor.correo;
 
-                    if (!accesoAUsuario.ExisteUsuario(asesor.idAsesor))
+                    if (!usuarioExiste)
                     {
-                        if (!string.IsNullOrEmpty(asesor.contrasena) && asesor.contrasena == asesor.confirmarContrasena)
-                        {
-                            accesoAUsuario.CrearUsuario(asesor.idAsesor, asesor.contrasena);
-                        }
-                        else
-                        {
-                            ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
-                            ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
-                            return View("CrearAsesor", asesor);
-                        }
+                        accesoAUsuario.CrearUsuario(asesor.idAsesor, asesor.contrasena!);
                     }
 
                     if (!accesoAAsesor.ExisteAsesor(asesor.idAsesor))
                     {
                         accesoAAsesor.CrearAsesor(asesor);
 
-                        TempData["successMessage"] = "El/la facilitador(a) se agregó con éxito.";
+                        TempData["successMessage"] = usuarioExiste
+                            ? "El/la facilitador(a) se agregó con éxito. La cuenta ya existía y se conserva su contraseña actual."
+                            : "El/la facilitador(a) se agregó con éxito.";
                         return RedirectToAction("ListaAsesores");
 
                     }
                     else
                     {
+                        if (returnToList)
+                        {
+                            ModelState.AddModelError(nameof(asesor.correo), "Ya existe un(a) facilitador(a) con los mismos datos.");
+                            ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                            ViewBag.OpenCreateAsesorModal = true;
+                            return View("ListaAsesores", asesor);
+                        }
+
                         TempData["errorMessage"] = "Ya existe un(a) facilitador(a) con los mismos datos.";
                         return RedirectToAction("ListaAsesores");
                     }
@@ -273,12 +296,27 @@ namespace webMetics.Controllers
                 else
                 {
                     // Si el formulario no es válido o hubo algún problema, regresar a la vista del formulario
+                    if (returnToList)
+                    {
+                        ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                        ViewBag.OpenCreateAsesorModal = true;
+                        return View("ListaAsesores", asesor);
+                    }
+
                     ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                     return View("CrearAsesor", asesor);
                 }
             }
             catch (Exception)
             {
+                if (returnToList)
+                {
+                    ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                    ViewBag.ErrorMessage = "Ocurrió un error al crear el/la facilitador(a).";
+                    ViewBag.OpenCreateAsesorModal = true;
+                    return View("ListaAsesores", asesor);
+                }
+
                 TempData["errorMessage"] = "Ocurrió un error crear el/la facilitador(a).";
                 return RedirectToAction("ListaAsesores");
             }
@@ -332,13 +370,20 @@ namespace webMetics.Controllers
         /// Role required: Admin (1) o el propio Asesor (2).
         /// </remarks>
         [HttpPost]
-        public ActionResult ActualizarAsesor(AsesorModel asesor)
+        public ActionResult ActualizarAsesor(AsesorModel asesor, bool returnToList = false)
         {
             ViewBag.Id = GetId();
             ViewBag.Role = GetRole();
 
             if (!ModelState.IsValid)
             {
+                if (returnToList && GetRole() == 1)
+                {
+                    ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                    ViewBag.OpenEditAsesorModal = true;
+                    return View("ListaAsesores", asesor);
+                }
+
                 ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                 return View("EditarAsesor", asesor);
             }
@@ -369,7 +414,14 @@ namespace webMetics.Controllers
                         }
                         else
                         {
-                            ViewBag.ErrorMessage = "Las contraseñas ingresadas deben coincidir.";
+                            ModelState.AddModelError(nameof(asesor.confirmarContrasena), "Las contraseñas ingresadas deben coincidir.");
+
+                            if (returnToList && GetRole() == 1)
+                            {
+                                ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                                ViewBag.OpenEditAsesorModal = true;
+                                return View("ListaAsesores", asesor);
+                            }
 
                             ViewData["Temas"] = accesoATema.ObtenerListaSeleccionTemas();
                             return View("EditarAsesor", asesor);
@@ -410,6 +462,14 @@ namespace webMetics.Controllers
                 }
                 catch
                 {
+                    if (returnToList && GetRole() == 1)
+                    {
+                        ViewBag.Asesores = accesoAAsesor.ObtenerAsesores();
+                        ViewBag.ErrorMessage = "Ocurrió un error al editar los datos del/la facilitador(a).";
+                        ViewBag.OpenEditAsesorModal = true;
+                        return View("ListaAsesores", asesor);
+                    }
+
                     TempData["errorMessage"] = "Ocurrió un error al editar los datos del/la facilitador(a).";
                 }
 

@@ -1,0 +1,61 @@
+@*
+    Menú lateral del panel de administración.
+    Solo agrupa enlaces a las pantallas existentes; no cambia rutas, acciones ni permisos.
+*@
+@{
+    // Prefijo de ids: permite reutilizar este mismo menú en el menú lateral y en el drawer móvil sin repetir ids.
+    string panelIdPrefijo = Convert.ToString(ViewData["AdminPanelNavIdPrefix"]) ?? "";
+    if (string.IsNullOrWhiteSpace(panelIdPrefijo)) panelIdPrefijo = "adminPanelNav";
+    string panelController = (Convert.ToString(ViewContext.RouteData.Values["controller"]) ?? "").ToLowerInvariant();
+    string panelAction = (Convert.ToString(ViewContext.RouteData.Values["action"]) ?? "").ToLowerInvariant();
+    string panelActiva = panelController == "emailsettings" ? "correo"
+        : panelAction == "cambiarcontrasena" ? "contrasena"
+        : panelAction.StartsWith("verbitacora", StringComparison.Ordinal) ? "accesos"
+        : "resumen";
+
+    var panelGrupos = new[]
+    {
+        (Titulo: "General", Secciones: new[]
+        {
+            (Clave: "resumen", Texto: "Resumen", Icono: "bi-grid", Enlace: Url.Action("InformacionPersonal", "Usuario")),
+            (Clave: "contrasena", Texto: "Cambiar contraseña", Icono: "bi-key", Enlace: Url.Action("CambiarContrasena", "Usuario"))
+        }),
+        (Titulo: "Configuración", Secciones: new[]
+        {
+            (Clave: "correo", Texto: "Configuración del correo", Icono: "bi-envelope", Enlace: Url.Action("Index", "EmailSettings"))
+        }),
+        (Titulo: "Auditoría", Secciones: new[]
+        {
+            (Clave: "accesos", Texto: "Registro de accesos", Icono: "bi-clock-history", Enlace: Url.Action("VerBitacoraAccesos", "Usuario"))
+        })
+    };
+}
+
+<nav class="admin-panel-nav" aria-labelledby="@(panelIdPrefijo)Titulo">
+    <div class="admin-panel-nav-header">
+        <i class="bi bi-gear" aria-hidden="true"></i>
+        <span id="@(panelIdPrefijo)Titulo">Panel de administración</span>
+    </div>
+    <div class="admin-panel-nav-groups">
+        @for (int indiceGrupo = 0; indiceGrupo < panelGrupos.Length; indiceGrupo++)
+        {
+            var grupo = panelGrupos[indiceGrupo];
+            string idGrupo = panelIdPrefijo + "Grupo" + indiceGrupo;
+            <div class="admin-panel-nav-group">
+                <p class="admin-panel-nav-group-title" id="@idGrupo">@grupo.Titulo</p>
+                <ul class="admin-panel-nav-list" aria-labelledby="@idGrupo">
+                    @foreach (var seccion in grupo.Secciones)
+                    {
+                        bool esActiva = seccion.Clave == panelActiva;
+                        <li>
+                            <a class="admin-panel-nav-link @(esActiva ? "is-active" : "")" href="@seccion.Enlace" aria-current="@(esActiva ? "page" : null)">
+                                <i class="bi @seccion.Icono" aria-hidden="true"></i>
+                                <span>@seccion.Texto</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</nav>

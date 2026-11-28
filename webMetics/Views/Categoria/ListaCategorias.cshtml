@@ -1,57 +1,48 @@
+@model webMetics.Models.CategoriaModel
 @using webMetics.Controllers
 @{
     ViewBag.Title = "Niveles";
-
-    var urlReferrer = Context.Request.Headers["Referer"].FirstOrDefault();
+    PageHeadingBuilder.Configure(ViewContext, Url);
 }
+
 
 @if (ViewBag.Id != "" && ViewBag.Role == 1)
 {
-    <div class="contenedor-caja container-fluid">
-        @if (urlReferrer != null)
-        {
-            <div class="d-flex justify-content-start mb-3">
-                <a class="text-dark fs-4" href="@Url.Action("ListaGruposDisponibles", "Grupo")">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-            </div>
-        }
-
-        <h1>@ViewBag.Title</h1>
-        <hr />
-
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-dark alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                @ViewBag.SuccessMessage
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        }
+    <div class="contenedor-caja container-fluid category-list-page table-page-with-divider">
+        <h1 metics-page-heading>@ViewBag.Title</h1>
+        <hr metics-page-heading />
+        @await Html.PartialAsync("_MeticsToast")
 
         @if (ViewBag.Categorias == null)
         {
             <h5 class="text-center mb-4">No hay categorías.</h5>
             <div class="text-center">
-                @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg" })
+                <button type="button" class="btn table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearCategoria">Crear nivel</button>
             </div>
         }
         else
         {
             <div class="table-card">
                 <div class="table-card-header">
-                    <span class="table-card-title">Niveles</span>
-                    <span class="table-card-desc">Listado de niveles registrados en el sistema</span>
+                    <div class="table-card-heading">
+                        <span class="table-card-title">Niveles registrados</span>
+                        <span class="table-card-desc">Listado de niveles registrados en el sistema.</span>
+                    </div>
+                    <div class="table-card-header-actions">
+                        <span class="table-card-count" id="categoriaCount" data-singular="nivel encontrado" data-plural="niveles encontrados" aria-live="polite">@ViewBag.Categorias.Count niveles encontrados</span>
+                        <button type="button" class="table-card-action bi bi-plus-lg" data-bs-toggle="modal" data-bs-target="#modalCrearCategoria">Crear nivel</button>
+                    </div>
                 </div>
 
                 <div class="table-toolbar">
                     <div class="table-toolbar-group">
+                        <div class="table-search">
+                            <div class="table-search-field">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                <input type="search" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" aria-label="Buscar nivel" />
+                            </div>
+                        </div>
+
                         <div class="table-pagesize">
                             <label for="categoriaPageSize">Mostrar</label>
                             <select id="categoriaPageSize">
@@ -62,26 +53,17 @@
                             </select>
                             <label for="categoriaPageSize">registros</label>
                         </div>
-
-                        <div class="table-search">
-                            <input type="text" id="categoriaBusqueda" class="form-control" placeholder="Buscar nivel" />
-                            <button type="button" class="btn"><i class="bi bi-search"></i></button>
-                        </div>
-                    </div>
-
-                    <div>
-                        @Html.ActionLink("  Crear Nivel", "CrearCategoria", "Categoria", new { }, new { @class = "btn btn-primary bi bi-plus-lg btn-table-sm" })
                     </div>
                 </div>
 
                 <div class="table-scroll">
-                    <table id="categoriaTblCustomers" class="data-table" style="min-width: 700px;">
+                    <table id="categoriaTblCustomers" class="data-table" style="min-width: 760px;">
                         <thead>
                             <tr>
-                                <th scope="col" style="width: 30%;">Nombre</th>
-                                <th scope="col" style="width: 60%;">Descripción</th>
-                                <th scope="col" class="text-center" style="width: 5%;">Editar</th>
-                                <th scope="col" class="text-center" style="width: 5%;">Eliminar</th>
+                                <th scope="col" style="width: 29%;">Nombre</th>
+                                <th scope="col" style="width: 51%;">Descripción</th>
+                                <th scope="col" class="text-center" style="width: 10%;">Editar</th>
+                                <th scope="col" class="text-center" style="width: 10%;">Eliminar</th>
                             </tr>
                         </thead>
 
@@ -92,7 +74,14 @@
                                     <td>@categoria.nombre</td>
                                     <td>@categoria.descripcion</td>
                                     <td class="text-center">
-                                        @Html.ActionLink("", "EditarCategoria", "Categoria", new { idCategoria = categoria.idCategoria }, new { @class = "icon-action icon-edit bi bi-pencil-square", @title = "Editar" })
+                                        <button type="button"
+                                                class="icon-action icon-edit bi bi-pencil-square"
+                                                title="Editar"
+                                                aria-label="Editar @categoria.nombre"
+                                                data-category-id="@categoria.idCategoria"
+                                                data-category-name="@categoria.nombre"
+                                                data-category-description="@categoria.descripcion"
+                                                onclick="abrirModalEditarCategoria(this)"></button>
                                     </td>
                                     <td class="text-center">
                                         <a href="#" onclick="actualizarModalEliminar('@categoria.idCategoria'); return false;" class="icon-action icon-delete bi bi-trash" title="Eliminar"></a>
@@ -103,30 +92,98 @@
                     </table>
                 </div>
 
-                <div id="categoriaTblPaginacion" class="table-pagination"></div>
+                <div class="table-card-footer">
+                    <div id="categoriaTblPaginacion" class="table-pagination"></div>
+                </div>
             </div>
         }
     </div>
 
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal fade create-category-modal" id="modalCrearCategoria" tabindex="-1" aria-labelledby="modalCrearCategoriaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar categoría</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro de que desea eliminar esta categoría?
-                    <br />
-                    @using (Html.BeginForm("EliminarCategoria", "Categoria"))
-                    {
-                        <div class="modal-footer">
-                            <input type="hidden" id="idCategoria" name="idCategoria">
-                            <input type="submit" class="btn btn-danger" value="Aceptar" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                @using (Html.BeginForm("CrearCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-layers"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalCrearCategoriaLabel">Crear nivel</h2>
+                            <p>Complete la información para registrar un nuevo nivel.</p>
                         </div>
-                    }
-                </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        @await Html.PartialAsync("_CategoriaFormFields", Model ?? new webMetics.Models.CategoriaModel())
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar nivel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal" id="modalEditarCategoria" tabindex="-1" aria-labelledby="modalEditarCategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("EditarCategoria", "Categoria", FormMethod.Post, new { enctype = "multipart/form-data", @class = "inline-required-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="idCategoria" id="editarCategoriaId" value="@(Model?.idCategoria ?? 0)" />
+                    <input type="hidden" name="returnToList" value="true" />
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEditarCategoriaLabel">Editar nivel</h2>
+                            <p>Actualiza la información de este nivel.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body">
+                        <div class="form-group create-category-field">
+                            @Html.Label("nombre", "Nombre", new { @for = "editarCategoriaNombre" })
+                            <span class="create-category-required" aria-hidden="true">*</span>
+                            @Html.TextBox("nombre", Model?.nombre, new { @class = "form-control", id = "editarCategoriaNombre", maxlength = "64", autocomplete = "off", required = "required" })
+                            @Html.ValidationMessage("nombre", "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group create-category-field">
+                            @Html.Label("descripcion", "Descripción", new { @for = "editarCategoriaDescripcion" })
+                            <span class="create-category-required" aria-hidden="true">*</span>
+                            @Html.TextArea("descripcion", Model?.descripcion, new { @class = "form-control", id = "editarCategoriaDescripcion", rows = "3", maxlength = "256", required = "required" })
+                            @Html.ValidationMessage("descripcion", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary create-category-save">Guardar cambios</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade create-category-modal category-delete-modal" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @using (Html.BeginForm("EliminarCategoria", "Categoria"))
+                {
+                    <div class="modal-header create-category-modal-header">
+                        <div class="create-category-modal-icon" aria-hidden="true"><i class="bi bi-trash3"></i></div>
+                        <div class="create-category-modal-heading">
+                            <h2 class="modal-title" id="modalEliminarLabel">Eliminar nivel</h2>
+                            <p>Confirme si desea quitar este nivel del sistema.</p>
+                        </div>
+                    </div>
+                    <div class="modal-body create-category-modal-body category-delete-message">
+                        ¿Está seguro de que desea eliminar este nivel? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer create-category-modal-actions">
+                        <input type="hidden" id="idCategoria" name="idCategoria">
+                        <button type="button" class="btn create-category-cancel" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn category-delete-confirm">Eliminar nivel</button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -139,10 +196,59 @@ else
 }
 
 <script type="text/javascript">
+    function clearCategoriaModalFeedback(modalId) {
+        var modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(function (field) {
+            if (field.tagName === 'SELECT') field.selectedIndex = 0;
+            else field.value = '';
+            field.classList.remove('input-validation-error');
+        });
+        modal.querySelectorAll('[data-valmsg-for]').forEach(function (message) {
+            message.textContent = '';
+            message.classList.remove('field-validation-error');
+            message.classList.add('field-validation-valid');
+        });
+    }
+
     function actualizarModalEliminar(idCategoria) {
         document.getElementById("idCategoria").value = idCategoria;
         var deleteModal = new bootstrap.Modal(document.getElementById('modalEliminar'));
         deleteModal.show();
+    }
+
+    function abrirModalEditarCategoria(button) {
+        document.getElementById('editarCategoriaId').value = button.dataset.categoryId || '';
+        document.getElementById('editarCategoriaNombre').value = button.dataset.categoryName || '';
+        document.getElementById('editarCategoriaDescripcion').value = button.dataset.categoryDescription || '';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEditarCategoria')).show();
+    }
+
+    @if (ViewBag.OpenCreateCategoriaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var createModalElement = document.getElementById('modalCrearCategoria');
+                if (createModalElement) {
+                    clearCategoriaModalFeedback('modalEditarCategoria');
+                    bootstrap.Modal.getOrCreateInstance(createModalElement).show();
+                }
+            });
+        </text>
+    }
+
+    @if (ViewBag.OpenEditCategoriaModal == true)
+    {
+        <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                var editModalElement = document.getElementById('modalEditarCategoria');
+                if (editModalElement) {
+                    clearCategoriaModalFeedback('modalCrearCategoria');
+                    bootstrap.Modal.getOrCreateInstance(editModalElement).show();
+                }
+            });
+        </text>
     }
 
     MeticsTable.init({
@@ -151,6 +257,7 @@ else
         paginationId: 'categoriaTblPaginacion',
         searching: true,
         searchInputId: 'categoriaBusqueda',
+        countId: 'categoriaCount',
         pageLength: 50
     });
 </script>
